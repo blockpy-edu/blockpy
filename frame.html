@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="blockly-master/blockly_compressed.js"></script>
+    <script type="text/javascript" src="blockly-master/blocks_compressed.js"></script>
+    <script type="text/javascript" src="blockly-master/javascript_compressed.js"></script>
+    <script type="text/javascript" src="blockly-master/python_compressed.js"></script>
+    <script type="text/javascript" src="blockly-master/msg/js/en.js"></script>
+    <style>
+      html, body {
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+      }
+      .blocklySvg {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <script>
+    function init() {
+        Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dictionary with"
+        Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "Create a new dictionary"
+        Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = ""
+        Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Key-value pairs"
+        Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "**"
+        Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key-value"
+        Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "Make a new key-value pair"
+        Blockly.Blocks['get_temperature'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendValueInput("city")
+                .appendTitle("get temperature for ")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "Number");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['get_forecasts'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendValueInput("city")
+                .appendTitle("get forecasts for ")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "Array");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['get_weather'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendValueInput("city")
+                .appendTitle("get weather for ")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "dict");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['get_forecasted_temperature'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendValueInput("city")
+                .appendTitle("get forecasted temperatures for ")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "Array");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['simple_pair'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendDummyInput()
+                .appendTitle('pair')
+                .appendTitle(new Blockly.FieldTextInput("key"), "key");
+            this.appendValueInput("value")
+                .appendTitle("with")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "pair");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['pair'] = {
+          init: function() {
+            this.setHelpUrl('http://www.example.com/');
+            this.setColour(330);
+            this.appendValueInput("key")
+                .setCheck(null)
+                .appendTitle("pair")
+            this.appendValueInput("value")
+                .appendTitle("with")
+                .setCheck(null);
+            this.setInputsInline(true);
+            this.setOutput(true, "pair");
+            this.setTooltip('');
+          }
+        };
+        Blockly.Blocks['dicts_create_with_container'] = {
+          // Container.
+          init: function() {
+            this.setColour(260);
+            this.appendDummyInput()
+                .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD);
+            this.appendStatementInput('STACK');
+            this.setTooltip(Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP);
+            this.contextMenu = false;
+          }
+        };
+
+        Blockly.Blocks['dicts_create_with_item'] = {
+          // Add items.
+          init: function() {
+            this.setColour(260);
+            this.appendDummyInput()
+                .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE);
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.setTooltip(Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP);
+            this.contextMenu = false;
+          }
+        };
+        Blockly.Blocks['dicts_create_with'] = {
+            init: function() {
+                this.setColour(260);
+                this.appendValueInput('ADD0')
+                    .setCheck('pair')
+                    .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
+                this.appendValueInput('ADD1')
+                    .setCheck('pair');
+                this.appendValueInput('ADD2')
+                    .setCheck('pair');
+                this.setOutput(true, 'dict');
+                this.setMutator(new Blockly.Mutator(['dicts_create_with_item']));
+                this.setTooltip(Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP);
+                this.itemCount_ = 3;
+            },
+            mutationToDom: function(workspace) {
+                var container = document.createElement('mutation');
+                container.setAttribute('items', this.itemCount_);
+                return container;
+            },
+            domToMutation: function(container) {
+                for (var x = 0; x < this.itemCount_; x++) {
+                  this.removeInput('ADD' + x);
+                }
+                this.itemCount_ = parseInt(container.getAttribute('items'), 10);
+                for (var x = 0; x < this.itemCount_; x++) {
+                  var input = this.appendValueInput('ADD' + x).setCheck('pair');
+                  if (x == 0) {
+                    input.appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
+                  }
+                }
+                if (this.itemCount_ == 0) {
+                  this.appendDummyInput('EMPTY')
+                      .appendTitle(Blockly.Msg.DICTS_CREATE_EMPTY_TITLE);
+                }
+            },
+            decompose: function(workspace) {
+                var containerBlock = new Blockly.Block(workspace,
+                                                       'dicts_create_with_container');
+                containerBlock.initSvg();
+                var connection = containerBlock.getInput('STACK').connection;
+                for (var x = 0; x < this.itemCount_; x++) {
+                  var itemBlock = new Blockly.Block(workspace, 'dicts_create_with_item');
+                  itemBlock.initSvg();
+                  connection.connect(itemBlock.previousConnection);
+                  connection = itemBlock.nextConnection;
+                }
+                return containerBlock;
+            },
+            compose: function(containerBlock) {
+                // Disconnect all input blocks and remove all inputs.
+                if (this.itemCount_ == 0) {
+                  this.removeInput('EMPTY');
+                } else {
+                  for (var x = this.itemCount_ - 1; x >= 0; x--) {
+                    this.removeInput('ADD' + x);
+                  }
+                }
+                this.itemCount_ = 0;
+                // Rebuild the block's inputs.
+                var itemBlock = containerBlock.getInputTargetBlock('STACK');
+                while (itemBlock) {
+                  var input = this.appendValueInput('ADD' + this.itemCount_);
+                  if (this.itemCount_ == 0) {
+                    input.appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
+                  }
+                  // Reconnect any child blocks.
+                  if (itemBlock.valueConnection_) {
+                    input.connection.connect(itemBlock.valueConnection_);
+                  }
+                  this.itemCount_++;
+                  itemBlock = itemBlock.nextConnection &&
+                      itemBlock.nextConnection.targetBlock();
+                }
+                if (this.itemCount_ == 0) {
+                  this.appendDummyInput('EMPTY')
+                      .appendTitle(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE);
+                }
+            },
+            saveConnections: function(containerBlock) {
+                // Store a pointer to any connected child blocks.
+                var itemBlock = containerBlock.getInputTargetBlock('STACK');
+                var x = 0;
+                while (itemBlock) {
+                  var input = this.getInput('ADD' + x);
+                  itemBlock.valueConnection_ = input && input.connection.targetConnection;
+                  x++;
+                  itemBlock = itemBlock.nextConnection &&
+                      itemBlock.nextConnection.targetBlock();
+                }
+            }
+        };
+
+        Blockly.Python['dicts_create_with'] = function(block) {
+          var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.Python.ORDER_ATOMIC);
+          // TODO: Assemble Python into code variable.
+          var code = 'dict()';
+          // TODO: Change ORDER_NONE to the correct strength.
+          return [code, Blockly.Python.ORDER_NONE];
+        };
+        parent.jQuery(document).ready(function() {
+            Blockly.inject(document.body,
+                {path: 'blockly-master/', toolbox: document.getElementById('toolbox')});
+            // Let the top-level application know that Blockly is ready.
+            window.parent.blocklyLoaded(Blockly);
+        });
+    }
+    </script>
+  </head>
+  <body onload="init()">
+    <button>Test</button>
+    <xml id="toolbox" style="display: none">
+        <category name="Decisions">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+        </category>
+        <category name="Manipulation">
+            <block type="variables_set"></block>
+            <block type="variables_get"></block>
+        </category>
+        <category name="Iteration">
+            <block type="controls_forEach"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+                <value name="TO">
+                  <block type="math_number">
+                    <field name="NUM">10</field>
+                  </block>
+                </value>
+              </block>
+        </category>
+        <category name="Calculation">
+            <block type="math_arithmetic"></block>
+            <block type="text_print"></block>
+        </category>
+        <category name="Data - Numbers and Strings">
+            <block type="text"></block>
+            <block type="math_number"></block>
+        </category>
+        <category name="Data - Lists and Dictionaries">
+            <block type="dicts_create_with"></block>
+            <block type="lists_create_with"></block>
+            <block type="pair"></block>
+            <block type="simple_pair"></block>
+        </category>
+        <category name="Data - Weather">
+            <block type="get_temperature">
+                <value name="city">
+                  <block type="text">
+                    <field name="city">Blacksburg, VA</field>
+                  </block>
+                </value>
+            </block>
+            <block type="get_weather"></block>
+            <block type="get_forecasted_temperature"></block>
+            <block type="get_forecasts"></block>
+        </category>
+    </xml>
+  </body>
+</html>

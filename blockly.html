@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Demo: Iframe Blockly</title>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border-style: solid;
+      border-color: #ddd;
+      border-width: 0 1px 1px 0;
+    }
+  </style>
+  <script src="jquery.js"></script>
+</head>
+<body>
+  <table width="100%" height="99%">
+    <tr>
+      <td>
+        <h1>CORGIS Blockly &gt;
+
+      </td>
+      <td width="50%">
+        
+      </td>
+    </tr>
+    <tr>
+      <td height="99%">
+        <script>
+          waitQueue = [];
+          function buildIptUrl(code, instruction) {
+            console.log( encodeURI(code));
+            return "http://localhost:8080/iframe-embed.html#&code=" + encodeURIComponent(code) + "&py=2&cumulative=false&curInstr=0";
+          }
+          function update_delay() {
+            if (waitQueue.length <= 1) {
+                $("#ipt-td").html();
+                var code = window.Blockly.Python.workspaceToCode();
+                $("#python-output").html(code);
+                //$("#ipt-td").html('<iframe id="ipt" frameborder="0" src="'+buildIptUrl(code)+'"></iframe>');
+            }
+            waitQueue.pop();
+          }
+          $(document).on("update_blockly", function() {
+            waitQueue.push(1);
+            window.setTimeout(update_delay, 0000);
+          });
+          function blocklyLoaded(blockly) {
+            // Called once Blockly is fully loaded.
+            window.Blockly = blockly;
+            blockly.addChangeListener(function () {
+                $(document).trigger("update_blockly");
+            });
+          }
+          $(document).ready(function() {
+            console.log("Hello");
+            //$("#ipt").attr("src", "http://localhost:8080/iframe-embed.html#&code=print+7&py=2&cumulative=false&curInstr=0");
+          });
+        </script>
+        <iframe src="frame.html"></iframe>
+      </td>
+      <td>
+        <pre id="python-output">
+        </pre>
+      </td>
+      <!--<td id="ipt-td">
+        <iframe id="ipt" frameborder="0"
+                src="http://localhost:8080/iframe-embed.html#&code=print+3&py=2&cumulative=false&curInstr=0">
+        </iframe>
+      </td>-->
+    </tr>
+  </table>
+
+</body>
+</html>
