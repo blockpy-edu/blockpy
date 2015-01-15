@@ -2,11 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script type="text/javascript" src="blockly-master/blockly_compressed.js"></script>
+    <script type="text/javascript" src="blockly-master/blockly_uncompressed.js"></script>
     <script type="text/javascript" src="blockly-master/blocks_compressed.js"></script>
     <script type="text/javascript" src="blockly-master/javascript_compressed.js"></script>
     <script type="text/javascript" src="blockly-master/python_compressed.js"></script>
     <script type="text/javascript" src="blockly-master/msg/js/en.js"></script>
+    
     <style>
       html, body {
         background-color: #fff;
@@ -20,93 +21,36 @@
         width: 100%;
       }
     </style>
+    
+    <script src='weather.js'></script>
+    
     <script>
     function init() {
-        Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dictionary with"
+        
+        function align(){
+            var blocks = Blockly.getMainWorkspace().getTopBlocks();
+            var y = 0;
+            for (var i = 0; i < blocks.length; i++){
+                //blocks[i].moveTo(Blockly.Toolbox.width+20, y);
+                blocks[i].moveTo(0, y);
+                y += blocks[i].getHeightWidth().height;
+                y += 20; // buffer
+            }
+        }
+        
+        Blockly.Msg.TYPE_CHECK = "check type of"
+        Blockly.Msg.DICT_KEYS = "get all keys of "
+        Blockly.Msg.DICT_GET = "get value of key"
+        Blockly.Msg.DICT_GET_TO = "from"
+        Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "dict of"
         Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "Create a new dictionary"
-        Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = ""
-        Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Key-value pairs"
+        Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "Create empty dict"
+        Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "key-value pairs"
         Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "**"
         Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key-value"
         Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "Make a new key-value pair"
-        Blockly.Blocks['get_temperature'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendValueInput("city")
-                .appendTitle("get temperature for ")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "Number");
-            this.setTooltip('');
-          }
-        };
-        Blockly.Blocks['get_forecasts'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendValueInput("city")
-                .appendTitle("get forecasts for ")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "Array");
-            this.setTooltip('');
-          }
-        };
-        Blockly.Blocks['get_weather'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendValueInput("city")
-                .appendTitle("get weather for ")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "dict");
-            this.setTooltip('');
-          }
-        };
-        Blockly.Blocks['get_forecasted_temperature'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendValueInput("city")
-                .appendTitle("get forecasted temperatures for ")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "Array");
-            this.setTooltip('');
-          }
-        };
-        Blockly.Blocks['simple_pair'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendDummyInput()
-                .appendTitle('pair')
-                .appendTitle(new Blockly.FieldTextInput("key"), "key");
-            this.appendValueInput("value")
-                .appendTitle("with")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "pair");
-            this.setTooltip('');
-          }
-        };
-        Blockly.Blocks['pair'] = {
-          init: function() {
-            this.setHelpUrl('http://www.example.com/');
-            this.setColour(330);
-            this.appendValueInput("key")
-                .setCheck(null)
-                .appendTitle("pair")
-            this.appendValueInput("value")
-                .appendTitle("with")
-                .setCheck(null);
-            this.setInputsInline(true);
-            this.setOutput(true, "pair");
-            this.setTooltip('');
-          }
-        };
+        Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key"
+        Blockly.Msg.DICTS_CREATE_WITH_ITEM_VALUE = "value"
         Blockly.Blocks['dicts_create_with_container'] = {
           // Container.
           init: function() {
@@ -134,13 +78,15 @@
         Blockly.Blocks['dicts_create_with'] = {
             init: function() {
                 this.setColour(260);
-                this.appendValueInput('ADD0')
-                    .setCheck('pair')
+                this.appendDummyInput('TITLE_TEXT')
                     .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
-                this.appendValueInput('ADD1')
-                    .setCheck('pair');
-                this.appendValueInput('ADD2')
-                    .setCheck('pair');
+                this.appendValueInput('KEY0')
+                this.appendValueInput('VALUE0');
+                this.appendValueInput('KEY1');
+                this.appendValueInput('VALUE1');
+                this.appendValueInput('KEY2');
+                this.appendValueInput('VALUE2');
+                
                 this.setOutput(true, 'dict');
                 this.setMutator(new Blockly.Mutator(['dicts_create_with_item']));
                 this.setTooltip(Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP);
@@ -152,19 +98,21 @@
                 return container;
             },
             domToMutation: function(container) {
+                this.removeInput('TITLE_TEXT');
                 for (var x = 0; x < this.itemCount_; x++) {
-                  this.removeInput('ADD' + x);
+                  this.removeInput('KEY' + x);
+                  this.removeInput('VALUE' + x);
                 }
                 this.itemCount_ = parseInt(container.getAttribute('items'), 10);
+                this.appendDummyInput('TITLE_TEXT')
+                    .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
                 for (var x = 0; x < this.itemCount_; x++) {
-                  var input = this.appendValueInput('ADD' + x).setCheck('pair');
-                  if (x == 0) {
-                    input.appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
-                  }
-                }
-                if (this.itemCount_ == 0) {
-                  this.appendDummyInput('EMPTY')
-                      .appendTitle(Blockly.Msg.DICTS_CREATE_EMPTY_TITLE);
+                  var key_input = this.appendValueInput('KEY' + x)
+                                      .setCheck(null)
+                                      .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY);
+                  var value_input = this.appendValueInput('VALUE' + x)
+                                      .setCheck(null)
+                                      .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_ITEM_VALUE);
                 }
             },
             decompose: function(workspace) {
@@ -185,21 +133,25 @@
                 if (this.itemCount_ == 0) {
                   this.removeInput('EMPTY');
                 } else {
+                  this.removeInput('TITLE_TEXT');
                   for (var x = this.itemCount_ - 1; x >= 0; x--) {
-                    this.removeInput('ADD' + x);
+                    this.removeInput('KEY' + x);
+                    this.removeInput('VALUE' + x);
                   }
                 }
                 this.itemCount_ = 0;
                 // Rebuild the block's inputs.
                 var itemBlock = containerBlock.getInputTargetBlock('STACK');
+                this.appendDummyInput('TITLE_TEXT')
+                    .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
                 while (itemBlock) {
-                  var input = this.appendValueInput('ADD' + this.itemCount_);
-                  if (this.itemCount_ == 0) {
-                    input.appendTitle(Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH);
-                  }
+                  var key_input = this.appendValueInput('KEY' + this.itemCount_)
+                                      .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY);
+                  var value_input = this.appendValueInput('VALUE' + this.itemCount_)
+                                        .appendTitle(Blockly.Msg.DICTS_CREATE_WITH_ITEM_VALUE);
                   // Reconnect any child blocks.
                   if (itemBlock.valueConnection_) {
-                    input.connection.connect(itemBlock.valueConnection_);
+                    value_input.connection.connect(itemBlock.valueConnection_);
                   }
                   this.itemCount_++;
                   itemBlock = itemBlock.nextConnection &&
@@ -207,7 +159,7 @@
                 }
                 if (this.itemCount_ == 0) {
                   this.appendDummyInput('EMPTY')
-                      .appendTitle(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE);
+                      .appendTitle(Blockly.Msg.DICTS_CREATE_EMPTY_TITLE);
                 }
             },
             saveConnections: function(containerBlock) {
@@ -215,70 +167,183 @@
                 var itemBlock = containerBlock.getInputTargetBlock('STACK');
                 var x = 0;
                 while (itemBlock) {
-                  var input = this.getInput('ADD' + x);
-                  itemBlock.valueConnection_ = input && input.connection.targetConnection;
+                  var key_input = this.getInput('KEY' + x);
+                  var value_input = this.getInput('VALUE' + x);
+                  itemBlock.valueConnection_ = value_input && value_input.connection.targetConnection;
                   x++;
                   itemBlock = itemBlock.nextConnection &&
                       itemBlock.nextConnection.targetBlock();
                 }
             }
         };
+        
+        Blockly.Python['dict_get'] = function(block) {
+          var dict = Blockly.Python.valueToCode(block, 'DICT',
+              Blockly.Python.ORDER_MEMBER) || '{}';
+          var value = Blockly.Python.valueToCode(block, 'ITEM',
+              Blockly.Python.ORDER_NONE) || 'None';
+          var code = dict + '[' + value + ']';
+          return [code, Blockly.Python.ORDER_ATOMIC];
+        };
+        
+        Blockly.Blocks['dict_get'] = {
+          // Set element at index.
+          init: function() {
+            this.setColour(260);
+            this.appendValueInput('ITEM')
+                .appendTitle(Blockly.Msg.DICT_GET);
+            this.appendValueInput('DICT')
+                .setCheck('dict')
+                .appendTitle(Blockly.Msg.DICT_GET_TO);
+            this.setInputsInline(true);
+            this.setOutput(true);
+            //this.setPreviousStatement(true);
+            //this.setNextStatement(true);
+          }
+        };
 
         Blockly.Python['dicts_create_with'] = function(block) {
           var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.Python.ORDER_ATOMIC);
           // TODO: Assemble Python into code variable.
-          var code = 'dict()';
-          // TODO: Change ORDER_NONE to the correct strength.
-          return [code, Blockly.Python.ORDER_NONE];
+          var code = new Array(block.itemCount_);
+          
+          for (var n = 0; n < block.itemCount_; n++) {
+            var key = Blockly.Python.valueToCode(block, 'KEY' + n,
+                Blockly.Python.ORDER_NONE) || 'None';
+            var value = Blockly.Python.valueToCode(block, 'VALUE' + n,
+                Blockly.Python.ORDER_NONE) || 'None';
+            code[n] = key +": "+ value;
+          }
+          code = '{' + code.join(',\n\t') + '}';
+          return [code, Blockly.Python.ORDER_ATOMIC];
         };
+        
+        Blockly.Python['raw_block'] = function(block) {
+          var code = block.getTitleValue('TEXT')+"\n";
+          return code;
+        };
+        
+        Blockly.Blocks['raw_block'] = {
+          // Container.
+          init: function() {
+            this.setColour(260);
+            this.setPreviousStatement(true);
+            this.setNextStatement(true);
+            this.appendDummyInput()
+                .appendTitle('raw code block:');
+            this.appendDummyInput()
+                .appendTitle(new Blockly.FieldTextArea(''), 'TEXT');
+          }
+        };
+        
+        Blockly.Python['raw_expression'] = function(block) {
+          var code = block.getTitleValue('TEXT');
+          return [code, Blockly.Python.ORDER_ATOMIC];
+        };
+        
+        Blockly.Blocks['raw_expression'] = {
+          // Container.
+          init: function() {
+            this.setColour(260);
+            this.appendDummyInput()
+                .appendTitle('raw expression:');
+            this.appendDummyInput()
+                .appendTitle(new Blockly.FieldTextArea(''), 'TEXT');
+            this.setOutput(true);
+          }
+        };
+        
+        Blockly.Python['dict_keys'] = function(block) {
+          var dict = Blockly.Python.valueToCode(block, 'DICT',
+              Blockly.Python.ORDER_MEMBER) || '{}';
+          var code = dict + '.keys()';
+          return [code, Blockly.Python.ORDER_ATOMIC];
+        };
+        
+        Blockly.Blocks['dict_keys'] = {
+          // Set element at index.
+          init: function() {
+            this.setColour(260);
+            this.appendValueInput('DICT')
+                .setCheck('dict')
+                .appendTitle(Blockly.Msg.DICT_KEYS);
+            this.setInputsInline(true);
+            this.setOutput(true, 'Array');
+            //this.setPreviousStatement(true);
+            //this.setNextStatement(true);
+          }
+        };
+        
+        Blockly.Python['type_check'] = function(block) {
+          var value = Blockly.Python.valueToCode(block, 'VALUE',
+              Blockly.Python.ORDER_MEMBER) || '{}';
+          var code = 'type('+value + ')';
+          return [code, Blockly.Python.ORDER_ATOMIC];
+        };
+        
+        Blockly.Blocks['type_check'] = {
+          // Set element at index.
+          init: function() {
+            this.setColour(130);
+            this.appendValueInput('VALUE')
+                .appendTitle(Blockly.Msg.TYPE_CHECK);
+            this.setInputsInline(true);
+            this.setOutput(true, 'Type');
+            //this.setPreviousStatement(true);
+            //this.setNextStatement(true);
+          }
+        };
+        
         parent.jQuery(document).ready(function() {
             Blockly.inject(document.body,
                 {path: 'blockly-master/', toolbox: document.getElementById('toolbox')});
             // Let the top-level application know that Blockly is ready.
             window.parent.blocklyLoaded(Blockly);
+            
+            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="raw_block" x="0" y="0"> <title name="TEXT">import numpy as np\na = [[1, 2], [3, 4]]\nb = np.array(a, ndmin=3, dtype=float)\nprint "np.array(a, ndmin=3a, dtype=float)" </title> </block> </xml>';
+            var xml = Blockly.Xml.textToDom(code);
+            Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+            align()
         });
     }
     </script>
   </head>
   <body onload="init()">
-    <button>Test</button>
     <xml id="toolbox" style="display: none">
         <category name="Decisions">
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
         </category>
-        <category name="Manipulation">
+        <category name="Manipulation" custom="VARIABLE">
             <block type="variables_set"></block>
             <block type="variables_get"></block>
         </category>
         <category name="Iteration">
             <block type="controls_forEach"></block>
-            <block type="controls_for">
-                <value name="FROM">
-                  <block type="math_number">
-                    <field name="NUM">1</field>
-                  </block>
-                </value>
-                <value name="TO">
-                  <block type="math_number">
-                    <field name="NUM">10</field>
-                  </block>
-                </value>
-              </block>
         </category>
-        <category name="Calculation">
+        <category name="Utility">
             <block type="math_arithmetic"></block>
             <block type="text_print"></block>
+            <block type="type_check"></block>
+            <block type="raw_block"></block>
+            <block type="raw_expression"></block>
+        </category>
+        <category name="Functions" custom="PROCEDURE">
         </category>
         <category name="Data - Numbers and Strings">
             <block type="text"></block>
             <block type="math_number"></block>
         </category>
-        <category name="Data - Lists and Dictionaries">
-            <block type="dicts_create_with"></block>
+        <category name="Data - Lists">
             <block type="lists_create_with"></block>
-            <block type="pair"></block>
-            <block type="simple_pair"></block>
+            <block type="lists_getIndex"></block>
+            <block type="lists_append"></block>
+            <block type="lists_length"></block>
+        </category>
+        <category name="Data - Dictionaries">
+            <block type="dicts_create_with"></block>
+            <block type="dict_get"></block>
+            <block type="dict_keys"></block>
         </category>
         <category name="Data - Weather">
             <block type="get_temperature">
@@ -288,9 +353,9 @@
                   </block>
                 </value>
             </block>
-            <block type="get_weather"></block>
-            <block type="get_forecasted_temperature"></block>
+            <block type="get_report"></block>
             <block type="get_forecasts"></block>
+            <block type="get_forecasted_reports"></block>
         </category>
     </xml>
   </body>

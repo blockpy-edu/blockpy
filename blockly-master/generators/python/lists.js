@@ -185,6 +185,19 @@ Blockly.Python['lists_getIndex'] = function(block) {
   throw 'Unhandled combination (lists_getIndex).';
 };
 
+Blockly.Python['lists_append'] = function(block) {
+  // Append
+  // Note: Until February 2013 this block did not have MODE or WHERE inputs.
+  var list = Blockly.Python.valueToCode(block, 'LIST',
+      Blockly.Python.ORDER_MEMBER) || '[]';
+  var value = Blockly.Python.valueToCode(block, 'ITEM',
+      Blockly.Python.ORDER_NONE) || 'None';
+  // Cache non-trivial values to variables to prevent repeated look-ups.
+  // Closure, which accesses and modifies 'list'.
+  
+  return list + '.append(' + value + ')\n';
+};
+
 Blockly.Python['lists_setIndex'] = function(block) {
   // Set element at index.
   // Note: Until February 2013 this block did not have MODE or WHERE inputs.

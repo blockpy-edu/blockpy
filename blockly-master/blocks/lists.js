@@ -424,6 +424,23 @@ Blockly.Blocks['lists_setIndex'] = {
   }
 };
 
+Blockly.Blocks['lists_append'] = {
+  // Set element at index.
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LISTS_APPEND_HELPURL);
+    this.setColour(260);
+    this.appendValueInput('ITEM')
+        .appendTitle(Blockly.Msg.LISTS_APPEND);
+    this.appendValueInput('LIST')
+        .setCheck('Array')
+        .appendTitle(Blockly.Msg.LISTS_APPEND_TO);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.LISTS_APPEND_TOOLTIP);
+  }
+};
+
 Blockly.Blocks['lists_getSublist'] = {
   // Get sublist.
   init: function() {

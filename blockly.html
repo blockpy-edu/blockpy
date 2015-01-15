@@ -26,16 +26,53 @@
     }
   </style>
   <script src="jquery.js"></script>
+  
+    <!-- Skulpt -->
+    <script type="text/javascript" src="skulpt.min.js"></script>
+    <script type="text/javascript" src="skulpt-stdlib.js"></script>
+    <script type="text/javascript">
+        function outf(text)
+        {
+            var output = document.getElementById("html-output");
+            text = text.replace(/</g, '&lt;');
+            output.innerHTML = output.innerHTML + text;
+        }
+        
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+        
+        function runit() {
+            runProgram(window.Blockly.Python.workspaceToCode());
+        }
+
+        function runProgram(prog)
+        {
+            var output = document.getElementById("html-output");
+            output.innerHTML = '';
+            Sk.configure({output:outf, read: builtinRead});
+            Sk.canvas = "mycanvas";
+            try {
+                var module = Sk.importMainWithBody("<stdin>", false, prog);
+                /*
+                var obj = module.tp$getattr('a');
+                var runMethod = obj.tp$getattr('run');
+                var ret = Sk.misceval.callsim(runMethod, 10);
+                alert(ret.v);*/
+            } catch (e) {
+                alert(e);
+            }
+        }
+    </script>
+  
 </head>
 <body>
   <table width="100%" height="99%">
     <tr>
-      <td>
+      <td width="66%">
         <h1>CORGIS Blockly &gt;
-
-      </td>
-      <td width="50%">
-        
       </td>
     </tr>
     <tr>
@@ -51,6 +88,8 @@
                 $("#ipt-td").html();
                 var code = window.Blockly.Python.workspaceToCode();
                 $("#python-output").html(code);
+                var dom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+                $("#xml-output").text(Blockly.Xml.domToPrettyText(dom));
                 //$("#ipt-td").html('<iframe id="ipt" frameborder="0" src="'+buildIptUrl(code)+'"></iframe>');
             }
             waitQueue.pop();
@@ -76,6 +115,15 @@
       <td>
         <pre id="python-output">
         </pre>
+        <button onclick="runit()" type="button">Run</button>
+        <pre id="html-output"></pre>
+        <canvas id="mycanvas"  height="100" width="100" style="border-style: solid;"></canvas>
+      </td>
+  </tr>
+  <tr>
+      <td colspan='2'>
+        <div id="xml-output" style='font-size:6pt'>
+        </div>
       </td>
       <!--<td id="ipt-td">
         <iframe id="ipt" frameborder="0"

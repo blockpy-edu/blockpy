@@ -894,6 +894,12 @@ Blockly.Msg.LISTS_SET_INDEX_SET = 'set';
 /// block text - [https://code.google.com/p/blockly/wiki/Lists#in_list_..._insert_at
 /// Inserts an item into a list].
 /// [[File:Blockly-in-list-set-insert.png]]
+// TODO
+Blockly.Msg.LISTS_APPEND = 'append';
+Blockly.Msg.LISTS_APPEND_TO = 'to';
+Blockly.Msg.LISTS_APPEND_TOOLTIP = 'Append an element to a list';
+Blockly.Msg.LISTS_APPEND_HELPURL = 'http://google.com'
+// TODO
 Blockly.Msg.LISTS_SET_INDEX_INSERT = 'insert at';
 /// block text - The word(s) after the position in the list and before the item to be set/inserted.
 /// [[File:Blockly-in-list-set-insert.png]]
