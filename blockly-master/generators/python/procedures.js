@@ -115,3 +115,17 @@ Blockly.Python['procedures_ifreturn'] = function(block) {
   }
   return code;
 };
+
+
+Blockly.Python['procedures_return'] = function(block) {
+  // return value from a procedure.
+  var code = "return";
+  if (block.hasReturnValue_) {
+    var value = Blockly.Python.valueToCode(block, 'VALUE',
+        Blockly.Python.ORDER_NONE) || 'None';
+    code += ' ' + value + '\n';
+  } else {
+    code += '\n';
+  }
+  return code;
+};

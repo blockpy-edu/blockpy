@@ -100,6 +100,34 @@ Blockly.Names.prototype.getDistinctName = function(name, type) {
   return safeName;
 };
 
+var _BETTER_SYMBOL_NAMES = {
+    '!': '_bang',
+    '@': '_at',
+    '#': '_number',
+    '$': '_dollar',
+    '%': '_percent',
+    '^': '_to',
+    '&': "_and",
+    '*': '_times',
+    '(': '_open', '[': '_square_open', '{': '_open',
+    ')': '_closed', ']': '_square_closed', '}': '_curly_open',
+    '-': '_minus',
+    '+': '_plus',
+    '=': '_equals',
+    ':': '_colon',
+    ';': '_pause',
+    '<': '_less_than',
+    '>': '_greater_than',
+    '/': '_slash',
+    '\\': '_back_slash',
+    '~': '_tilde',
+    '`': '_quote', '\'': '_quote', '"': '_quote',
+    '.': '_dot',
+    ',': '_comma',
+    '?': '_huh',
+    '|': '_bar'
+}
+
 /**
  * Given a proposed entity name, generate a name that conforms to the
  * [_A-Za-z][_A-Za-z0-9]* format that most languages consider legal for
@@ -114,7 +142,14 @@ Blockly.Names.prototype.safeName_ = function(name) {
   } else {
     // Unfortunately names in non-latin characters will look like
     // _E9_9F_B3_E4_B9_90 which is pretty meaningless.
-    name = encodeURI(name.replace(/ /g, '_')).replace(/[^\w]/g, '_');
+    name = encodeURI(name
+                .replace(/[^ -~]/g, function(chr) {
+                    return (chr in _BETTER_SYMBOL_NAMES) 
+                      ? _BETTER_SYMBOL_NAMES[chr]
+                      : chr;
+                })
+                .replace(/ /g, '_'))
+                .replace(/[^\w]/g, '_');
     // Most languages don't allow names with leading numbers.
     if ('0123456789'.indexOf(name[0]) != -1) {
       name = 'my_' + name;

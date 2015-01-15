@@ -360,7 +360,10 @@ class Gen_langfiles(threading.Thread):
       json_files = [file for file in json_files if not
                     (file.endswith(('keys.json', 'synonyms.json', 'qqq.json')))]
       cmd.extend(json_files)
-      subprocess.check_call(cmd)
+      try:
+        subprocess.check_call(cmd)
+      except WindowsError:
+        subprocess.check_call(['python'] + cmd)
     except (subprocess.CalledProcessError, OSError), e:
       print('Error running i18n/create_messages.py: ', e)
       sys.exit(1)

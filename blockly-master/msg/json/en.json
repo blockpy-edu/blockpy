@@ -1,7 +1,7 @@
 {
     "@metadata": {
         "author": "Ellen Spertus <ellen.spertus@gmail.com>",
-        "lastupdated": "2013-12-02 10:12:35.305038",
+        "lastupdated": "2014-10-22 12:15:01.096000",
         "locale": "en",
         "messagedocumentation" : "qqq"
     },
@@ -299,6 +299,10 @@
     "LISTS_GET_INDEX_TOOLTIP_REMOVE_RANDOM": "Removes a random item in a list.",
     "LISTS_SET_INDEX_HELPURL": "https://code.google.com/p/blockly/wiki/Lists#in_list_..._set",
     "LISTS_SET_INDEX_SET": "set",
+    "LISTS_APPEND": "append",
+    "LISTS_APPEND_TO": "to",
+    "LISTS_APPEND_TOOLTIP": "Append an element to a list",
+    "LISTS_APPEND_HELPURL": "http://google.com",
     "LISTS_SET_INDEX_INSERT": "insert at",
     "LISTS_SET_INDEX_INPUT_TO": "as",
     "LISTS_SET_INDEX_TOOLTIP_SET_FROM_START": "Sets the item at the specified position in a list.  #1 is the first item.",
