@@ -174,7 +174,7 @@ Blockly.Msg.CONTROLS_FOR_INPUT_FROM_TO_BY = 'from %1 to %2 by %3';
 Blockly.Msg.CONTROLS_FOR_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
 
 /// url - Describes 'for-each loops' in computer programs.  Consider using your language's translation of [https://en.wikipedia.org/wiki/Foreach http://en.wikipedia.org/wiki/Foreach] if present.
-Blockly.Msg.CONTROLS_FOREACH_HELPURL = 'https://code.google.com/p/blockly/wiki/Loops#for_each for each block';
+Blockly.Msg.CONTROLS_FOREACH_HELPURL = 'http://think.cs.vt.edu/book/static/compthink/Algorithms/blockly-big-data.html#iteration';
 /// block text - Title of [https://code.google.com/p/blockly/wiki/Loops#for_each for each block].
 Blockly.Msg.CONTROLS_FOREACH_INPUT_ITEM = 'for each item';
 /// block text - Preceding the list that should be iterated over in a [https://code.google.com/p/blockly/wiki/Loops#for_each for each loop].
@@ -200,7 +200,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = 'Warning: This block may only be 
 
 // Logic Blocks.
 /// url - Describes conditional statements (if-then-else) in computer programs.  Consider using your language's translation of [https://en.wikipedia.org/wiki/If_else http://en.wikipedia.org/wiki/If_else], if present.
-Blockly.Msg.CONTROLS_IF_HELPURL = 'http://code.google.com/p/blockly/wiki/If_Then';
+Blockly.Msg.CONTROLS_IF_HELPURL = 'http://think.cs.vt.edu/book/static/compthink/Algorithms/blockly-big-data.html#decision';
 /// tooltip - Describes [https://code.google.com/p/blockly/wiki/IfElse#If_blocks 'if' blocks].  Consider using your language's translation of [https://en.wikipedia.org/wiki/If_statement http://en.wikipedia.org/wiki/If_statement], if present.
 Blockly.Msg.CONTROLS_IF_TOOLTIP_1 = 'If a value is true, then do some statements.';
 /// tooltip - Describes [https://code.google.com/p/blockly/wiki/IfElse#If-Else_blocks if-else blocks].  Consider using your language's translation of [https://en.wikipedia.org/wiki/If_statement http://en.wikipedia.org/wiki/If_statement], if present.
@@ -216,7 +216,7 @@ Blockly.Msg.CONTROLS_IF_MSG_IF = 'if';
 Blockly.Msg.CONTROLS_IF_MSG_ELSEIF = 'else if';
 /// block text - See [https://code.google.com/p/blockly/wiki/IfElse https://code.google.com/p/blockly/wiki/IfElse].  The English word "otherwise" would probably be superior to "else", but the latter is used because it is traditional and shorter.
 Blockly.Msg.CONTROLS_IF_MSG_ELSE = 'else';
-Blockly.Msg.CONTROLS_IF_MSG_THEN = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
+Blockly.Msg.CONTROLS_IF_MSG_THEN = 'then';
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 /// tooltip - Describes [https://code.google.com/p/blockly/wiki/IfElse#Block_Modification if block modification].
 Blockly.Msg.CONTROLS_IF_IF_TOOLTIP = 'Add, remove, or reorder sections to reconfigure this if block.';
@@ -264,9 +264,9 @@ Blockly.Msg.LOGIC_NEGATE_TOOLTIP = 'Returns true if the input is false.  Returns
 /// url - Information about the logic values ''true'' and ''false''.  Consider using the translation of [https://en.wikipedia.org/wiki/Truth_value http://en.wikipedia.org/wiki/Truth_value] if it exists in your language.
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = 'http://code.google.com/p/blockly/wiki/True_False';
 /// block text - The word for the [https://en.wikipedia.org/wiki/Truth_value logical value] ''true''.
-Blockly.Msg.LOGIC_BOOLEAN_TRUE = 'true';
+Blockly.Msg.LOGIC_BOOLEAN_TRUE = 'True';
 /// block text - The word for the [https://en.wikipedia.org/wiki/Truth_value logical value] ''false''.
-Blockly.Msg.LOGIC_BOOLEAN_FALSE = 'false';
+Blockly.Msg.LOGIC_BOOLEAN_FALSE = 'False';
 /// tooltip - Indicates that the block returns either of the two possible [https://en.wikipedia.org/wiki/Truth_value logical values].
 Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = 'Returns either true or false.';
 
@@ -824,23 +824,25 @@ Blockly.Msg.LISTS_GET_INDEX_REMOVE = 'remove';
 /// automatically appear ''after'' this number (and any other ordinal numbers on this block).
 /// See [[Translating:Blockly#Ordinal_numbers]] for more information on ordinal numbers in Blockly.
 /// [[File:Blockly-list-get-item.png]]
-Blockly.Msg.LISTS_GET_INDEX_FROM_START = '#';
+Blockly.Msg.LISTS_GET_INDEX_FROM_START = '#th item';
 /// dropdown - Indicates that an index relative to the end of the list should be used
 /// to [https://code.google.com/p/blockly/wiki/Lists#Getting_a_single_item access an item in a list].
 /// [[File:Blockly-list-get-item.png]]
-Blockly.Msg.LISTS_GET_INDEX_FROM_END = '# from end';
+Blockly.Msg.LISTS_GET_INDEX_FROM_END = '#th item from end';
 /// dropdown - Indicates that the '''first''' item should be
 /// [https://code.google.com/p/blockly/wiki/Lists#Getting_a_single_item accessed in a list].
 /// [[File:Blockly-list-get-item.png]]
-Blockly.Msg.LISTS_GET_INDEX_FIRST = 'first';
+Blockly.Msg.LISTS_GET_INDEX_FIRST = 'zeroth item';
+Blockly.Msg.LISTS_GET_INDEX_SECOND = 'first item';
+Blockly.Msg.LISTS_GET_INDEX_THIRD = 'second item';
 /// dropdown - Indicates that the '''last''' item should be
 /// [https://code.google.com/p/blockly/wiki/Lists#Getting_a_single_item accessed in a list].
 /// [[File:Blockly-list-get-item.png]]
-Blockly.Msg.LISTS_GET_INDEX_LAST = 'last';
+Blockly.Msg.LISTS_GET_INDEX_LAST = 'last item';
 /// dropdown - Indicates that a '''random''' item should be
 /// [https://code.google.com/p/blockly/wiki/Lists#Getting_a_single_item accessed in a list].
 /// [[File:Blockly-list-get-item.png]]
-Blockly.Msg.LISTS_GET_INDEX_RANDOM = 'random';
+Blockly.Msg.LISTS_GET_INDEX_RANDOM = 'random item';
 /// block text - Text that should go after the rightmost block/dropdown when
 /// [http://code.google.com/p/blockly/wiki/Lists#Getting_a_single_item
 /// accessing an item from a list].  In most languages, this will be the empty string.
@@ -895,8 +897,8 @@ Blockly.Msg.LISTS_SET_INDEX_SET = 'set';
 /// Inserts an item into a list].
 /// [[File:Blockly-in-list-set-insert.png]]
 // TODO
-Blockly.Msg.LISTS_APPEND = 'append';
-Blockly.Msg.LISTS_APPEND_TO = 'to';
+Blockly.Msg.LISTS_APPEND = 'append item';
+Blockly.Msg.LISTS_APPEND_TO = 'to list';
 Blockly.Msg.LISTS_APPEND_TOOLTIP = 'Append an element to a list';
 Blockly.Msg.LISTS_APPEND_HELPURL = 'http://google.com'
 // TODO
@@ -1011,12 +1013,12 @@ Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = 'https://en.wikipedia.org/wiki/Proc
 /// block text - This precedes the name of the procedure when defining it.  See
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#c84aoc this sample
 /// procedure definition].
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = 'to';
+Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = 'define';
 /// default name - This acts as a placeholder for the name of a function on a
 /// function definition block, as shown on
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#w7cfju this block].
 /// The user will replace it with the function's name.
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = 'do something';
+Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = 'function';
 /// block text - This precedes the list of parameters to a function.  See
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#6ot5y5 this sample
 /// function with parameters].
@@ -1066,12 +1068,12 @@ Blockly.Msg.PROCEDURES_CALLRETURN_TOOLTIP = 'Run the user-defined function "%1" 
 /// on the plus sign or star on a function definition block.  It refers to the set of parameters
 /// (referred to by the simpler term "inputs") to the function.  See
 /// [[Translating:Blockly#function_definitions]].
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = 'inputs';
+Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = 'parameters';
 /// block text - This text appears on a block in a window that appears when the user clicks
 /// on the plus sign or star on a function definition block].  It appears on the block for
 /// adding an individual parameter (referred to by the simpler term "inputs") to the function.
 /// See [[Translating:Blockly#function_definitions]].
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = 'input name:';
+Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = 'parameter:';
 
 /// context menu - This appears on the context menu for function calls.  Selecting
 /// it causes the corresponding function definition to be highlighted (as shown at

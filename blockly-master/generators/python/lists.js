@@ -106,13 +106,13 @@ Blockly.Python['lists_getIndex'] = function(block) {
       Blockly.Python.ORDER_UNARY_SIGN) || '1';
   var list = Blockly.Python.valueToCode(block, 'VALUE',
       Blockly.Python.ORDER_MEMBER) || '[]';
-
-  if (where == 'FIRST') {
+  var location_maps = {'FIRST': 0, 'SECOND': 1, 'THIRD': 2}
+  if (where in location_maps) {
     if (mode == 'GET') {
-      var code = list + '[0]';
+      var code = list + '['+location_maps[where]+']';
       return [code, Blockly.Python.ORDER_MEMBER];
     } else {
-      var code = list + '.pop(0)';
+      var code = list + '.pop('+location_maps[where]+')';
       if (mode == 'GET_REMOVE') {
         return [code, Blockly.Python.ORDER_FUNCTION_CALL];
       } else if (mode == 'REMOVE') {
@@ -323,3 +323,101 @@ Blockly.Python['lists_getSublist'] = function(block) {
   var code = list + '[' + at1 + ' : ' + at2 + ']';
   return [code, Blockly.Python.ORDER_MEMBER];
 };
+
+Blockly.Python['dict_get'] = function(block) {
+  var dict = Blockly.Python.valueToCode(block, 'DICT',
+      Blockly.Python.ORDER_MEMBER) || '{}';
+  var value = Blockly.Python.valueToCode(block, 'ITEM',
+      Blockly.Python.ORDER_NONE) || 'None';
+  var code = dict + '[' + value + ']';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+
+
+Blockly.Python['dicts_create_with'] = function(block) {
+  var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.Python.ORDER_ATOMIC);
+  // TODO: Assemble Python into code variable.
+  var code = new Array(block.itemCount_);
+  
+  for (var n = 0; n < block.itemCount_; n++) {
+    var key = Blockly.Python.valueToCode(block, 'KEY' + n,
+        Blockly.Python.ORDER_NONE) || 'None';
+    var value = Blockly.Python.valueToCode(block, 'VALUE' + n,
+        Blockly.Python.ORDER_NONE) || 'None';
+    code[n] = key +": "+ value;
+  }
+  code = '{' + code.join(',\n\t') + '}';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['raw_block'] = function(block) {
+  var code = block.getTitleValue('TEXT')+"\n";
+  return code;
+};
+
+
+
+Blockly.Python['raw_expression'] = function(block) {
+  var code = block.getTitleValue('TEXT');
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+
+
+Blockly.Python['dict_keys'] = function(block) {
+  var dict = Blockly.Python.valueToCode(block, 'DICT',
+      Blockly.Python.ORDER_MEMBER) || '{}';
+  var code = dict + '.keys()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+
+
+Blockly.Python['type_check'] = function(block) {
+  var value = Blockly.Python.valueToCode(block, 'VALUE',
+      Blockly.Python.ORDER_MEMBER) || '0';
+  var code = 'type('+value + ')';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+
+
+Blockly.Python['get_forecasts'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_forecasts(';
+    var argument0 = Blockly.Python.valueToCode(block, 'city',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+    code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['get_report'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_report(';
+    var argument0 = Blockly.Python.valueToCode(block, 'city',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+    code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+
+
+Blockly.Python['get_forecasted_reports'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_forecasted_reports(';
+    var argument0 = Blockly.Python.valueToCode(block, 'city',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+    code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['get_temperature'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_temperature(';
+    var argument0 = Blockly.Python.valueToCode(block, 'city',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+    code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
+

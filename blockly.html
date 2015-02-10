@@ -25,11 +25,16 @@
       border-width: 0 1px 1px 0;
     }
   </style>
-  <script src="jquery.js"></script>
+  <script src="libs/jquery.js"></script>
+  <script type="text/javascript" src="libs/d3.min.js"></script>
+  <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
   
+    
     <!-- Skulpt -->
-    <script type="text/javascript" src="skulpt.min.js"></script>
-    <script type="text/javascript" src="skulpt-stdlib.js"></script>
+    <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
+    <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
+    <script type="text/javascript" src="analyzer.js"></script>
+    <script type="text/javascript" src="python_to_blockly.js"></script>
     <script type="text/javascript">
         function outf(text)
         {
@@ -47,6 +52,14 @@
         function runit() {
             runProgram(window.Blockly.Python.workspaceToCode());
         }
+        
+        function resetit() {
+            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="controls_if" inline="false" x="22" y="4"> <mutation elseif="1"></mutation> <statement name="DO1"> <block type="variables_set" inline="false"> <title name="VAR">item</title> <value name="VALUE"> <block type="variables_get"> <title name="VAR">item</title> </block> </value> <next> <block type="variables_set" inline="false"> <title name="VAR">item</title> <value name="VALUE"> <block type="math_number"> <title name="NUM">1</title> </block> </value> <next> <block type="variables_set" inline="false"> <title name="VAR">item</title> <value name="VALUE"> <block type="math_number"> <title name="NUM">2</title> </block> </value> <next> <block type="variables_set" inline="false"> <title name="VAR">item</title> <value name="VALUE"> <block type="math_number"> <title name="NUM">3</title> </block> </value> </block> </next> </block> </next> </block> </next> </block> </statement> </block> </xml>';
+            var xml = Blockly.Xml.textToDom(code);
+            Blockly.mainWorkspace.clear();
+            Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+            align();
+        }
 
         function runProgram(prog)
         {
@@ -54,13 +67,18 @@
             output.innerHTML = '';
             Sk.configure({output:outf, read: builtinRead});
             Sk.canvas = "mycanvas";
+            var time = 0;
+            Sk.afterSingleExecution = function($gbl) {
+                console.log(time, $gbl);
+                time += 1;
+            };
             try {
                 var module = Sk.importMainWithBody("<stdin>", false, prog);
-                /*
-                var obj = module.tp$getattr('a');
-                var runMethod = obj.tp$getattr('run');
-                var ret = Sk.misceval.callsim(runMethod, 10);
-                alert(ret.v);*/
+                Sk.afterSingleExecution(module.$d);
+                //var obj = module.tp$getattr('a');
+                //var runMethod = obj.tp$getattr('run');
+                //var ret = Sk.misceval.callsim(runMethod, 10);
+                //alert(ret.v);
             } catch (e) {
                 alert(e);
             }
@@ -78,10 +96,48 @@
     <tr>
       <td height="99%">
         <script>
+        
+            function align(){
+                var blocks = Blockly.getMainWorkspace().getTopBlocks();
+                var y = 20;
+                for (var i = 0; i < blocks.length; i++){
+                    blocks[i].moveTo(Blockly.Toolbox.width+20, y);
+                    y += blocks[i].getHeightWidth().height;
+                    y += 20; // buffer
+                }
+            }
+
           waitQueue = [];
           function buildIptUrl(code, instruction) {
             console.log( encodeURI(code));
             return "http://localhost:8080/iframe-embed.html#&code=" + encodeURIComponent(code) + "&py=2&cumulative=false&curInstr=0";
+          }
+          
+          function clearit() {
+            Blockly.mainWorkspace.clear();
+          }
+          
+          function analyzeit() {
+            try {
+                analyze_code();
+            } catch (e) {
+                console.error("Analyzer: ", e, e.stack);
+            }
+          }
+          
+          function convertit() {
+            try {
+                var code = $("#python-output").text();
+                var xml = (new Python2Blockly()).convert(code);
+                var xmlString = new XMLSerializer().serializeToString(xml);
+                var blocklyXML = Blockly.Xml.textToDom(xmlString);
+                console.log(xmlString);
+                Blockly.mainWorkspace.clear();
+                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
+                align();
+            } catch (e) {
+                console.error("P2B: ", e, e.stack);
+            }
           }
           function update_delay() {
             if (waitQueue.length <= 1) {
@@ -106,7 +162,6 @@
             });
           }
           $(document).ready(function() {
-            console.log("Hello");
             //$("#ipt").attr("src", "http://localhost:8080/iframe-embed.html#&code=print+7&py=2&cumulative=false&curInstr=0");
           });
         </script>
@@ -116,8 +171,12 @@
         <pre id="python-output">
         </pre>
         <button onclick="runit()" type="button">Run</button>
+        <button onclick="convertit()" type="button">Convert</button>
+        <button onclick="resetit()" type="button">Reset</button>
+        <button onclick="analyzeit()" type="button">Analyze</button>
+        <button onclick="clearit()" type="button">Clear</button>
         <pre id="html-output"></pre>
-        <canvas id="mycanvas"  height="100" width="100" style="border-style: solid;"></canvas>
+        <div id="mycanvas"></div>
       </td>
   </tr>
   <tr>
