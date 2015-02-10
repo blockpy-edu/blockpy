@@ -337,7 +337,7 @@ class Gen_langfiles(threading.Thread):
             os.path.join('i18n', 'js_to_json.py'),
             '--input_file', 'msg/messages.js',
             '--output_dir', 'msg/json/',
-            '--quiet'])
+            '--quiet'], shell=True)
       except (subprocess.CalledProcessError, OSError), e:
         # Documentation for subprocess.check_call says that CalledProcessError
         # will be raised on failure, but I found that OSError is also possible.
