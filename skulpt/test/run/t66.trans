@@ -1,0 +1,8 @@
+Module(body=[Print(dest=None,
+                   values=[Compare(left=Num(n=7),
+                                   ops=[In()],
+                                   comparators=[List(elts=[Num(n=1),
+                                                           Num(n=2),
+                                                           Num(n=3)],
+                                                     ctx=Load())])],
+                   nl=True)])

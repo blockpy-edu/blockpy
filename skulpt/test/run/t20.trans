@@ -1,0 +1,11 @@
+Module(body=[If(test=BoolOp(op=Or(),
+                            values=[Compare(left=Str(s='x'),
+                                            ops=[Is()],
+                                            comparators=[Str(s='x')]),
+                                    Compare(left=Str(s='y'),
+                                            ops=[Is()],
+                                            comparators=[Str(s='y')])]),
+                body=[Print(dest=None,
+                            values=[Str(s='OK')],
+                            nl=True)],
+                orelse=[])])

@@ -1,0 +1,5 @@
+Module(body=[Print(dest=None,
+                   values=[BinOp(left=Num(n=4),
+                                 op=Sub(),
+                                 right=Num(n=1))],
+                   nl=True)])

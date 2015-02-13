@@ -1,0 +1,10 @@
+Module(body=[Print(dest=None,
+                   values=[Call(func=Attribute(value=Str(s='aa..bbb...ccc'),
+                                               attr='replace',
+                                               ctx=Load()),
+                                args=[Str(s='..'),
+                                      Str(s='X')],
+                                keywords=[],
+                                starargs=None,
+                                kwargs=None)],
+                   nl=True)])

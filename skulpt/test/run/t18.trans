@@ -1,0 +1,7 @@
+Module(body=[If(test=Compare(left=Str(s='a'),
+                             ops=[IsNot()],
+                             comparators=[Str(s='b')]),
+                body=[Print(dest=None,
+                            values=[Str(s='OK')],
+                            nl=True)],
+                orelse=[])])
