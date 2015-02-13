@@ -63,12 +63,6 @@ Blockly.Blocks['plot_scatter'] = {
   }
 };
 
-Blockly.Python['plot_show'] = function(block) {
-    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var code = 'plt.show()\n';
-    return code;
-};
-
 Blockly.Blocks['plot_title'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -84,14 +78,6 @@ Blockly.Blocks['plot_title'] = {
   }
 };
 
-Blockly.Python['plot_title'] = function(block) {
-    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var parameter_plot_title = Blockly.Python.valueToCode(block, 'title',
-      Blockly.Python.ORDER_NONE) || '""';
-    var code = 'plt.title('+parameter_plot_title+')\n';
-    return code;
-};
-
 Blockly.Blocks['plot_line'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -99,32 +85,10 @@ Blockly.Blocks['plot_line'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.appendValueInput("y_values")
-        .appendTitle("plot line ")
+        .appendField("plot line ")
         .setCheck('Array');
     this.setInputsInline(false);
     this.setOutput(false);
     this.setTooltip('Plots onto the canvas');
   }
-};
-
-Blockly.Python['plot_line'] = function(block) {
-    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var code = 'plt.plot(';
-    var argument1 = Blockly.Python.valueToCode(block, 'y_values',
-      Blockly.Python.ORDER_NONE) || '[]';
-    code += argument1 +')\n';
-    return code;
-};
-
-
-
-Blockly.Python['plot_scatter'] = function(block) {
-    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var code = 'plt.plot(';
-    var argument0 = Blockly.Python.valueToCode(block, 'x_values',
-      Blockly.Python.ORDER_NONE) || '[]';
-    var argument1 = Blockly.Python.valueToCode(block, 'y_values',
-      Blockly.Python.ORDER_NONE) || '[]';
-    code += argument0 + ','+ argument1 +',\nlinewidth=3, markersize=6,\ndash_capstyle="projecting", markerfacecolor="b")\n';
-    return code;
 };
