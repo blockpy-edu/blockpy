@@ -653,3 +653,20 @@ Blockly.Blocks['lists_split'] = {
     });
   }
 };
+
+Blockly.Blocks['lists_append'] = {
+  // Set element at index.
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LISTS_APPEND_HELPURL);
+    this.setColour(260);
+    this.appendValueInput('ITEM')
+        .appendField(Blockly.Msg.LISTS_APPEND);
+    this.appendValueInput('LIST')
+        .setCheck('Array')
+        .appendField(Blockly.Msg.LISTS_APPEND_TO);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    //this.setTooltip(Blockly.Msg.LISTS_APPEND_TOOLTIP);
+  }
+};

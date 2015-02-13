@@ -270,3 +270,14 @@ Blockly.Python['text_prompt_ext'] = function(block) {
   }
   return [code, Blockly.Python.ORDER_FUNCTION_CALL];
 };
+
+Blockly.Python['text_print_multiple'] = function(block) {
+  // Create a list with any number of elements of any type.
+  var inner_prints = new Array(block.itemCount_);
+  for (var n = 0; n < block.itemCount_; n++) {
+    inner_prints[n] = Blockly.Python.valueToCode(block, 'PRINT' + n,
+        Blockly.Python.ORDER_NONE) || 'None';
+  }
+  code = 'print ' + inner_prints.join(', ') + '\n';
+  return code;
+};

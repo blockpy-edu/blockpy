@@ -639,3 +639,123 @@ Blockly.Blocks['text_prompt_ext'] = {
     });
   }
 };
+
+
+Blockly.Blocks['text_print_multiple'] = {
+  /**
+   * Block for printing multiple things (including nothing)
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.texts.HUE);
+    this.appendValueInput('PRINT0')
+        .appendField('print');
+    this.setMutator(new Blockly.Mutator(['text_print_multiple_item']));
+    this.setTooltip(Blockly.Msg.TEXT_PRINT_TOOLTIP);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.itemCount_ = 1;
+  },
+  mutationToDom: function(workspace) {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(container) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('PRINT' + x);
+    }
+    this.itemCount_ = parseInt(container.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('PRINT' + x);
+      if (x == 0) {
+        input.appendField('print');
+      }
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('print');
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock = new Blockly.Block(workspace,
+                                           'text_print_multiple_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = new Blockly.Block(workspace, 'text_print_multiple_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    // Disconnect all input blocks and remove all inputs.
+    if (this.itemCount_ == 0) {
+      this.removeInput('EMPTY');
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('PRINT' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('PRINT' + this.itemCount_);
+      if (this.itemCount_ == 0) {
+        input.appendField('print');
+      }
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('print');
+    }
+  },
+  saveConnections: function(containerBlock) {
+    // Store a pointer to any connected child blocks.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('PRINT' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+Blockly.Blocks['text_print_multiple_container'] = {
+  // Container.
+  init: function() {
+    this.setColour(Blockly.Blocks.texts.HUE);
+    this.appendDummyInput()
+        .appendField('print');
+    this.appendStatementInput('STACK');
+    this.setTooltip('');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['text_print_multiple_item'] = {
+  // Add items.
+  init: function() {
+    this.setColour(Blockly.Blocks.texts.HUE);
+    this.appendDummyInput()
+        .appendField('item');
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+    this.contextMenu = false;
+  }
+};
