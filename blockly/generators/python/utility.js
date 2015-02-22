@@ -45,3 +45,18 @@ Blockly.Python['type_check'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+Blockly.Python['function_call'] = function(block) {
+  var name = block.getFieldValue('NAME');
+  var hasReturn = block.hasReturn_;
+  var args = new Array(block.itemCount_);
+  for (var n = 0; n < block.itemCount_; n++) {
+    args[n] = Blockly.Python.valueToCode(block, 'ARGUMENT' + n,
+        Blockly.Python.ORDER_NONE) || 'None';
+  }
+  var code = name+ '(' + args.join(', ') + ')';
+  if (hasReturn) {
+      return [code, Blockly.Python.ORDER_ATOMIC];
+  } else {
+      return code+'\n';
+  }
+};

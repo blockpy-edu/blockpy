@@ -51,10 +51,10 @@ Blockly.Msg.EXPAND_ALL = 'Expand Blocks';
 
 // Variable renaming.
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
-Blockly.Msg.NEW_VARIABLE = 'New variable...';
-Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
-Blockly.Msg.RENAME_VARIABLE = 'Rename variable...';
-Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
+Blockly.Msg.NEW_VARIABLE = 'New property...';
+Blockly.Msg.NEW_VARIABLE_TITLE = 'New property name:';
+Blockly.Msg.RENAME_VARIABLE = 'Rename property...';
+Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" properties to:';
 
 // Colour Blocks.
 Blockly.Msg.COLOUR_PICKER_HELPURL = 'http://en.wikipedia.org/wiki/Color';

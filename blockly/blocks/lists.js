@@ -29,7 +29,7 @@ goog.provide('Blockly.Blocks.lists');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.lists.HUE = 260;
+Blockly.Blocks.lists.HUE = 100;
 
 Blockly.Blocks['lists_create_empty'] = {
   /**
@@ -658,7 +658,7 @@ Blockly.Blocks['lists_append'] = {
   // Set element at index.
   init: function() {
     this.setHelpUrl(Blockly.Msg.LISTS_APPEND_HELPURL);
-    this.setColour(260);
+    this.setColour(Blockly.Blocks.lists.HUE);
     this.appendValueInput('ITEM')
         .appendField(Blockly.Msg.LISTS_APPEND);
     this.appendValueInput('LIST')

@@ -40,19 +40,18 @@ Blockly.Python['dict_get'] = function(block) {
 
 
 Blockly.Python['dicts_create_with'] = function(block) {
-  var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.Python.ORDER_ATOMIC);
-  // TODO: Assemble Python into code variable.
-  var code = new Array(block.itemCount_);
+    var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.   Python.ORDER_ATOMIC);
+    // TODO: Assemble Python into code variable.
+    var code = new Array(block.itemCount_);
   
-  for (var n = 0; n < block.itemCount_; n++) {
-    var key = Blockly.Python.valueToCode(block, 'KEY' + n,
-        Blockly.Python.ORDER_NONE) || 'None';
-    var value = Blockly.Python.valueToCode(block, 'VALUE' + n,
-        Blockly.Python.ORDER_NONE) || 'None';
-    code[n] = key +": "+ value;
-  }
-  code = '{' + code.join(',\n\t') + '}';
-  return [code, Blockly.Python.ORDER_ATOMIC];
+    for (var n = 0; n < block.itemCount_; n++) {
+        var key = Blockly.Python.quote_(block.getFieldValue('KEY' + n));
+        var value = Blockly.Python.valueToCode(block, 'VALUE' + n,
+                Blockly.Python.ORDER_NONE) || 'None';
+        code[n] = key +": "+ value;
+    }
+    code = '{' + code.join(', ') + '}';
+    return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['dict_keys'] = function(block) {

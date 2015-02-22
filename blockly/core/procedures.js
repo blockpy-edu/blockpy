@@ -182,12 +182,18 @@ Blockly.Procedures.flyoutCategory = function(blocks, gaps, margin, workspace) {
     blocks.push(block);
     gaps.push(margin * 2);
   }
-  if (Blockly.Blocks['procedures_ifreturn']) {
+  /* if (Blockly.Blocks['procedures_ifreturn']) {
     var block = Blockly.Block.obtain(workspace, 'procedures_ifreturn');
     block.initSvg();
     blocks.push(block);
     gaps.push(margin * 2);
-  }
+  }*/
+  /*if (Blockly.Blocks['procedures_return']) {
+    var block = Blockly.Block.obtain(workspace, 'procedures_return');
+    block.initSvg();
+    blocks.push(block);
+    gaps.push(margin * 2);
+  }*/
   if (gaps.length) {
     // Add slightly larger gap between system blocks and user calls.
     gaps[gaps.length - 1] = margin * 3;
@@ -262,6 +268,21 @@ Blockly.Procedures.mutateCallers = function(name, workspace,
   var callers = Blockly.Procedures.getCallers(name, workspace);
   for (var x = 0; x < callers.length; x++) {
     callers[x].setProcedureParameters(paramNames, paramIds);
+  }
+};
+
+/**
+ * When a procedure definition changes its return, find and edit all its
+ * callers.
+ * @param {string} name Name of edited procedure definition.
+ * @param {!Blockly.Workspace} workspace The workspace to delete callers from.
+ * @param {boolean} returnState whether it returned
+ */
+Blockly.Procedures.mutateCallersReturns = function(name, workspace,
+                                            returnState) {
+  var callers = Blockly.Procedures.getCallers(name, workspace);
+  for (var x = 0; x < callers.length; x++) {
+    callers[x].setReturn(returnState);
   }
 };
 

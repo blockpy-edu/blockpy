@@ -29,6 +29,7 @@ goog.provide('Blockly.FieldTextArea');
 goog.require('Blockly.Field');
 goog.require('Blockly.Msg');
 goog.require('goog.asserts');
+goog.require('goog.dom');
 goog.require('goog.userAgent');
 
 
@@ -44,7 +45,6 @@ goog.require('goog.userAgent');
  */
 Blockly.FieldTextArea = function(text, opt_changeHandler) {
   Blockly.FieldTextArea.superClass_.constructor.call(this, text);
-
   this.changeHandler_ = opt_changeHandler;
 };
 goog.inherits(Blockly.FieldTextArea, Blockly.Field);
@@ -67,8 +67,7 @@ Blockly.FieldTextArea.prototype.CURSOR = 'text';
  * Close the input widget if this input is being deleted.
  */
 Blockly.FieldTextArea.prototype.dispose = function() {
-  //Blockly.WidgetDiv.hideIfOwner(this);
-  Blockly.WidgetDiv.hideIfField(this);
+  Blockly.WidgetDiv.hideIfOwner(this);
   Blockly.FieldTextArea.superClass_.dispose.call(this);
 };
 
@@ -82,7 +81,7 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
     // No change if null.
     return;
   }
-  if (this.changeHandler_) {
+  if (this.sourceBlock_ && this.changeHandler_) {
     var validated = this.changeHandler_(text);
     // If the new text is invalid, validation returns null.
     // In this case we still want to display the illegal result.
@@ -98,7 +97,9 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
   this.text_ = text;
   
   // Empty the text element.
-  goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
+  if (this.textElement_ !== undefined) {
+    goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
+  }
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
   
   if (Blockly.RTL && text) {

@@ -28,40 +28,36 @@ goog.provide('Blockly.Python.weather');
 
 goog.require('Blockly.Python');
 
-Blockly.Python['get_forecasts'] = function(block) {
+Blockly.Python['weather_forecasts'] = function(block) {
     Blockly.Python.definitions_['import_weather'] = 'import weather';
     var code = 'weather.get_forecasts(';
-    var argument0 = Blockly.Python.valueToCode(block, 'city',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+    var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
     code += argument0 + ')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Python['get_report'] = function(block) {
+Blockly.Python['weather_report'] = function(block) {
     Blockly.Python.definitions_['import_weather'] = 'import weather';
     var code = 'weather.get_report(';
-    var argument0 = Blockly.Python.valueToCode(block, 'city',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+    var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
     code += argument0 + ')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 
 
-Blockly.Python['get_forecasted_reports'] = function(block) {
+Blockly.Python['weather_report_forecasts'] = function(block) {
     Blockly.Python.definitions_['import_weather'] = 'import weather';
     var code = 'weather.get_forecasted_reports(';
-    var argument0 = Blockly.Python.valueToCode(block, 'city',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+    var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
     code += argument0 + ')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Python['get_temperature'] = function(block) {
+Blockly.Python['weather_temperature'] = function(block) {
     Blockly.Python.definitions_['import_weather'] = 'import weather';
     var code = 'weather.get_temperature(';
-    var argument0 = Blockly.Python.valueToCode(block, 'city',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+    var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
     code += argument0 + ')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };

@@ -29,7 +29,7 @@ goog.provide('Blockly.Blocks.procedures');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.procedures.HUE = 290;
+Blockly.Blocks.procedures.HUE = 210;
 
 Blockly.Blocks['procedures_defnoreturn'] = {
   /**
@@ -463,6 +463,19 @@ Blockly.Blocks['procedures_callnoreturn'] = {
           .replace('%1', newName));
     }
   },
+    /**
+     * Notification that the procedure's return state has changed.
+     * @param {boolean} returnState New return state
+     * @this Blockly.Block
+     */
+    setReturn: function(returnState) {
+        this.setOutput(returnState);
+        this.previousStatement(!returnState);
+        this.nextStatement(!returnState);
+        if (this.rendered) {
+            this.render();
+        }
+    },
   /**
    * Notification that the procedure's parameters have changed.
    * @param {!Array.<string>} paramNames New param names, e.g. ['x', 'y', 'z'].
@@ -757,40 +770,14 @@ Blockly.Blocks['procedures_return'] = {
    */
   init: function() {
     this.setHelpUrl('http://c2.com/cgi/wiki?GuardClause');
-    this.setColour(290);
+    this.setColour(Blockly.Blocks.procedures.HUE);
     this.appendValueInput('VALUE')
         .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
-    //this.setInputsInline(true);
+    this.setInputsInline(false);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP);
     this.hasReturnValue_ = true;
-  },
-  /**
-   * Create XML to represent whether this block has a return value.
-   * @return {Element} XML storage element.
-   * @this Blockly.Block
-   */
-  mutationToDom: function() {
-    // Save whether this block has a return value.
-    var container = document.createElement('mutation');
-    container.setAttribute('value', Number(this.hasReturnValue_));
-    return container;
-  },
-  /**
-   * Parse XML to restore whether this block has a return value.
-   * @param {!Element} xmlElement XML storage element.
-   * @this Blockly.Block
-   */
-  domToMutation: function(xmlElement) {
-    // Restore whether this block has a return value.
-    var value = xmlElement.getAttribute('value');
-    this.hasReturnValue_ = (value == 1);
-    if (!this.hasReturnValue_) {
-      this.removeInput('VALUE');
-      this.appendDummyInput('VALUE')
-        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
-    }
   },
   /**
    * Called whenever anything on the workspace changes.
@@ -815,18 +802,21 @@ Blockly.Blocks['procedures_return'] = {
     } while (block);
     if (legal) {
       // If needed, toggle whether this block has a return value.
+      /*
       if (block.type == 'procedures_defnoreturn' && this.hasReturnValue_) {
         this.removeInput('VALUE');
         this.appendDummyInput('VALUE')
-          .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+            .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
         this.hasReturnValue_ = false;
       } else if (block.type == 'procedures_defreturn' &&
                  !this.hasReturnValue_) {
         this.removeInput('VALUE');
         this.appendValueInput('VALUE')
-          .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+            .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
         this.hasReturnValue_ = true;
-      }
+      }*/
+      /*Blockly.Procedures.mutateCallersReturns(this.getFieldValue('NAME'),
+                                              this.workspace, true);*/
       this.setWarningText(null);
     } else {
       this.setWarningText(Blockly.Msg.PROCEDURES_IFRETURN_WARNING);

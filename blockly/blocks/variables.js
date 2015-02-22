@@ -29,7 +29,7 @@ goog.provide('Blockly.Blocks.variables');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.variables.HUE = 330;
+Blockly.Blocks.variables.HUE = 240;
 
 Blockly.Blocks['variables_get'] = {
   /**
@@ -104,6 +104,7 @@ Blockly.Blocks['variables_set'] = {
         Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
+    this.setInputsInline(false);
     this.setTooltip(Blockly.Msg.VARIABLES_SET_TOOLTIP);
     this.contextMenuMsg_ = Blockly.Msg.VARIABLES_SET_CREATE_GET;
     this.contextMenuType_ = 'variables_get';

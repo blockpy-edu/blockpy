@@ -29,7 +29,8 @@ goog.provide('Blockly.Blocks.logic');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.logic.HUE = 210;
+var DATA_HUE = 230;
+Blockly.Blocks.logic.HUE = 0;
 
 Blockly.Blocks['controls_if'] = {
   /**
@@ -264,19 +265,19 @@ Blockly.Blocks['logic_compare'] = {
    */
   init: function() {
     var OPERATORS = Blockly.RTL ? [
-          ['=', 'EQ'],
-          ['\u2260', 'NEQ'],
+          ['==', 'EQ'],
+          ['!=', 'NEQ'],
           ['>', 'LT'],
-          ['\u2265', 'LTE'],
+          ['<=', 'LTE'],
           ['<', 'GT'],
-          ['\u2264', 'GTE']
+          ['>=', 'GTE']
         ] : [
-          ['=', 'EQ'],
-          ['\u2260', 'NEQ'],
+          ['==', 'EQ'],
+          ['!=', 'NEQ'],
           ['<', 'LT'],
-          ['\u2264', 'LTE'],
+          ['<=', 'LTE'],
           ['>', 'GT'],
-          ['\u2265', 'GTE']
+          ['>=', 'GTE']
         ];
     this.setHelpUrl(Blockly.Msg.LOGIC_COMPARE_HELPURL);
     this.setColour(Blockly.Blocks.logic.HUE);
@@ -387,7 +388,7 @@ Blockly.Blocks['logic_boolean'] = {
         [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
          [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(Blockly.Blocks.logic.HUE);
+    this.setColour(DATA_HUE);
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
@@ -402,7 +403,7 @@ Blockly.Blocks['logic_null'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_NULL_HELPURL);
-    this.setColour(Blockly.Blocks.logic.HUE);
+    this.setColour(DATA_HUE);
     this.setOutput(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg.LOGIC_NULL);

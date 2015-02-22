@@ -29,14 +29,14 @@ goog.provide('Blockly.Blocks.plot');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.plot.HUE = 210;
+Blockly.Blocks.plot.HUE = 170;
 
 Blockly.Blocks['plot_show'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.plot.HUE);
     this.appendDummyInput()
-        .appendTitle("show plot canvas");
+        .appendField("show plot canvas");
     this.setInputsInline(false);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -48,14 +48,14 @@ Blockly.Blocks['plot_show'] = {
 Blockly.Blocks['plot_scatter'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.plot.HUE);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.appendValueInput("x_values")
-        .appendTitle("plot scatter ")
+        .appendField("plot scatter ")
         .setCheck('Array');
     this.appendValueInput("y_values")
-        .appendTitle("vs. ")
+        .appendField("vs. ")
         .setCheck('Array');
     this.setInputsInline(false);
     this.setOutput(false);
@@ -66,10 +66,10 @@ Blockly.Blocks['plot_scatter'] = {
 Blockly.Blocks['plot_title'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.plot.HUE);
     this.appendValueInput('title')
         .setCheck('String')
-        .appendTitle("make plot's title");
+        .appendField("make plot's title");
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -81,7 +81,7 @@ Blockly.Blocks['plot_title'] = {
 Blockly.Blocks['plot_line'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
+    this.setColour(Blockly.Blocks.plot.HUE);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.appendValueInput("y_values")

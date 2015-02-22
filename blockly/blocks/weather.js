@@ -28,58 +28,63 @@ goog.provide('Blockly.Blocks.weather');
 
 goog.require('Blockly.Blocks');
 
+var CITIES = [['Blacksburg, VA', 'BLACKSBURG'], 
+              ['Seattle, WA', 'SEATTLE'],
+              ['Miami, FL', 'MIAMI'],
+              ['San Jose, CA', 'SANJOSE'],
+              ['New York, NY', 'NEWYORK']]
 
-Blockly.Blocks.weather.HUE = 210;
+Blockly.Blocks.weather.HUE = 70;
 
-Blockly.Blocks['get_temperature'] = {
+Blockly.Blocks['weather_temperature'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
-    this.appendValueInput("city")
-        .appendTitle("get temperature for ")
-        .setCheck(null);
-    this.setInputsInline(true);
+    this.setColour(Blockly.Blocks.weather.HUE);
+    this.appendDummyInput()
+        .appendField("get temperature in")
+        .appendField(new Blockly.FieldDropdown(CITIES), 'CITY');
+    this.setInputsInline(false);
     this.setOutput(true, "Number");
-    this.setTooltip('');
+    this.setTooltip('Returns a single temperature (number)');
   }
 };
         
         
-Blockly.Blocks['get_forecasts'] = {
+Blockly.Blocks['weather_forecasts'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
-    this.appendValueInput("city")
-        .appendTitle("get forecasts for ")
-        .setCheck(null);
-    this.setInputsInline(true);
+    this.setColour(Blockly.Blocks.weather.HUE);
+    this.appendDummyInput()
+        .appendField("get forecasted temperatures in")
+        .appendField(new Blockly.FieldDropdown(CITIES), 'CITY');
+    this.setInputsInline(false);
     this.setOutput(true, "Array");
-    this.setTooltip('');
+    this.setTooltip('Returns a list of forecasted temperatures (list of number)');
   }
 };
 
-Blockly.Blocks['get_forecasted_reports'] = {
+Blockly.Blocks['weather_report_forecasts'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
-    this.appendValueInput("city")
-        .appendTitle("get forecasted reports for ")
-        .setCheck(null);
-    this.setInputsInline(true);
+    this.setColour(Blockly.Blocks.weather.HUE);
+    this.appendDummyInput()
+        .appendField("get forecasted weather in")
+        .appendField(new Blockly.FieldDropdown(CITIES), 'CITY');
+    this.setInputsInline(false);
     this.setOutput(true, "Array");
-    this.setTooltip('');
+    this.setTooltip('Returns a list of forecasted weather reports (list of dicts)');
   }
 };
 
-Blockly.Blocks['get_report'] = {
+Blockly.Blocks['weather_report'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
-    this.setColour(330);
-    this.appendValueInput("city")
-        .appendTitle("get report for ")
-        .setCheck(null);
-    this.setInputsInline(true);
+    this.setColour(Blockly.Blocks.weather.HUE);
+    this.appendDummyInput()
+        .appendField("get weather in")
+        .appendField(new Blockly.FieldDropdown(CITIES), 'CITY');
+    this.setInputsInline(false);
     this.setOutput(true, "dict");
-    this.setTooltip('');
+    this.setTooltip('Returns a weather report (dictionary)');
   }
 };

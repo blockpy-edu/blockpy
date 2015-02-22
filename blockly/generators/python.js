@@ -102,13 +102,15 @@ Blockly.Python.init = function(workspace) {
     Blockly.Python.variableDB_.reset();
   }
 
-  var defvars = [];
+  // Add initialization for variables
+  // Removed, because we shouldn't teach students to do this.
+  /*var defvars = [];
   var variables = Blockly.Variables.allVariables(workspace);
   for (var x = 0; x < variables.length; x++) {
     defvars[x] = Blockly.Python.variableDB_.getName(variables[x],
         Blockly.Variables.NAME_TYPE) + ' = None';
   }
-  Blockly.Python.definitions_['variables'] = defvars.join('\n');
+  Blockly.Python.definitions_['variables'] = defvars.join('\n');*/
 };
 
 /**

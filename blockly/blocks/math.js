@@ -29,7 +29,8 @@ goog.provide('Blockly.Blocks.math');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks.math.HUE = 230;
+var DATA_HUE = 100;
+Blockly.Blocks.math.HUE = 270;
 
 Blockly.Blocks['math_number'] = {
   /**
@@ -38,7 +39,7 @@ Blockly.Blocks['math_number'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.MATH_NUMBER_HELPURL);
-    this.setColour(Blockly.Blocks.math.HUE);
+    this.setColour(DATA_HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
         Blockly.FieldTextInput.numberValidator), 'NUM');
