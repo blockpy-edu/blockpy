@@ -65,8 +65,9 @@
         }
         
         function resetit() {
-            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="63" inline="false" x="23" y="-48"> <field name="VAR">quake_list</field> <value name="VALUE"> <block type="earthquake_get" id="64"> <field name="PROPERTY">magnitude</field> </block> </value> <next> <block type="variables_set" id="65" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_number" id="66"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="72" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_number" id="73"> <field name="NUM">0</field> </block> </value> <next> <block type="controls_forEach" id="67" inline="false"> <field name="VAR">a quake</field> <value name="LIST"> <block type="variables_get" id="71"> <field name="VAR">quake_list</field> </block> </value> <statement name="DO"> <block type="controls_if" id="69" inline="false"> <value name="IF0"> <block type="logic_compare" id="96" inline="true"> <field name="OP">GTE</field> <value name="A"> <block type="variables_get" id="97"> <field name="VAR">a quake</field> </block> </value> <value name="B"> <block type="math_number" id="98"> <field name="NUM">3</field> </block> </value> </block> </value> <statement name="DO0"> <block type="variables_set" id="121" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="106" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="122"> <field name="VAR">total_quakes</field> </block> </value> <value name="B"> <block type="math_number" id="123"> <field name="NUM">1</field> </block> </value> </block> </value> <next> <block type="variables_set" id="124" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="125" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="126"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="128"> <field name="VAR">a quake</field> </block> </value> </block> </value> </block> </next> </block> </statement> </block> </statement> <next> <block type="variables_set" id="177" inline="false"> <field name="VAR">average significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="178" inline="true"> <field name="OP">DIVIDE</field> <value name="A"> <block type="variables_get" id="179"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="180"> <field name="VAR">total_quakes</field> </block> </value> </block> </value> <next> <block type="text_print" id="201" inline="false"> <value name="TEXT"> <block type="variables_get" id="202"> <field name="VAR">average significant quakes</field> </block> </value> <next> <block type="plot_line" id="137" inline="false"> <value name="y_values"> <block type="variables_get" id="176"> <field name="VAR">quake_list</field> </block> </value> <next> <block type="plot_title" id="175"> <field name="TEXT">Significant Quakes</field> <next> <block type="plot_show" id="154"></block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </xml>';
+            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="63" inline="false" x="23" y="-48"> <field name="VAR">quake_list</field> <value name="VALUE"> <block type="earthquake_get" id="64"> <field name="PROPERTY">magnitude</field> </block> </value> <next> <block type="variables_set" id="65" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_number" id="66"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="72" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_number" id="73"> <field name="NUM">0</field> </block> </value> <next> <block type="controls_forEach" id="67" inline="false"> <field name="VAR">a quake</field> <value name="LIST"> <block type="variables_get" id="71"> <field name="VAR">quake_list</field> </block> </value> <statement name="DO"> <block type="controls_if" id="69" inline="false"> <value name="IF0"> <block type="logic_compare" id="96" inline="true"> <field name="OP">GTE</field> <value name="A"> <block type="variables_get" id="97"> <field name="VAR">a quake</field> </block> </value> <value name="B"> <block type="math_number" id="98"> <field name="NUM">3</field> </block> </value> </block> </value> <statement name="DO0"> <block type="variables_set" id="121" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="106" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="122"> <field name="VAR">total_quakes</field> </block> </value> <value name="B"> <block type="math_number" id="123"> <field name="NUM">1</field> </block> </value> </block> </value> <next> <block type="variables_set" id="124" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="125" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="126"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="128"> <field name="VAR">a quake</field> </block> </value> </block> </value> </block> </next> </block> </statement> </block> </statement> <next> <block type="variables_set" id="177" inline="false"> <field name="VAR">average significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="178" inline="true"> <field name="OP">DIVIDE</field> <value name="A"> <block type="variables_get" id="179"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="180"> <field name="VAR">total_quakes</field> </block> </value> </block> </value> <next> <block type="text_print" id="201" inline="false"> <value name="TEXT"> <block type="variables_get" id="202"> <field name="VAR">average significant quakes</field> </block> </value> <next> <block type="plot_line" id="137" inline="false"> <value name="y_values"> <block type="variables_get" id="176"> <field name="VAR">quake_list</field> </block> </value> <next> <block type="plot_title" id="175"> <field name="TEXT">Significant Quakes</field> <next> <block type="plot_show" id="154"></block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </xml>';
             //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="0" y="0"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="2"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="3" inline="false"> <field name="VAR">a string</field> <value name="VALUE"> <block type="text" id="4"> <field name="TEXT">ellie</field> </block> </value> <next> <block type="variables_set" id="5" inline="false"> <field name="VAR">temperatures</field> <value name="VALUE"> <block type="weather_forecasts" id="6"> <field name="CITY">BLACKSBURG</field> </block> </value> <next> <block type="variables_set" id="7" inline="false"> <field name="VAR">a dog</field> <value name="VALUE"> <block type="dicts_create_with" id="8" inline="false"> <mutation items="3"></mutation> <field name="KEY0">name</field> <field name="KEY1">age</field> <field name="KEY2">good</field> <value name="VALUE0"> <block type="text" id="9"> <field name="TEXT">Klaus</field> </block> </value> <value name="VALUE1"> <block type="math_number" id="10"> <field name="NUM">14</field> </block> </value> <value name="VALUE2"> <block type="logic_boolean" id="11"> <field name="BOOL">TRUE</field> </block> </value> </block> </value> <next> <block type="controls_if" id="42" inline="false"> <mutation else="1"></mutation> <value name="IF0"> <block type="dict_get" id="74" inline="true"> <value name="ITEM"> <block type="text" id="76"> <field name="TEXT">good</field> </block> </value> <value name="DICT"> <block type="variables_get" id="75"> <field name="VAR">a dog</field> </block> </value> </block> </value> <statement name="DO0"> <block type="procedures_callnoreturn" id="12"> <mutation name="function_name"></mutation> </block> </statement> <statement name="ELSE"> <block type="text_print_multiple" id="52" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="53"> <field name="VAR">a string</field> </block> </value> </block> </statement> <next> <block type="controls_forEach" id="13" inline="false"> <field name="VAR">iterator variable</field> <value name="LIST"> <block type="variables_get" id="14"> <field name="VAR">temperatures</field> </block> </value> <statement name="DO"> <block type="variables_set" id="15" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_arithmetic" id="16" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="17"> <field name="VAR">a number</field> </block> </value> <value name="B"> <block type="math_number" id="18"> <field name="NUM">1</field> </block> </value> </block> </value> </block> </statement> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> <block type="procedures_defnoreturn" id="19" x="4" y="388"> <mutation></mutation> <field name="NAME">function_name</field> <statement name="STACK"> <block type="variables_set" id="20" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="21"> <field name="NUM">3</field> </block> </value> <next> <block type="variables_set" id="22" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="23"> <field name="NUM">5</field> </block> </value> <next> <block type="text_print_multiple" id="24" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="25"> <field name="VAR">a number</field> </block> </value> </block> </next> </block> </next> </block> </statement> </block> </xml>';
+            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="40" inline="false" x="58" y="92"> <field name="VAR">property_name</field> </block> </xml>';
             var xml = Blockly.Xml.textToDom(code);
             Blockly.mainWorkspace.clear();
             Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
@@ -337,8 +338,11 @@
           }
           
           function convertit() {
+            $("#error-state").hide();
+            var backup = getXml();
+            var error = true;
             try {
-                var code = $("#python-output").text();
+                var code = $("#python-output").val();
                 var xml = (new Python2Blockly()).convert(code);
                 var xmlString = new XMLSerializer().serializeToString(xml);
                 var blocklyXML = Blockly.Xml.textToDom(xmlString);
@@ -346,17 +350,14 @@
                 Blockly.mainWorkspace.clear();
                 Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
                 align();
+                error = false;
             } catch (e) {
                 console.error("P2B: ", e, e.stack);
-                try {
-                    var xml = (new Python2Blockly()).convertToRaw(code);
-                    var xmlString = new XMLSerializer().serializeToString(xml);
-                    var blocklyXML = Blockly.Xml.textToDom(xmlString);
-                    Blockly.mainWorkspace.clear();
-                    Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
-                } catch (e) {
-                    console.error("P2B-X: ", e, e.stack);
-                }
+                $("#error-state").show();
+            }
+            if (error) {
+                Blockly.mainWorkspace.clear();
+                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, backup);
             }
           }
           
@@ -381,7 +382,7 @@
             function blocklyToPython() {
                 // Actual code
                 var code = window.Blockly.Python.workspaceToCode();
-                $("#python-output").html(code);
+                $("#python-output").val(code);
             }
           
           function update_delay() {
@@ -404,8 +405,17 @@
                 $(document).trigger("update_blockly");
             });
           }
-          $(document).ready(function() {
-            //$("#ipt").attr("src", "http://localhost:8080/iframe-embed.html#&code=print+7&py=2&cumulative=false&curInstr=0");
+            var timers = {};
+            function addDelay(directive, action) {
+                clearTimeout(timers[directive]);
+                timers[directive] = setTimeout(action, 400);
+            }
+            $(document).ready(function() {
+                $('#python-output').on('keyup input propertychange paste change', function() {
+                    addDelay('#python-output', function() {
+                        convertit();
+                    });
+                });
           });
         </script>
         <iframe src="blockpy-inner.html" style='height:550px'></iframe>
@@ -413,7 +423,8 @@
       </td>
       <td>
         <img src='' id='my-image' />
-        <pre id="python-output"></pre>
+        <span id='error-state' class='glyphicon glyphicon-remove label label-danger'></span>
+        <textarea style='width:100%;' rows='10' id="python-output"></textarea><br>
         <button onclick="runit()" type="button">Run</button>
         <button onclick="convertit()" type="button">Convert</button>
         <button onclick="resetit()" type="button">Reset</button>
