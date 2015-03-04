@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Demo: Iframe Blockly</title>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border-style: solid;
+      border-color: #ddd;
+      border-width: 0 1px 1px 0;
+    }
+  </style>
+  <script src="libs/jquery.js"></script>
+  <script type="text/javascript" src="libs/crime_data.js"></script>
+  <script type="text/javascript" src="libs/d3.min.js"></script>
+  <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
+  
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  
+    
+    <!-- Skulpt -->
+    <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
+    <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
+    <script type="text/javascript" src="analyzer/analyzer.js"></script>
+    <script type="text/javascript" src="converter/python_to_blockly.js"></script>
+    <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
+    <script type="text/javascript">
+        function outf(text)
+        {
+            var output = document.getElementById("html-output");
+            text = text.replace(/</g, '&lt;');
+            output.innerHTML = output.innerHTML + text;
+        }
+        
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+        
+        function runit() {
+            runProgram(window.Blockly.Python.workspaceToCode());
+        }
+        
+        function resetit() {
+            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="63" inline="false" x="23" y="-48"> <field name="VAR">quake_list</field> <value name="VALUE"> <block type="earthquake_get" id="64"> <field name="PROPERTY">magnitude</field> </block> </value> <next> <block type="variables_set" id="65" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_number" id="66"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="72" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_number" id="73"> <field name="NUM">0</field> </block> </value> <next> <block type="controls_forEach" id="67" inline="false"> <field name="VAR">a quake</field> <value name="LIST"> <block type="variables_get" id="71"> <field name="VAR">quake_list</field> </block> </value> <statement name="DO"> <block type="controls_if" id="69" inline="false"> <value name="IF0"> <block type="logic_compare" id="96" inline="true"> <field name="OP">GTE</field> <value name="A"> <block type="variables_get" id="97"> <field name="VAR">a quake</field> </block> </value> <value name="B"> <block type="math_number" id="98"> <field name="NUM">3</field> </block> </value> </block> </value> <statement name="DO0"> <block type="variables_set" id="121" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="106" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="122"> <field name="VAR">total_quakes</field> </block> </value> <value name="B"> <block type="math_number" id="123"> <field name="NUM">1</field> </block> </value> </block> </value> <next> <block type="variables_set" id="124" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="125" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="126"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="128"> <field name="VAR">a quake</field> </block> </value> </block> </value> </block> </next> </block> </statement> </block> </statement> <next> <block type="variables_set" id="177" inline="false"> <field name="VAR">average significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="178" inline="true"> <field name="OP">DIVIDE</field> <value name="A"> <block type="variables_get" id="179"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="180"> <field name="VAR">total_quakes</field> </block> </value> </block> </value> <next> <block type="text_print" id="201" inline="false"> <value name="TEXT"> <block type="variables_get" id="202"> <field name="VAR">average significant quakes</field> </block> </value> <next> <block type="plot_line" id="137" inline="false"> <value name="y_values"> <block type="variables_get" id="176"> <field name="VAR">quake_list</field> </block> </value> <next> <block type="plot_title" id="175"> <field name="TEXT">Significant Quakes</field> <next> <block type="plot_show" id="154"></block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </xml>';
+            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="0" y="0"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="2"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="3" inline="false"> <field name="VAR">a string</field> <value name="VALUE"> <block type="text" id="4"> <field name="TEXT">ellie</field> </block> </value> <next> <block type="variables_set" id="5" inline="false"> <field name="VAR">temperatures</field> <value name="VALUE"> <block type="weather_forecasts" id="6"> <field name="CITY">BLACKSBURG</field> </block> </value> <next> <block type="variables_set" id="7" inline="false"> <field name="VAR">a dog</field> <value name="VALUE"> <block type="dicts_create_with" id="8" inline="false"> <mutation items="3"></mutation> <field name="KEY0">name</field> <field name="KEY1">age</field> <field name="KEY2">good</field> <value name="VALUE0"> <block type="text" id="9"> <field name="TEXT">Klaus</field> </block> </value> <value name="VALUE1"> <block type="math_number" id="10"> <field name="NUM">14</field> </block> </value> <value name="VALUE2"> <block type="logic_boolean" id="11"> <field name="BOOL">TRUE</field> </block> </value> </block> </value> <next> <block type="controls_if" id="42" inline="false"> <mutation else="1"></mutation> <value name="IF0"> <block type="dict_get" id="74" inline="true"> <value name="ITEM"> <block type="text" id="76"> <field name="TEXT">good</field> </block> </value> <value name="DICT"> <block type="variables_get" id="75"> <field name="VAR">a dog</field> </block> </value> </block> </value> <statement name="DO0"> <block type="procedures_callnoreturn" id="12"> <mutation name="function_name"></mutation> </block> </statement> <statement name="ELSE"> <block type="text_print_multiple" id="52" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="53"> <field name="VAR">a string</field> </block> </value> </block> </statement> <next> <block type="controls_forEach" id="13" inline="false"> <field name="VAR">iterator variable</field> <value name="LIST"> <block type="variables_get" id="14"> <field name="VAR">temperatures</field> </block> </value> <statement name="DO"> <block type="variables_set" id="15" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_arithmetic" id="16" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="17"> <field name="VAR">a number</field> </block> </value> <value name="B"> <block type="math_number" id="18"> <field name="NUM">1</field> </block> </value> </block> </value> </block> </statement> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> <block type="procedures_defnoreturn" id="19" x="4" y="388"> <mutation></mutation> <field name="NAME">function_name</field> <statement name="STACK"> <block type="variables_set" id="20" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="21"> <field name="NUM">3</field> </block> </value> <next> <block type="variables_set" id="22" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="23"> <field name="NUM">5</field> </block> </value> <next> <block type="text_print_multiple" id="24" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="25"> <field name="VAR">a number</field> </block> </value> </block> </next> </block> </next> </block> </statement> </block> </xml>';
+            var xml = Blockly.Xml.textToDom(code);
+            Blockly.mainWorkspace.clear();
+            Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+            align();
+        }
+        
+        function parseValue(property, value) {
+            switch (value.constructor) {
+                case Sk.builtin.func:
+                    return {'name': property,
+                            'type': "Function",
+                            "value":  
+                                (value.func_code.co_varnames !== undefined ?
+                                 " Arguments: "+value.func_code.co_varnames.join(", ") :
+                                 ' No arguments')
+                            };
+                case Sk.builtin.module: return null;
+                case Sk.builtin.str:
+                    return {'name': property,
+                        'type': "String",
+                        "value": value.$r().v
+                    };
+                case Sk.builtin.none:
+                    return {'name': property,
+                        'type': "None",
+                        "value": "None"
+                    };
+                case Sk.builtin.bool:
+                    return {'name': property,
+                        'type': "Boolean",
+                        "value": value.$r().v
+                    };
+                case Sk.builtin.nmber:
+                    return {'name': property,
+                        'type': "int" == value.skType ? "Integer": "Float",
+                        "value": value.$r().v
+                    };
+                case Sk.builtin.list:
+                    return {'name': property,
+                        'type': "List",
+                        "value": value.$r().v
+                    };
+                case Sk.builtin.dict:
+                    return {'name': property,
+                        'type': "Dictionary",
+                        "value": value.$r().v
+                    };
+                case Number:
+                    return {'name': property,
+                        'type': value % 1 === 0 ? "Integer" : "Float",
+                        "value": value
+                    };
+                case String:
+                    return {'name': property,
+                        'type': "String",
+                        "value": value
+                    };
+                default:
+                    return {'name': property,
+                            'type': value.$r().v,
+                            "value": value.$r().v
+                            };
+            }
+        }
+        
+        function parseGlobals(globals) {
+            var result = Array();
+            for (var property in globals) {
+                value = globals[property];
+                if (property !== "__name__") {
+                    property = property.replace('_$rw$', '')
+                                       .replace('_$rn$', '');
+                    var parsed = parseValue(property, value);
+                    if (parsed !== null) {
+                        result.push(parsed);
+                    }
+                }
+            }
+            return result;
+        }
+
+        function runProgram(prog)
+        {
+            var output = document.getElementById("html-output");
+            output.innerHTML = '';
+            Sk.configure({output:outf, read: builtinRead});
+            Sk.canvas = "mycanvas";
+            var step = 0;
+            var highlightMap = mapBlocklyToPython();
+            var propertyList = [];
+            Sk.afterSingleExecution = function($gbl, lineno, colno, filename) {
+                console.log($gbl);
+                propertyList.push({'step': step, 
+                                   'filename': filename,
+                                   'block': highlightMap[lineno-1],
+                                   'lineno': lineno,
+                                   'colno': colno,
+                                   'properties': parseGlobals($gbl)});
+                step += 1;
+            };
+            try {
+                var module = Sk.importMainWithBody("<stdin>", false, prog);
+                Sk.afterSingleExecution(module.$d);
+                //var obj = module.tp$getattr('a');
+                //var runMethod = obj.tp$getattr('run');
+                //var ret = Sk.misceval.callsim(runMethod, 10);
+                //alert(ret.v);
+            } catch (e) {
+                alert(e);
+            }
+            reloadDataViewer(propertyList, -1);
+            console.log(propertyList);
+        }
+        
+        function reloadDataViewer(propertyList, page) {
+            var last = propertyList.length-1;
+            if (page < 0) {
+                page = last+page+1;
+            }
+            
+            Blockly.mainWorkspace.traceOn(true)
+            // Clear out any existing data
+            var tbl = $("#data-viewer");
+            tbl.html('');
+            function buildButton(next_page, label) {
+                var button = $('<button>'+label+'</button>');
+                button.click(function() { reloadDataViewer(propertyList, next_page)});
+                return $("<td/>").append(button);
+            }
+            var row = $('<tr/>');
+            row.append(buildButton(0, "First"));
+            row.append(buildButton(Math.max(0, page-1), "Previous"));
+            row.append($("<td/>"));
+            row.append(buildButton(Math.min(last, page+1), "Next"));
+            row.append(buildButton(last, "Last"));
+            tbl.append(row);
+            
+            function renderData(property, value) {
+                var row = $("<tr/>");
+                row.append($("<td/>").text(value['name']));
+                row.append($("<td />").text(value['type']));
+                row.append($("<td colspan='3'/>").text(value['value']));
+                return row;
+            }
+            
+            if (propertyList[page] === undefined) {
+                tbl.append($("<tr><td colspan='5'>No data found at this step!</td></tr>"));
+            } else {
+                var lineno = propertyList[page]['lineno'];
+                if (page == last) {
+                    tbl.append($("<tr><th colspan='5'>Completed</th></tr>"));
+                } else {
+                    tbl.append($("<tr><th colspan='5'>Step "+page+" (Line "+lineno+")</th></tr>"));
+                }
+                var block = propertyList[page]['block'];
+                Blockly.mainWorkspace.highlightBlock(block);
+                for (var property in propertyList[page]['properties']) {
+                    var value = propertyList[page]['properties'][property];
+                    row = renderData(property, value);
+                    tbl.append(row);
+                }
+            }
+           
+        }
+    </script>
+  
+</head>
+<body>
+  <table width="100%" height="99%">
+    <tr>
+      <td width="900px">
+        <h1>CORGIS Blockly &gt;
+      </td>
+    </tr>
+    <tr>
+      <td style='vertical-align:top'>
+        <script>
+        
+            function align(){
+                var blocks = Blockly.getMainWorkspace().getTopBlocks();
+                var y = 0;
+                for (var i = 0; i < blocks.length; i++){
+                    var properties = blocks[i].getRelativeToSurfaceXY()
+                    //blocks[i].moveTo(Blockly.Toolbox.width+20, y);
+                    //blocks[i].moveTo(0, y);
+                    blocks[i].moveBy(-properties.x, -properties.y+y);
+                    y += blocks[i].getHeightWidth().height;
+                    y += 20; // buffer
+                }
+            }
+
+          waitQueue = [];
+          function buildIptUrl(code, instruction) {
+            console.log( encodeURI(code));
+            return "http://localhost:8080/iframe-embed.html#&code=" + encodeURIComponent(code) + "&py=2&cumulative=false&curInstr=0";
+          }
+          
+          function clearit() {
+            Blockly.mainWorkspace.clear();
+          }
+          
+          function layoutit() {
+            var metrics = Blockly.mainWorkspace.getMetrics();
+            var newScrollX = (metrics.contentWidth - metrics.viewWidth ) / 2;
+            var newScrollY = (metrics.contentHeight - metrics.viewHeight ) / 2;
+            var blocks = Blockly.getMainWorkspace().getTopBlocks();
+            if (blocks.length > 0) {
+                //Blockly.mainWorkspace.scrollbar.set(0, 0);
+            } else {
+                //Blockly.mainWorkspace.scrollbar.set(0, 0);
+            }
+            align();
+          }
+          
+          var UNDO_STACK = Array();
+          var REDO_STACK = Array();
+          var SAVE_UNDO_FLAG = true;
+          var MAXIMUM_UNDOS = 20;
+          
+          function saveUndo() {
+              if (SAVE_UNDO_FLAG) {
+                  if (UNDO_STACK.length >= MAXIMUM_UNDOS) {
+                      UNDO_STACK.shift();
+                  }
+                  UNDO_STACK.push(getXml());
+                  REDO_STACK = Array();
+              } else {
+                  SAVE_UNDO_FLAG = true;
+              }
+          }
+          
+          function getXml() {
+              return Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+          }
+          
+          function loadXml(xml) {
+              //var blocklyXML = Blockly.Xml.textToDom(xml);
+              Blockly.mainWorkspace.clear();
+              Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+          }
+          
+          function loadUndo() {
+              if (UNDO_STACK.length > 0) {
+                  console.log("Popping undo");
+                  SAVE_UNDO_FLAG = false;
+                  var state = UNDO_STACK.pop();
+                  REDO_STACK.push(state);
+                  loadXml(state);
+              }
+          }
+          
+          function loadRedo() {
+              if (REDO_STACK.length > 0) {
+                  console.log("Popping redo");
+                  SAVE_UNDO_FLAG = false;
+                  var state = REDO_STACK.pop();
+                  UNDO_STACK.push(state);
+                  loadXml(state);
+              }
+          }
+          
+          function analyzeit() {
+            try {
+                analyze_code();
+            } catch (e) {
+                console.error("Analyzer: ", e, e.stack);
+            }
+          }
+          
+          function convertit() {
+            try {
+                var code = $("#python-output").text();
+                var xml = (new Python2Blockly()).convert(code);
+                var xmlString = new XMLSerializer().serializeToString(xml);
+                var blocklyXML = Blockly.Xml.textToDom(xmlString);
+                console.log(xmlString);
+                Blockly.mainWorkspace.clear();
+                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
+                align();
+            } catch (e) {
+                console.error("P2B: ", e, e.stack);
+                try {
+                    var xml = (new Python2Blockly()).convertToRaw(code);
+                    var xmlString = new XMLSerializer().serializeToString(xml);
+                    var blocklyXML = Blockly.Xml.textToDom(xmlString);
+                    Blockly.mainWorkspace.clear();
+                    Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
+                } catch (e) {
+                    console.error("P2B-X: ", e, e.stack);
+                }
+            }
+          }
+          
+            function mapBlocklyToPython() {
+                // Build up highlight map
+                var backup = window.Blockly.Python.STATEMENT_PREFIX;
+                window.Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
+                window.Blockly.Python.addReservedWords('__HIGHLIGHT__');
+                var highlightedCode = window.Blockly.Python.workspaceToCode();
+                window.Blockly.Python.STATEMENT_PREFIX = backup;
+                var highlightMap = [];
+                for (var i = 0, lines = highlightedCode.split("\n");
+                     i < lines.length; i++) {
+                     var id = lines[i].match(/\W*__HIGHLIGHT__\(\'(.+?)\'\)/);
+                     if (id !== null) {
+                        highlightMap[i] = parseInt(id[1], 10);
+                    }
+                }
+                return highlightMap;
+            }
+          
+            function blocklyToPython() {
+                // Actual code
+                var code = window.Blockly.Python.workspaceToCode();
+                $("#python-output").html(code);
+            }
+          
+          function update_delay() {
+            if (waitQueue.length <= 1) {
+                blocklyToPython();
+                var dom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+                $("#xml-output").text(Blockly.Xml.domToPrettyText(dom));
+            }
+            waitQueue.pop();
+          }
+          $(document).on("update_blockly", function() {
+            waitQueue.push(1);
+            window.setTimeout(update_delay, 0000);
+          });
+          function blocklyLoaded(blockly) {
+            // Called once Blockly is fully loaded.
+            window.Blockly = blockly;
+            blockly.addChangeListener(function () {
+                saveUndo();
+                $(document).trigger("update_blockly");
+            });
+          }
+          $(document).ready(function() {
+            //$("#ipt").attr("src", "http://localhost:8080/iframe-embed.html#&code=print+7&py=2&cumulative=false&curInstr=0");
+          });
+        </script>
+        <iframe src="blockpy-inner.html" style='height:550px'></iframe>
+        <div id="xml-output" style='font-size:6pt'></div>
+      </td>
+      <td>
+        <img src='' id='my-image' />
+        <pre id="python-output"></pre>
+        <button onclick="runit()" type="button">Run</button>
+        <button onclick="convertit()" type="button">Convert</button>
+        <button onclick="resetit()" type="button">Reset</button>
+        <button onclick="clearit()" type="button">Clear</button>
+        <button onclick="layoutit()" type="button">Align</button>
+        <button onclick="loadRedo()" type="button">R</button>
+        <button onclick="loadUndo()" type="button">U</button>
+        <button onclick="renderBlocklyCanvas('#my-image')" type="button">Picture</button>
+        <br>
+        Program Output:
+        <pre id="html-output" style='max-width:400px'></pre>
+        <div id="mycanvas"></div>
+        State visualization:
+        <table id='data-viewer' class='table table-condensed table-striped' width='100%'><tr></tr></table>
+      </td>
+  </tr>
+  <tr>
+      <td colspan='2'>
+      </td>
+      <!--<td id="ipt-td">
+        <iframe id="ipt" frameborder="0"
+                src="http://localhost:8080/iframe-embed.html#&code=print+3&py=2&cumulative=false&curInstr=0">
+        </iframe>
+      </td>-->
+    </tr>
+  </table>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="blockly/blockly_compressed.js"></script>
+    <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="blockly/python_compressed.js"></script>
+    <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
+    <script type="text/javascript" src="blockly/msg/js/en.js"></script>
+    
+    <style>
+      html, body {
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+      }
+      .blocklyDraggable {
+        /* Hotspot coordinates are baked into the CUR file, but they are still
+         required in the CSS due to a Chrome bug.
+         http://code.google.com/p/chromium/issues/detail?id=1446 */
+        cursor: url(./media/handopen.cur) 8 5, auto;
+        }
+
+      .blocklySvg {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    
+    <script>
+    function init() {
+        
+        function align(){
+            var blocks = Blockly.getMainWorkspace().getTopBlocks();
+            var y = 0;
+            for (var i = 0; i < blocks.length; i++) {
+                var properties = blocks[i].getRelativeToSurfaceXY()
+                //blocks[i].moveTo(Blockly.Toolbox.width+20, y);
+                //blocks[i].moveTo(0, y);
+                blocks[i].moveBy(-properties.x, -properties.y+y);
+                y += blocks[i].getHeightWidth().height;
+                y += 20; // buffer
+            }
+        }
+        
+        parent.jQuery(document).ready(function() {
+            Blockly.inject(document.body,
+                {path: 'blockly/', 
+                 scrollbars: true, 
+                 toolbox: document.getElementById('toolbox')});
+            // Let the top-level application know that Blockly is ready.
+            window.parent.blocklyLoaded(Blockly);
+            
+            window.parent.resetit();
+        });
+    }
+    </script>
+  </head>
+  <body onload="init()">
+    <xml id="toolbox" style="display: none">
+        <category name="Decisions">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+        </category>
+        <category name="Properties" custom="VARIABLE">
+            <block type="variables_set"></block>
+            <block type="variables_get"></block>
+        </category>
+        <category name="Iteration">
+            <block type="controls_forEach"></block>
+        </category>
+        <category name="Utility">
+            <block type="text_print"></block>
+            <block type="type_check"></block>
+            <block type="raw_block"></block>
+            <block type="raw_expression"></block>
+            <block type="function_call"></block>
+        </category>
+        <category name="Functions" custom="PROCEDURE">
+        </category>
+        <category name="Calculation">
+            <block type="math_arithmetic"></block>
+            <block type="math_single"></block>
+            <block type="math_number_property"></block>
+            <block type="math_round"></block>
+            <block type="text_join"></block>
+        </category>
+        <category name="Plotting">
+            <block type="plot_line"></block>
+            <block type="plot_scatter"></block>
+            <block type="plot_show"></block>
+            <block type="plot_title"></block>
+        </category>
+        <category name="Data - Simple">
+            <block type="text"></block>
+            <block type="math_number"></block>
+            <block type="logic_boolean"></block>
+        </category>
+        <category name="Data - Lists">
+            <block type="lists_create_with"></block>
+            <block type="lists_create_empty"></block>
+            <block type="lists_append"></block>
+            <block type="lists_length"></block>
+        </category>
+        <category name="Data - Dictionaries">
+            <block type="dicts_create_with"></block>
+            <block type="dict_get"></block>
+            <block type="dict_keys"></block>
+        </category>
+        <category name="Data - Weather">
+            <block type="weather_temperature"></block>
+            <block type="weather_report"></block>
+            <block type="weather_forecasts"></block>
+            <block type="weather_report_forecasts"></block>
+        </category>
+        <category name="Data - Stock">
+            <block type="stocks_current"></block>
+            <block type="stocks_past"></block>
+        </category>
+        <category name="Data - Earthquakes">
+            <block type="earthquake_get"></block>
+            <block type="earthquake_both"></block>
+            <block type="earthquake_all"></block>
+        </category>
+        <category name="Data - Crime">
+            <block type="crime_state"></block>
+            <block type="crime_year"></block>
+            <block type="crime_all"></block>
+        </category>
+        <category name="Data - Books">
+            <block type="books_get"></block>
+        </category>
+    </xml>
+  </body>
+</html>

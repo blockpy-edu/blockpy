@@ -1,0 +1,71 @@
+<html>
+<head>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+</style>
+</head>
+<body>
+<script src="libs/d3.min.js"></script>
+<script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
+<script src="libs/jquery.js"></script>
+
+<script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
+<script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
+<script type="text/javascript">
+        function outf(text)
+        {
+            var output = document.getElementById("html-output");
+            text = text.replace(/</g, '&lt;');
+            output.innerHTML = output.innerHTML + text;
+        }
+        
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+        
+        function runit() {
+            runProgram($("#python-output").text());
+        }
+
+        function runProgram(prog)
+        {
+            var output = document.getElementById("html-output");
+            output.innerHTML = '';
+            Sk.configure({output:outf, read: builtinRead});
+            Sk.canvas = "mycanvas";
+            try {
+                module = Sk.importMainWithBody("<stdin>", false, prog);
+                //var obj = module.tp$getattr('a');
+                //var runMethod = obj.tp$getattr('run');
+                //var ret = Sk.misceval.callsim(runMethod, 10);
+            } catch (e) {
+                $("#error-output").text(e);
+            }
+            
+        }
+        
+        $(document).ready(function() {
+            runit();
+        });
+        
+        
+    </script>
+    
+    <pre id="python-output">
+import matplotlib.pyplot as pp
+import numpy as np
+pp.plot([0,1,20, 30, 40, 50])
+pp.show()</pre>
+    <button onclick="runit()" type="button">Run</button>
+    <pre id="html-output"></pre>
+    <pre id="error-output"></pre>
+    <svg id="mycanvas"  height="400" width="400" style="border:1px solid #000000;">
+    </svg>
+</body>
+</html>
