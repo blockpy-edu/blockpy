@@ -29,6 +29,7 @@
  *
  * To convert all of the json files to .js files, run:
  * ../i18n/create_messages.py json/*.json
+ * Windows users will want to replace the *.json with the target: e.g., en.json
  */
 'use strict';
 

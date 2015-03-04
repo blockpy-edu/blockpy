@@ -67,14 +67,30 @@ Blockly.Blocks['plot_title'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
     this.setColour(Blockly.Blocks.plot.HUE);
-    this.appendValueInput('title')
-        .setCheck('String')
-        .appendField("make plot's title");
+    this.appendDummyInput()
+        .appendField("make plot's title")
+        .appendField(this.newQuote_(true))
+        .appendField(new Blockly.FieldTextInput('title'), 'TEXT')
+        .appendField(this.newQuote_(false));
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setOutput(false);
     this.setTooltip('Sets the plot\'s title');
+  },
+  /**
+   * Create an image of an open or closed quote.
+   * @param {boolean} open True if open quote, false if closed.
+   * @return {!Blockly.FieldImage} The field image of the quote.
+   * @private
+   */
+  newQuote_: function(open) {
+    if (open == Blockly.RTL) {
+      var file = 'quote1.png';
+    } else {
+      var file = 'quote0.png';
+    }
+    return new Blockly.FieldImage(Blockly.pathToMedia + file, 12, 12, '"');
   }
 };
 

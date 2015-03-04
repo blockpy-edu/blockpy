@@ -30,8 +30,7 @@ goog.require('Blockly.Python');
 
 Blockly.Python['plot_title'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var parameter_plot_title = Blockly.Python.valueToCode(block, 'title',
-      Blockly.Python.ORDER_NONE) || '""';
+    var parameter_plot_title = Blockly.Python.quote_(block.getFieldValue('TEXT'))
     var code = 'plt.title('+parameter_plot_title+')\n';
     return code;
 };

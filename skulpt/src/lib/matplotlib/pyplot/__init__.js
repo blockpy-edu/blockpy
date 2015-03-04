@@ -1612,6 +1612,7 @@ var $builtinmodule = function(name) {
         }
     };
 
+    mod.values = Array();
     // Main plotting function
     var plot_f = function(kwa) {
         // http://matplotlib.org/api/pyplot_api.html
@@ -1619,6 +1620,7 @@ var $builtinmodule = function(name) {
         //debugger;
         Sk.builtin.pyCheckArgs("plotk", arguments, 1, Infinity, true, false);
         args = Array.prototype.slice.call(arguments, 1);
+        mod.values.push(args);
         kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
         kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
 
