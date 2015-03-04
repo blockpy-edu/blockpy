@@ -605,7 +605,7 @@ Python2Blockly.prototype.convert = function(python_source) {
     this.sourceCodeLines = python_source.split("\n");
     
     if (error_message !== false) {
-        console.log("Error: "+error_message);
+        throw "Error: "+error_message;
     } else {
         this._convertBody(this.XML, parse_tree.body);
     }
