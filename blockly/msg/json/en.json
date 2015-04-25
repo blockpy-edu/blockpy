@@ -2,6 +2,7 @@
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
 <<<<<<< HEAD
+<<<<<<< HEAD
 		"lastupdated": "2015-02-25 15:05:28.489000",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
@@ -9,6 +10,9 @@
 	"VARIABLES_DEFAULT_NAME": "property_name",
 =======
 		"lastupdated": "2015-02-05 13:05:05.137671",
+=======
+		"lastupdated": "2015-02-23 14:32:49.921791",
+>>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},

@@ -39,9 +39,7 @@
       position: fixed;
     }
     #previewFrame {
-      border-style: solid;
-      border-color: #ddd;
-      border-width: 0 1px 1px 0;
+      border: none;
       position: absolute;
     }
     pre {
@@ -164,7 +162,11 @@
       <block type="field_dropdown"></block>
       <block type="field_checkbox"></block>
       <block type="field_colour"></block>
+      <!--
+      Date picker commented out since it increases footprint by 60%.
+      Add it only if you need it.  See also goog.require in blockly.js.
       <block type="field_date"></block>
+      -->
       <block type="field_variable"></block>
       <block type="field_image"></block>
     </category>

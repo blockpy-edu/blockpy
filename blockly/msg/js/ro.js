@@ -35,7 +35,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "continuă cu următoar
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Ieși din bucla care conţine.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Sari peste restul aceastei bucle, şi continuă cu urmatoarea iteratie.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "Avertisment: Acest bloc pote fi utilizat numai în interiorul unei bucle.";
-Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each for each block";  // untranslated
+Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each pentru fiecare bloc";
 Blockly.Msg.CONTROLS_FOREACH_INPUT_INLIST = "în listă";
 Blockly.Msg.CONTROLS_FOREACH_INPUT_INLIST_TAIL = "";  // untranslated
 Blockly.Msg.CONTROLS_FOREACH_INPUT_ITEM = "pentru fiecare element";
@@ -88,8 +88,9 @@ Blockly.Msg.DUPLICATE_BLOCK = "Duplicati";
 Blockly.Msg.ENABLE_BLOCK = "Permite bloc";
 Blockly.Msg.EXPAND_ALL = "Extinde blocuri";
 Blockly.Msg.EXPAND_BLOCK = "Extinde bloc";
-Blockly.Msg.EXTERNAL_INPUTS = "Intrări Externe";
+Blockly.Msg.EXTERNAL_INPUTS = "Intrări externe";
 Blockly.Msg.HELP = "Ajutor";
+<<<<<<< HEAD
 Blockly.Msg.INLINE_INPUTS = "Intrari de Linie";
 <<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
@@ -98,6 +99,9 @@ Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
 =======
 >>>>>>> c5183726939fef4ab1e456826716478687020170
+=======
+Blockly.Msg.INLINE_INPUTS = "Intrări în linie";
+>>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "creează listă goală";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returnează o listă, de lungime 0, care nu conţine înregistrări de date";
@@ -168,11 +172,11 @@ Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FROM_START = "Setează elementul la pozi
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_LAST = "Setează ultimul element într-o listă.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_RANDOM = "Setează un element aleator într-o listă.";
 Blockly.Msg.LISTS_SPLIT_HELPURL = "https://github.com/google/blockly/wiki/Lists#splitting-strings-and-joining-lists";  // untranslated
-Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "make list from text";  // untranslated
-Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "make text from list";  // untranslated
-Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = "Join a list of texts into one text, separated by a delimiter.";  // untranslated
-Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = "Split text into a list of texts, breaking at each delimiter.";  // untranslated
-Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "with delimiter";  // untranslated
+Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "convertește textul în listă";
+Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "convertește lista în text";
+Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = "Concatenează o listă de texte (alternate cu separatorul) într-un text unic";
+Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = "Împarte textul într-o listă de texte, despărțite prin fiecare separator";
+Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "cu separatorul";
 Blockly.Msg.LISTS_TOOLTIP = "Returnează adevărat dacă lista este goală.";
 Blockly.Msg.LOGIC_BOOLEAN_FALSE = "fals";
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = "https://github.com/google/blockly/wiki/Logic#values";  // untranslated
