@@ -47,6 +47,13 @@ Blockly.Python['weather_forecasts'] = function(block) {
     code += argument0 + ')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
+Blockly.Python['weather_highs_lows'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_highs_lows(';
+    var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
+    code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
 
 Blockly.Python['weather_report'] = function(block) {
     Blockly.Python.definitions_['import_weather'] = 'import weather';
@@ -61,6 +68,12 @@ Blockly.Python['weather_report_forecasts'] = function(block) {
     var code = 'weather.get_forecasted_reports(';
     var argument0 = Blockly.Python.quote_(block.getFieldValue('CITY'));
     code += argument0 + ')';
+    return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['weather_all_forecasts'] = function(block) {
+    Blockly.Python.definitions_['import_weather'] = 'import weather';
+    var code = 'weather.get_all_forecasted_temperatures()'
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 

@@ -38,6 +38,14 @@ Blockly.Python['dict_get'] = function(block) {
 };
 
 
+Blockly.Python['dict_get_literal'] = function(block) {
+  var dict = Blockly.Python.valueToCode(block, 'DICT',
+      Blockly.Python.ORDER_MEMBER) || '{}';
+  var value = Blockly.Python.quote_(block.getFieldValue('ITEM'));
+  var code = dict + '[' + value + ']';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
 
 Blockly.Python['dicts_create_with'] = function(block) {
     var value_keys = Blockly.Python.valueToCode(block, 'keys', Blockly.   Python.ORDER_ATOMIC);

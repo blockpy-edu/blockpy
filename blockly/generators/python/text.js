@@ -278,6 +278,11 @@ Blockly.Python['text_print_multiple'] = function(block) {
     inner_prints[n] = Blockly.Python.valueToCode(block, 'PRINT' + n,
         Blockly.Python.ORDER_NONE) || 'None';
   }
-  var code = 'print(' + inner_prints.join(', ') + ')\n';
+  var code;
+  if (block.itemCount_ == 1) {
+      code = 'print(' + inner_prints.join(', ') + ')\n';
+  } else {
+      code = 'print ' + inner_prints.join(', ') + ' \n';
+  }
   return code;
 };

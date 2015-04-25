@@ -29,7 +29,7 @@ goog.provide('Blockly.Blocks.math');
 goog.require('Blockly.Blocks');
 
 
-var DATA_HUE = 100;
+var DATA_HUE = 100, LOGIC_HUE = 230;
 Blockly.Blocks.math.HUE = 270;
 
 Blockly.Blocks['math_number'] = {
@@ -58,6 +58,7 @@ Blockly.Blocks['math_arithmetic'] = {
         [[Blockly.Msg.MATH_ADDITION_SYMBOL, 'ADD'],
          [Blockly.Msg.MATH_SUBTRACTION_SYMBOL, 'MINUS'],
          [Blockly.Msg.MATH_MULTIPLICATION_SYMBOL, 'MULTIPLY'],
+         ['%', 'MODULO'],
          [Blockly.Msg.MATH_DIVISION_SYMBOL, 'DIVIDE'],
          [Blockly.Msg.MATH_POWER_SYMBOL, 'POWER']];
     this.setHelpUrl(Blockly.Msg.MATH_ARITHMETIC_HELPURL);
@@ -77,6 +78,7 @@ Blockly.Blocks['math_arithmetic'] = {
         'ADD': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_ADD,
         'MINUS': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS,
         'MULTIPLY': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY,
+        'MODULO': "Interpolation or remainder",
         'DIVIDE': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE,
         'POWER': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER
       };
@@ -197,7 +199,7 @@ Blockly.Blocks['math_number_property'] = {
          [Blockly.Msg.MATH_IS_POSITIVE, 'POSITIVE'],
          [Blockly.Msg.MATH_IS_NEGATIVE, 'NEGATIVE'],
          [Blockly.Msg.MATH_IS_DIVISIBLE_BY, 'DIVISIBLE_BY']];
-    this.setColour(Blockly.Blocks.math.HUE);
+    this.setColour(LOGIC_HUE);
     this.appendValueInput('NUMBER_TO_CHECK')
         .setCheck('Number');
     var dropdown = new Blockly.FieldDropdown(PROPERTIES, function(option) {
@@ -257,7 +259,7 @@ Blockly.Blocks['math_change'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.MATH_CHANGE_HELPURL);
-    this.setColour(Blockly.Blocks.math.HUE);
+    this.setColour(240);
     this.interpolateMsg(
         // TODO: Combine these messages instead of using concatenation.
         Blockly.Msg.MATH_CHANGE_TITLE_CHANGE + ' %1 ' +
@@ -267,6 +269,7 @@ Blockly.Blocks['math_change'] = {
         Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
+    this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     this.setTooltip(function() {

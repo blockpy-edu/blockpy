@@ -69,6 +69,19 @@ Blockly.Blocks['weather_forecasts'] = {
   }
 };
 
+Blockly.Blocks['weather_highs_lows'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(WEATHER_HUE);
+    this.appendDummyInput()
+        .appendField("get highs and lows in")
+        .appendField(new Blockly.FieldDropdown(CITIES), 'CITY');
+    this.setInputsInline(false);
+    this.setOutput(true, "dict");
+    this.setTooltip('Returns a list of forecasted temperature highs and lows (dict of lists of numbers)');
+  }
+};
+
 Blockly.Blocks['weather_report_forecasts'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -92,6 +105,18 @@ Blockly.Blocks['weather_report'] = {
     this.setInputsInline(false);
     this.setOutput(true, "dict");
     this.setTooltip('Returns a weather report (dictionary)');
+  }
+};
+
+Blockly.Blocks['weather_all_forecasts'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(WEATHER_HUE);
+    this.appendDummyInput()
+        .appendField("get all forecasted temperatures");
+    this.setInputsInline(false);
+    this.setOutput(true, "dict");
+    this.setTooltip('Returns a list of dictionaries of forecasts and cities');
   }
 };
 

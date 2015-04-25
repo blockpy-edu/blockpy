@@ -2,6 +2,8 @@ var $builtinmodule = function(name)
 {
     var mod = {};
     
+    var CONNECTED = false;
+    
     var WEATHER_REPORTS = {
     'BLACKSBURG':[{'temperature': 30, 'humidity':  20, 'wind':  3}, {'temperature': 25, 'humidity': 50, 'wind': 10},
                   {'temperature': 29, 'humidity': 100, 'wind':  5}, {'temperature': 18, 'humidity': 90, 'wind': 15},
@@ -90,6 +92,51 @@ var $builtinmodule = function(name)
             throw new Sk.builtin.ValueError("Weather data is only available for the following cities: Blacksburg, Miami, San Jose, New York, Seattle.");
         }
         return Sk.ffi.remapToPy(WEATHER_REPORTS[city]);
+    });
+    
+    mod.get_highs_lows = new Sk.builtin.func(function(city) {
+        Sk.builtin.pyCheckArgs("get_highs_lows", arguments, 1, 1);
+        Sk.builtin.pyCheckType("city", "string", Sk.builtin.checkString(city));
+        city = normalize_city(city.v);
+        if (city === null) {
+            throw new Sk.builtin.ValueError("Weather data is only available for the following cities: Blacksburg, Miami, San Jose, New York, Seattle.");
+        }
+        var highs = [], lows = [];
+        for (var i = 0; i < WEATHER_REPORTS[city].length; i+= 1) {
+            var temperature = WEATHER_REPORTS[city][i]['temperature'];
+            if (i % 2 == 0) {
+                highs.push(temperature);
+            } else {
+                lows.push(temperature);
+            }
+        }
+        return Sk.ffi.remapToPy({"highs": highs, "lows":  lows});
+    });
+    
+    var get_temperatures = function(city) {
+        return WEATHER_REPORTS[city].map(function(elem){
+            return elem['temperature'];
+        })
+    };
+    
+    mod.get_all_forecasted_temperatures = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_all_forecasted_temperatures", arguments, 0, 0);
+        return Sk.ffi.remapToPy([
+            {"city": "Blacksburg, VA", "forecasts": get_temperatures("BLACKSBURG")},
+            {"city": "Seattle, WA", "forecasts": get_temperatures("SEATTLE")},
+            {"city": "Miami, FL", "forecasts": get_temperatures("MIAMI")},
+            {"city": "San Jose, CA", "forecasts": get_temperatures("SANJOSE")},
+            {"city": "New York, NY", "forecasts": get_temperatures("NEWYORK")},
+        ]);
+    });
+    
+    mod.connect = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("connect", arguments, 0, 0);
+        CONNECTED = true;
+    });
+    mod.disconnect = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("disconnect", arguments, 0, 0);
+        CONNECTED = false;
     });
 
     return mod;

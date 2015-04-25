@@ -48,6 +48,40 @@ Blockly.Blocks['dict_get'] = {
   }
 };
 
+Blockly.Blocks['dict_get_literal'] = {
+  // Set element at index.
+  init: function() {
+    this.setColour(Blockly.Blocks.dicts.HUE);   
+    this.appendValueInput('DICT')
+        .appendField('get') // TODO: fix this to be outside
+        .appendField(this.newQuote_(true))
+        .appendField(new Blockly.FieldTextInput(
+                     Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY),
+                     'ITEM')
+        .appendField(this.newQuote_(false))
+        .setCheck('dict')
+        .appendField(Blockly.Msg.DICT_GET_TO);
+    this.setInputsInline(false);
+    this.setOutput(true);
+    //this.setPreviousStatement(true);
+    //this.setNextStatement(true);
+  },
+  /**
+   * Create an image of an open or closed quote.
+   * @param {boolean} open True if open quote, false if closed.
+   * @return {!Blockly.FieldImage} The field image of the quote.
+   * @private
+   */
+  newQuote_: function(open) {
+    if (open == Blockly.RTL) {
+      var file = 'quote1.png';
+    } else {
+      var file = 'quote0.png';
+    }
+    return new Blockly.FieldImage(Blockly.pathToMedia + file, 12, 12, '"');
+  }
+};
+
 Blockly.Blocks['dict_keys'] = {
   // Set element at index.
   init: function() {

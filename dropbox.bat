@@ -8,6 +8,7 @@ copy analyzer\analyzer.js %outputdir%\analyzer\
 
 mkdir %outputdir%\converter\
 copy converter\python_to_blockly.js %outputdir%\converter\
+copy converter\renderBlocklyToPng.js %outputdir%\converter\
 
 mkdir %outputdir%\blockly\
 copy blockly\blockly_compressed.js %outputdir%\blockly\blockly_compressed.js
@@ -26,3 +27,6 @@ copy skulpt\dist\skulpt-stdlib.js %outputdir%\skulpt\dist\skulpt-stdlib.js
 
 mkdir %outputdir%\libs\
 copy libs\* %outputdir%\libs\
+
+mkdir %outputdir%\images\
+copy images\blockly-corgi-logo.png %outputdir%\images\blockly-corgi-logo.png

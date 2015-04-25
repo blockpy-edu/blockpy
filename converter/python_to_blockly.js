@@ -1,3 +1,32 @@
+/**
+ * @license
+ * Visual Blocks Editor
+ *
+ * Copyright 2014 Austin Cory Bart
+ * https://github.com/RealTimeWeb/corgis-blockly
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+ /**
+ * @fileoverview Core Library for Converting a Skulpt AST to a Blockly XML Tree
+ * @author acbart@vt.edu (Austin Cory Bart)
+ */
+'use strict';
+
+/**
+ * @constructor 
+ */
 function Python2Blockly() {
     this.XML = document.createElement("xml");
     this.XML.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
@@ -43,7 +72,7 @@ Python2Blockly.prototype._createNone = function() {
 
 
 
-skulptToBlockly_logicOperations = function(op) {
+var skulptToBlockly_logicOperations = function(op) {
     switch (op) {
         case "Eq": return "EQ";
         case "NotEq": return "NEQ";
@@ -57,11 +86,73 @@ skulptToBlockly_logicOperations = function(op) {
         default: return "Error";
     }
 }
+var skulptToBlockly_mathArithmetic = function(op) {
+    switch (op) {
+        case "Add": return "ADD";
+        case "Sub": return "MINUS";
+        case "Div": case "FloorDiv": return "DIVIDE";
+        case "Mult": return "MULTIPLY";
+        case "Pow": return "POWER";
+        case "Mod": return "MODULO";
+        default: return "Error";
+    }
+}
+
+Python2Blockly.prototype.convertAugAssign_ = function(expression) {
+    //math_change
+    // TODO
+    throw "Augmented Assignment is not currently supported.";
+}
+
 Python2Blockly.prototype._createLogicCompare = function(expression) {
     return this._createBinaryBlock("logic_compare", "true", "OP",
                                    skulptToBlockly_logicOperations(expression.ops[0].name),
                                    this._convertExpression("", expression.left),
                                    this._convertExpression("", expression.comparators[0]))
+}
+Python2Blockly.prototype._createBinOp = function(expression) {
+    return this._createBinaryBlock("math_arithmetic", "true", "OP",
+                                   skulptToBlockly_mathArithmetic(expression.op.name),
+                                   this._convertExpression("", expression.left),
+                                   this._convertExpression("", expression.right))
+}
+Python2Blockly.prototype.createAppendBlock_ = function(func, args) {
+    var Block_ = document.createElement("block");
+    Block_.setAttribute("type", "lists_append");
+    Block_.setAttribute("inline", "false");
+    if (args.length === 1) {
+        var ItemValue = document.createElement("value");
+        ItemValue.setAttribute("name", "ITEM");
+        ItemValue.appendChild(this._convertExpression("", args[0]));
+        Block_.appendChild(ItemValue);
+    } else {
+        throw "Incorrect number of arguments to append";
+    }
+    var ListValue = document.createElement("value");
+    ListValue.setAttribute("name", "LIST");
+    ListValue.appendChild(this._convertExpression("", func.value));
+    Block_.appendChild(ListValue);
+    return Block_;
+}
+Python2Blockly.prototype.createDictSubscript_ = function(expression) {
+    var Raw = document.createElement("block");
+    Raw.setAttribute("type", "dict_get_literal");
+    Raw.setAttribute("inline", "false");
+    //console.log(expression.slice);
+    if (expression.slice.value.constructor.name == "Str") {
+        var ItemValue = document.createElement("field");
+        ItemValue.setAttribute("name", "ITEM");
+        //TODO: Handle Index
+        ItemValue.appendChild(document.createTextNode(expression.slice.value.s.v));
+        Raw.appendChild(ItemValue);
+    } else {
+        throw "Non-string indexes not supported yet";
+    }
+    var DictValue = document.createElement("value");
+    DictValue.setAttribute("name", "DICT");
+    DictValue.appendChild(this._convertExpression("", expression.value));
+    Raw.appendChild(DictValue);
+    return Raw;
 }
 Python2Blockly.prototype._createLogicOperation = function(expression) {
     return this._createBinaryBlock("logic_operation", "true", "OP",
@@ -129,6 +220,29 @@ Python2Blockly.prototype._createCallBlock = function(expression) {
     return Raw;
 }
 
+Python2Blockly.prototype.createDict_ = function(expression) {
+    var Raw = document.createElement("block");
+    Raw.setAttribute("type", "dicts_create_with");
+    Raw.setAttribute("inline", "false");
+    
+    var Mutation = document.createElement("mutation");
+    Mutation.setAttribute("items", expression.keys.length);
+    Raw.appendChild(Mutation);
+    
+    for (var i = 0; i < expression.keys.length; i+= 1) {
+        var Value = document.createElement("value");
+        Value.setAttribute("name", "VALUE"+i);
+        Value.appendChild(this._convertExpression("", expression.values[i]));
+        Raw.appendChild(Value);
+        var Field_ = document.createElement("field");
+        Field_.setAttribute("name", "KEY"+i);
+        Field_.appendChild(this._convertExpression("", expression.keys[i]));
+        Raw.appendChild(Field_);
+    }
+        
+    return Raw;
+}
+
 Python2Blockly.prototype._createList = function(expression) {
     var Raw = document.createElement("block");
     Raw.setAttribute("type", "lists_create_with");
@@ -146,6 +260,20 @@ Python2Blockly.prototype._createList = function(expression) {
     }
         
     return Raw;
+}
+
+Python2Blockly.prototype.convertReturn_ = function(parent, statement) {
+    var Block_ = document.createElement("block");
+    Block_.setAttribute("type", "procedures_return");
+    Block_.setAttribute("inline", "false");
+    
+    var returnValue = this._convertExpression(parent, statement.value);
+    var ValueTitle = document.createElement("value");
+    ValueTitle.setAttribute("name", "VALUE");
+    ValueTitle.appendChild(returnValue);
+    Block_.appendChild(ValueTitle);
+    
+    return Block_;
 }
 
 Python2Blockly.prototype._createPrint = function(parent, statement) {
@@ -332,6 +460,7 @@ Python2Blockly.prototype._convertIf = function(parent, statement) {
     var walker = statement;
     var elseifCount = 0;
     var elseCount = 0;
+    var potentialElseBody = null;
     while ("orelse" in walker && walker.orelse.length > 0) {
         potentialElseBody = walker.orelse;
         walker = walker.orelse[0];
@@ -386,6 +515,12 @@ Python2Blockly.prototype._convertExpression = function(parent, expression) {
             }
         case "Call":
             if (expression.func.constructor.name == "Attribute") {
+                // Check if its a special function - TODO make this smarter
+                switch (expression.func.attr.v) {
+                    case "append":
+                        return this.createAppendBlock_(expression.func, expression.args);
+                    default: break;
+                }
                 switch (expression.func.value.id.v) {
                 case "weather":
                     switch (expression.func.attr.v) {
@@ -398,6 +533,11 @@ Python2Blockly.prototype._convertExpression = function(parent, expression) {
                     case "get_forecasts":
                         return this._createBuiltinBlock("weather_forecasts", 
                                                         [["CITY", expression.args[0].s.v]]);
+                    case "get_highs_lows":
+                        return this._createBuiltinBlock("weather_highs_lows", 
+                                                        [["CITY", expression.args[0].s.v]]);
+                    case "get_all_forecasted_temperatures":
+                        return this._createBuiltinBlock("weather_all_forecasts", []);
                     case "get_forecasted_reports":
                         return this._createBuiltinBlock("weather_report_forecasts", 
                                                         [["CITY", expression.args[0].s.v]]);
@@ -456,43 +596,41 @@ Python2Blockly.prototype._convertExpression = function(parent, expression) {
                 return this._createCallBlock(expression);
             }
         case "Attribute":
-            console.log(expression);
-            break; // TODO
+            throw "Attribute access is not currently supported.";
         case "Subscript":
-            break; // TODO
+            return this.createDictSubscript_(expression);
         case "Dict":
-            break; // TODO
+            return this.createDict_(expression);
         case "Tuple":
-            break; // TODO
+            throw "Tuples are not currently supported.";
         case "Set":
-            break; // TODO
+            throw "Sets are not currently supported.";
         case "List":
             return this._createList(expression);
         case "Num":
             return this._createMathNumber(expression);
         case "Str":
             return this._createString(expression);
-            break; // TODO
         case "Compare":
             return this._createLogicCompare(expression);
         case "UnaryOp":
             return this._createLogicNegate(expression);
         case "BinOp":
-            break; // TODO
+            return this._createBinOp(expression);
         case "Lambda":
-            break; // TODO
+            throw "Lambdas are not currently supported.";
         case "IfExp":
-            break; // TODO
+            throw "Inline If Expressions are not currently supported.";
         case "ListComp":
-            break; // TODO
+            throw "List Comprehensions are not currently supported.";
         case "DictComp":
-            break; // TODO
+            throw "Dictionary Comprehensions are not currently supported.";
         case "GeneratorExp":
-            break; // TODO
+            throw "Generators Expressions are not currently supported.";
         case "Yield":
-            break; // TODO
+            throw "Yield Expressions are not currently supported.";
         case "Repr":
-            break; // TODO
+            throw "Repr expressions are not currently supported.";
         case "BoolOp":
             return this._createLogicOperation(expression);
     }
@@ -502,13 +640,13 @@ Python2Blockly.prototype._convertExpression = function(parent, expression) {
 Python2Blockly.prototype._hasNextStatement = function(statement) {
     switch (statement.constructor.name) {
         case "Import_": return true;
-        case "Expr": 
-            console.log(statement);
+        case "Expr":
             if (statement.value.constructor.name == "Call") {
                 if (statement.value.func && statement.value.func.constructor.name == "Attribute") {
                     if (statement.value.func.value && statement.value.func.value.id.v == "plt") {
                         return true;
                     }
+                    return true;
                 }
             }
             return false;
@@ -529,17 +667,16 @@ Python2Blockly.prototype._convertStatement = function(parent, statement) {
             return null;
         case "ImportFrom":
             return null;
+        case "Return_":
+            return this.convertReturn_(parent, statement);
         case "Expr":
             return this._convertExpression(parent, statement.value);
         case "With":
-            // TODO
-            break;
+            throw "With is not currently supported.";
         case "While":
-            // TODO
-            break;
+            throw "While loops are not currently supported.";
         case "ClassDef":
-            // TODO
-            break;
+            throw "Class definitions are not currently supported.";
         case "FunctionDef":
             return this._convertFunctionDef(parent, statement);
         case "Print":
@@ -549,16 +686,14 @@ Python2Blockly.prototype._convertStatement = function(parent, statement) {
         case "For_":
             return this._convertFor(parent, statement);
         case "AugAssign":
-            // TODO
-            break;
+            return this.convertAugAssign_(parent, statement);
         case "Assign":
             return this._convertAssignment(parent, statement);
         case "Delete":
-            // TODO
-            break;
+            throw "Deletion is not currently supported.";
         // Raise, TryExcept, TryFinally, Assert, Global, Break, Continue, Pass
         default:
-            console.log(statement);
+            //console.log(statement);
             break;
     }
     return this._createRawBlock(statement);//this.sourceCodeLines[statement.lineno-1]);
@@ -592,7 +727,6 @@ Python2Blockly.prototype._convertBody = function(parent, statements) {
 }
 
 Python2Blockly.prototype.convert = function(python_source) {
-    console.log("-------------------");
     var filename = 'user_code.py';
     var parse_tree, symbol_table, error_message;
     try {
@@ -604,6 +738,7 @@ Python2Blockly.prototype.convert = function(python_source) {
     }
     this.sourceCodeLines = python_source.split("\n");
     
+    console.log(parse_tree.body)
     if (error_message !== false) {
         throw "Error: "+error_message;
     } else {

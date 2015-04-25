@@ -1102,7 +1102,7 @@ jsplotlib.get_color = function(cs) {
 jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
     attributes) {
     chart_counter++;
-    var DEFAULT_PADDING = 10;
+    var DEFAULT_PADDING = 40;
     insert_container = insert_container || "body";
     width = width - 2 * DEFAULT_PADDING || 500;
     height = height - 2 * DEFAULT_PADDING || 200;
@@ -1132,7 +1132,7 @@ jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
         }
     }
 
-    $('.chart#' + attributes.id).css('padding', DEFAULT_PADDING + 'px');
+    $('.chart#' + attributes.id).css('padding-left', DEFAULT_PADDING + 'px');
     return chart;
 };
 
