@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "تا زمانی که یک مق�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "تا زمانی که یک مقدار صحیح است، چند عبارت را انجام بده.";
 Blockly.Msg.DELETE_BLOCK = "حذف بلوک";
 Blockly.Msg.DELETE_X_BLOCKS = "حذف بلوک‌های %1";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "غیرفعال‌سازی بلوک";
 Blockly.Msg.DUPLICATE_BLOCK = "تکراری";
 Blockly.Msg.ENABLE_BLOCK = "فعال‌سازی بلوک";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "گسترش بلوک";
 Blockly.Msg.EXTERNAL_INPUTS = "ورودی‌های خارجی";
 Blockly.Msg.HELP = "کومک";
 Blockly.Msg.INLINE_INPUTS = "ورودی‌های درون خطی";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "ایجاد فهرست خالی";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "فهرستی با طول صفر شامل هیچ رکورد داده‌ای بر می‌گرداند.";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "طول %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "بازگرداندن عددی از حروف (شامل فاصله‌ها) در متن فراهم‌شده.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "چاپ %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "چاپ متن، عدد یا هر مقدار دیگر مشخص‌شده.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "اعلان برای کاربر با یک عدد.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "تراشیدن فاصله‌ها از  ط
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "تراشیدن فاصله‌ها از  طرف چپ";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "کپی از متن با فاصله‌های حذف‌شده از یک یا هر دو پایان باز می‌گرداند.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "مورد";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "درست‌کردن «تنظیم %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

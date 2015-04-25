@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Miễn là điều kiện còn 
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Miễn là điều kiện còn đúng, thì thực hiện các lệnh.";
 Blockly.Msg.DELETE_BLOCK = "Xóa Mảnh Này";
 Blockly.Msg.DELETE_X_BLOCKS = "Xóa %1 Mảnh";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Ngưng Tác Dụng";
 Blockly.Msg.DUPLICATE_BLOCK = "Tạo Bản Sao";
 Blockly.Msg.ENABLE_BLOCK = "Phục Hồi Tác Dụng";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Mở Lớn Mảnh";
 Blockly.Msg.EXTERNAL_INPUTS = "Chỗ Gắn Bên Ngoài";
 Blockly.Msg.HELP = "Trợ Giúp";
 Blockly.Msg.INLINE_INPUTS = "Chỗ Gắn Cùng Dòng";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "tạo danh sách trống";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Hoàn trả một danh sách, với độ dài 0, không có thành tố nào cả";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "độ dài của %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Hoàn trả số lượng ký tự (kể cả khoảng trắng) trong văn bản đầu vào.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "in lên màng hình %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "In ra màng hình một văn bản, con số, hay một giá trị đầu vào khác.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Xin người dùng nhập vào một con số.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "cắt các không gian từ bên trái c�
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "cắt các không gian từ bên phải của";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Hoàn trả bản sao của văn bản sau khi xóa khoảng trắng từ một hoặc hai bên.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "vật";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Tạo mảnh \"đặt vào %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

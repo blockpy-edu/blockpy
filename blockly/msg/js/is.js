@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Endurtaka eitthvað á meðan g
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Endurtaka eitthvað á meðan gildi er satt.";
 Blockly.Msg.DELETE_BLOCK = "Eyða kubbi";
 Blockly.Msg.DELETE_X_BLOCKS = "Eyða %1 kubbum";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Óvirkja kubb";
 Blockly.Msg.DUPLICATE_BLOCK = "Afrita";
 Blockly.Msg.ENABLE_BLOCK = "Virkja kubb";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Opna kubb";
 Blockly.Msg.EXTERNAL_INPUTS = "Ytri inntök";
 Blockly.Msg.HELP = "Hjálp";
 Blockly.Msg.INLINE_INPUTS = "Innri inntök";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "búa til tóman lista";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Skilar lista með lengdina 0 án gagna";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "lengd %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Skilar fjölda stafa (með bilum) í gefna textanum.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";
 Blockly.Msg.TEXT_PRINT_TITLE = "prenta %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Prenta tiltekinn texta, tölu eða annað gildi.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Biðja notandann um tölu.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "eyða bilum vinstra megin við";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "eyða bilum hægra megin við";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Skila afriti af textanum þar sem möguleg bil við báða enda hafa verið fjarlægð.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "atriði";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Búa til 'stilla %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";

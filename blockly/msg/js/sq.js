@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Përderisa një vlerë është 
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Përderisa një vlerë është e saktë, atëherë ekzekuto disa fjali.";
 Blockly.Msg.DELETE_BLOCK = "Fshij bllokun";
 Blockly.Msg.DELETE_X_BLOCKS = "Fshij %1 blloqe";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Çaktivizo bllokun";
 Blockly.Msg.DUPLICATE_BLOCK = "Kopjo";
 Blockly.Msg.ENABLE_BLOCK = "Aktivizo bllokun";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Zmadho bllokun";
 Blockly.Msg.EXTERNAL_INPUTS = "Hyrjet e jashtme";
 Blockly.Msg.HELP = "Ndihmë";
 Blockly.Msg.INLINE_INPUTS = "Hyrjet e brendshme";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "http://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "krijo një listë të zbrazët";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Kthen një listë, te gjatësisë 0, duke mos përmbajtur asnjë regjistrim të të dhënave";
@@ -305,7 +311,11 @@ Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Thekso definicionin e funksionit";
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "Nëse një vlerë është e saktë, atëherë kthe një vlerë të dytë.";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Paralajmërim: Ky bllok mund të përdoret vetëm brenda definicionit të funksionit.";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "Fut emrin:";
+<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
+=======
+Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "Informacioni i futur";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "Fshij komentin";
@@ -359,7 +369,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "gjatesi %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Pergjigjet me nje numer shkronjash (duke perfshire hapesire) ne tekstin e dhene.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "printo %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Printo tekstin e caktuar, numer ose vlere tjeter.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Kerkoji perdoruesit nje numer.";
@@ -374,7 +387,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "prit hapesirat nga ana e majte";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "prit hapesirat nga ana e djathte";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Pergjigju me nje kopje te tekstit me hapesira te fshira nga njera ane ose te dyja anet.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "send";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Krijo 'vendos %1";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

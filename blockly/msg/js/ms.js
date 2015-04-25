@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Lakukan beberapa perintah apabi
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Lakukan beberapa perintah apabila nilainya benar (true).";
 Blockly.Msg.DELETE_BLOCK = "Hapuskan Blok";
 Blockly.Msg.DELETE_X_BLOCKS = "Hapuskan %1 Blok";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Matikan Blok";
 Blockly.Msg.DUPLICATE_BLOCK = "Pendua";
 Blockly.Msg.ENABLE_BLOCK = "Hidupkan Blok";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Buka Blok";
 Blockly.Msg.EXTERNAL_INPUTS = "Input Luaran";
 Blockly.Msg.HELP = "Bantuan";
 Blockly.Msg.INLINE_INPUTS = "Input Sebaris";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "Wujudkan senarai kosong";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Kembalikan senarai panjang 0, yang tidak mengandungi rekod data";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "panjang %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Kembalikan jumlah huruf (termasuk ruang) dalam teks yang disediakan.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "cetak %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Cetak teks yang ditentukan, nombor atau nilai lain.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Peringatan kepada pengguna untuk nombor.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "mengurangkan ruang dari sebelah kiri";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "mengurangkan kawasan dari sisi kanan";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Kembali salinan teks dengan ruang yang dikeluarkan daripada satu atau hujung kedua belah.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "Perkara";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Hasilkan 'set %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

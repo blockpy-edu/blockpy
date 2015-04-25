@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Ενόσω μια τιμή εί
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Ενόσω μια τιμή είναι αληθής, τότε εκτελεί κάποιες εντολές.";
 Blockly.Msg.DELETE_BLOCK = "Διέγραψε Το Μπλοκ";
 Blockly.Msg.DELETE_X_BLOCKS = "Διέγραψε %1 Μπλοκ";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Απενεργοποίησε Το Μπλοκ";
 Blockly.Msg.DUPLICATE_BLOCK = "Αντίγραφο";
 Blockly.Msg.ENABLE_BLOCK = "Ενεργοποίησε Το Μπλοκ";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Επέκτεινε Το Μπλοκ";
 Blockly.Msg.EXTERNAL_INPUTS = "Εξωτερικές Είσοδοι";
 Blockly.Msg.HELP = "Βοήθεια";
 Blockly.Msg.INLINE_INPUTS = "Εσωτερικές Είσοδοι";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "λίστα";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "δημιούργησε κενή λίστα";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Επιστρέφει μια λίστα, με μήκος 0, η οποία δεν περιέχει εγγραφές δεδομένων";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "το μήκος του %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Επιστρέφει το πλήθος των γραμμάτων (συμπεριλαμβανομένων και των κενών διαστημάτων) στο παρεχόμενο κείμενο.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "εκτύπωσε %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Εκτυπώνει το καθορισμένο κείμενο, αριθμό ή άλλη τιμή.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Δημιουργεί προτροπή για τον χρήστη για να δώσει ένα αριθμό.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "περίκοψε τα κενά από τ�
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "περίκοψε τα κενά από την δεξιά πλευρά του";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Επιστρέφει ένα αντίγραφο του κειμένου με αφαιρεμένα τα κενά από το ένα ή και τα δύο άκρα.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "αντικείμενο";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Δημιούργησε «όρισε %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

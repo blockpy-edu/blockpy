@@ -554,6 +554,7 @@ Blockly.Blocks['text_trim'] = {
   }
 };
 
+
 Blockly.Blocks['text_prompt'] = {
   /**
    * Block for prompt function (internal message).

@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Durante que un valor es false, 
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Durante que un valor es ver, exequer certe instructiones.";
 Blockly.Msg.DELETE_BLOCK = "Deler bloco";
 Blockly.Msg.DELETE_X_BLOCKS = "Deler %1 blocos";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Disactivar bloco";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicar";
 Blockly.Msg.ENABLE_BLOCK = "Activar bloco";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Displicar bloco";
 Blockly.Msg.EXTERNAL_INPUTS = "Entrata externe";
 Blockly.Msg.HELP = "Adjuta";
 Blockly.Msg.INLINE_INPUTS = "Entrata interne";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "crear un lista vacue";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Retorna un lista, de longitude 0, sin datos.";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "longitude de %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Retorna le numero de litteras (incluse spatios) in le texto fornite.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "scriber %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Scriber le texto, numero o altere valor specificate.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Peter un numero al usator.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "remover spatios del sinistre latere de";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "remover spatios del dextre latere de";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Retornar un copia del texto con spatios eliminate de un extremitate o ambes.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "cosa";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Crea 'mitter %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

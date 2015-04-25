@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Interis su valori est frassu, t
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Interis su valori est berus, tandu fai pariga de cumandus.";
 Blockly.Msg.DELETE_BLOCK = "Fulia Brocu";
 Blockly.Msg.DELETE_X_BLOCKS = "Fulia %1 Brocus";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Disabìlita Brocu";
 Blockly.Msg.DUPLICATE_BLOCK = "Dòpia";
 Blockly.Msg.ENABLE_BLOCK = "Abìlita Brocu";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Aberi Brocu";
 Blockly.Msg.EXTERNAL_INPUTS = "Inputs esternus";
 Blockly.Msg.HELP = "Agiudu";
 Blockly.Msg.INLINE_INPUTS = "Inputs in lìnia";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "fait una lista buida";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Torrat una lista, de longària 0, chena records de datus.";
@@ -359,7 +365,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "longària de %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Torrat su numeru de lìteras (cun is spàtzius) in su testu giau.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "scri %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Scri su testu, numeru o àteru valori.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Pregonta unu nùmeru a s'impitadore.";
@@ -374,7 +383,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "bogat spàtzius de su càbudu de manca de
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "bogat spàtzius de su càbudu de dereta de";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Torrat una copia de su testu bogaus is spàtzius de unu o de ambus is càbudus.";
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "item";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Fait 'imposta %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

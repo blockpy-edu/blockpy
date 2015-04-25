@@ -325,6 +325,7 @@
 	"LISTS_SPLIT_WITH_DELIMITER": "block text - Prompts for a letter to be used as a separator when splitting or joining text.",
 	"LISTS_SPLIT_TOOLTIP_SPLIT": "tooltip - See [https://github.com/google/blockly/wiki/Lists#make-list-from-text https://github.com/google/blockly/wiki/Lists#make-list-from-text] for more information.",
 	"LISTS_SPLIT_TOOLTIP_JOIN": "tooltip - See [https://github.com/google/blockly/wiki/Lists#make-text-from-list https://github.com/google/blockly/wiki/Lists#make-text-from-list] for more information.",
+<<<<<<< HEAD
 	"LISTS_APPEND": "TODO",
 	"LISTS_APPEND_TO": "TODO",
 	"LISTS_APPEND_TOOLTIP": "TODO",
@@ -344,6 +345,8 @@
 	"TYPE_CHECK": "TODO",
 	"TEXT_PRINT_TITLE_PRINT": "TODO",
 	"TEXT_PRINT_TOOLTIP": "TODO",
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 	"ORDINAL_NUMBER_SUFFIX": "grammar - Text that follows an ordinal number (a number that indicates position relative to other numbers).  In most languages, such text appears before the number, so this should be blank.  An exception is Hungarian. See [[Translating:Blockly#Ordinal_numbers]] for more information.",
 	"VARIABLES_GET_HELPURL": "url - Information about ''variables'' in computer programming.  Consider using your language's translation of [https://en.wikipedia.org/wiki/Variable_(computer_science) https://en.wikipedia.org/wiki/Variable_(computer_science)], if it exists.",
 	"VARIABLES_GET_TITLE": "block text - This precedes the name of a variable when getting its values.  In most (all?) languages, it should be the empty string.  If unsure, ask yourself if any word should go before 'x' in the expression 'x + 1'.",

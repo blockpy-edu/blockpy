@@ -68,6 +68,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Додека вредноста
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Додека вредноста е вистинита, исполнува наредби.";
 Blockly.Msg.DELETE_BLOCK = "Избриши блок";
 Blockly.Msg.DELETE_X_BLOCKS = "Избриши %1 блока";
+<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -80,6 +81,8 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Исклучи блок";
 Blockly.Msg.DUPLICATE_BLOCK = "Ископирај";
 Blockly.Msg.ENABLE_BLOCK = "Вклучи блок";
@@ -88,10 +91,13 @@ Blockly.Msg.EXPAND_BLOCK = "Рашири го блокови";
 Blockly.Msg.EXTERNAL_INPUTS = "Надворешен внос";
 Blockly.Msg.HELP = "Помош";
 Blockly.Msg.INLINE_INPUTS = "Внатрешен внос";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "create empty list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returns a list, of length 0, containing no data records";  // untranslated
@@ -294,8 +300,13 @@ Blockly.Msg.PROCEDURES_CALL_BEFORE_PARAMS = "with:";  // untranslated
 Blockly.Msg.PROCEDURES_CREATE_DO = "Create '%1'";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "function_name";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";  // untranslated
+=======
+Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "do something";  // untranslated
+Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Creates a function with no output.";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "return";  // untranslated
@@ -304,9 +315,15 @@ Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING = "Warning: This function has dupli
 Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "parameter name:";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "parameters";  // untranslated
+=======
+Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";  // untranslated
+Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
+Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "Отстрани коментар";
 Blockly.Msg.RENAME_VARIABLE = "Преименувај променлива...";
@@ -352,15 +369,23 @@ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 is empty";  // untranslated
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Returns true if the provided text is empty.";  // untranslated
 Blockly.Msg.TEXT_JOIN_HELPURL = "https://github.com/google/blockly/wiki/Text#text-creation";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "join strings";  // untranslated
+=======
+Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "create text with";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_JOIN_TOOLTIP = "Create a piece of text by joining together any number of items.";  // untranslated
 Blockly.Msg.TEXT_LENGTH_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TITLE = "length of %1";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returns the number of letters (including spaces) in the provided text.";  // untranslated
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "print %1";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "";  // untranslated
+=======
+Blockly.Msg.TEXT_PRINT_TOOLTIP = "Print the specified text, number or other value.";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Prompt for user for a number.";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT = "Prompt for user for some text.";  // untranslated
@@ -374,7 +399,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "trim spaces from left side of";  // untra
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "trim spaces from right side of";  // untranslated
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Return a copy of the text with spaces removed from one or both ends.";  // untranslated
 Blockly.Msg.TODAY = "Today";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "елемент";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create 'set %1'";  // untranslated
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -383,7 +411,11 @@ Blockly.Msg.VARIABLES_GET_TITLE = "";  // untranslated
 Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returns the value of this variable.";  // untranslated
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Create 'get %1'";  // untranslated
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+=======
+Blockly.Msg.VARIABLES_SET_TAIL = "to";  // untranslated
+>>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
