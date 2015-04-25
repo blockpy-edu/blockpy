@@ -67,7 +67,8 @@
         function resetit() {
             //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="63" inline="false" x="23" y="-48"> <field name="VAR">quake_list</field> <value name="VALUE"> <block type="earthquake_get" id="64"> <field name="PROPERTY">magnitude</field> </block> </value> <next> <block type="variables_set" id="65" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_number" id="66"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="72" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_number" id="73"> <field name="NUM">0</field> </block> </value> <next> <block type="controls_forEach" id="67" inline="false"> <field name="VAR">a quake</field> <value name="LIST"> <block type="variables_get" id="71"> <field name="VAR">quake_list</field> </block> </value> <statement name="DO"> <block type="controls_if" id="69" inline="false"> <value name="IF0"> <block type="logic_compare" id="96" inline="true"> <field name="OP">GTE</field> <value name="A"> <block type="variables_get" id="97"> <field name="VAR">a quake</field> </block> </value> <value name="B"> <block type="math_number" id="98"> <field name="NUM">3</field> </block> </value> </block> </value> <statement name="DO0"> <block type="variables_set" id="121" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="106" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="122"> <field name="VAR">total_quakes</field> </block> </value> <value name="B"> <block type="math_number" id="123"> <field name="NUM">1</field> </block> </value> </block> </value> <next> <block type="variables_set" id="124" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="125" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="126"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="128"> <field name="VAR">a quake</field> </block> </value> </block> </value> </block> </next> </block> </statement> </block> </statement> <next> <block type="variables_set" id="177" inline="false"> <field name="VAR">average significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="178" inline="true"> <field name="OP">DIVIDE</field> <value name="A"> <block type="variables_get" id="179"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="180"> <field name="VAR">total_quakes</field> </block> </value> </block> </value> <next> <block type="text_print" id="201" inline="false"> <value name="TEXT"> <block type="variables_get" id="202"> <field name="VAR">average significant quakes</field> </block> </value> <next> <block type="plot_line" id="137" inline="false"> <value name="y_values"> <block type="variables_get" id="176"> <field name="VAR">quake_list</field> </block> </value> <next> <block type="plot_title" id="175"> <field name="TEXT">Significant Quakes</field> <next> <block type="plot_show" id="154"></block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </xml>';
             //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="0" y="0"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="2"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="3" inline="false"> <field name="VAR">a string</field> <value name="VALUE"> <block type="text" id="4"> <field name="TEXT">ellie</field> </block> </value> <next> <block type="variables_set" id="5" inline="false"> <field name="VAR">temperatures</field> <value name="VALUE"> <block type="weather_forecasts" id="6"> <field name="CITY">BLACKSBURG</field> </block> </value> <next> <block type="variables_set" id="7" inline="false"> <field name="VAR">a dog</field> <value name="VALUE"> <block type="dicts_create_with" id="8" inline="false"> <mutation items="3"></mutation> <field name="KEY0">name</field> <field name="KEY1">age</field> <field name="KEY2">good</field> <value name="VALUE0"> <block type="text" id="9"> <field name="TEXT">Klaus</field> </block> </value> <value name="VALUE1"> <block type="math_number" id="10"> <field name="NUM">14</field> </block> </value> <value name="VALUE2"> <block type="logic_boolean" id="11"> <field name="BOOL">TRUE</field> </block> </value> </block> </value> <next> <block type="controls_if" id="42" inline="false"> <mutation else="1"></mutation> <value name="IF0"> <block type="dict_get" id="74" inline="true"> <value name="ITEM"> <block type="text" id="76"> <field name="TEXT">good</field> </block> </value> <value name="DICT"> <block type="variables_get" id="75"> <field name="VAR">a dog</field> </block> </value> </block> </value> <statement name="DO0"> <block type="procedures_callnoreturn" id="12"> <mutation name="function_name"></mutation> </block> </statement> <statement name="ELSE"> <block type="text_print_multiple" id="52" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="53"> <field name="VAR">a string</field> </block> </value> </block> </statement> <next> <block type="controls_forEach" id="13" inline="false"> <field name="VAR">iterator variable</field> <value name="LIST"> <block type="variables_get" id="14"> <field name="VAR">temperatures</field> </block> </value> <statement name="DO"> <block type="variables_set" id="15" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_arithmetic" id="16" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="17"> <field name="VAR">a number</field> </block> </value> <value name="B"> <block type="math_number" id="18"> <field name="NUM">1</field> </block> </value> </block> </value> </block> </statement> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> <block type="procedures_defnoreturn" id="19" x="4" y="388"> <mutation></mutation> <field name="NAME">function_name</field> <statement name="STACK"> <block type="variables_set" id="20" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="21"> <field name="NUM">3</field> </block> </value> <next> <block type="variables_set" id="22" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="23"> <field name="NUM">5</field> </block> </value> <next> <block type="text_print_multiple" id="24" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="25"> <field name="VAR">a number</field> </block> </value> </block> </next> </block> </next> </block> </statement> </block> </xml>';
-            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="40" inline="false" x="58" y="92"> <field name="VAR">property_name</field> </block> </xml>';
+            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="40" inline="false" x="58" y="92"> <field name="VAR">property_name</field> </block> </xml>';
+            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="-19" y="16"> <field name="VAR">property_name</field> <value name="VALUE"> <block type="lists_create_empty" id="12"></block> </value> <next> <block type="controls_forEach" id="24" inline="false"> <field name="VAR">i</field> <value name="LIST"> <block type="variables_get" id="34"> <field name="VAR">property_name</field> </block> </value> <statement name="DO"> <block type="lists_append" id="20" inline="true"> <value name="ITEM"> <block type="math_number" id="39"> <field name="NUM">0</field> </block> </value> <value name="LIST"> <block type="variables_get" id="35"> <field name="VAR">property_name</field> </block> </value> </block> </statement> </block> </next> </block> </xml>';
             var xml = Blockly.Xml.textToDom(code);
             Blockly.mainWorkspace.clear();
             Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
@@ -75,6 +76,7 @@
         }
         
         function parseValue(property, value) {
+            console.log(value);
             switch (value.constructor) {
                 case Sk.builtin.func:
                     return {'name': property,
@@ -125,6 +127,11 @@
                         'type': "String",
                         "value": value
                     };
+                case Boolean:
+                    return {'name': property,
+                        'type': "Boolean",
+                        "value": (value ? "True": "False")
+                    };
                 default:
                     return {'name': property,
                             'type': value.$r().v,
@@ -154,12 +161,17 @@
             var output = document.getElementById("html-output");
             output.innerHTML = '';
             Sk.configure({output:outf, read: builtinRead});
+            Sk.execLimit = 5000;
             Sk.canvas = "mycanvas";
+            if (! Sk.TurtleGraphics ) {
+                Sk.TurtleGraphics = {};
+            }
+            Sk.TurtleGraphics.height = 320;
+            Sk.TurtleGraphics.width = 320;
             var step = 0;
             var highlightMap = mapBlocklyToPython();
             var propertyList = [];
             Sk.afterSingleExecution = function($gbl, lineno, colno, filename) {
-                console.log($gbl);
                 propertyList.push({'step': step, 
                                    'filename': filename,
                                    'block': highlightMap[lineno-1],
@@ -168,15 +180,16 @@
                                    'properties': parseGlobals($gbl)});
                 step += 1;
             };
+            var module;
             try {
-                var module = Sk.importMainWithBody("<stdin>", false, prog);
+                module = Sk.importMainWithBody("<stdin>", false, prog);
                 Sk.afterSingleExecution(module.$d);
                 //var obj = module.tp$getattr('a');
                 //var runMethod = obj.tp$getattr('run');
                 //var ret = Sk.misceval.callsim(runMethod, 10);
                 //alert(ret.v);
             } catch (e) {
-                alert(e);
+                console.log(e.stack);
             }
             reloadDataViewer(propertyList, -1);
             console.log(propertyList);
@@ -239,7 +252,37 @@
   <table width="100%" height="99%">
     <tr>
       <td width="900px">
-        <h1>CORGIS Blockly &gt;
+      <div>The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer.</div>
+      <div>
+        <span class="label label-success">Drag Blockly blocks to write Python code.</span>
+        <span class="label label-primary">Edit Python code that converts to Blocks.</span>
+        <span class="label label-info">Run everything in the browser.</span>
+        <span class="label label-success">Trace your program's execution and state.</span>
+        <span class="label label-primary">Use real-time data blocks.</span>
+        <span class="label label-warning">Visualize your answers with matplotlib.</span>
+        <span class="label label-danger">Build GUIs with TKinter.</span>
+    </div>
+      <div>Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it!</div>
+      </td>
+      <td rowspan='2'>
+      <img src='images/blockly-corgi-logo.png'/><br>
+      <img src='' id='my-image' />
+        <span id='error-state' class='glyphicon glyphicon-remove label label-danger'></span>
+        <textarea style='width:100%;' rows='10' id="python-output"></textarea><br>
+        <button onclick="runit()" type="button">Run</button>
+        <button onclick="convertit()" type="button">Convert</button>
+        <button onclick="resetit()" type="button">Reset</button>
+        <button onclick="clearit()" type="button">Clear</button>
+        <button onclick="layoutit()" type="button">Align</button>
+        <button onclick="loadRedo()" type="button">R</button>
+        <button onclick="loadUndo()" type="button">U</button>
+        <button onclick="renderBlocklyCanvas('#my-image')" type="button">Picture</button>
+        <br>
+        Program Output:
+        <pre id="html-output" style='max-width:400px'></pre>
+        <div id="mycanvas"></div>
+        State visualization:
+        <table id='data-viewer' class='table table-condensed table-striped' width='100%'><tr></tr></table>
       </td>
     </tr>
     <tr>
@@ -353,6 +396,7 @@
                 error = false;
             } catch (e) {
                 console.error("P2B: ", e, e.stack);
+                $("#error-state").text(e);
                 $("#error-state").show();
             }
             if (error) {
@@ -408,7 +452,7 @@
             var timers = {};
             function addDelay(directive, action) {
                 clearTimeout(timers[directive]);
-                timers[directive] = setTimeout(action, 400);
+                timers[directive] = setTimeout(action, 1000);
             }
             $(document).ready(function() {
                 $('#python-output').on('keyup input propertychange paste change', function() {
@@ -421,25 +465,6 @@
         <iframe src="blockpy-inner.html" style='height:550px'></iframe>
         <div id="xml-output" style='font-size:6pt'></div>
       </td>
-      <td>
-        <img src='' id='my-image' />
-        <span id='error-state' class='glyphicon glyphicon-remove label label-danger'></span>
-        <textarea style='width:100%;' rows='10' id="python-output"></textarea><br>
-        <button onclick="runit()" type="button">Run</button>
-        <button onclick="convertit()" type="button">Convert</button>
-        <button onclick="resetit()" type="button">Reset</button>
-        <button onclick="clearit()" type="button">Clear</button>
-        <button onclick="layoutit()" type="button">Align</button>
-        <button onclick="loadRedo()" type="button">R</button>
-        <button onclick="loadUndo()" type="button">U</button>
-        <button onclick="renderBlocklyCanvas('#my-image')" type="button">Picture</button>
-        <br>
-        Program Output:
-        <pre id="html-output" style='max-width:400px'></pre>
-        <div id="mycanvas"></div>
-        State visualization:
-        <table id='data-viewer' class='table table-condensed table-striped' width='100%'><tr></tr></table>
-      </td>
   </tr>
   <tr>
       <td colspan='2'>
@@ -451,6 +476,17 @@
       </td>-->
     </tr>
   </table>
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38802329-2', 'auto');
+ga('send', 'pageview');
+
+</script>
 
 </body>
 </html>

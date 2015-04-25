@@ -60,62 +60,64 @@
   </head>
   <body onload="init()">
     <xml id="toolbox" style="display: none">
+        <category name="Properties" custom="VARIABLE">
+        </category>
         <category name="Decisions">
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
             <block type="logic_operation"></block>
             <block type="logic_negate"></block>
         </category>
-        <category name="Properties" custom="VARIABLE">
-            <block type="variables_set"></block>
-            <block type="variables_get"></block>
-        </category>
         <category name="Iteration">
             <block type="controls_forEach"></block>
-        </category>
-        <category name="Utility">
-            <block type="text_print"></block>
-            <block type="type_check"></block>
-            <block type="raw_block"></block>
-            <block type="raw_expression"></block>
-            <block type="function_call"></block>
         </category>
         <category name="Functions" custom="PROCEDURE">
         </category>
         <category name="Calculation">
             <block type="math_arithmetic"></block>
-            <block type="math_single"></block>
+            <block type="type_check"></block>
+            <block type="raw_block"></block>
+            <block type="raw_expression"></block>
+            <!--<block type="math_single"></block>
             <block type="math_number_property"></block>
             <block type="math_round"></block>
-            <block type="text_join"></block>
+            <block type="text_join"></block>-->
         </category>
-        <category name="Plotting">
+        <category name="Output">
+            <block type="text_print"></block>
             <block type="plot_line"></block>
             <block type="plot_scatter"></block>
             <block type="plot_show"></block>
             <block type="plot_title"></block>
+            <category name="Turtles">
+                <block type="turtles_start"></block>
+            </category>
         </category>
-        <category name="Data - Simple">
+        <sep></sep>
+        <category name="Values">
             <block type="text"></block>
             <block type="math_number"></block>
             <block type="logic_boolean"></block>
         </category>
-        <category name="Data - Lists">
+        <category name="Lists">
             <block type="lists_create_with"></block>
             <block type="lists_create_empty"></block>
             <block type="lists_append"></block>
             <block type="lists_length"></block>
         </category>
-        <category name="Data - Dictionaries">
+        <category name="Dictionaries">
             <block type="dicts_create_with"></block>
-            <block type="dict_get"></block>
+            <block type="dict_get_literal"></block>
             <block type="dict_keys"></block>
         </category>
+        <sep></sep>
         <category name="Data - Weather">
             <block type="weather_temperature"></block>
             <block type="weather_report"></block>
             <block type="weather_forecasts"></block>
             <block type="weather_report_forecasts"></block>
+            <block type="weather_all_forecasts"></block>
+            <block type="weather_highs_lows"></block>
         </category>
         <category name="Data - Stock">
             <block type="stocks_current"></block>
