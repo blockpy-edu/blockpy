@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Пакуль значэньне
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Пакуль значэньне ісьціна, выконваць пэўныя апэрацыі.";
 Blockly.Msg.DELETE_BLOCK = "Выдаліць блёк";
 Blockly.Msg.DELETE_X_BLOCKS = "Выдаліць %1 блёкі";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Адключыць блёк";
 Blockly.Msg.DUPLICATE_BLOCK = "Капіяваць";
 Blockly.Msg.ENABLE_BLOCK = "Адключыць блёкі";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Разгарнуць блёк";
 Blockly.Msg.EXTERNAL_INPUTS = "Зьнешнія ўваходы";
 Blockly.Msg.HELP = "Дапамога";
 Blockly.Msg.INLINE_INPUTS = "Унутраныя ўваходы";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "стварыць пусты сьпіс";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Вяртае сьпіс даўжынёй 0, які ня ўтрымлівае запісаў зьвестак";
@@ -208,21 +202,10 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE = "Вяртае дзель двух �
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS = "Вяртае рознасьць двух лікаў.";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY = "Вяртае здабытак двух лікаў.";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "Вяртае першы лік у ступені другога ліку.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";  // untranslated
-Blockly.Msg.MATH_CHANGE_INPUT_BY = "by";  // untranslated
-Blockly.Msg.MATH_CHANGE_TITLE_CHANGE = "change";  // untranslated
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to property '%1'.";  // untranslated
-=======
-Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to variable '%1'.";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-=======
 Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";
 Blockly.Msg.MATH_CHANGE_INPUT_BY = "на";
 Blockly.Msg.MATH_CHANGE_TITLE_CHANGE = "зьмяніць";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Дадае лічбу да зьменнай '%1'.";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://be-x-old.wikipedia.org/wiki/%D0%9C%D0%B0%D1%82%D1%8D%D0%BC%D0%B0%D1%82%D1%8B%D1%87%D0%BD%D0%B0%D1%8F_%D0%BA%D0%B0%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D0%B0";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Вяртае адну з агульных канстантаў: π (3.141...), e (2.718...), φ (1.618...), sqrt(2) (1.414...), sqrt(½) (0,707...) або ∞ (бясконцасьць).";
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
@@ -311,13 +294,8 @@ Blockly.Msg.PROCEDURES_CALL_BEFORE_PARAMS = "with:";  // untranslated
 Blockly.Msg.PROCEDURES_CREATE_DO = "Create '%1'";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "function_name";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "do something";  // untranslated
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Creates a function with no output.";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "return";  // untranslated
@@ -326,15 +304,9 @@ Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING = "Warning: This function has dupli
 Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "parameter name:";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "parameters";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "Выдаліць камэнтар";
 Blockly.Msg.RENAME_VARIABLE = "Перайменаваць зьменную…";
@@ -380,33 +352,15 @@ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 пусты";
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Вяртае значэньне ісьціна, калі тэкст пусты.";
 Blockly.Msg.TEXT_JOIN_HELPURL = "https://github.com/google/blockly/wiki/Text#text-creation";  // untranslated
-<<<<<<< HEAD
-<<<<<<< HEAD
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "join strings";  // untranslated
-=======
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "create text with";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-Blockly.Msg.TEXT_JOIN_TOOLTIP = "Create a piece of text by joining together any number of items.";  // untranslated
-=======
 Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "стварыць тэкст з";
 Blockly.Msg.TEXT_JOIN_TOOLTIP = "Стварае фрагмэнт тэксту аб’яднаньнем любой колькасьці элемэнтаў.";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.TEXT_LENGTH_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TITLE = "даўжыня %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Вяртае колькасьць літараў (у тым ліку прабелы) у пададзеным тэксьце.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
-<<<<<<< HEAD
-Blockly.Msg.TEXT_PRINT_TITLE = "print %1";  // untranslated
-<<<<<<< HEAD
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-Blockly.Msg.TEXT_PRINT_TOOLTIP = "";  // untranslated
-=======
-Blockly.Msg.TEXT_PRINT_TOOLTIP = "Print the specified text, number or other value.";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-=======
 Blockly.Msg.TEXT_PRINT_TITLE = "друкаваць %1";
+Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Надрукаваць пазначаны тэкст, лічбу ці іншыя сымбалі.";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Запытаць у карыстальніка лічбу.";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT = "Запытаць у карыстальніка тэкст.";
@@ -420,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "абрэзаць прабелы зь ле
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "абрэзаць прабелы з правага боку";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Вяртае копію тэксту з прабеламі, выдаленымі ад аднаго ці абодвух бакоў.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "аб’ект";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create 'set %1'";  // untranslated
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -432,11 +383,7 @@ Blockly.Msg.VARIABLES_GET_TITLE = "";  // untranslated
 Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returns the value of this variable.";  // untranslated
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Create 'get %1'";  // untranslated
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-=======
-Blockly.Msg.VARIABLES_SET_TAIL = "to";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;

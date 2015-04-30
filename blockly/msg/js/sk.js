@@ -67,9 +67,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_WHILE = "opakuj kým";
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Kým je hodnota nepravdivá, vykonávaj príkazy.";
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Kým je hodnota pravdivá, vykonávaj príkazy.";
 Blockly.Msg.DELETE_BLOCK = "Odstrániť blok";
-<<<<<<< HEAD
-Blockly.Msg.DELETE_X_BLOCKS = "Odstrániť %1 bloky";
-<<<<<<< HEAD
+Blockly.Msg.DELETE_X_BLOCKS = "Odstrániť %1 blokov";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -82,11 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
-=======
-Blockly.Msg.DELETE_X_BLOCKS = "Odstrániť %1 blokov";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.DISABLE_BLOCK = "Vypnúť blok";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplikovať";
 Blockly.Msg.ENABLE_BLOCK = "Povoliť blok";
@@ -95,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Rozvinúť blok";
 Blockly.Msg.EXTERNAL_INPUTS = "Vonkajšie vstupy";
 Blockly.Msg.HELP = "Pomoc";
 Blockly.Msg.INLINE_INPUTS = "Riadkové vstupy";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "prázdny zoznam";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Vráti zoznam nulovej dĺžky, ktorý neobsahuje žiadne prvky.";
@@ -304,33 +294,6 @@ Blockly.Msg.PROCEDURES_CALL_BEFORE_PARAMS = "s:";
 Blockly.Msg.PROCEDURES_CREATE_DO = "Vytvoriť '%1'";
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
-<<<<<<< HEAD
-<<<<<<< HEAD
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "function_name";  // untranslated
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "do something";  // untranslated
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Creates a function with no output.";  // untranslated
-Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
-Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "return";  // untranslated
-Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP = "Creates a function with an output.";  // untranslated
-Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING = "Warning: This function has duplicate parameters.";  // untranslated
-Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";  // untranslated
-Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";  // untranslated
-Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";  // untranslated
-<<<<<<< HEAD
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "parameter name:";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "parameters";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
-=======
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "urob niečo";
 Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "na";
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Vytvorí funciu bez výstupu.";
@@ -345,7 +308,6 @@ Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "názov vstupu:";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Pridať vstup do funkcie.";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "vstupy";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Pridať, odstrániť alebo zmeniť poradie vstupov tejto funkcie.";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.REMOVE_COMMENT = "Odstrániť komentár";
 Blockly.Msg.RENAME_VARIABLE = "Premenovať premennú...";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Premenovať všetky premenné '%1' na:";
@@ -397,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "dĺžka %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Vráti počet písmen (s medzerami) v zadanom texte.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "píš %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Napíš zadaný text, číslo alebo hodnotu.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Výzva pre používateľa na zadanie čísla.";
@@ -415,36 +374,18 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "odstráň medzery z ľavej strany";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "odstráň medzery z pravej strany";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Vráť kópiu textu bez medzier na jednom alebo oboch koncoch.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
-Blockly.Msg.VARIABLES_DEFAULT_NAME = "položka";
-Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create 'set %1'";  // untranslated
-=======
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "prvok";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Vytvoriť \"nastaviť %1\"";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
 Blockly.Msg.VARIABLES_GET_TAIL = "";  // untranslated
 Blockly.Msg.VARIABLES_GET_TITLE = "";  // untranslated
 Blockly.Msg.VARIABLES_GET_TOOLTIP = "Vráti hodnotu tejto premennej.";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Vytvoriť \"získať %1\"";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-<<<<<<< HEAD
-<<<<<<< HEAD
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-=======
-Blockly.Msg.VARIABLES_SET_TAIL = "to";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
-=======
 Blockly.Msg.VARIABLES_SET_TAIL = "na";
 Blockly.Msg.VARIABLES_SET_TITLE = "nastaviť";
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Nastaví túto premennú, aby sa rovnala vstupu.";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_SET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;

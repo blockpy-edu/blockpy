@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Amíg a feltétel hamis, végre
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Amíg a feltétel igaz, végrehajtja az utasításokat.";
 Blockly.Msg.DELETE_BLOCK = "Blokk törlése";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 blokk törlése";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Blokk letiltása";
 Blockly.Msg.DUPLICATE_BLOCK = "Másolat";
 Blockly.Msg.ENABLE_BLOCK = "Blokk engedélyezése";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Blokk kibontása";
 Blockly.Msg.EXTERNAL_INPUTS = "Külső kapcsolatok";
 Blockly.Msg.HELP = "Súgó";
 Blockly.Msg.INLINE_INPUTS = "Belső kapcsolatok";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "üres lista";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Elemeket nem tartalmazó üres listát ad eredményül";
@@ -365,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "hossz %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "A megadott szöveg karaktereinek számát adja eredményül (beleértve a szóközöket).";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "Üzenet %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Megejelníti a megadott kaakterláncot üzenetként a képernyőn.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Számot kér be a felhasználótól.";
@@ -383,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "szóközök levágása az elejéről";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "szóközök levágása a végéről";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Levágja a megadott szöveg végeiről a szóközöket.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "változó";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create \"set %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

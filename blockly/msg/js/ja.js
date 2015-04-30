@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "値は false のあいだ、い
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "値は true のあいだ、いくつかのステートメントを行います。";
 Blockly.Msg.DELETE_BLOCK = "ブロックを消す";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 個のブロックを消す";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "ブロックを無効にします。";
 Blockly.Msg.DUPLICATE_BLOCK = "複製";
 Blockly.Msg.ENABLE_BLOCK = "ブロックを有効にします。";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "ブロックを展開します。";
 Blockly.Msg.EXTERNAL_INPUTS = "外部入力";
 Blockly.Msg.HELP = "ヘルプ";
 Blockly.Msg.INLINE_INPUTS = "インライン入力";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "空のリストを作成します。";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "長さゼロ、データ レコード空のリストを返します";
@@ -311,11 +305,7 @@ Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "関数の内容を強調表示します�
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "1番目値が true の場合、2 番目の値を返します。";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "警告: このブロックは、関数定義内でのみ使用できます。";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "入力名:";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "入力";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "コメントを削除します。";
@@ -369,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "%1 の長さ";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "指定されたテキストの文字 (スペースを含む) の数を返します。";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "%1 を印刷します。";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "指定したテキスト、番号または他の値を印刷します。";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "ユーザーにプロンプトして数字のインプットを求めます";
@@ -387,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "左端のスペースを取り除く";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "右端のスペースを取り除く";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "スペースを 1 つまたは両方の端から削除したのち、テキストのコピーを返します。";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "項目";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "'セット%1を作成します。";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

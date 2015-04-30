@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "While a value is false, then do
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "While a value is true, then do some statements.";
 Blockly.Msg.DELETE_BLOCK = "Delete Block";
 Blockly.Msg.DELETE_X_BLOCKS = "Delete %1 Blocks";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";
@@ -81,14 +80,11 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";
 Blockly.Msg.DICT_GET = "get key";
 Blockly.Msg.DICT_GET_TO = "from dict";
 Blockly.Msg.DICT_KEYS = "get all keys from";
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Disable Block";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicate";
 Blockly.Msg.ENABLE_BLOCK = "Enable Block";
 Blockly.Msg.EXPAND_ALL = "Expand Blocks";
 Blockly.Msg.EXPAND_BLOCK = "Expand Block";
-<<<<<<< HEAD
 Blockly.Msg.EXTERNAL_INPUTS = "Change to External Inputs";
 Blockly.Msg.HELP = "Help";
 Blockly.Msg.INLINE_INPUTS = "Change to Inline Inputs";
@@ -96,11 +92,6 @@ Blockly.Msg.LISTS_APPEND = "append item";
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";
 Blockly.Msg.LISTS_APPEND_TO = "to list";
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";
-=======
-Blockly.Msg.EXTERNAL_INPUTS = "External Inputs";
-Blockly.Msg.HELP = "Help";
-Blockly.Msg.INLINE_INPUTS = "Inline Inputs";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "create empty list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returns a list, of length 0, containing no data records";
@@ -177,17 +168,10 @@ Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = "Join a list of texts into one text, sepa
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = "Split text into a list of texts, breaking at each delimiter.";
 Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "with delimiter";
 Blockly.Msg.LISTS_TOOLTIP = "Returns true if the list is empty.";
-<<<<<<< HEAD
 Blockly.Msg.LOGIC_BOOLEAN_FALSE = "False";
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = "https://github.com/google/blockly/wiki/Logic#values";
 Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = "Returns either true or false.";
 Blockly.Msg.LOGIC_BOOLEAN_TRUE = "True";
-=======
-Blockly.Msg.LOGIC_BOOLEAN_FALSE = "false";
-Blockly.Msg.LOGIC_BOOLEAN_HELPURL = "https://github.com/google/blockly/wiki/Logic#values";
-Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = "Returns either true or false.";
-Blockly.Msg.LOGIC_BOOLEAN_TRUE = "true";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LOGIC_COMPARE_HELPURL = "https://en.wikipedia.org/wiki/Inequality_(mathematics)";
 Blockly.Msg.LOGIC_COMPARE_TOOLTIP_EQ = "Return true if both inputs equal each other.";
 Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT = "Return true if the first input is greater than the second input.";
@@ -198,11 +182,7 @@ Blockly.Msg.LOGIC_COMPARE_TOOLTIP_NEQ = "Return true if both inputs are not equa
 Blockly.Msg.LOGIC_NEGATE_HELPURL = "https://github.com/google/blockly/wiki/Logic#not";
 Blockly.Msg.LOGIC_NEGATE_TITLE = "not %1";
 Blockly.Msg.LOGIC_NEGATE_TOOLTIP = "Returns true if the input is false. Returns false if the input is true.";
-<<<<<<< HEAD
 Blockly.Msg.LOGIC_NULL = "None";
-=======
-Blockly.Msg.LOGIC_NULL = "null";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LOGIC_NULL_HELPURL = "https://en.wikipedia.org/wiki/Nullable_type";
 Blockly.Msg.LOGIC_NULL_TOOLTIP = "Returns null.";
 Blockly.Msg.LOGIC_OPERATION_AND = "and";
@@ -225,11 +205,7 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "Return the first number raised to t
 Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";
 Blockly.Msg.MATH_CHANGE_INPUT_BY = "by";
 Blockly.Msg.MATH_CHANGE_TITLE_CHANGE = "change";
-<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to property '%1'.";
-=======
-Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to variable '%1'.";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Return one of the common constants: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infinity).";
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
@@ -304,13 +280,8 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Return the cosine of a degree (not radian).
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Return the sine of a degree (not radian).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Return the tangent of a degree (not radian).";
 Blockly.Msg.ME = "Me";
-<<<<<<< HEAD
 Blockly.Msg.NEW_VARIABLE = "New property...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "New property name:";
-=======
-Blockly.Msg.NEW_VARIABLE = "New variable...";
-Blockly.Msg.NEW_VARIABLE_TITLE = "New variable name:";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "allow statements";
 Blockly.Msg.PROCEDURES_BEFORE_PARAMS = "with:";
@@ -323,13 +294,8 @@ Blockly.Msg.PROCEDURES_CALL_BEFORE_PARAMS = "with:";
 Blockly.Msg.PROCEDURES_CREATE_DO = "Create '%1'";
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "function_name";
 Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";
-=======
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "do something";
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Creates a function with no output.";
 Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";
 Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "return";
@@ -338,7 +304,6 @@ Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING = "Warning: This function has dupli
 Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "parameter name:";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "parameters";
@@ -346,15 +311,6 @@ Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder input
 Blockly.Msg.REMOVE_COMMENT = "Remove Comment";
 Blockly.Msg.RENAME_VARIABLE = "Rename property...";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Rename all '%1' properties to:";
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";
-Blockly.Msg.REMOVE_COMMENT = "Remove Comment";
-Blockly.Msg.RENAME_VARIABLE = "Rename variable...";
-Blockly.Msg.RENAME_VARIABLE_TITLE = "Rename all '%1' variables to:";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_APPEND_APPENDTEXT = "append text";
 Blockly.Msg.TEXT_APPEND_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";
 Blockly.Msg.TEXT_APPEND_TO = "to";
@@ -396,23 +352,15 @@ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 is empty";
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Returns true if the provided text is empty.";
 Blockly.Msg.TEXT_JOIN_HELPURL = "https://github.com/google/blockly/wiki/Text#text-creation";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "join strings";
-=======
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "create text with";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_JOIN_TOOLTIP = "Create a piece of text by joining together any number of items.";
 Blockly.Msg.TEXT_LENGTH_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";
 Blockly.Msg.TEXT_LENGTH_TITLE = "length of %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returns the number of letters (including spaces) in the provided text.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";
 Blockly.Msg.TEXT_PRINT_TITLE = "print %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "";
-=======
-Blockly.Msg.TEXT_PRINT_TOOLTIP = "Print the specified text, number or other value.";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Prompt for user for a number.";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT = "Prompt for user for some text.";
@@ -426,12 +374,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "trim spaces from left side of";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "trim spaces from right side of";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Return a copy of the text with spaces removed from one or both ends.";
 Blockly.Msg.TODAY = "Today";
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "property_name";
-=======
-Blockly.Msg.VARIABLES_DEFAULT_NAME = "item";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create 'set %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";
 Blockly.Msg.VARIABLES_GET_TAIL = "";
@@ -439,11 +383,7 @@ Blockly.Msg.VARIABLES_GET_TITLE = "";
 Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returns the value of this variable.";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Create 'get %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";
-<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_TAIL = "=";
-=======
-Blockly.Msg.VARIABLES_SET_TAIL = "to";
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_SET_TITLE = "set";
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;

@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "जब तक मान फॉ�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "जब तक मान ट्रू है, तब तक कुछ स्टेट्मेंट्स चलाएँ।";
 Blockly.Msg.DELETE_BLOCK = "ब्लॉक हटाएँ";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 ब्लॉक हटाएँ";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "ब्लॉक को अक्षम करें";
 Blockly.Msg.DUPLICATE_BLOCK = "कॉपी करें";
 Blockly.Msg.ENABLE_BLOCK = "ब्लॉक को सक्षम करें";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "ब्लॉक का विस्तार कर�
 Blockly.Msg.EXTERNAL_INPUTS = "बाहरी इनपुट";
 Blockly.Msg.HELP = "सहायता";
 Blockly.Msg.INLINE_INPUTS = "इनलाइन इनपुट";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "खाली सूची बनाएँ";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returns a list, of length 0, containing no data records";  // untranslated
@@ -301,11 +295,7 @@ Blockly.Msg.PROCEDURES_CREATE_DO = "'%1' बनाएँ";
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "कुछ करें";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "बिना आउटपुट वाला एक फ़ंक्शन बनाता है।";
 Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "रिटर्न";
@@ -369,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "%1 की लंबाई";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "दिए गये टेक्स्ट मे अक्षरों की संख्या रिटर्न करता है (खाली स्थान मिला के)।";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "प्रिंट करें %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "दिया गया टेक्स्ट प्रिंट करें, संख्या या अन्य मान।";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "यूज़र से संख्या के लिए प्रॉम्प्ट करें।";
@@ -387,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "रिक्त स्थान को �
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "रिक्त स्थान को इस टेक्स्ट के दाईं तरफ से निकालें";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Return a copy of the text with spaces removed from one or both ends.";  // untranslated
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "आइटम";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "सेट '%1' बनाएँ";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

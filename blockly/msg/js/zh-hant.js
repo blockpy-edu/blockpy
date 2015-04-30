@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "當值為否時，執行一些�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "當值為真時，執行一些語句";
 Blockly.Msg.DELETE_BLOCK = "刪除積木";
 Blockly.Msg.DELETE_X_BLOCKS = "刪除 %1 塊積木";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "停用積木";
 Blockly.Msg.DUPLICATE_BLOCK = "複製";
 Blockly.Msg.ENABLE_BLOCK = "啟用積木";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "展開積木";
 Blockly.Msg.EXTERNAL_INPUTS = "多行輸入";
 Blockly.Msg.HELP = "說明";
 Blockly.Msg.INLINE_INPUTS = "單行輸入";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "建立空列表";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "返回一個長度為 0 的列表，不包含任何資料記錄";
@@ -311,11 +305,7 @@ Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "高亮顯示函式定義";
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "如果值為 真，則返回第二個值。";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "警告: 此積木僅可在定義函式時使用。";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "變量:";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "參數";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "移除註解";
@@ -369,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "長度 %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "返回這串文字的字元數（含空格） 。";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "印出 %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "印出指定的文字、 數字或其他值。";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "輸入數字";
@@ -387,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "消除左側空格";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "消除右側空格";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "複製這段文字的同時刪除兩端多餘的空格。";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "變量";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "創立 '設定 %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

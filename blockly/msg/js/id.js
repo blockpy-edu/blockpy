@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Jika sementara nilai tidak  ben
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Jika sementara nilai benar (true), maka lakukan beberapa perintah.";
 Blockly.Msg.DELETE_BLOCK = "Hapus blok";
 Blockly.Msg.DELETE_X_BLOCKS = "Hapus %1 blok";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Nonaktifkan blok";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplikat";
 Blockly.Msg.ENABLE_BLOCK = "Aktifkan blok";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Kembangkan blok";
 Blockly.Msg.EXTERNAL_INPUTS = "Input-input eksternal";
 Blockly.Msg.HELP = "Tolong";
 Blockly.Msg.INLINE_INPUTS = "Input inline";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "buat list kosong";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Mengembalikan daftar, dengan panjang 0, tidak berisi data";
@@ -311,11 +305,7 @@ Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Sorot definisi fungsi";
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "Jika nilai yang benar, kemudian kembalikan nilai kedua.";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Peringatan: Blok ini dapat digunakan hanya dalam definisi fungsi.";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "masukan Nama:";
-<<<<<<< HEAD
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-=======
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "input";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "Hapus komentar";
@@ -369,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "panjang dari %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Kembalikan sejumlah huruf (termasuk spasi) dari teks yang disediakan.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "cetak %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Cetak teks yant ditentukan, angka atau ninlai lainnya.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Meminta pengguna untuk memberi sebuah angka.";
@@ -387,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "pangkas ruang dari sisi kiri";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "pangkas ruang dari sisi kanan";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Kembali salinan teks dengan spasi dihapus dari satu atau kedua ujungnya.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "item";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Membuat 'tetapkan %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

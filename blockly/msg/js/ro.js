@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "În timp ce o valoare este adev
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "În timp ce o valoare este adevărat, atunci face unele declaraţii.";
 Blockly.Msg.DELETE_BLOCK = "Șterge Bloc";
 Blockly.Msg.DELETE_X_BLOCKS = "Ștergeți %1 Blocuri";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Dezactivaţi bloc";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicati";
 Blockly.Msg.ENABLE_BLOCK = "Permite bloc";
@@ -90,18 +87,11 @@ Blockly.Msg.EXPAND_ALL = "Extinde blocuri";
 Blockly.Msg.EXPAND_BLOCK = "Extinde bloc";
 Blockly.Msg.EXTERNAL_INPUTS = "Intrări externe";
 Blockly.Msg.HELP = "Ajutor";
-<<<<<<< HEAD
-Blockly.Msg.INLINE_INPUTS = "Intrari de Linie";
-<<<<<<< HEAD
+Blockly.Msg.INLINE_INPUTS = "Intrări în linie";
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
-=======
-Blockly.Msg.INLINE_INPUTS = "Intrări în linie";
->>>>>>> 67140282a08b10d0beb8d842a2dc35beadc5d5e0
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "creează listă goală";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returnează o listă, de lungime 0, care nu conţine înregistrări de date";
@@ -369,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "lungime de %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returnează numărul de litere (inclusiv spaţiile) în textul furnizat.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "imprimare %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Afișează textul specificat, numărul sau altă valoare.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Solicită utilizatorul pentru un număr.";
@@ -387,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "tăiaţi spațiile din partea stângă a"
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "taie spațiile din partea dreaptă a";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Returnează o copie a textului fără spațiile de la unul sau ambele capete.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Crează 'set %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

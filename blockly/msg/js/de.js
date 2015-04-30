@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Führe die Anweisung solange au
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Führe die Anweisung solange aus wie die Bedingung wahr (true) ist.";
 Blockly.Msg.DELETE_BLOCK = "Block löschen";
 Blockly.Msg.DELETE_X_BLOCKS = "Block %1 löschen";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Block deaktivieren";
 Blockly.Msg.DUPLICATE_BLOCK = "Kopieren";
 Blockly.Msg.ENABLE_BLOCK = "Block aktivieren";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Block entfalten";
 Blockly.Msg.EXTERNAL_INPUTS = "externe Eingänge";
 Blockly.Msg.HELP = "Hilfe";
 Blockly.Msg.INLINE_INPUTS = "interne Eingänge";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "Erzeuge eine leere Liste";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Erzeugt eine leere Liste ohne Inhalt.";
@@ -365,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "Länge %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Die Anzahl von Zeichen in einem Text. (inkl. Leerzeichen)";
 Blockly.Msg.TEXT_PRINT_HELPURL = "http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode91.html";
 Blockly.Msg.TEXT_PRINT_TITLE = "Ausgabe %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Gib den Inhalt einer Variable aus.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode92.html";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Fragt den Benutzer nach einer Zahl.";
@@ -383,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "entferne Leerzeichen vom Anfang (links)";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "entferne Leerzeichen vom Ende (rechts)";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Entfernt Leerzeichen vom Anfang und / oder Ende eines Textes.";
 Blockly.Msg.TODAY = "Heute";
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "Element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Erzeuge \"Schreibe %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://de.wikipedia.org/wiki/Variable_%28Programmierung%29";

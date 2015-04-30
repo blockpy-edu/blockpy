@@ -68,7 +68,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Mientras un valor sea falso, en
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Mientras un valor sea verdadero, entonces hacer algunas declaraciones.";
 Blockly.Msg.DELETE_BLOCK = "Eliminar bloque";
 Blockly.Msg.DELETE_X_BLOCKS = "Eliminar %1 bloques";
-<<<<<<< HEAD
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -81,8 +80,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.DISABLE_BLOCK = "Desactivar bloque";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicar";
 Blockly.Msg.ENABLE_BLOCK = "Activar bloque";
@@ -91,13 +88,10 @@ Blockly.Msg.EXPAND_BLOCK = "Expandir bloque";
 Blockly.Msg.EXTERNAL_INPUTS = "Entradas externas";
 Blockly.Msg.HELP = "Ayuda";
 Blockly.Msg.INLINE_INPUTS = "Entradas en línea";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "crear lista vacía";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Devuelve una lista, de longitud 0, sin ningún dato";
@@ -365,10 +359,7 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "longitud de %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Devuelve el número de letras (incluyendo espacios) en el texto proporcionado.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "imprimir %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Imprimir el texto, número u otro valor especificado.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Solicitar al usuario un número.";
@@ -383,10 +374,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "quitar espacios iniciales de";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "quitar espacios finales de";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Devuelve una copia del texto sin los espacios de uno o ambos extremos.";
 Blockly.Msg.TODAY = "Today";  // untranslated
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> c5183726939fef4ab1e456826716478687020170
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "elemento";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Crear 'establecer %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
