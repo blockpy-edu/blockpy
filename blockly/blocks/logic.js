@@ -264,7 +264,7 @@ Blockly.Blocks['logic_compare'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var OPERATORS = Blockly.RTL ? [
+    var OPERATORS = this.RTL ? [
           ['==', 'EQ'],
           ['!=', 'NEQ'],
           ['>', 'LT'],
