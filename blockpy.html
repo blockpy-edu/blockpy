@@ -55,6 +55,9 @@
     <!-- Converter -->
     <script type="text/javascript" src="converter/python_to_blockly.js"></script>
     
+    <!-- Analyzer -->
+    <script type="text/javascript" src="kennel/kennel.js"></script>
+    
     <!-- Renderer -->
     <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
     
@@ -302,24 +305,9 @@
       <td style='vertical-align:top'>
         <script>
         
-            function align(){
-                var blocks = Blockly.getMainWorkspace().getTopBlocks();
-                var y = 0;
-                for (var i = 0; i < blocks.length; i++){
-                    var properties = blocks[i].getRelativeToSurfaceXY()
-                    //blocks[i].moveTo(Blockly.Toolbox.width+20, y);
-                    //blocks[i].moveTo(0, y);
-                    blocks[i].moveBy(-properties.x, -properties.y+y);
-                    y += blocks[i].getHeightWidth().height;
-                    y += 20; // buffer
-                }
-            }
+            
 
-          waitQueue = [];
-          function buildIptUrl(code, instruction) {
-            console.log( encodeURI(code));
-            return "http://localhost:8080/iframe-embed.html#&code=" + encodeURIComponent(code) + "&py=2&cumulative=false&curInstr=0";
-          }
+          
           
           function clearit() {
             Blockly.mainWorkspace.clear();
@@ -442,28 +430,11 @@
                 $("#python-output").val(code);
             }
           
-          function update_delay() {
-            if (waitQueue.length <= 1) {
-                blocklyToPython();
-                var dom = Blockly.Xml.workspaceToDom(WB);
-                $("#xml-output").text(Blockly.Xml.domToPrettyText(dom));
-            }
-            waitQueue.pop();
-          }
+          
           
           $(document).ready(function() {
-            WB = Blockly.inject(document.getElementById('blockly_canvas'),
-                {path: 'blockly/', 
-                 scrollbars: true, 
-                 toolbox: document.getElementById('toolbox')});
-            $(document).on("update_blockly", function() {
-                waitQueue.push(1);
-                window.setTimeout(update_delay, 0000);
-            });
-            WB.addChangeListener(function () {
-                saveUndo();
-                $(document).trigger("update_blockly");
-            });
+            var kennel = new Kennel(document.getElementById('blockly_canvas'),
+                                    document.getElementById('toolbox'));
           });
             var timers = {};
             function addDelay(directive, action) {
@@ -478,7 +449,6 @@
                 });
           });
         </script>
-        <!--<iframe src="blockpy-inner.html" style='height:550px'></iframe>-->
         <div id='blockly_canvas' style='height:550px'></div>
         <xml id="toolbox" style="display: none">
             <category name="Properties" custom="VARIABLE">
@@ -564,11 +534,6 @@
   <tr>
       <td colspan='2'>
       </td>
-      <!--<td id="ipt-td">
-        <iframe id="ipt" frameborder="0"
-                src="http://localhost:8080/iframe-embed.html#&code=print+3&py=2&cumulative=false&curInstr=0">
-        </iframe>
-      </td>-->
     </tr>
   </table>
   
