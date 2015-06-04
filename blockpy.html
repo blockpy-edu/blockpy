@@ -39,6 +39,12 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   
+  
+    <script type="text/javascript" src="blockly/blockly_compressed.js"></script>
+    <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="blockly/python_compressed.js"></script>
+    <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
+    <script type="text/javascript" src="blockly/msg/js/en.js"></script>
     
     <!-- Skulpt -->
     <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
@@ -61,7 +67,7 @@
         }
         
         function runit() {
-            runProgram(window.Blockly.Python.workspaceToCode());
+            runProgram(WB.Python.workspaceToCode());
         }
         
         function resetit() {
@@ -407,11 +413,11 @@
           
             function mapBlocklyToPython() {
                 // Build up highlight map
-                var backup = window.Blockly.Python.STATEMENT_PREFIX;
-                window.Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
-                window.Blockly.Python.addReservedWords('__HIGHLIGHT__');
-                var highlightedCode = window.Blockly.Python.workspaceToCode();
-                window.Blockly.Python.STATEMENT_PREFIX = backup;
+                var backup = WB.Python.STATEMENT_PREFIX;
+                WB.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
+                WB.Python.addReservedWords('__HIGHLIGHT__');
+                var highlightedCode = WB.Python.workspaceToCode();
+                WB.Python.STATEMENT_PREFIX = backup;
                 var highlightMap = [];
                 for (var i = 0, lines = highlightedCode.split("\n");
                      i < lines.length; i++) {
@@ -425,30 +431,33 @@
           
             function blocklyToPython() {
                 // Actual code
-                var code = window.Blockly.Python.workspaceToCode();
+                var code = Blockly.Python.workspaceToCode(WB);
                 $("#python-output").val(code);
             }
           
           function update_delay() {
             if (waitQueue.length <= 1) {
                 blocklyToPython();
-                var dom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+                var dom = Blockly.Xml.workspaceToDom(WB);
                 $("#xml-output").text(Blockly.Xml.domToPrettyText(dom));
             }
             waitQueue.pop();
           }
-          $(document).on("update_blockly", function() {
-            waitQueue.push(1);
-            window.setTimeout(update_delay, 0000);
-          });
-          function blocklyLoaded(blockly) {
-            // Called once Blockly is fully loaded.
-            window.Blockly = blockly;
-            blockly.addChangeListener(function () {
+          
+          $(document).ready(function() {
+            WB = Blockly.inject(document.getElementById('blockly_canvas'),
+                {path: 'blockly/', 
+                 scrollbars: true, 
+                 toolbox: document.getElementById('toolbox')});
+            $(document).on("update_blockly", function() {
+                waitQueue.push(1);
+                window.setTimeout(update_delay, 0000);
+            });
+            WB.addChangeListener(function () {
                 saveUndo();
                 $(document).trigger("update_blockly");
             });
-          }
+          });
             var timers = {};
             function addDelay(directive, action) {
                 clearTimeout(timers[directive]);
@@ -462,7 +471,86 @@
                 });
           });
         </script>
-        <iframe src="blockpy-inner.html" style='height:550px'></iframe>
+        <!--<iframe src="blockpy-inner.html" style='height:550px'></iframe>-->
+        <div id='blockly_canvas' style='height:550px'></div>
+        <xml id="toolbox" style="display: none">
+            <category name="Properties" custom="VARIABLE">
+            </category>
+            <category name="Decisions">
+                <block type="controls_if"></block>
+                <block type="logic_compare"></block>
+                <block type="logic_operation"></block>
+                <block type="logic_negate"></block>
+            </category>
+            <category name="Iteration">
+                <block type="controls_forEach"></block>
+            </category>
+            <category name="Functions" custom="PROCEDURE">
+            </category>
+            <category name="Calculation">
+                <block type="math_arithmetic"></block>
+                <block type="type_check"></block>
+                <block type="raw_block"></block>
+                <block type="raw_expression"></block>
+                <!--<block type="math_single"></block>
+                <block type="math_number_property"></block>
+                <block type="math_round"></block>
+                <block type="text_join"></block>-->
+            </category>
+            <category name="Output">
+                <block type="text_print"></block>
+                <block type="plot_line"></block>
+                <block type="plot_scatter"></block>
+                <block type="plot_show"></block>
+                <block type="plot_title"></block>
+                <category name="Turtles">
+                    <block type="turtles_start"></block>
+                </category>
+            </category>
+            <sep></sep>
+            <category name="Values">
+                <block type="text"></block>
+                <block type="math_number"></block>
+                <block type="logic_boolean"></block>
+            </category>
+            <category name="Lists">
+                <block type="lists_create_with"></block>
+                <block type="lists_create_empty"></block>
+                <block type="lists_append"></block>
+                <block type="lists_length"></block>
+            </category>
+            <category name="Dictionaries">
+                <block type="dicts_create_with"></block>
+                <block type="dict_get_literal"></block>
+                <block type="dict_keys"></block>
+            </category>
+            <sep></sep>
+            <category name="Data - Weather">
+                <block type="weather_temperature"></block>
+                <block type="weather_report"></block>
+                <block type="weather_forecasts"></block>
+                <block type="weather_report_forecasts"></block>
+                <block type="weather_all_forecasts"></block>
+                <block type="weather_highs_lows"></block>
+            </category>
+            <category name="Data - Stock">
+                <block type="stocks_current"></block>
+                <block type="stocks_past"></block>
+            </category>
+            <category name="Data - Earthquakes">
+                <block type="earthquake_get"></block>
+                <block type="earthquake_both"></block>
+                <block type="earthquake_all"></block>
+            </category>
+            <category name="Data - Crime">
+                <block type="crime_state"></block>
+                <block type="crime_year"></block>
+                <block type="crime_all"></block>
+            </category>
+            <category name="Data - Books">
+                <block type="books_get"></block>
+            </category>
+        </xml>
         <div id="xml-output" style='font-size:6pt'></div>
       </td>
   </tr>
