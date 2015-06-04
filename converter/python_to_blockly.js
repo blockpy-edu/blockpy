@@ -1,8 +1,8 @@
 /**
  * @license
- * Visual Blocks Editor
+ * Kennel
  *
- * Copyright 2014 Austin Cory Bart
+ * Copyright 2015 Austin Cory Bart
  * https://github.com/RealTimeWeb/corgis-blockly
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
