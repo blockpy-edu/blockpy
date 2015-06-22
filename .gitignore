@@ -1,5 +1,6 @@
 ignore/
 kennel_dist/
+closure-compiler/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
