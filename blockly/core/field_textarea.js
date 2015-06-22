@@ -19,8 +19,10 @@
  */
 
 /**
- * @fileoverview Text input field.
+ * @fileoverview Text Area field.
  * @author fraser@google.com (Neil Fraser)
+ * @author Andrew Mee
+ * @author acbart@vt.edu (Austin Cory Bart)
  */
 'use strict';
 
