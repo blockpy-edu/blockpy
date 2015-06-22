@@ -35,7 +35,7 @@ function Kennel(attachment_point, toolbox) {
     this._attachment_point = attachment_point;
     
     this._load_main();
-    this._load_blockly();
+    this._load_blockly(toolbox);
     this._load_text();
 };
 
@@ -82,7 +82,8 @@ Kennel.prototype._load_main = function() {
                         "<div class='tab-content' style='height:550px'>"+
                             "<div class='tab-pane active kennel-blocks'"+
                                   "style='height:100%' id='blocks'>"+
-                                  "<div style='height:100%'></div>"+
+                                  "<div class='blockly-div' style='position: absolute'></div>"+
+                                  "<div class='blockly-area' style='height:100%'></div>"+
                             "</div>"+
                             "<div class='tab-pane kennel-text' id='text'>"+
                                 "<textarea class='language-python'>import weather</textarea>"+
@@ -92,9 +93,10 @@ Kennel.prototype._load_main = function() {
     this._main_div = $(this._attachment_point).html($(main_tabs))
 };
 
-Kennel.prototype._load_blockly = function() {
-    var blockly_canvas = this._main_div.find('.kennel-blocks > div');
-    this._blockly = Blockly.inject(blockly_canvas[0],
+Kennel.prototype._load_blockly = function(toolbox) {
+    var blockly_div = this._main_div.find('.kennel-blocks > .blockly-div')[0];
+    var blockly_area = this._main_div.find('.kennel-blocks > .blockly-area')[0];
+    this._blockly = Blockly.inject(blockly_div,
                                   {path: 'blockly/', 
                                   scrollbars: true, 
                                   toolbox: toolbox});
@@ -105,6 +107,26 @@ Kennel.prototype._load_blockly = function() {
     $(this._attachment_point).on("blockly:update", function() {
         this._textUpdateQueue.add(this._update_text, 0);
     });
+    var onresize = function(e) {
+        // Compute the absolute coordinates and dimensions of blockly_area.
+        var element = blockly_area;
+        console.log(element);
+        var x = 0;
+        var y = 0;
+        do {
+            x += element.offsetLeft;
+            y += element.offsetTop;
+            element = element.offsetParent;
+        } while (element);
+        // Position blockly_div over blockly_area.
+        blockly_div.style.left = x + 'px';
+        blockly_div.style.top = y + 'px';
+        blockly_div.style.width = blockly_area.offsetWidth + 'px';
+        blockly_div.style.height = blockly_area.offsetHeight + 'px';
+        console.log(blockly_area.offsetHeight);
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
 };
 
 Kennel.prototype._load_text = function() {
