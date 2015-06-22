@@ -147,7 +147,7 @@ Kennel.prototype._load_text = function() {
                                         extraKeys: {"Tab": "indentMore", "Shift-Tab": "indentLess"},
                                         //onKeyEvent: handleEdKeys
                                       });
-    this.text.setSize(null, "100%");
+    //this.text.setSize(null, "100%");
     $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
         var content_div = $(e.target.attributes.href.value);
         content_div.find('.CodeMirror').each(function(i, el) {

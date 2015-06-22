@@ -150,18 +150,14 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
  * @private
  */
 Blockly.FieldTextArea.prototype.render_ = function() {
-
-this.size_.width = this.textElement_.getBBox().width + 5;
-
- this.size_.height= (this.text_.split(/\n/).length ||1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
-        
-  if (this.borderRect_) {
-    this.borderRect_.setAttribute('width',
-         this.size_.width + Blockly.BlockSvg.SEP_SPACE_X);
+    this.size_.width = this.textElement_.getBBox().width + 5;
+    this.size_.height= (this.text_.split(/\n/).length ||1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
+    if (this.borderRect_) {
+        this.borderRect_.setAttribute('width',
+            this.size_.width + Blockly.BlockSvg.SEP_SPACE_X);
         this.borderRect_.setAttribute('height',
-         this.size_.height -  (Blockly.BlockSvg.SEP_SPACE_Y+5));
-  }
-
+            this.size_.height -  (Blockly.BlockSvg.SEP_SPACE_Y+5));
+    }
 };
         
 
@@ -198,6 +194,7 @@ Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
   Blockly.FieldTextArea.htmlInput_ = htmlInput;
   htmlInput.style.resize = 'none';
   htmlInput.style['line-height'] = '20px';
+  htmlInput.style['overflow'] = 'hidden';
   htmlInput.style.height = '100%';//this.size_.height - Blockly.BlockSvg.SEP_SPACE_Y + 'px';
   div.appendChild(htmlInput);
 
@@ -295,13 +292,14 @@ Blockly.FieldTextArea.prototype.resizeEditor_ = function() {
   var div = Blockly.WidgetDiv.DIV;
   var bBox = this.fieldGroup_.getBBox();
   var htmlInput = Blockly.FieldTextArea.htmlInput_;
-  div.style.width = bBox.width + 'px';
+  //div.style.width = bBox.width + 'px';
   if (htmlInput.clientHeight < htmlInput.scrollHeight) {
-    div.style.width = (32 + bBox.width) + 'px';
+    div.style.width = (bBox.width) + 'px';
   } else {
     div.style.width = bBox.width + 'px';
   }
   div.style.height = bBox.height + 'px';
+  // Position the editor
   var xy = this.getAbsoluteXY_();
   // In RTL mode block fields and LTR input fields the left edge moves,
   // whereas the right edge is fixed.  Reposition the editor.
