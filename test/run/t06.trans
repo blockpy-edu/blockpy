@@ -1,0 +1,13 @@
+Module(body=[Assign(targets=[Name(id='x',
+                                  ctx=Store())],
+                    value=Num(n=4)),
+             Assign(targets=[Name(id='x',
+                                  ctx=Store())],
+                    value=BinOp(left=Name(id='x',
+                                          ctx=Load()),
+                                op=Mult(),
+                                right=Num(n=3))),
+             Print(dest=None,
+                   values=[Name(id='x',
+                                ctx=Load())],
+                   nl=True)])

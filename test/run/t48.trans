@@ -1,0 +1,13 @@
+Module(body=[Print(dest=None,
+                   values=[Call(func=Attribute(value=Str(s=''),
+                                               attr='join',
+                                               ctx=Load()),
+                                args=[BinOp(left=List(elts=[Str(s='O')],
+                                                      ctx=Load()),
+                                            op=Add(),
+                                            right=List(elts=[Str(s='K')],
+                                                       ctx=Load()))],
+                                keywords=[],
+                                starargs=None,
+                                kwargs=None)],
+                   nl=True)])

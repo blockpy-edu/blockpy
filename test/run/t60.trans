@@ -1,0 +1,8 @@
+Module(body=[If(test=UnaryOp(op=Not(),
+                             operand=Compare(left=Str(s='?'),
+                                             ops=[In()],
+                                             comparators=[Str(s='xyz')])),
+                body=[Print(dest=None,
+                            values=[Str(s='OK')],
+                            nl=True)],
+                orelse=[])])

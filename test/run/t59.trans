@@ -1,0 +1,11 @@
+Module(body=[Print(dest=None,
+                   values=[Call(func=Name(id='len',
+                                          ctx=Load()),
+                                args=[Dict(keys=[Str(s='a'),
+                                                 Str(s='b')],
+                                           values=[Num(n=1),
+                                                   Num(n=2)])],
+                                keywords=[],
+                                starargs=None,
+                                kwargs=None)],
+                   nl=True)])

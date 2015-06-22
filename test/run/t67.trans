@@ -1,0 +1,8 @@
+Module(body=[Print(dest=None,
+                   values=[Compare(left=Num(n=7),
+                                   ops=[In()],
+                                   comparators=[Dict(keys=[Num(n=1),
+                                                           Str(s='a')],
+                                                     values=[Num(n=2),
+                                                             Num(n=7)])])],
+                   nl=True)])

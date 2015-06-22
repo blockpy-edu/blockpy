@@ -1,0 +1,10 @@
+Module(body=[Assign(targets=[Name(id='x',
+                                  ctx=Store())],
+                    value=Dict(keys=[Str(s='a')],
+                               values=[Str(s='OK')])),
+             Print(dest=None,
+                   values=[Subscript(value=Name(id='x',
+                                                ctx=Load()),
+                                     slice=Index(value=Str(s='a')),
+                                     ctx=Load())],
+                   nl=True)])
