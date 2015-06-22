@@ -32,11 +32,16 @@ function Kennel(attachment_point, toolbox) {
     this._textUpdateQueue = new WaitQueue();
     this._blocklyUpdateQueue = new WaitQueue();
     
+    // The Div or whatever HTML element we attach everything to
     this._attachment_point = attachment_point;
+    
     
     this._load_main();
     this._load_blockly(toolbox);
     this._load_text();
+    
+    // Default mode when you open the screen is blocks
+    this._mode = 'blocks';
 };
 
 Kennel.prototype.ALIGNMENT_VERTICAL_SPACING = 20;
@@ -71,31 +76,31 @@ Kennel.prototype.clear = function() {
     this._blockly.clear();
 };
 
+Kennel.prototype.change_mode = function() {
+    if (this._mode == 'blocks') {
+        this._mode = 'text';
+    } else {
+        this._mode = 'blocks';
+    }
+}
+
 Kennel.prototype._load_main = function() {
-    var main_tabs = "<div class='kennel-content'>"+
-                        "<ul class='nav nav-tabs'>"+
-                            "<li class='active'><a data-toggle='tab' href='#blocks'>"+
-                                "<span>Blocks</span></a></li>"+
-                            "<li><a data-toggle='tab' href='#text'>"+
-                                "<span>Text</span></a></li>"+
-                        "</ul>"+
-                        "<div class='tab-content' style='height:550px'>"+
-                            "<div class='tab-pane active kennel-blocks'"+
-                                  "style='height:100%' id='blocks'>"+
-                                  "<div class='blockly-div' style='position: absolute'></div>"+
-                                  "<div class='blockly-area' style='height:100%'></div>"+
-                            "</div>"+
-                            "<div class='tab-pane kennel-text' id='text'>"+
-                                "<textarea class='language-python'>import weather</textarea>"+
-                            "</div>"+
+    var main_tabs = "<div class='kennel-content' style='height:100%'>"+
+                        "<div class='kennel-blocks'"+
+                              "style='height:100%' id='blocks'>"+
+                              "<div class='blockly-div' style='position: absolute'></div>"+
+                              "<div class='blockly-area' style='height:100%'></div>"+
+                        "</div>"+
+                        "<div class='kennel-text' id='text'>"+
+                            "<textarea class='language-python'>import weather</textarea>"+
                         "</div>"+
                     "</div>";
     this._main_div = $(this._attachment_point).html($(main_tabs))
 };
 
 Kennel.prototype._load_blockly = function(toolbox) {
-    var blockly_div = this._main_div.find('.kennel-blocks > .blockly-div')[0];
-    var blockly_area = this._main_div.find('.kennel-blocks > .blockly-area')[0];
+    var blockly_div = this._main_div.find('.blockly-div')[0];
+    var blockly_area = this._main_div.find('.blockly-area')[0];
     this._blockly = Blockly.inject(blockly_div,
                                   {path: 'blockly/', 
                                   scrollbars: true, 
@@ -110,7 +115,6 @@ Kennel.prototype._load_blockly = function(toolbox) {
     var onresize = function(e) {
         // Compute the absolute coordinates and dimensions of blockly_area.
         var element = blockly_area;
-        console.log(element);
         var x = 0;
         var y = 0;
         do {
@@ -123,28 +127,27 @@ Kennel.prototype._load_blockly = function(toolbox) {
         blockly_div.style.top = y + 'px';
         blockly_div.style.width = blockly_area.offsetWidth + 'px';
         blockly_div.style.height = blockly_area.offsetHeight + 'px';
-        console.log(blockly_area.offsetHeight);
     };
     window.addEventListener('resize', onresize, false);
     onresize();
 };
 
 Kennel.prototype._load_text = function() {
-    var text_canvas = this._main_div.find('.kennel-text > textarea');
-    this.text = CodeMirror.fromTextArea(text_canvas[0], {
-                                        /*mode: {name: 'python',
-                                               version: 2,
-                                               singleLineStringErrors: false},*/
-                                        mode: 'python',
+    //var text_canvas = this._main_div.find('.kennel-text > textarea')[0];
+    var text_canvas = document.getElementById('python-output');
+    this.text = CodeMirror.fromTextArea(text_canvas, {
+                                        mode: { name: "python", version: 3, singleLineStringErrors: false },
                                         readOnly: false,
                                         lineNumbers: true,
                                         firstLineNumber: 1,
                                         indentUnit: 4,
-                                      indentWithTabs: false,
-                                          matchBrackets: true,
-                                          extraKeys: {"Tab": "indentMore", "Shift-Tab": "indentLess"},
-                                          //onKeyEvent: handleEdKeys
+                                        tabSize: 4,
+                                        indentWithTabs: false,
+                                        matchBrackets: true,
+                                        extraKeys: {"Tab": "indentMore", "Shift-Tab": "indentLess"},
+                                        //onKeyEvent: handleEdKeys
                                       });
+    this.text.setSize(null, "100%");
     $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
         var content_div = $(e.target.attributes.href.value);
         content_div.find('.CodeMirror').each(function(i, el) {
