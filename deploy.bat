@@ -1,4 +1,4 @@
-set outputdir=C:\Users\acbart\Projects\blockpy\dist
+set outputdir=C:\Users\acbart\Projects\blockpy\kennel_dist
 
 mkdir %outputdir%
 
