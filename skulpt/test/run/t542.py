@@ -3,14 +3,14 @@
 x = u'中文'
 #print type(x)
 print len(x)
-print x
+#print x
 
 x = u'Résumé'
 #print type(x)
 print len(x)
-print x
+#print x
 
 x = u'string'
 #print type(x)
 print len(x)
-print x
+#print x

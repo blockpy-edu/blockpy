@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "Zmadho bllokun";
 Blockly.Msg.EXTERNAL_INPUTS = "Hyrjet e jashtme";
 Blockly.Msg.HELP = "Ndihmë";
 Blockly.Msg.INLINE_INPUTS = "Hyrjet e brendshme";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "http://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "krijo një listë të zbrazët";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Kthen një listë, te gjatësisë 0, duke mos përmbajtur asnjë regjistrim të të dhënave";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "listë";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "ndrysho %1 nga %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Shto një numër në ndryshoren '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "http://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Kthen një nga konstantet e përbashkëta: : π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infiniti).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "http://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "detyro %1 e ulët %2 e lartë %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Vëni një numër që të jetë në mes të kufive të specifikuara(përfshirëse).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -380,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Pergjigjet me nje vlere te kesaj variable."
 Blockly.Msg.VARIABLES_SET = "vendos %1 ne %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Krijo 'merr %1";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Vendos kete variable te jete e barabarte me te dhenat ne hyrje.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -390,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

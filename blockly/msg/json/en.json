@@ -1,11 +1,7 @@
 {
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
-<<<<<<< HEAD
-		"lastupdated": "2015-06-22 11:18:12.729000",
-=======
-		"lastupdated": "2015-06-10 18:37:24.926409",
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+		"lastupdated": "2015-06-22 13:15:24.038000",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},
@@ -156,14 +152,8 @@
 	"MATH_IS_DIVISIBLE_BY": "is divisible by",
 	"MATH_IS_TOOLTIP": "Check if a number is an even, odd, prime, whole, positive, negative, or if it is divisible by certain number. Returns true or false.",
 	"MATH_CHANGE_HELPURL": "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter",
-<<<<<<< HEAD
-	"MATH_CHANGE_TITLE_CHANGE": "change",
-	"MATH_CHANGE_INPUT_BY": "by",
-	"MATH_CHANGE_TOOLTIP": "Add a number to property '%1'.",
-=======
 	"MATH_CHANGE_TITLE": "change %1 by %2",
-	"MATH_CHANGE_TOOLTIP": "Add a number to variable '%1'.",
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+	"MATH_CHANGE_TOOLTIP": "Add a number to property '%1'.",
 	"MATH_ROUND_HELPURL": "https://en.wikipedia.org/wiki/Rounding",
 	"MATH_ROUND_TOOLTIP": "Round a number up or down.",
 	"MATH_ROUND_OPERATOR_ROUND": "round",
@@ -359,12 +349,9 @@
 	"VARIABLES_GET_TOOLTIP": "Returns the value of this variable.",
 	"VARIABLES_GET_CREATE_SET": "Create 'set %1'",
 	"VARIABLES_SET_HELPURL": "https://github.com/google/blockly/wiki/Variables#set",
-<<<<<<< HEAD
 	"VARIABLES_SET_TITLE": "set",
 	"VARIABLES_SET_TAIL": "=",
-=======
 	"VARIABLES_SET": "set %1 to %2",
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 	"VARIABLES_SET_TOOLTIP": "Sets this variable to be equal to the input.",
 	"VARIABLES_SET_CREATE_GET": "Create 'get %1'",
 	"PROCEDURES_DEFNORETURN_HELPURL": "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29",

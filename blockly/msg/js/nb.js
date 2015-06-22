@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "Utvid blokk";
 Blockly.Msg.EXTERNAL_INPUTS = "Eksterne kilder";
 Blockly.Msg.HELP = "Hjelp";
 Blockly.Msg.INLINE_INPUTS = "Interne kilder";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "opprett en tom liste";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returnerer en tom liste, altså med lengde 0";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "liste";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "endre %1 ved %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Addere et tall til variabelen '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Returner en av felleskonstantene π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), eller ∞ (uendelig).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "begrense %1 lav %2 høy %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Begrens et tall til å være mellom de angitte grenseverdiene (inklusiv).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -371,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "fjern mellomrom fra begge sider av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "fjern mellomrom fra venstre side av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "fjern mellomrom fra høyre side av";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Returner en kopi av teksten med mellomrom fjernet fra en eller begge sidene.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "I dag";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Opprett 'sett %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returnerer verdien av denne variabelen.";
 Blockly.Msg.VARIABLES_SET = "sett %1 til %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Opprett 'hent %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Setter verdien av denne variablen lik parameteren.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -394,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

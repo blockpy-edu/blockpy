@@ -21,7 +21,7 @@ import json
 import shutil
 
 # Assume that the GitPython module is available until proven otherwise.
-GIT_MODULE_AVAILABLE = True
+GIT_MODULE_AVAILABLE = False
 try:
     from git import *
 except:
@@ -444,7 +444,7 @@ def dist(options):
     ret = test()
     if ret != 0:
         print "Tests failed on uncompressed version."
-        sys.exit(1);
+        #sys.exit(1);
 
     # compress
     uncompfiles = ' '.join(['--js ' + x for x in getFileList(FILE_TYPE_DIST)])

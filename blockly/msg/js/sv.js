@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "Fäll ut block";
 Blockly.Msg.EXTERNAL_INPUTS = "Externa inmatningar";
 Blockly.Msg.HELP = "Hjälp";
 Blockly.Msg.INLINE_INPUTS = "Radinmatning";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "skapa tom lista";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Ger tillbaka en lista utan någon data, alltså med längden 0";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "lista";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "ändra %1 med %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Lägg till ett tal till variabeln '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://sv.wikipedia.org/wiki/Matematisk_konstant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Returnerar en av de vanliga konstanterna: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…) eller ∞ (oändligt).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "begränsa %1 till mellan %2 och %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Begränsa ett tal till att mellan de angivna gränsvärden (inklusive).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -371,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "ta bort mellanrum från båda sidorna av"
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "ta bort mellanrum från vänstra sidan av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "ta bort mellanrum från högra sidan av";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Returnerar en kopia av texten med borttagna mellanrum från en eller båda ändar.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Idag";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "föremål";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Skapa \"välj %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returnerar värdet av denna variabel.";
 Blockly.Msg.VARIABLES_SET = "välj %1 till %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Skapa 'hämta %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Gör så att den här variabeln blir lika med inputen.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -394,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

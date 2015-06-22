@@ -35,7 +35,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "继续下一次循环"
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "中断包含它的循环。";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "跳过这个循环的剩余部分，并继续下一次迭代。";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "警告：此块仅可用于在一个循环内。";
-Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each用于每个块";
+Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each";  // untranslated
 Blockly.Msg.CONTROLS_FOREACH_TITLE = "为每个项目 %1 在列表中 %2";
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "遍历每个列表中的项目，将变量“%1”设定到该项中，然后执行某些语句。";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "https://github.com/google/blockly/wiki/Loops#count-with";  // untranslated
@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "展开块";
 Blockly.Msg.EXTERNAL_INPUTS = "外部输入";
 Blockly.Msg.HELP = "帮助";
 Blockly.Msg.INLINE_INPUTS = "单行输入";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "创建空列表";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "返回一个列表，长度为 0，不包含任何数据记录";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "列表";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "更改 %1 由 %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "将一个数添加到变量“%1”。";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://zh.wikipedia.org/wiki/数学常数";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "返回一个常见常量：π (3.141......)，e (2.718...)、φ (1.618...)、 sqrt(2) (1.414......)、sqrt(½) (0.707......)或 ∞（无穷大）。";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "限制数字 %1 介于 (低) %2 到 (高) %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "限制数字介于两个指定的数字之间";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
@@ -371,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "消除两侧空格";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "消除左侧空格";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "消除右侧空格";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "复制这段文字的同时删除两端多余的空格。";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "今天";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "项目";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "创建“设定%1”";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "返回此变量的值。";
 Blockly.Msg.VARIABLES_SET = "赋值 %1 到 %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "创建“获得%1”";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "设置此变量，以使它和输入值相等。";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -394,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

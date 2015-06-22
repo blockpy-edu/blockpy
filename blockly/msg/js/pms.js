@@ -36,7 +36,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Seurte da la liassa anglob
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Sauté ël rest ëd sa liassa, e continué con l'iterassion apress.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "Atension: Ës blòch a peul mach esse dovrà andrinta a na liassa.";
 Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each";  // untranslated
-Blockly.Msg.CONTROLS_FOREACH_TITLE = "për minca element %1 ant la lista %2";
+Blockly.Msg.CONTROLS_FOREACH_TITLE = "për minca n'element %1 ant la lista %2";
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "Për minca element an na lista, dé ël valor ëd l'element a la variàbil '%1', peui eseguì chèiche anstrussion.";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "https://github.com/google/blockly/wiki/Loops#count-with";  // untranslated
 Blockly.Msg.CONTROLS_FOR_TITLE = "conté con %1 da %2 a %3 për %4";
@@ -367,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "gavé jë spassi da le doe bande ëd";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "gavé jë spassi da la banda snistra ëd";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "gavé jë spassi da la banda drita ëd";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "A smon na còpia dël test con jë spassi gavà da n'estremità o da tute doe.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Ancheuj";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Creé 'fissé %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -380,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "A smon ël valor ëd sa variàbil.";
 Blockly.Msg.VARIABLES_SET = "fissé %1 a %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Creé 'oten-e %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Fissé costa variàbil ugual al valor d'imission.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -390,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

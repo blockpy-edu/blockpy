@@ -35,7 +35,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "folytatja a következ�
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Megszakítja végtelen ciklust.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Megszakítja az aktuális futást és folytatja elölről.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "Figyelem: Ez a blokk, csak egy ciklusban használható.";
-Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://hu.wikipedia.org/wiki/Ciklus_(programoz%C3%A1s)#Iter.C3.A1l.C3.B3_ciklus";
+Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each";  // untranslated
 Blockly.Msg.CONTROLS_FOREACH_TITLE = "Minden %1 elemre a %2 listában";
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "A lista elemszámának megfelelő lépésszámú ciklus.  A \"%1\" változó minden lépésben megkapja a lista adott elemének értékét.  Minden lépésben végrehajtódnak az utasítások.";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "https://github.com/google/blockly/wiki/Loops#count-with";  // untranslated
@@ -367,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "szóközök levágása mindkét végérő
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "szóközök levágása az elejéről";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "szóközök levágása a végéről";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Levágja a megadott szöveg végeiről a szóközöket.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Ma";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "változó";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Készíts \"beállít %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -380,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "A változó értékét adja eredményül.";
 Blockly.Msg.VARIABLES_SET = "állítsd be %1 erre %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Készíts \"kér %1\"";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "A változónak adhatunk értéket.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -390,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

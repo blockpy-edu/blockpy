@@ -113,7 +113,7 @@ for (var i in $gbl) {\
     print(i, $gbl[i].v, typeof $gbl[i], Object.keys($gbl[i]));\
 }\
 ");*/
-        out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl);\n}\n");
+        out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename);\n}\n");
         //out("\ntry {\n\tSk.afterSingleExecution("+this.st.stss[2].name+");\n} catch (e) {\n\talert(e);\n}");
         //out("\ntry {\n\tSk.afterSingleExecution("+this.st.stss[2].name+");\n} catch (e) {\n\talert(e);\n}");
     }

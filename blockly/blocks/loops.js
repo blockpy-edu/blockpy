@@ -29,14 +29,7 @@ goog.provide('Blockly.Blocks.loops');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
 Blockly.Blocks.loops.HUE = 300;
-=======
-/**
- * Common HSV hue for all blocks in this category.
- */
-Blockly.Blocks.loops.HUE = 120;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['controls_repeat'] = {
   /**

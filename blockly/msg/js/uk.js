@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "Розгорнути блок";
 Blockly.Msg.EXTERNAL_INPUTS = "Зовнішні входи";
 Blockly.Msg.HELP = "Довідка";
 Blockly.Msg.INLINE_INPUTS = "Вбудовані входи";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://uk.wikipedia.org/wiki/Зв%27язаний_список";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "створити порожній список";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Повертає список, довжиною 0, що не містить записів даних";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "список";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "змінити %1 на %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Додати число до змінної '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://uk.wikipedia.org/wiki/Математична_константа";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Повертає одну з поширених констант: π (3.141...), e (2.718...), φ (1,618...), sqrt(2) (1.414...), sqrt(½) (0.707...) або ∞ (нескінченність).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "обмежити %1 від %2 до %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Обмежує число вказаними межами (включно).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
@@ -357,12 +353,8 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "довжина %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Повертає число символів (включно з пропусками) у даному тексті.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode91.html";
 Blockly.Msg.TEXT_PRINT_TITLE = "друк %1";
-<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-Blockly.Msg.TEXT_PRINT_TOOLTIP = "Надрукувати заданий текст, числа або інші символи.";
-=======
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Надрукувати заданий текст, числа або інші значення.";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.TEXT_PROMPT_HELPURL = "http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode92.html";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Запитати у користувача число.";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT = "Запитати у користувача деякий текст.";
@@ -371,20 +363,12 @@ Blockly.Msg.TEXT_PROMPT_TYPE_TEXT = "запит тексту з повідомл
 Blockly.Msg.TEXT_TEXT_HELPURL = "https://uk.wikipedia.org/wiki/Рядок_(програмування)";
 Blockly.Msg.TEXT_TEXT_TOOLTIP = "Символ, слово або рядок тексту.";
 Blockly.Msg.TEXT_TRIM_HELPURL = "http://www.liv.ac.uk/HPC/HTMLF90Course/HTMLF90CourseNotesnode91.html";
-<<<<<<< HEAD
-Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "викидайте крайні пробіли з обох сторін";
-Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "вилучати пробіли з лівого боку";
-Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "вилучати пробіли з правого боку";
-Blockly.Msg.TEXT_TRIM_TOOLTIP = "Повертає копію тексту з пробілами вилученими від одного або обох кінців.";
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "вилучити крайні пропуски з обох кінців";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "вилучити пропуски з лівого боку";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "вилучити пропуски з правого боку";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Повертає копію тексту з вилученими пропусками з одного або обох кінців.";
 Blockly.Msg.TODAY = "Сьогодні";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "елемент";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Створити 'встановити %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -392,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Повертає значення цієї 
 Blockly.Msg.VARIABLES_SET = "встановити %1 до %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Створити 'отримати %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Задає цю змінну рівною входу.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -402,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

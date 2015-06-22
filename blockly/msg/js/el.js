@@ -40,7 +40,7 @@ Blockly.Msg.CONTROLS_FOREACH_TITLE = "για κάθε στοιχείο %1 στη
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "Για κάθε στοιχείο σε μια λίστα, ορίζει τη μεταβλητή «%1» στο στοιχείο και, στη συνέχεια, εκτελεί κάποιες εντολές.";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "Blockly";
 Blockly.Msg.CONTROLS_FOR_TITLE = "μέτρησε με %1 από το %2 έως το %3 ανά %4";
-Blockly.Msg.CONTROLS_FOR_TOOLTIP = "Η μεταβλητή \"%1\" παίρνει τιμές ξεκινώντας από τον αριθμό έναρξης μέχρι τον αριθμό τέλους αυξάνοντας κάθε φορά με το καθορισμένο βήμα και εκτελώντας το καθορισμένο μπλοκ.";
+Blockly.Msg.CONTROLS_FOR_TOOLTIP = "Η μεταβλητή «%1» παίρνει τιμές ξεκινώντας από τον αριθμό έναρξης μέχρι τον αριθμό τέλους αυξάνοντας κάθε φορά με το καθορισμένο βήμα και εκτελώντας το καθορισμένο μπλοκ.";
 Blockly.Msg.CONTROLS_IF_ELSEIF_TOOLTIP = "Πρόσθετει μια κατάσταση/συνθήκη στο μπλοκ «εάν».";
 Blockly.Msg.CONTROLS_IF_ELSE_TOOLTIP = "Προσθέτει μια τελική κατάσταση/συνθήκη, που πιάνει όλες τις άλλες περιπτώσεις, στο μπλοκ «εάν».";
 Blockly.Msg.CONTROLS_IF_HELPURL = "https://github.com/google/blockly/wiki/IfElse";  // untranslated
@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "Επέκτεινε Το Μπλοκ";
 Blockly.Msg.EXTERNAL_INPUTS = "Εξωτερικές Είσοδοι";
 Blockly.Msg.HELP = "Βοήθεια";
 Blockly.Msg.INLINE_INPUTS = "Εσωτερικές Είσοδοι";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "λίστα";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "δημιούργησε κενή λίστα";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Επιστρέφει μια λίστα, με μήκος 0, η οποία δεν περιέχει εγγραφές δεδομένων";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "λίστα";
@@ -371,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "περίκοψε τα κενά και α�
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "περίκοψε τα κενά από την αριστερή πλευρά του";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "περίκοψε τα κενά από την δεξιά πλευρά του";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Επιστρέφει ένα αντίγραφο του κειμένου με αφαιρεμένα τα κενά από το ένα ή και τα δύο άκρα.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Σήμερα";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "αντικείμενο";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Δημιούργησε «όρισε %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Επιστρέφει την τιμή αυτ
 Blockly.Msg.VARIABLES_SET = "όρισε %1 μέχρι το %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Δημιούργησε «πάρε %1»";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Ορίζει αυτή τη μεταβλητή να είναι ίση με την είσοδο.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -394,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

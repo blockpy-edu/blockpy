@@ -83,15 +83,11 @@ Blockly.Msg.EXPAND_BLOCK = "블록 확장";
 Blockly.Msg.EXTERNAL_INPUTS = "외부 입력";
 Blockly.Msg.HELP = "도움말";
 Blockly.Msg.INLINE_INPUTS = "내부 입력";
-<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "빈 리스트 생성";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "아이템이 없는, 빈 리스트를 만들어 돌려줍니다.";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "리스트";
@@ -206,7 +202,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "바꾸기 %1 만큼 %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "변수 '%1' 에 저장되어있는 값에, 어떤 수를 더해, 변수에 다시 저장합니다.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "일반적인 상수 값들 중 하나를 돌려줍니다. : π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infinity).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "%1 의 값을, 최소 %2 최대 %3 으로 조정";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "어떤 수를, 특정 범위의 값이 되도록 강제로 조정합니다.";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -371,12 +367,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "양쪽의 공백 문자 제거";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "왼쪽의 공백 문자 제거";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "오른쪽의 공백 문자 제거";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "문장의 왼쪽/오른쪽/양쪽에서 스페이스 문자를 제거해 돌려줍니다.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "ㅇㅎ눌";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "항목";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "'집합 %1' 생성";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,7 +376,10 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "변수에 저장 되어있는 값을 돌려
 Blockly.Msg.VARIABLES_SET = "바꾸기 %1 를 다음 값으로 바꾸기 %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "'%1 값 읽기' 블럭 생성";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
+Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "변수의 값을 입력한 값으로 변경해 줍니다.";
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -394,7 +389,7 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

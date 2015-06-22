@@ -48,12 +48,12 @@ Blockly.Python['plot_line'] = function(block) {
 
 Blockly.Python['plot_scatter'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-    var code = 'plt.plot(';
+    var code = 'plt.scatter(';
     var argument0 = Blockly.Python.valueToCode(block, 'x_values',
       Blockly.Python.ORDER_NONE) || '[]';
     var argument1 = Blockly.Python.valueToCode(block, 'y_values',
       Blockly.Python.ORDER_NONE) || '[]';
-    code += argument0 + ','+ argument1 +',\nlinewidth=3, markersize=6,\ndash_capstyle="projecting", markerfacecolor="b")\n';
+    code += argument0 + ','+ argument1 + ')\n';
     return code;
 };
 

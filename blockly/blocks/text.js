@@ -29,15 +29,8 @@ goog.provide('Blockly.Blocks.texts');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
 Blockly.Blocks.texts.HUE = 270;
 var DATA_HUE = 100;
-=======
-/**
- * Common HSV hue for all blocks in this category.
- */
-Blockly.Blocks.texts.HUE = 160;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['text'] = {
   /**
@@ -575,8 +568,6 @@ Blockly.Blocks['text_trim'] = {
   }
 };
 
-<<<<<<< HEAD
-=======
 Blockly.Blocks['text_print'] = {
   /**
    * Block for print statement.
@@ -599,7 +590,6 @@ Blockly.Blocks['text_print'] = {
     });
   }
 };
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['text_prompt'] = {
   /**

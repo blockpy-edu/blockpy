@@ -29,15 +29,8 @@ goog.provide('Blockly.Blocks.math');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
 var DATA_HUE = 100, LOGIC_HUE = 230;
 Blockly.Blocks.math.HUE = 270;
-=======
-/**
- * Common HSV hue for all blocks in this category.
- */
-Blockly.Blocks.math.HUE = 230;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['math_number'] = {
   /**
@@ -264,20 +257,6 @@ Blockly.Blocks['math_change'] = {
    * @this Blockly.Block
    */
   init: function() {
-<<<<<<< HEAD
-    this.setHelpUrl(Blockly.Msg.MATH_CHANGE_HELPURL);
-    this.setColour(240);
-    this.interpolateMsg(
-        // TODO: Combine these messages instead of using concatenation.
-        Blockly.Msg.MATH_CHANGE_TITLE_CHANGE + ' %1 ' +
-        Blockly.Msg.MATH_CHANGE_INPUT_BY + ' %2',
-        ['VAR', new Blockly.FieldVariable(Blockly.Msg.MATH_CHANGE_TITLE_ITEM)],
-        ['DELTA', 'Number', Blockly.ALIGN_RIGHT],
-        Blockly.ALIGN_RIGHT);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setInputsInline(true);
-=======
     this.jsonInit({
       "message": Blockly.Msg.MATH_CHANGE_TITLE,
       "args": [
@@ -298,7 +277,6 @@ Blockly.Blocks['math_change'] = {
       "colour": Blockly.Blocks.math.HUE,
       "helpUrl": Blockly.Msg.MATH_CHANGE_HELPURL
     });
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     this.setTooltip(function() {
