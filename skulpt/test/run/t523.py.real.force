@@ -1,2 +1,0 @@
-TypeError: __nonzero__ should return an int on line 3
-TypeError: __len__ should return an int on line 12

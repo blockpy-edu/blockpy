@@ -1,1 +1,0 @@
-print True and True

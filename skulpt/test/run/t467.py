@@ -1,2 +1,0 @@
-if true:
-    print "Hello"

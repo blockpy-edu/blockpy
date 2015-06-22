@@ -1,7 +1,0 @@
-Module(body=[Print(dest=None,
-                   values=[BoolOp(op=And(),
-                                  values=[Name(id='True',
-                                               ctx=Load()),
-                                          Name(id='True',
-                                               ctx=Load())])],
-                   nl=True)])

@@ -1,1 +1,0 @@
-print False or False

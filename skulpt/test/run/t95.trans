@@ -1,3 +1,0 @@
-Module(body=[Print(dest=None,
-                   values=[Num(n=255)],
-                   nl=True)])

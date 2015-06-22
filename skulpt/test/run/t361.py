@@ -1,6 +1,0 @@
-print "".isdigit()
-print "abc".isdigit()
-print " 93".isdigit()
-print "13434".isdigit()
-print "038".isdigit()
-print "0a9c3".isdigit()

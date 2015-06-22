@@ -1,3 +1,0 @@
-
-window.addevent('onload', function(){
-

@@ -1,2 +1,0 @@
-print "\W"
-print "\n"

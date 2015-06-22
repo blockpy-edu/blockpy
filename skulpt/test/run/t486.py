@@ -1,2 +1,0 @@
-filter(None, 8)
-

@@ -1,3 +1,0 @@
-import sys
-print sys.ps1
-print sys.ps2

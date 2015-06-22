@@ -1,1 +1,0 @@
-print "..bbb..".replace("..", "X")

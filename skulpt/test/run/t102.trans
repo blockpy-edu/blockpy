@@ -1,8 +1,0 @@
-Module(body=[For(target=Name(id='i',
-                             ctx=Store()),
-                 iter=Str(s='skulpt'),
-                 body=[Print(dest=None,
-                             values=[Name(id='i',
-                                          ctx=Load())],
-                             nl=True)],
-                 orelse=[])])

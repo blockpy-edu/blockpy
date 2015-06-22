@@ -1,2 +1,0 @@
-print ~True
-print ~False

@@ -1,3 +1,0 @@
-Module(body=[Print(dest=None,
-                   values=[Str(s='hello world')],
-                   nl=True)])
