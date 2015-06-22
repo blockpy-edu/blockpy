@@ -1,0 +1,11 @@
+Module(body=[Assign(targets=[Name(id='x',
+                                  ctx=Store())],
+                    value=Num(n=1)),
+             If(test=Compare(left=Name(id='x',
+                                       ctx=Load()),
+                             ops=[Eq()],
+                             comparators=[Num(n=1)]),
+                body=[Print(dest=None,
+                            values=[Str(s='yes')],
+                            nl=True)],
+                orelse=[])])

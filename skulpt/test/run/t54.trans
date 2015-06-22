@@ -1,0 +1,13 @@
+Module(body=[Assign(targets=[Tuple(elts=[Name(id='a',
+                                              ctx=Store()),
+                                         Name(id='b',
+                                              ctx=Store())],
+                                   ctx=Store())],
+                    value=Str(s='OK')),
+             Print(dest=None,
+                   values=[BinOp(left=Name(id='a',
+                                           ctx=Load()),
+                                 op=Add(),
+                                 right=Name(id='b',
+                                            ctx=Load()))],
+                   nl=True)])

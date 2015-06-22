@@ -1,0 +1,6 @@
+()
+(<type 'object'>,)
+(<type 'object'>,)
+(<class '__main__.X'>, <type 'object'>)
+(<class '__main__.X'>,)
+(<class '__main__.Y'>, <class '__main__.X'>, <type 'object'>)

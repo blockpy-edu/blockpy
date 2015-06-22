@@ -1,0 +1,15 @@
+support/tmp/
+doc/static/skulpt-stdlib.js
+doc/static/skulpt.min.js
+doc/static/dist/*
+vendor/
+dist/*
+node_modules/
+*.pyc
+.DS_Store
+test/namedtests.js
+/.d8_history
+/.idea
+/.vagrant
+
+Vagrantfile

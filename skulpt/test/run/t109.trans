@@ -1,0 +1,5 @@
+Module(body=[Print(dest=None,
+                   values=[Num(n=3),
+                           Num(n=4),
+                           Num(n=5)],
+                   nl=True)])

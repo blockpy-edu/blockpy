@@ -1,0 +1,11 @@
+Module(body=[Print(dest=None,
+                   values=[Call(func=Name(id='max',
+                                          ctx=Load()),
+                                args=[Num(n=3),
+                                      Num(n=8),
+                                      Num(n=2),
+                                      Num(n=6)],
+                                keywords=[],
+                                starargs=None,
+                                kwargs=None)],
+                   nl=True)])

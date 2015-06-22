@@ -1,0 +1,9 @@
+Module(body=[For(target=Name(id='k',
+                             ctx=Store()),
+                 iter=Dict(keys=[Str(s='OK')],
+                           values=[Num(n=0)]),
+                 body=[Print(dest=None,
+                             values=[Name(id='k',
+                                          ctx=Load())],
+                             nl=True)],
+                 orelse=[])])

@@ -1,0 +1,9 @@
+Module(body=[If(test=Compare(left=Name(id='None',
+                                       ctx=Load()),
+                             ops=[Is()],
+                             comparators=[Name(id='None',
+                                               ctx=Load())]),
+                body=[Print(dest=None,
+                            values=[Str(s='OK')],
+                            nl=True)],
+                orelse=[])])
