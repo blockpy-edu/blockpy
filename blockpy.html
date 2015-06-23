@@ -66,18 +66,6 @@
     
     
     <script type="text/javascript">
-        function outf(text)
-        {
-            var output = document.getElementById("html-output");
-            text = text.replace(/</g, '&lt;');
-            output.innerHTML = output.innerHTML + text;
-        }
-        
-        function builtinRead(x) {
-            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-                throw "File not found: '" + x + "'";
-            return Sk.builtinFiles["files"][x];
-        }
         
         function runit() {
             runProgram(WB.Python.workspaceToCode());
@@ -343,73 +331,11 @@
               }
           }
           
-          function convertit() {
-            $("#error-state").hide();
-            var backup = getXml();
-            var error = true;
-            try {
-                var code = $("#python-output").val();
-                var xml = (new Python2Blockly()).convert(code);
-                var xmlString = new XMLSerializer().serializeToString(xml);
-                var blocklyXML = Blockly.Xml.textToDom(xmlString);
-                console.log(xmlString);
-                Blockly.mainWorkspace.clear();
-                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, blocklyXML);
-                align();
-                error = false;
-            } catch (e) {
-                console.error("P2B: ", e, e.stack);
-                $("#error-state").text(e);
-                $("#error-state").show();
-            }
-            if (error) {
-                Blockly.mainWorkspace.clear();
-                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, backup);
-            }
-          }
-          
-            function mapBlocklyToPython() {
-                // Build up highlight map
-                var backup = WB.Python.STATEMENT_PREFIX;
-                WB.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
-                WB.Python.addReservedWords('__HIGHLIGHT__');
-                var highlightedCode = WB.Python.workspaceToCode();
-                WB.Python.STATEMENT_PREFIX = backup;
-                var highlightMap = [];
-                for (var i = 0, lines = highlightedCode.split("\n");
-                     i < lines.length; i++) {
-                     var id = lines[i].match(/\W*__HIGHLIGHT__\(\'(.+?)\'\)/);
-                     if (id !== null) {
-                        highlightMap[i] = parseInt(id[1], 10);
-                    }
-                }
-                return highlightMap;
-            }
-          
-            function blocklyToPython() {
-                // Actual code
-                var code = Blockly.Python.workspaceToCode(WB);
-                $("#python-output").val(code);
-            }
-          
-          
           
           $(document).ready(function() {
             kennel = new Kennel(document.getElementById('kennel-div'),
                                 document.getElementById('toolbox'),
                                 document.getElementById("html-output"));
-          });
-            var timers = {};
-            function addDelay(directive, action) {
-                clearTimeout(timers[directive]);
-                timers[directive] = setTimeout(action, 1000);
-            }
-            $(document).ready(function() {
-                $('#python-output').on('keyup input propertychange paste change', function() {
-                    addDelay('#python-output', function() {
-                        convertit();
-                    });
-                });
           });
         </script>
         <xml id="toolbox" style="display: none">

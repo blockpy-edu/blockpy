@@ -35,6 +35,9 @@ function Kennel(attachmentPoint, toolbox, console) {
     // The Div or whatever HTML element we attach everything to
     this._attachmentPoint = attachmentPoint;
     
+    // Prevent cascading conversions
+    this._convertingText = false;
+    this._convertingBlocks = true;
     
     this._loadMain();
     this._loadBlockly(toolbox);
@@ -47,8 +50,45 @@ function Kennel(attachmentPoint, toolbox, console) {
 };
 
 Kennel.prototype._updateText = function() {
-    var code = Blockly.Python.workspaceToCode(this._blockly);
-    this.text.setValue(code);
+    console.log("Updating Text", this._convertingBlocks,this._convertingText);
+    if (this._convertingBlocks) {
+        this._convertingBlocks = false;
+    } else {
+        this._convertingText = true;
+        var code = Blockly.Python.workspaceToCode(this._blockly);
+        this.text.setValue(code);
+    }
+}
+
+Kennel.prototype._updateBlocks = function() {
+    console.log("Updating Blocks", this._convertingBlocks,this._convertingText);
+    if (this._convertingText) {
+        this._convertingText = false;
+    } else {
+        this._convertingBlocks = true;
+        var backupXML = this.getXml();
+        var error = true;
+        try {
+            var code = this.text.getValue();
+            var xml = this._converter.convert(code);
+            var blocklyXML = Blockly.Xml.textToDom(xml);
+            console.log("Mockingjay", code);
+            this._blockly.clear();
+            var c2 = Blockly.Python.workspaceToCode(this._blockly);
+            console.log("Hummingbird", c2);
+            Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
+            var c3 = Blockly.Python.workspaceToCode(this._blockly);
+            console.log("SParrow", c3);
+            this._blockly.align();
+            error = false;
+        } catch (e) {
+            this.printError(e);
+        }
+        if (error) {
+            this._blockly.clear();
+            Blockly.Xml.domToWorkspace(this._blockly, backupXML);
+        }
+    }
 }
 
 /**
@@ -103,9 +143,9 @@ Kennel.prototype._loadBlockly = function(toolbox) {
     });
     $(this._attachmentPoint).on("blockly:update", function() {
         // Have to wrap it in a function to prevent *this* mangling.
-        _kennel_instance._textUpdateQueue.add(function() {
+        _kennel_instance._blocklyUpdateQueue.add(function() {
             _kennel_instance._updateText()
-        }, 100);
+        }, 1000);
     });
     var onResize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
@@ -147,6 +187,12 @@ Kennel.prototype._loadText = function() {
                                         //onKeyEvent: handleEdKeys
                                       });
     //this.text.setSize(null, "100%");
+    var _kennel_instance = this;
+    this.text.on("change", function(codeMirror) {
+        _kennel_instance._textUpdateQueue.add(function() {
+            _kennel_instance._updateBlocks()
+        }, 1100);
+    });
     $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
         var contentDiv = $(e.target.attributes.href.value);
         contentDiv.find('.CodeMirror').each(function(i, el) {
@@ -277,12 +323,12 @@ Kennel.prototype.refreshTraceTable = function() {
 }
 
 Kennel.prototype.getXml = function() {
-    return Blockly.Xml.workspaceToDom(this.mainWorkspace);
+    return Blockly.Xml.workspaceToDom(this._blockly);
 }
           
 Kennel.prototype.setXml = function(xml) {
     this._blockly.clear();
-    Blockly.Xml.domToWorkspace(this.mainWorkspace, xml);
+    Blockly.Xml.domToWorkspace(this._blockly, xml);
 }
 
 /**
