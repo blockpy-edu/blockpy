@@ -103,6 +103,12 @@ Blockly.WorkspaceSvg.prototype.trashcan = null;
 Blockly.WorkspaceSvg.prototype.scrollbar = null;
 
 /**
+ *
+ *
+ */
+Blockly.WorkspaceSvg.prototype.alignment_vertical_spacing = 20;
+
+/**
  * Create the trash can elements.
  * @param {string=} opt_backgroundClass Either 'blocklyMainBackground' or
  *     'blocklyMutatorBackground'.
@@ -250,6 +256,23 @@ Blockly.WorkspaceSvg.prototype.translate = function(x, y) {
   this.svgBlockCanvas_.setAttribute('transform', translation);
   this.svgBubbleCanvas_.setAttribute('transform', translation);
 };
+
+
+/**
+ * Align the blocks in the workspace vertically.
+ */
+Blockly.Workspace.prototype.align = function() {
+    var blocks = this.getTopBlocks(false);
+    var y = 0;
+    for (var i = 0; i < blocks.length; i++){
+        // Get a block
+        var block = blocks[i];
+        var properties = block.getRelativeToSurfaceXY();
+        block.moveBy(-properties.x, -properties.y+y);
+        // Move it by its height plus a buffer
+        y += block.getHeightWidth().height + this.alignment_vertical_spacing;
+    }
+}
 
 /**
  * Add a block to the list of top blocks.

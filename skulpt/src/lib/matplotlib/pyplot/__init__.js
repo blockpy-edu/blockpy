@@ -1103,7 +1103,7 @@ jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
     attributes) {
     chart_counter++;
     var DEFAULT_PADDING = 40;
-    insert_container = insert_container || "body";
+    insert_container = insert_container || document.body;
     width = width - 2 * DEFAULT_PADDING || 500;
     height = height - 2 * DEFAULT_PADDING || 200;
     attributes = attributes || {};
@@ -1601,14 +1601,14 @@ var $builtinmodule = function(name) {
 
     var create_chart = function() {
         /* test if Canvas ist available should be moved to create_chart function */
-        if (Sk.canvas === undefined) {
+        if (Sk.matplotlibCanvas === undefined) {
             throw new Sk.builtin.NameError(
-                "Can not resolve drawing area. Sk.canvas is undefined!");
+                "Can not resolve drawing area. Sk.matplotlibCanvas is undefined!");
         }
 
         if (!chart) {
-            $('#' + Sk.canvas).empty();
-            chart = jsplotlib.make_chart(400, 400, "#" + Sk.canvas);
+            Sk.matplotlibCanvas.empty();
+            chart = jsplotlib.make_chart(400, 400, Sk.matplotlibCanvas, false);
         }
     };
 
@@ -1743,7 +1743,7 @@ var $builtinmodule = function(name) {
                 "Can not call show without any plot created.");
         }
 
-        $('#' + Sk.canvas).show();
+        Sk.matplotlibCanvas.show();
     };
     mod.show = new Sk.builtin.func(show_f);
 
@@ -1857,8 +1857,8 @@ var $builtinmodule = function(name) {
         chart = null;
         plot = null;
 
-        if (Sk.canvas !== undefined) {
-            $('#' + Sk.canvas).empty();
+        if (Sk.matplotlibCanvas !== undefined) {
+            Sk.matplotlibCanvas.empty();
         }
     };
 

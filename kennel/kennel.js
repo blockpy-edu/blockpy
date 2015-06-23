@@ -27,46 +27,35 @@
 /**
  * @constructor 
  */
-function Kennel(attachment_point, toolbox) {    
+function Kennel(attachmentPoint, toolbox, console) {    
     // The weightQueue will prevents spamming of updates
     this._textUpdateQueue = new WaitQueue();
     this._blocklyUpdateQueue = new WaitQueue();
     
     // The Div or whatever HTML element we attach everything to
-    this._attachment_point = attachment_point;
+    this._attachmentPoint = attachmentPoint;
     
     
-    this._load_main();
-    this._load_blockly(toolbox);
-    this._load_text();
+    this._loadMain();
+    this._loadBlockly(toolbox);
+    this._loadText();
+    this._loadConverter();
+    this._loadConsole();
     
     // Default mode when you open the screen is blocks
     this._mode = 'blocks';
 };
 
-Kennel.prototype.ALIGNMENT_VERTICAL_SPACING = 20;
-
-Kennel.prototype._update_text = function() {
-    // TODO:
-    blocklyToPython();
-    var dom = Blockly.Xml.workspaceToDom(WB);
-    $("#xml-output").text(Blockly.Xml.domToPrettyText(dom));
+Kennel.prototype._updateText = function() {
+    var code = Blockly.Python.workspaceToCode(this._blockly);
+    this.text.setValue(code);
 }
 
 /**
  * Aligns all the blocks vertically
  */
-Kennel.prototype.align_blocks = function() {
-    var blocks = this._blockly.getTopBlocks();
-    var y = 0;
-    for (var i = 0; i < blocks.length; i++){
-        var block = blocks[i];
-        var properties = block.getRelativeToSurfaceXY()
-        // 
-        block.moveBy(-properties.x, -properties.y+y);
-        // Move it by its height plus a buffer
-        y += block.getHeightWidth().height + this.ALIGNMENT_VERTICAL_SPACING;
-    }
+Kennel.prototype.alignBlocks = function() {
+    this._blockly.align();
 }
 
 /**
@@ -76,7 +65,7 @@ Kennel.prototype.clear = function() {
     this._blockly.clear();
 };
 
-Kennel.prototype.change_mode = function() {
+Kennel.prototype.changeMode = function() {
     if (this._mode == 'blocks') {
         this._mode = 'text';
     } else {
@@ -84,8 +73,8 @@ Kennel.prototype.change_mode = function() {
     }
 }
 
-Kennel.prototype._load_main = function() {
-    var main_tabs = "<div class='kennel-content' style='height:100%'>"+
+Kennel.prototype._loadMain = function() {
+    var mainTabs = "<div class='kennel-content' style='height:100%'>"+
                         "<div class='kennel-blocks'"+
                               "style='height:100%' id='blocks'>"+
                               "<div class='blockly-div' style='position: absolute'></div>"+
@@ -94,27 +83,33 @@ Kennel.prototype._load_main = function() {
                         "<div class='kennel-text' id='text'>"+
                             "<textarea class='language-python'>import weather</textarea>"+
                         "</div>"+
+                        "<div class='kennel-console' id='console'>"+
+                        "</div>"+
                     "</div>";
-    this._main_div = $(this._attachment_point).html($(main_tabs))
+    this._mainDiv = $(this._attachmentPoint).html($(mainTabs))
 };
 
-Kennel.prototype._load_blockly = function(toolbox) {
-    var blockly_div = this._main_div.find('.blockly-div')[0];
-    var blockly_area = this._main_div.find('.blockly-area')[0];
-    this._blockly = Blockly.inject(blockly_div,
+Kennel.prototype._loadBlockly = function(toolbox) {
+    var blocklyDiv = this._mainDiv.find('.blockly-div')[0];
+    var blocklyArea = this._mainDiv.find('.blockly-area')[0];
+    this._blockly = Blockly.inject(blocklyDiv,
                                   {path: 'blockly/', 
                                   scrollbars: true, 
                                   toolbox: toolbox});
-    this._blockly.addChangeListener(function() {
+    var _kennel_instance = this;
+    this._blockly.addChangeListener(function(event) {
         //TODO: saveUndo();
-        $(this._attachment_point).trigger("blockly:update");
+        $(_kennel_instance._attachmentPoint).trigger("blockly:update");
     });
-    $(this._attachment_point).on("blockly:update", function() {
-        this._textUpdateQueue.add(this._update_text, 0);
+    $(this._attachmentPoint).on("blockly:update", function() {
+        // Have to wrap it in a function to prevent *this* mangling.
+        _kennel_instance._textUpdateQueue.add(function() {
+            _kennel_instance._updateText()
+        }, 100);
     });
-    var onresize = function(e) {
-        // Compute the absolute coordinates and dimensions of blockly_area.
-        var element = blockly_area;
+    var onResize = function(e) {
+        // Compute the absolute coordinates and dimensions of blocklyArea.
+        var element = blocklyArea;
         var x = 0;
         var y = 0;
         do {
@@ -122,21 +117,24 @@ Kennel.prototype._load_blockly = function(toolbox) {
             y += element.offsetTop;
             element = element.offsetParent;
         } while (element);
-        // Position blockly_div over blockly_area.
-        blockly_div.style.left = x + 'px';
-        blockly_div.style.top = y + 'px';
-        blockly_div.style.width = blockly_area.offsetWidth + 'px';
-        blockly_div.style.height = blockly_area.offsetHeight + 'px';
+        // Position blocklyDiv over blocklyArea.
+        blocklyDiv.style.left = x + 'px';
+        blocklyDiv.style.top = y + 'px';
+        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
     };
-    window.addEventListener('resize', onresize, false);
-    onresize();
+    window.addEventListener('resize', onResize, false);
+    onResize();
 };
 
-Kennel.prototype._load_text = function() {
-    //var text_canvas = this._main_div.find('.kennel-text > textarea')[0];
-    var text_canvas = document.getElementById('python-output');
-    this.text = CodeMirror.fromTextArea(text_canvas, {
-                                        mode: { name: "python", version: 3, singleLineStringErrors: false },
+Kennel.prototype._loadText = function() {
+    //var textCanvas = this._main_div.find('.kennel-text > textarea')[0];
+    var textCanvas = document.getElementById('python-output');
+    this.text = CodeMirror.fromTextArea(textCanvas, {
+                                        mode: { name: "python", 
+                                                version: 3, 
+                                                singleLineStringErrors: false
+                                        },
                                         readOnly: false,
                                         lineNumbers: true,
                                         firstLineNumber: 1,
@@ -144,37 +142,164 @@ Kennel.prototype._load_text = function() {
                                         tabSize: 4,
                                         indentWithTabs: false,
                                         matchBrackets: true,
-                                        extraKeys: {"Tab": "indentMore", "Shift-Tab": "indentLess"},
+                                        extraKeys: {"Tab": "indentMore", 
+                                                    "Shift-Tab": "indentLess"},
                                         //onKeyEvent: handleEdKeys
                                       });
     //this.text.setSize(null, "100%");
     $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
-        var content_div = $(e.target.attributes.href.value);
-        content_div.find('.CodeMirror').each(function(i, el) {
+        var contentDiv = $(e.target.attributes.href.value);
+        contentDiv.find('.CodeMirror').each(function(i, el) {
             el.CodeMirror.refresh();
         });
     });
-    this.text.setValue('import weather\nif test:\n    print "Hello"');
 };
+
+Kennel.prototype._loadConverter = function() {
+    this._converter = new PythonToBlocks();
+}
+
+/*
+ * Resets skulpt to some default values
+ */
+Kennel.prototype._loadConsole = function() {
+    //this._skulptConsole = this._main_div.find('.kennel-console')[0];
+    this._console = document.getElementById('html-output');
+    Sk.configure({
+        // Function to handle the text outputted by Skulpt
+        output: this.print,
+        // Function to handle loading in new files
+        read: function (filename) {
+                    if (Sk.builtinFiles === undefined) {
+                        throw new Error("Built-in files are not loaded!");
+                    }
+                    if (Sk.builtinFiles["files"][filename] === undefined) {
+                        throw new Error("File not found: '" + filename + "'");
+                    }
+                    return Sk.builtinFiles["files"][filename];
+                }
+    });
+    // Limit execution to 5 seconds
+    Sk.execLimit = 5000;
+    // Identify the location to put new charts
+    Sk.matplotlibCanvas = this._console;
+}
+
+
+/*
+ * Print an error to the consoles -- the on screen one and the browser one
+ */
+Kennel.prototype.printError = function(error) {
+    console.log(error.stack);
+    // Perform any necessary cleaning
+    this._console.innerHTML = this._console.innerHTML + error.message;
+}
+
+/*
+ * Print a successful line to the on-screen console.
+ */
+Kennel.prototype.print = function(text) {
+    // Perform any necessary cleaning
+    text = text.replace(/</g, '&lt;');
+    this._console.innerHTML = this._console.innerHTML + text;
+}
+
+Kennel.prototype.resetConsole = function() {
+    this._skulptConsole.innerHtml = "";
+    var step = 0;
+    var highlightMap = this.getHighlightMap();
+    this.traceTable = [];
+    Sk.afterSingleExecution = function(variables, lineNumber, 
+                                       columnNumber, filename) {
+        if (filename == '<stdin>.py') {
+            this.traceTable.push({'step': step, 
+                                  'filename': filename,
+                                  'block': highlightMap[lineNumber-1],
+                                  'line': lineNumber,
+                                  'column': columnNumber,
+                                  'properties': this.parseGlobals(variables)});
+            step += 1;
+        }
+    };
+}
+
+/*
+ * Builds up an array indicating the relevant block ID for a given step.
+ * Operates on the current this._blockly instance
+ * It works by injecting __HIGHLIGHT__(id); at the start of every line of code
+ *  and then extracting that with regular expressions. This makes it vulnerable
+ *  if someone decides to use __HIGHLIGHT__ in their code. I'm betting on that
+ *  never being a problem, though.
+ */
+Kennel.prototype.getHighlightMap = function() {
+    // Protect the current STATEMENT_PREFIX
+    var backup = Blockly.Python.STATEMENT_PREFIX;
+    Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
+    Blockly.Python.addReservedWords('__HIGHLIGHT__');
+    // Get the source code, injected with __HIGHLIGHT__(id)
+    var highlightedCode = Blockly.Python.workspaceToCode(this._blockly);
+    Blockly.Python.STATEMENT_PREFIX = backup;
+    // Build up the array by processing the highlighted code line-by-line
+    var highlightMap = [];
+    var lines = highlightedCode.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+        // Get the block ID from the line
+        var id = lines[i].match(/\W*__HIGHLIGHT__\(\'(.+?)\'\)/);
+        if (id !== null) {
+            // Convert it into a base-10 number, because JavaScript.
+            highlightMap[i] = parseInt(id[1], 10);
+        }
+    }
+    return highlightMap;
+}
+
+/*
+ * Runs the given python code, resetting the console and Trace Table.
+ */
+Kennel.prototype.run = function(code) {
+    this.resetConsole();
+    var module;
+    try {
+        // Actually run the python code
+        module = Sk.importMainWithBody("<stdin>", false, code);
+        // And run the afterSingleExecution one extra time to get final program state
+        Sk.afterSingleExecution(module.$d);
+    } catch (e) {
+        this.printError(e);
+    }
+    this.refreshTraceTable();
+}
+
+Kennel.prototype.refreshTraceTable = function() {
+    if (this.traceTable === undefined) {
+        return false;
+    }
+}
+
+Kennel.prototype.getXml = function() {
+    return Blockly.Xml.workspaceToDom(this.mainWorkspace);
+}
+          
+Kennel.prototype.setXml = function(xml) {
+    this._blockly.clear();
+    Blockly.Xml.domToWorkspace(this.mainWorkspace, xml);
+}
 
 /**
  * @constructor
  * A class for managing delayed function calls so they combine
  */
 function WaitQueue() {
-    this.queue = [];
+    this.timeout = null;
 }
 
-WaitQueue.prototype.add = function(a_function, delay) {
-    this.queue.push(1);
-    window.setTimeout(this._delayed_function(a_function), delay);
-}
-
-WaitQueue.prototype._delayed_function = function(a_function) {
-    return function() {
-        if (this.queue.length <= 1) {
-            a_function();
-        }
-        this.queue.pop();
-    };
+/**
+ * Adds the function to the timeout queue. If there's already a function
+ *  triggered to run, then it gets rid of it.
+ */
+WaitQueue.prototype.add = function(aFunction, delay) {
+    if (this.timeout !== null) {
+        clearTimeout(this.timeout);
+    }
+    this.timeout = window.setTimeout(aFunction, delay);
 }
