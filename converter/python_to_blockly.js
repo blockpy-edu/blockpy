@@ -37,11 +37,6 @@ PythonAST.prototype.AugAssign = function() {
  * @constructor 
  */
 function PythonToBlocks() {
-    this.XML = document.createElement("xml");
-    this.XML.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    
-    this.current = this.XML;
-    this.parent = [];
 };
 
 PythonToBlocks.prototype._createRawBlock = function(body) {
@@ -732,6 +727,8 @@ PythonToBlocks.prototype._convertBody = function(parent, statements) {
 }
 
 PythonToBlocks.prototype.convert = function(python_source) {
+    this.XML = document.createElement("xml");
+    this.XML.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     var filename = 'user_code.py';
     var parse_tree, symbol_table, error_message;
     try {
@@ -740,16 +737,17 @@ PythonToBlocks.prototype.convert = function(python_source) {
         error_message = false;
     } catch (e) {
         error_message = e;
+        console.log(error_message);
     }
     this.sourceCodeLines = python_source.split("\n");
     
-    console.log(parse_tree.body)
     if (error_message !== false) {
         throw "Error: "+error_message;
     } else {
         this._convertBody(this.XML, parse_tree.body);
     }
-    return this.XML;
+    console.log(parse_tree.body)
+    return new XMLSerializer().serializeToString(this.XML);
 }
 
 PythonToBlocks.prototype.convertToRaw = function(python_source) {
