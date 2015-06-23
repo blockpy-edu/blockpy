@@ -84,9 +84,6 @@
         }
         
         function resetit() {
-            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="63" inline="false" x="23" y="-48"> <field name="VAR">quake_list</field> <value name="VALUE"> <block type="earthquake_get" id="64"> <field name="PROPERTY">magnitude</field> </block> </value> <next> <block type="variables_set" id="65" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_number" id="66"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="72" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_number" id="73"> <field name="NUM">0</field> </block> </value> <next> <block type="controls_forEach" id="67" inline="false"> <field name="VAR">a quake</field> <value name="LIST"> <block type="variables_get" id="71"> <field name="VAR">quake_list</field> </block> </value> <statement name="DO"> <block type="controls_if" id="69" inline="false"> <value name="IF0"> <block type="logic_compare" id="96" inline="true"> <field name="OP">GTE</field> <value name="A"> <block type="variables_get" id="97"> <field name="VAR">a quake</field> </block> </value> <value name="B"> <block type="math_number" id="98"> <field name="NUM">3</field> </block> </value> </block> </value> <statement name="DO0"> <block type="variables_set" id="121" inline="false"> <field name="VAR">total_quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="106" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="122"> <field name="VAR">total_quakes</field> </block> </value> <value name="B"> <block type="math_number" id="123"> <field name="NUM">1</field> </block> </value> </block> </value> <next> <block type="variables_set" id="124" inline="false"> <field name="VAR">significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="125" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="126"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="128"> <field name="VAR">a quake</field> </block> </value> </block> </value> </block> </next> </block> </statement> </block> </statement> <next> <block type="variables_set" id="177" inline="false"> <field name="VAR">average significant quakes</field> <value name="VALUE"> <block type="math_arithmetic" id="178" inline="true"> <field name="OP">DIVIDE</field> <value name="A"> <block type="variables_get" id="179"> <field name="VAR">significant quakes</field> </block> </value> <value name="B"> <block type="variables_get" id="180"> <field name="VAR">total_quakes</field> </block> </value> </block> </value> <next> <block type="text_print" id="201" inline="false"> <value name="TEXT"> <block type="variables_get" id="202"> <field name="VAR">average significant quakes</field> </block> </value> <next> <block type="plot_line" id="137" inline="false"> <value name="y_values"> <block type="variables_get" id="176"> <field name="VAR">quake_list</field> </block> </value> <next> <block type="plot_title" id="175"> <field name="TEXT">Significant Quakes</field> <next> <block type="plot_show" id="154"></block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> </xml>';
-            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="0" y="0"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="2"> <field name="NUM">0</field> </block> </value> <next> <block type="variables_set" id="3" inline="false"> <field name="VAR">a string</field> <value name="VALUE"> <block type="text" id="4"> <field name="TEXT">ellie</field> </block> </value> <next> <block type="variables_set" id="5" inline="false"> <field name="VAR">temperatures</field> <value name="VALUE"> <block type="weather_forecasts" id="6"> <field name="CITY">BLACKSBURG</field> </block> </value> <next> <block type="variables_set" id="7" inline="false"> <field name="VAR">a dog</field> <value name="VALUE"> <block type="dicts_create_with" id="8" inline="false"> <mutation items="3"></mutation> <field name="KEY0">name</field> <field name="KEY1">age</field> <field name="KEY2">good</field> <value name="VALUE0"> <block type="text" id="9"> <field name="TEXT">Klaus</field> </block> </value> <value name="VALUE1"> <block type="math_number" id="10"> <field name="NUM">14</field> </block> </value> <value name="VALUE2"> <block type="logic_boolean" id="11"> <field name="BOOL">TRUE</field> </block> </value> </block> </value> <next> <block type="controls_if" id="42" inline="false"> <mutation else="1"></mutation> <value name="IF0"> <block type="dict_get" id="74" inline="true"> <value name="ITEM"> <block type="text" id="76"> <field name="TEXT">good</field> </block> </value> <value name="DICT"> <block type="variables_get" id="75"> <field name="VAR">a dog</field> </block> </value> </block> </value> <statement name="DO0"> <block type="procedures_callnoreturn" id="12"> <mutation name="function_name"></mutation> </block> </statement> <statement name="ELSE"> <block type="text_print_multiple" id="52" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="53"> <field name="VAR">a string</field> </block> </value> </block> </statement> <next> <block type="controls_forEach" id="13" inline="false"> <field name="VAR">iterator variable</field> <value name="LIST"> <block type="variables_get" id="14"> <field name="VAR">temperatures</field> </block> </value> <statement name="DO"> <block type="variables_set" id="15" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_arithmetic" id="16" inline="true"> <field name="OP">ADD</field> <value name="A"> <block type="variables_get" id="17"> <field name="VAR">a number</field> </block> </value> <value name="B"> <block type="math_number" id="18"> <field name="NUM">1</field> </block> </value> </block> </value> </block> </statement> </block> </next> </block> </next> </block> </next> </block> </next> </block> </next> </block> <block type="procedures_defnoreturn" id="19" x="4" y="388"> <mutation></mutation> <field name="NAME">function_name</field> <statement name="STACK"> <block type="variables_set" id="20" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="21"> <field name="NUM">3</field> </block> </value> <next> <block type="variables_set" id="22" inline="false"> <field name="VAR">a number</field> <value name="VALUE"> <block type="math_number" id="23"> <field name="NUM">5</field> </block> </value> <next> <block type="text_print_multiple" id="24" inline="false"> <mutation items="1"></mutation> <value name="PRINT0"> <block type="variables_get" id="25"> <field name="VAR">a number</field> </block> </value> </block> </next> </block> </next> </block> </statement> </block> </xml>';
-            //var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="40" inline="false" x="58" y="92"> <field name="VAR">property_name</field> </block> </xml>';
             var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="-19" y="16"> <field name="VAR">property_name</field> <value name="VALUE"> <block type="lists_create_empty" id="12"></block> </value> <next> <block type="controls_forEach" id="24" inline="false"> <field name="VAR">i</field> <value name="LIST"> <block type="variables_get" id="34"> <field name="VAR">property_name</field> </block> </value> <statement name="DO"> <block type="lists_append" id="20" inline="true"> <value name="ITEM"> <block type="math_number" id="39"> <field name="NUM">0</field> </block> </value> <value name="LIST"> <block type="variables_get" id="35"> <field name="VAR">property_name</field> </block> </value> </block> </statement> </block> </next> </block> </xml>';
             var xml = Blockly.Xml.textToDom(code);
             Blockly.mainWorkspace.clear();
@@ -309,19 +306,6 @@
         <div id="kennel-div" style='height:100%'></div>
         <script>
           
-          function layoutit() {
-            var metrics = Blockly.mainWorkspace.getMetrics();
-            var newScrollX = (metrics.contentWidth - metrics.viewWidth ) / 2;
-            var newScrollY = (metrics.contentHeight - metrics.viewHeight ) / 2;
-            var blocks = Blockly.getMainWorkspace().getTopBlocks();
-            if (blocks.length > 0) {
-                //Blockly.mainWorkspace.scrollbar.set(0, 0);
-            } else {
-                //Blockly.mainWorkspace.scrollbar.set(0, 0);
-            }
-            align();
-          }
-          
           var UNDO_STACK = Array();
           var REDO_STACK = Array();
           var SAVE_UNDO_FLAG = true;
@@ -337,16 +321,6 @@
               } else {
                   SAVE_UNDO_FLAG = true;
               }
-          }
-          
-          function getXml() {
-              return Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-          }
-          
-          function loadXml(xml) {
-              //var blocklyXML = Blockly.Xml.textToDom(xml);
-              Blockly.mainWorkspace.clear();
-              Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
           }
           
           function loadUndo() {
@@ -367,14 +341,6 @@
                   UNDO_STACK.push(state);
                   loadXml(state);
               }
-          }
-          
-          function analyzeit() {
-            try {
-                analyze_code();
-            } catch (e) {
-                console.error("Analyzer: ", e, e.stack);
-            }
           }
           
           function convertit() {
@@ -430,7 +396,8 @@
           
           $(document).ready(function() {
             kennel = new Kennel(document.getElementById('kennel-div'),
-                                    document.getElementById('toolbox'));
+                                document.getElementById('toolbox'),
+                                document.getElementById("html-output"));
           });
             var timers = {};
             function addDelay(directive, action) {
