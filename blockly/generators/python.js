@@ -84,7 +84,7 @@ Blockly.Python.ORDER_NONE = 99;             // (...)
 /**
  * Empty loops or conditionals are not allowed in Python.
  */
-Blockly.Python.PASS = '  pass\n';
+Blockly.Python.PASS = '    pass\n';
 
 /**
  * Initialise the database of variable names.

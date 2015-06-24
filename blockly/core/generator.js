@@ -271,7 +271,7 @@ Blockly.Generator.prototype.addLoopTrap = function(branch, id) {
  * The method of indenting.  Defaults to two spaces, but language generators
  * may override this to increase indent or change to tabs.
  */
-Blockly.Generator.prototype.INDENT = '  ';
+Blockly.Generator.prototype.INDENT = '    ';
 
 /**
  * Add one or more words to the list of reserved words for this language.
