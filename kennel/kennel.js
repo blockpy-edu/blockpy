@@ -121,9 +121,6 @@ Kennel.prototype._loadMain = function() {
                               "<div class='blockly-area' style='height:100%'></div>"+
                         "</div>"+
                         "<div class='kennel-text' style='height:"+this.metrics_editor_height+"'>"+
-                            /*"<div class='kennel-text-guide' style='height: 100%; float:left'>"+
-                                "Some Text."+
-                            "</div>"+*/
                             "<textarea class='language-python'"+
                                        "style='height:"+this.metrics_editor_height+
                                        "'>import weather</textarea>"+
@@ -211,12 +208,6 @@ Kennel.prototype._loadText = function() {
             el.CodeMirror.refresh();
         });
     });
-    /*this._text.on('cursorActivity', function(){
-        var editor = _kennel_instance._text;
-        var word = editor.findWordAt(editor.getCursor()); 
-        var range = editor.getRange(word.anchor, word.head);
-        _kennel_instance._mainDiv.find('.kennel-text-guide').html(range);
-    });*/
 };
 
 Kennel.prototype._loadConverter = function() {
