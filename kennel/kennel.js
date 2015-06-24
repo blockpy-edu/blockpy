@@ -100,12 +100,14 @@ Kennel.prototype.changeMode = function() {
         this._text.setSize(null, '100%'); //this.metrics_editor_height);
         $(this._mainDiv).find('.kennel-text-guide').css('width', this._blockly.toolbox_.width+'px');
         this._text.refresh();
+        $(this._mainDiv).find('.kennel-change-mode').html('Change to Block View');
     } else {
         this._mode = 'blocks';
         this._updateBlocks();
         $(this._text.getWrapperElement()).hide().css('height', '0%');
         this._blockly.setVisible(true);
         $(this._mainDiv).find('.kennel-blocks').css('height', this.metrics_editor_height);
+        $(this._mainDiv).find('.kennel-change-mode').html('Change to Text View');
     }
 }
 
@@ -113,7 +115,9 @@ Kennel.prototype._loadMain = function() {
     var mainTabs = "<div class='kennel-content' style='height:100%'>"+
                         "<div class='kennel-header'>"+
                             "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
-                            "<button class='kennel-change-mode'>Change Mode</button>"+
+                        "</div>"+
+                        "<div class='kennel-toolbar'>"+
+                            "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
                         "</div>"+
                         "<div class='kennel-blocks'"+
                               "style='height:"+this.metrics_editor_height+"'>"+
