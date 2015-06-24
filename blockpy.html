@@ -67,10 +67,6 @@
     
     <script type="text/javascript">
         
-        function runit() {
-            runProgram(WB.Python.workspaceToCode());
-        }
-        
         function resetit() {
             var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="-19" y="16"> <field name="VAR">property_name</field> <value name="VALUE"> <block type="lists_create_empty" id="12"></block> </value> <next> <block type="controls_forEach" id="24" inline="false"> <field name="VAR">i</field> <value name="LIST"> <block type="variables_get" id="34"> <field name="VAR">property_name</field> </block> </value> <statement name="DO"> <block type="lists_append" id="20" inline="true"> <value name="ITEM"> <block type="math_number" id="39"> <field name="NUM">0</field> </block> </value> <value name="LIST"> <block type="variables_get" id="35"> <field name="VAR">property_name</field> </block> </value> </block> </statement> </block> </next> </block> </xml>';
             var xml = Blockly.Xml.textToDom(code);
@@ -159,45 +155,6 @@
             }
             return result;
         }
-
-        function runProgram(prog)
-        {
-            var output = document.getElementById("html-output");
-            output.innerHTML = '';
-            Sk.configure({output:outf, read: builtinRead});
-            Sk.execLimit = 5000;
-            Sk.canvas = "mycanvas";
-            if (! Sk.TurtleGraphics ) {
-                Sk.TurtleGraphics = {};
-            }
-            Sk.TurtleGraphics.height = 320;
-            Sk.TurtleGraphics.width = 320;
-            var step = 0;
-            var highlightMap = mapBlocklyToPython();
-            var propertyList = [];
-            Sk.afterSingleExecution = function($gbl, lineno, colno, filename) {
-                propertyList.push({'step': step, 
-                                   'filename': filename,
-                                   'block': highlightMap[lineno-1],
-                                   'lineno': lineno,
-                                   'colno': colno,
-                                   'properties': parseGlobals($gbl)});
-                step += 1;
-            };
-            var module;
-            try {
-                module = Sk.importMainWithBody("<stdin>", false, prog);
-                Sk.afterSingleExecution(module.$d);
-                //var obj = module.tp$getattr('a');
-                //var runMethod = obj.tp$getattr('run');
-                //var ret = Sk.misceval.callsim(runMethod, 10);
-                //alert(ret.v);
-            } catch (e) {
-                console.log(e.stack);
-            }
-            reloadDataViewer(propertyList, -1);
-            console.log(propertyList);
-        }
         
         function reloadDataViewer(propertyList, page) {
             var last = propertyList.length-1;
@@ -253,27 +210,8 @@
   
 </head>
 <body>
-<table width="100%" height="99%">
-    <tr>
-        <td width="900px">
-            <div>The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer.</div>
-            <div>
-                <span class="label label-success">Drag Blockly blocks to write Python code.</span>
-                <span class="label label-primary">Edit Python code that converts to Blocks.</span>
-                <span class="label label-info">Run everything in the browser.</span>
-                <span class="label label-success">Trace your program's execution and state.</span>
-                <span class="label label-primary">Use real-time data blocks.</span>
-                <span class="label label-warning">Visualize your answers with matplotlib.</span>
-                <span class="label label-danger">Build GUIs with TKinter.</span>
-            </div>
-            <div>Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it!</div>
-        </td>
-    <td rowspan='2'>
-        <img src='images/blockly-corgi-logo.png'/><br>
-        <img src='' id='my-image' />
-        <span id='error-state' class='glyphicon glyphicon-remove label label-danger'></span>
-        <textarea style='width:100%;' id="python-output" class='language-python'></textarea><br>
-        <button onclick="runit()" type="button">Run</button>
+        <!--<textarea style='width:100%;' id="python-output" class='language-python'></textarea><br>
+        <button onclick="kennel.run();" type="button">Run</button>
         <button onclick="convertit()" type="button">Convert</button>
         <button onclick="resetit()" type="button">Reset</button>
         <button onclick="clearit()" type="button">Clear</button>
@@ -286,12 +224,8 @@
         <pre id="html-output" style='max-width:400px'></pre>
         <div id="mycanvas"></div>
         State visualization:
-        <table id='data-viewer' class='table table-condensed table-striped' width='100%'><tr></tr></table>
-      </td>
-    </tr>
-    <tr>
-      <td style='vertical-align:top; height:100%;'>
-        <div id="kennel-div" style='height:100%'></div>
+        <table id='data-viewer' class='table table-condensed table-striped' width='100%'><tr></tr></table>-->
+<div id="kennel-div" style='height:100%'></div>
         <script>
           
           var UNDO_STACK = Array();
@@ -338,92 +272,86 @@
                                 document.getElementById("html-output"));
           });
         </script>
-        <xml id="toolbox" style="display: none">
-            <category name="Properties" custom="VARIABLE">
-            </category>
-            <category name="Decisions">
-                <block type="controls_if"></block>
-                <block type="logic_compare"></block>
-                <block type="logic_operation"></block>
-                <block type="logic_negate"></block>
-            </category>
-            <category name="Iteration">
-                <block type="controls_forEach"></block>
-            </category>
-            <category name="Functions" custom="PROCEDURE">
-            </category>
-            <category name="Calculation">
-                <block type="math_arithmetic"></block>
-                <block type="type_check"></block>
-                <block type="raw_block"></block>
-                <block type="raw_expression"></block>
-                <!--<block type="math_single"></block>
-                <block type="math_number_property"></block>
-                <block type="math_round"></block>
-                <block type="text_join"></block>-->
-            </category>
-            <category name="Output">
-                <block type="text_print"></block>
-                <block type="plot_line"></block>
-                <block type="plot_scatter"></block>
-                <block type="plot_show"></block>
-                <block type="plot_title"></block>
-                <category name="Turtles">
-                    <block type="turtles_start"></block>
-                </category>
-            </category>
-            <sep></sep>
-            <category name="Values">
-                <block type="text"></block>
-                <block type="math_number"></block>
-                <block type="logic_boolean"></block>
-            </category>
-            <category name="Lists">
-                <block type="lists_create_with"></block>
-                <block type="lists_create_empty"></block>
-                <block type="lists_append"></block>
-                <block type="lists_length"></block>
-            </category>
-            <category name="Dictionaries">
-                <block type="dicts_create_with"></block>
-                <block type="dict_get_literal"></block>
-                <block type="dict_keys"></block>
-            </category>
-            <sep></sep>
-            <category name="Data - Weather">
-                <block type="weather_temperature"></block>
-                <block type="weather_report"></block>
-                <block type="weather_forecasts"></block>
-                <block type="weather_report_forecasts"></block>
-                <block type="weather_all_forecasts"></block>
-                <block type="weather_highs_lows"></block>
-            </category>
-            <category name="Data - Stock">
-                <block type="stocks_current"></block>
-                <block type="stocks_past"></block>
-            </category>
-            <category name="Data - Earthquakes">
-                <block type="earthquake_get"></block>
-                <block type="earthquake_both"></block>
-                <block type="earthquake_all"></block>
-            </category>
-            <category name="Data - Crime">
-                <block type="crime_state"></block>
-                <block type="crime_year"></block>
-                <block type="crime_all"></block>
-            </category>
-            <category name="Data - Books">
-                <block type="books_get"></block>
-            </category>
-        </xml>
-      </td>
-  </tr>
-  <tr>
-      <td colspan='2'>
-      <div id="xml-output" style='font-size:6pt'></div>
-      </td>
-    </tr>
-  </table>
+  
+  
+<xml id="toolbox" style="display: none">
+    <category name="Properties" custom="VARIABLE">
+    </category>
+    <category name="Decisions">
+        <block type="controls_if"></block>
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+    </category>
+    <category name="Iteration">
+        <block type="controls_forEach"></block>
+    </category>
+    <category name="Functions" custom="PROCEDURE">
+    </category>
+    <category name="Calculation">
+        <block type="math_arithmetic"></block>
+        <block type="type_check"></block>
+        <block type="raw_block"></block>
+        <block type="raw_expression"></block>
+        <!--<block type="math_single"></block>
+        <block type="math_number_property"></block>
+        <block type="math_round"></block>
+        <block type="text_join"></block>-->
+    </category>
+    <category name="Output">
+        <block type="text_print"></block>
+        <block type="plot_line"></block>
+        <block type="plot_scatter"></block>
+        <block type="plot_show"></block>
+        <block type="plot_title"></block>
+        <category name="Turtles">
+            <block type="turtles_start"></block>
+        </category>
+    </category>
+    <sep></sep>
+    <category name="Values">
+        <block type="text"></block>
+        <block type="math_number"></block>
+        <block type="logic_boolean"></block>
+    </category>
+    <category name="Lists">
+        <block type="lists_create_with"></block>
+        <block type="lists_create_empty"></block>
+        <block type="lists_append"></block>
+        <block type="lists_length"></block>
+    </category>
+    <category name="Dictionaries">
+        <block type="dicts_create_with"></block>
+        <block type="dict_get_literal"></block>
+        <block type="dict_keys"></block>
+    </category>
+    <sep></sep>
+    <category name="Data - Weather">
+        <block type="weather_temperature"></block>
+        <block type="weather_report"></block>
+        <block type="weather_forecasts"></block>
+        <block type="weather_report_forecasts"></block>
+        <block type="weather_all_forecasts"></block>
+        <block type="weather_highs_lows"></block>
+    </category>
+    <category name="Data - Stock">
+        <block type="stocks_current"></block>
+        <block type="stocks_past"></block>
+    </category>
+    <category name="Data - Earthquakes">
+        <block type="earthquake_get"></block>
+        <block type="earthquake_both"></block>
+        <block type="earthquake_all"></block>
+    </category>
+    <category name="Data - Crime">
+        <block type="crime_state"></block>
+        <block type="crime_year"></block>
+        <block type="crime_all"></block>
+    </category>
+    <category name="Data - Books">
+        <block type="books_get"></block>
+    </category>
+</xml>
   
 <!-- Google Analytics -->
 <script>

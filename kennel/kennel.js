@@ -49,19 +49,21 @@ function Kennel(attachmentPoint, toolbox, console) {
     this._mode = 'blocks';
 };
 
+Kennel.prototype.getPythonFromBlocks = function() {
+    return Blockly.Python.workspaceToCode(this._blockly);
+}
+
 Kennel.prototype._updateText = function() {
-    console.log("Updating Text", this._convertingBlocks,this._convertingText);
     if (this._convertingBlocks) {
         this._convertingBlocks = false;
     } else {
         this._convertingText = true;
-        var code = Blockly.Python.workspaceToCode(this._blockly);
-        this.text.setValue(code);
+        var code = this.getPythonFromBlocks();
+        this._text.setValue(code);
     }
 }
 
 Kennel.prototype._updateBlocks = function() {
-    console.log("Updating Blocks", this._convertingBlocks,this._convertingText);
     if (this._convertingText) {
         this._convertingText = false;
     } else {
@@ -69,16 +71,11 @@ Kennel.prototype._updateBlocks = function() {
         var backupXML = this.getXml();
         var error = true;
         try {
-            var code = this.text.getValue();
+            var code = this._text.getValue();
             var xml = this._converter.convert(code);
             var blocklyXML = Blockly.Xml.textToDom(xml);
-            console.log("Mockingjay", code);
             this._blockly.clear();
-            var c2 = Blockly.Python.workspaceToCode(this._blockly);
-            console.log("Hummingbird", c2);
             Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
-            var c3 = Blockly.Python.workspaceToCode(this._blockly);
-            console.log("SParrow", c3);
             this._blockly.align();
             error = false;
         } catch (e) {
@@ -105,33 +102,53 @@ Kennel.prototype.clear = function() {
     this._blockly.clear();
 };
 
+Kennel.prototype.metrics_editor_height = '60%';
+
 Kennel.prototype.changeMode = function() {
     if (this._mode == 'blocks') {
         this._mode = 'text';
+        $(this._text.getWrapperElement()).show().css('height', this.metrics_editor_height);
+        this._blockly.setVisible(false);
+        $(this._mainDiv).find('.kennel-blocks').css('height', '0%');
+        this._updateText();
     } else {
         this._mode = 'blocks';
+        $(this._text.getWrapperElement()).hide().css('height', '0%');
+        this._blockly.setVisible(true);
+        $(this._mainDiv).find('.kennel-blocks').css('height', this.metrics_editor_height);
+        this._updateBlocks();
     }
 }
 
 Kennel.prototype._loadMain = function() {
     var mainTabs = "<div class='kennel-content' style='height:100%'>"+
+                        "<div class='kennel-header'>"+
+                            "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+                            "<button class='kennel-change-mode'>Change Mode</button>"+
+                        "</div>"+
                         "<div class='kennel-blocks'"+
-                              "style='height:100%' id='blocks'>"+
+                              "style='height:60%'>"+
                               "<div class='blockly-div' style='position: absolute'></div>"+
                               "<div class='blockly-area' style='height:100%'></div>"+
                         "</div>"+
-                        "<div class='kennel-text' id='text'>"+
+                        "<div class='kennel-text'>"+
                             "<textarea class='language-python'>import weather</textarea>"+
                         "</div>"+
-                        "<div class='kennel-console' id='console'>"+
+                        "<div class='kennel-console'>"+
+                        "</div>"+
+                        "<div class='kennel-trace'>"+
                         "</div>"+
                     "</div>";
     this._mainDiv = $(this._attachmentPoint).html($(mainTabs))
+    
+    var kennel = this;
+    this._mainDiv.find('.kennel-change-mode').click(function() {kennel.changeMode()});
 };
 
 Kennel.prototype._loadBlockly = function(toolbox) {
     var blocklyDiv = this._mainDiv.find('.blockly-div')[0];
     var blocklyArea = this._mainDiv.find('.blockly-area')[0];
+    this._blocklyDiv = blocklyDiv;
     this._blockly = Blockly.inject(blocklyDiv,
                                   {path: 'blockly/', 
                                   scrollbars: true, 
@@ -141,12 +158,12 @@ Kennel.prototype._loadBlockly = function(toolbox) {
         //TODO: saveUndo();
         $(_kennel_instance._attachmentPoint).trigger("blockly:update");
     });
-    $(this._attachmentPoint).on("blockly:update", function() {
+    /*$(this._attachmentPoint).on("blockly:update", function() {
         // Have to wrap it in a function to prevent *this* mangling.
         _kennel_instance._blocklyUpdateQueue.add(function() {
             _kennel_instance._updateText()
         }, 1000);
-    });
+    });*/
     var onResize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
         var element = blocklyArea;
@@ -168,9 +185,9 @@ Kennel.prototype._loadBlockly = function(toolbox) {
 };
 
 Kennel.prototype._loadText = function() {
-    //var textCanvas = this._main_div.find('.kennel-text > textarea')[0];
-    var textCanvas = document.getElementById('python-output');
-    this.text = CodeMirror.fromTextArea(textCanvas, {
+    var textCanvas = this._mainDiv.find('.kennel-text > textarea')[0];
+    //var textCanvas = document.getElementById('python-output');
+    this._text = CodeMirror.fromTextArea(textCanvas, {
                                         mode: { name: "python", 
                                                 version: 3, 
                                                 singleLineStringErrors: false
@@ -186,13 +203,14 @@ Kennel.prototype._loadText = function() {
                                                     "Shift-Tab": "indentLess"},
                                         //onKeyEvent: handleEdKeys
                                       });
-    //this.text.setSize(null, "100%");
+    this._text.setSize(null, "200px");
+    $(this._text.getWrapperElement()).hide();
     var _kennel_instance = this;
-    this.text.on("change", function(codeMirror) {
+    /*this._text.on("change", function(codeMirror) {
         _kennel_instance._textUpdateQueue.add(function() {
             _kennel_instance._updateBlocks()
         }, 1100);
-    });
+    });*/
     $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
         var contentDiv = $(e.target.attributes.href.value);
         contentDiv.find('.CodeMirror').each(function(i, el) {
@@ -205,22 +223,29 @@ Kennel.prototype._loadConverter = function() {
     this._converter = new PythonToBlocks();
 }
 
+function encodeHTML(text) {
+    return text.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;')
+               .replace(/"/g, '&quot;')
+               .replace(/'/g, '&apos;');
+}
+
 /*
  * Resets skulpt to some default values
  */
 Kennel.prototype._loadConsole = function() {
-    //this._skulptConsole = this._main_div.find('.kennel-console')[0];
-    this._console = document.getElementById('html-output');
+    this._console = this._mainDiv.find('.kennel-console')[0];
+    //this._console = document.getElementById('html-output');
+    var kennel = this;
     Sk.configure({
         // Function to handle the text outputted by Skulpt
-        output: this.print,
+        output: function(text) { kennel.print(text); },
         // Function to handle loading in new files
         read: function (filename) {
-                    if (Sk.builtinFiles === undefined) {
-                        throw new Error("Built-in files are not loaded!");
-                    }
-                    if (Sk.builtinFiles["files"][filename] === undefined) {
-                        throw new Error("File not found: '" + filename + "'");
+                    if (Sk.builtinFiles === undefined ||
+                        Sk.builtinFiles["files"][filename] === undefined) {
+                        throw "File not found: '" + filename + "'";
                     }
                     return Sk.builtinFiles["files"][filename];
                 }
@@ -229,16 +254,27 @@ Kennel.prototype._loadConsole = function() {
     Sk.execLimit = 5000;
     // Identify the location to put new charts
     Sk.matplotlibCanvas = this._console;
+    Sk.pre = 'html-output';
 }
-
 
 /*
  * Print an error to the consoles -- the on screen one and the browser one
  */
 Kennel.prototype.printError = function(error) {
-    console.log(error.stack);
+    console.log(error);
+    // Is it a string?
+    if (typeof error !== "string") {
+        // A weird skulpt thing?
+        if (error.tp$str !== undefined) {
+            error = error.tp$str().v;
+        } else {
+            // An error?
+            error = ""+error.name + ": " + error.message;
+            console.log(error.stack);
+        }
+    }
     // Perform any necessary cleaning
-    this._console.innerHTML = this._console.innerHTML + error.message;
+    this._console.innerHTML = this._console.innerHTML + encodeHTML(error);
 }
 
 /*
@@ -246,27 +282,33 @@ Kennel.prototype.printError = function(error) {
  */
 Kennel.prototype.print = function(text) {
     // Perform any necessary cleaning
-    text = text.replace(/</g, '&lt;');
+    text = encodeHTML(text);
+    // Append to the current text
     this._console.innerHTML = this._console.innerHTML + text;
 }
 
 Kennel.prototype.resetConsole = function() {
-    this._skulptConsole.innerHtml = "";
+    this._console.innerHTML = "";
     var step = 0;
     var highlightMap = this.getHighlightMap();
     this.traceTable = [];
+    var kennel = this;
     Sk.afterSingleExecution = function(variables, lineNumber, 
                                        columnNumber, filename) {
         if (filename == '<stdin>.py') {
-            this.traceTable.push({'step': step, 
+            kennel.traceTable.push({'step': step, 
                                   'filename': filename,
                                   'block': highlightMap[lineNumber-1],
                                   'line': lineNumber,
                                   'column': columnNumber,
-                                  'properties': this.parseGlobals(variables)});
+                                  'properties': kennel.parseGlobals(variables)});
             step += 1;
         }
     };
+}
+
+Kennel.prototype.parseGlobals = function(variables) {
+    return {};
 }
 
 /*
@@ -302,15 +344,24 @@ Kennel.prototype.getHighlightMap = function() {
 /*
  * Runs the given python code, resetting the console and Trace Table.
  */
-Kennel.prototype.run = function(code) {
+Kennel.prototype.run = function() {
+    var code = "";
+    if (this._mode == 'blocks') {
+        code = this._text.getValue();
+    } else {
+        code = this.getPythonFromBlocks();
+    }
+    if (code.trim() == "") {
+        this.printError("Your canvas is currently blank.");
+    }
     this.resetConsole();
-    var module;
     try {
         // Actually run the python code
-        module = Sk.importMainWithBody("<stdin>", false, code);
+        var module = Sk.importMainWithBody("<stdin>", false, code);
         // And run the afterSingleExecution one extra time to get final program state
         Sk.afterSingleExecution(module.$d);
     } catch (e) {
+        console.log(e.stack);
         this.printError(e);
     }
     this.refreshTraceTable();
