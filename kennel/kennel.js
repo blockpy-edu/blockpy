@@ -94,20 +94,24 @@ Kennel.prototype.changeMode = function() {
     if (this._mode == 'blocks') {
         this._mode = 'text';
         this._updateText();
-        $(this._text.getWrapperElement()).show().css('height', this.metrics_editor_height);
-        this._blockly.setVisible(false);
+        $(this._text.getWrapperElement()).show(); //.css('height', this.metrics_editor_height);
         $(this._mainDiv).find('.kennel-blocks').css('height', '0%');
-        this._text.setSize(null, '100%'); //this.metrics_editor_height);
-        $(this._mainDiv).find('.kennel-text-guide').css('width', this._blockly.toolbox_.width+'px');
+        $(this._mainDiv).find('.kennel-text').css('height', this.metrics_editor_height);
+        //this._text.setSize(null, '100%'); //this.metrics_editor_height);
         this._text.refresh();
         $(this._mainDiv).find('.kennel-change-mode').html('Change to Block View');
-    } else {
+        this._blockly.setVisible(false);
+    } else if (this._mode == 'text') {
         this._mode = 'blocks';
         this._updateBlocks();
-        $(this._text.getWrapperElement()).hide().css('height', '0%');
-        this._blockly.setVisible(true);
+        $(this._text.getWrapperElement()).hide();
+        $(this._mainDiv).find('.kennel-text').css('height', '0%');
         $(this._mainDiv).find('.kennel-blocks').css('height', this.metrics_editor_height);
         $(this._mainDiv).find('.kennel-change-mode').html('Change to Text View');
+        this._resetBlocklySize();
+        this._blockly.setVisible(true);
+    } else {
+        console.error("Invalid mode:", this._mode);
     }
 }
 
@@ -118,6 +122,7 @@ Kennel.prototype._loadMain = function() {
                         "</div>"+
                         "<div class='kennel-toolbar'>"+
                             "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
+                            "<button class='btn btn-default kennel-run'>Run</button>"+
                         "</div>"+
                         "<div class='kennel-blocks'"+
                               "style='height:"+this.metrics_editor_height+"'>"+
@@ -138,6 +143,7 @@ Kennel.prototype._loadMain = function() {
     
     var kennel = this;
     this._mainDiv.find('.kennel-change-mode').click(function() {kennel.changeMode()});
+    this._mainDiv.find('.kennel-run').click(function() {kennel.run()});
 };
 
 Kennel.prototype._loadBlockly = function(toolbox) {
@@ -149,17 +155,7 @@ Kennel.prototype._loadBlockly = function(toolbox) {
                                   scrollbars: true, 
                                   toolbox: toolbox});
     var _kennel_instance = this;
-    this._blockly.addChangeListener(function(event) {
-        //TODO: saveUndo();
-        $(_kennel_instance._attachmentPoint).trigger("blockly:update");
-    });
-    /*$(this._attachmentPoint).on("blockly:update", function() {
-        // Have to wrap it in a function to prevent *this* mangling.
-        _kennel_instance._blocklyUpdateQueue.add(function() {
-            _kennel_instance._updateText()
-        }, 1000);
-    });*/
-    var onResize = function(e) {
+    this._resetBlocklySize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
         var element = blocklyArea;
         var x = 0;
@@ -174,9 +170,10 @@ Kennel.prototype._loadBlockly = function(toolbox) {
         blocklyDiv.style.top = y + 'px';
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
         blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+        _kennel_instance._blockly.render();
     };
-    window.addEventListener('resize', onResize, false);
-    onResize();
+    window.addEventListener('resize', this._resetBlocklySize, false);
+    this._resetBlocklySize();
 };
 
 Kennel.prototype._loadText = function() {
@@ -200,18 +197,6 @@ Kennel.prototype._loadText = function() {
                                       });
     this._text.setSize(null, "200px");
     $(this._text.getWrapperElement()).hide();
-    var _kennel_instance = this;
-    /*this._text.on("change", function(codeMirror) {
-        _kennel_instance._textUpdateQueue.add(function() {
-            _kennel_instance._updateBlocks()
-        }, 1100);
-    });*/
-    $('.kennel-content > .nav-tabs a').on('shown.bs.tab', function (e) {
-        var contentDiv = $(e.target.attributes.href.value);
-        contentDiv.find('.CodeMirror').each(function(i, el) {
-            el.CodeMirror.refresh();
-        });
-    });
 };
 
 Kennel.prototype._loadConverter = function() {
@@ -342,9 +327,9 @@ Kennel.prototype.getHighlightMap = function() {
 Kennel.prototype.run = function() {
     var code = "";
     if (this._mode == 'blocks') {
-        code = this._text.getValue();
-    } else {
         code = this.getPythonFromBlocks();
+    } else {
+        code = this.getPythonFromText();
     }
     if (code.trim() == "") {
         this.printError("Your canvas is currently blank.");
@@ -375,6 +360,14 @@ Kennel.prototype.getXml = function() {
 Kennel.prototype.setXml = function(xml) {
     this._blockly.clear();
     Blockly.Xml.domToWorkspace(this._blockly, xml);
+}
+
+Kennel.prototype.getPythonFromText = function() {
+    return this._text.getValue();
+}
+          
+Kennel.prototype.setPythonFromText = function(text) {
+    this._text.setValue(text);
 }
 
 /**
