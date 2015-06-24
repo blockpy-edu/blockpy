@@ -270,6 +270,8 @@
             kennel = new Kennel(document.getElementById('kennel-div'),
                                 document.getElementById('toolbox'),
                                 document.getElementById("html-output"));
+            kennel.changeMode();
+            kennel.setPythonFromText("print('Hello World!')");
           });
         </script>
   
