@@ -230,7 +230,7 @@ Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
  * @param {!Event} e Keyboard event.
  * @private
  */
-Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ = function(e) {
+Blockly.FieldTextArea.prototype.onHtmlInputKeyDown_ = function(e) {
   var htmlInput = Blockly.FieldTextArea.htmlInput_;
   var escKey = 27;
   if (e.keyCode == escKey) {
