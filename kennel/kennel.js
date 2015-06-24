@@ -35,10 +35,6 @@ function Kennel(attachmentPoint, toolbox, console) {
     // The Div or whatever HTML element we attach everything to
     this._attachmentPoint = attachmentPoint;
     
-    // Prevent cascading conversions
-    this._convertingText = false;
-    this._convertingBlocks = true;
-    
     this._loadMain();
     this._loadBlockly(toolbox);
     this._loadText();
@@ -54,37 +50,27 @@ Kennel.prototype.getPythonFromBlocks = function() {
 }
 
 Kennel.prototype._updateText = function() {
-    if (this._convertingBlocks) {
-        this._convertingBlocks = false;
-    } else {
-        this._convertingText = true;
-        var code = this.getPythonFromBlocks();
-        this._text.setValue(code);
-    }
+    var code = this.getPythonFromBlocks();
+    this._text.setValue(code);
 }
 
 Kennel.prototype._updateBlocks = function() {
-    if (this._convertingText) {
-        this._convertingText = false;
-    } else {
-        this._convertingBlocks = true;
-        var backupXML = this.getXml();
-        var error = true;
-        try {
-            var code = this._text.getValue();
-            var xml = this._converter.convert(code);
-            var blocklyXML = Blockly.Xml.textToDom(xml);
-            this._blockly.clear();
-            Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
-            this._blockly.align();
-            error = false;
-        } catch (e) {
-            this.printError(e);
-        }
-        if (error) {
-            this._blockly.clear();
-            Blockly.Xml.domToWorkspace(this._blockly, backupXML);
-        }
+    var backupXML = this.getXml();
+    var error = true;
+    try {
+        var code = this._text.getValue();
+        var xml = this._converter.convert(code);
+        var blocklyXML = Blockly.Xml.textToDom(xml);
+        this._blockly.clear();
+        Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
+        this._blockly.align();
+        error = false;
+    } catch (e) {
+        this.printError(e);
+    }
+    if (error) {
+        this._blockly.clear();
+        Blockly.Xml.domToWorkspace(this._blockly, backupXML);
     }
 }
 
@@ -107,16 +93,19 @@ Kennel.prototype.metrics_editor_height = '60%';
 Kennel.prototype.changeMode = function() {
     if (this._mode == 'blocks') {
         this._mode = 'text';
+        this._updateText();
         $(this._text.getWrapperElement()).show().css('height', this.metrics_editor_height);
         this._blockly.setVisible(false);
         $(this._mainDiv).find('.kennel-blocks').css('height', '0%');
-        this._updateText();
+        this._text.setSize(null, '100%'); //this.metrics_editor_height);
+        $(this._mainDiv).find('.kennel-text-guide').css('width', this._blockly.toolbox_.width+'px');
+        this._text.refresh();
     } else {
         this._mode = 'blocks';
+        this._updateBlocks();
         $(this._text.getWrapperElement()).hide().css('height', '0%');
         this._blockly.setVisible(true);
         $(this._mainDiv).find('.kennel-blocks').css('height', this.metrics_editor_height);
-        this._updateBlocks();
     }
 }
 
@@ -127,12 +116,17 @@ Kennel.prototype._loadMain = function() {
                             "<button class='kennel-change-mode'>Change Mode</button>"+
                         "</div>"+
                         "<div class='kennel-blocks'"+
-                              "style='height:60%'>"+
+                              "style='height:"+this.metrics_editor_height+"'>"+
                               "<div class='blockly-div' style='position: absolute'></div>"+
                               "<div class='blockly-area' style='height:100%'></div>"+
                         "</div>"+
-                        "<div class='kennel-text'>"+
-                            "<textarea class='language-python'>import weather</textarea>"+
+                        "<div class='kennel-text' style='height:"+this.metrics_editor_height+"'>"+
+                            /*"<div class='kennel-text-guide' style='height: 100%; float:left'>"+
+                                "Some Text."+
+                            "</div>"+*/
+                            "<textarea class='language-python'"+
+                                       "style='height:"+this.metrics_editor_height+
+                                       "'>import weather</textarea>"+
                         "</div>"+
                         "<div class='kennel-console'>"+
                         "</div>"+
@@ -217,6 +211,12 @@ Kennel.prototype._loadText = function() {
             el.CodeMirror.refresh();
         });
     });
+    /*this._text.on('cursorActivity', function(){
+        var editor = _kennel_instance._text;
+        var word = editor.findWordAt(editor.getCursor()); 
+        var range = editor.getRange(word.anchor, word.head);
+        _kennel_instance._mainDiv.find('.kennel-text-guide').html(range);
+    });*/
 };
 
 Kennel.prototype._loadConverter = function() {
