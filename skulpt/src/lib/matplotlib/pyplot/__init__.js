@@ -1858,7 +1858,7 @@ var $builtinmodule = function(name) {
         plot = null;
 
         if (Sk.matplotlibCanvas !== undefined) {
-            Sk.matplotlibCanvas.empty();
+            $(Sk.matplotlibCanvas).empty();
         }
     };
 
