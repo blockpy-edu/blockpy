@@ -130,29 +130,23 @@ Kennel.prototype._loadMain = function() {
             "</div>"+
         "</div>"+
         "<div class='row'>"+
-            "<div class='col-md-8'>"+
-                "<div class='row'>"+
-                    "<div class='col-md-12 kennel-editor'>"+
-                        "<div class='kennel-blocks' "+
-                             "style='height:"+this.metrics_editor_height+"'>"+
-                            "<div class='blockly-div' style='position: absolute'></div>"+
-                            "<div class='blockly-area' style='height:100%'></div>"+
-                        "</div>"+
-                        "<div class='kennel-text'>"+
-                            "<textarea class='language-python'"+
-                                       "style='height:"+this.metrics_editor_height+
-                                       "'>import weather</textarea>"+
-                        "</div>"+
+            "<div class='col-md-7'>"+
+                "<div class='kennel-editor'>"+
+                    "<div class='kennel-blocks' "+
+                         "style='height:"+this.metrics_editor_height+"'>"+
+                        "<div class='blockly-div' style='position: absolute'></div>"+
+                        "<div class='blockly-area' style='height:100%'></div>"+
                     "</div>"+
-                "</div>"+
-                "<div class='row'>"+
-                    "<div class='col-md-12 kennel-console'>"+
-                        "Console"+
+                    "<div class='kennel-text'>"+
+                        "<textarea class='language-python'"+
+                                   "style='height:"+this.metrics_editor_height+
+                                   "'>import weather</textarea>"+
                     "</div>"+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-4 kennel-explorer'>"+
-                "<p>"+
+            "<div class='col-md-5'>"+
+                "<div class='kennel-console'></div>"+
+                "<div class='kennel-explorer'>"+
                     "<table><tr>"+
                     // Step: X of Y (Line: Z)
                     "<td colspan='4'>"+
@@ -189,7 +183,7 @@ Kennel.prototype._loadMain = function() {
                             "<th>Value</th>"+
                         "</tr>"+
                     "</table>"+
-                "</p>"+
+                "</div>"+
             "</div>"+
         "</div>"+
     "</div>";
@@ -293,13 +287,15 @@ Kennel.prototype._loadBlockly = function(toolbox) {
             x += element.offsetLeft;
             y += element.offsetTop;
             element = element.offsetParent;
+            console.log("Resize!", x, y, "Next:", element, element === null ? false : element.style.position);
+            element = null;
         } while (element);
         // Position blocklyDiv over blocklyArea.
         blocklyDiv.style.left = x + 'px';
         blocklyDiv.style.top = y + 'px';
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
         blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-        _kennel_instance._blockly.render();
+        //_kennel_instance._blockly.render();
     };
     window.addEventListener('resize', this._resetBlocklySize, false);
     this._resetBlocklySize();

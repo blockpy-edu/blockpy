@@ -9,11 +9,15 @@
 }
 
 .kennel-editor {
-    height: 400px;
+    height: 500px;
+}
+
+.kennel-text {
+    border: 1px solid lightgray;
 }
 
 .kennel-console {
-    height: 180px;
+    height: 250px;
     overflow: auto;
     border: 1px solid lightgray;
 }
