@@ -6,6 +6,7 @@
     
     <link rel="stylesheet" href="libs/bootstrap.min.css">
     <link rel="stylesheet" href="libs/codemirror.css">
+    <link rel="stylesheet" href="kennel/kennel.css">
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
     <style>
         html, body {
@@ -42,7 +43,7 @@
     <script type="text/javascript" src="libs/crime_data.js"></script>
     
     <!-- Blockly -->
-    <script type="text/javascript" src="blockly/blockly_uncompressed.js"></script>
+    <script type="text/javascript" src="blockly/blockly_compressed.js"></script>
     <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
     <script type="text/javascript" src="blockly/python_compressed.js"></script>
     <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
@@ -66,14 +67,7 @@
     
     
     <script type="text/javascript">
-        
-        function resetit() {
-            var code = '<xml xmlns="http://www.w3.org/1999/xhtml"> <block type="variables_set" id="1" inline="false" x="-19" y="16"> <field name="VAR">property_name</field> <value name="VALUE"> <block type="lists_create_empty" id="12"></block> </value> <next> <block type="controls_forEach" id="24" inline="false"> <field name="VAR">i</field> <value name="LIST"> <block type="variables_get" id="34"> <field name="VAR">property_name</field> </block> </value> <statement name="DO"> <block type="lists_append" id="20" inline="true"> <value name="ITEM"> <block type="math_number" id="39"> <field name="NUM">0</field> </block> </value> <value name="LIST"> <block type="variables_get" id="35"> <field name="VAR">property_name</field> </block> </value> </block> </statement> </block> </next> </block> </xml>';
-            var xml = Blockly.Xml.textToDom(code);
-            Blockly.mainWorkspace.clear();
-            Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
-            align();
-        }
+
         
         function parseValue(property, value) {
             console.log(value);
@@ -157,53 +151,7 @@
         }
         
         function reloadDataViewer(propertyList, page) {
-            var last = propertyList.length-1;
-            if (page < 0) {
-                page = last+page+1;
-            }
             
-            Blockly.mainWorkspace.traceOn(true)
-            // Clear out any existing data
-            var tbl = $("#data-viewer");
-            tbl.html('');
-            function buildButton(next_page, label) {
-                var button = $('<button>'+label+'</button>');
-                button.click(function() { reloadDataViewer(propertyList, next_page)});
-                return $("<td/>").append(button);
-            }
-            var row = $('<tr/>');
-            row.append(buildButton(0, "First"));
-            row.append(buildButton(Math.max(0, page-1), "Previous"));
-            row.append($("<td/>"));
-            row.append(buildButton(Math.min(last, page+1), "Next"));
-            row.append(buildButton(last, "Last"));
-            tbl.append(row);
-            
-            function renderData(property, value) {
-                var row = $("<tr/>");
-                row.append($("<td/>").text(value['name']));
-                row.append($("<td />").text(value['type']));
-                row.append($("<td colspan='3'/>").text(value['value']));
-                return row;
-            }
-            
-            if (propertyList[page] === undefined) {
-                tbl.append($("<tr><td colspan='5'>No data found at this step!</td></tr>"));
-            } else {
-                var lineno = propertyList[page]['lineno'];
-                if (page == last) {
-                    tbl.append($("<tr><th colspan='5'>Completed</th></tr>"));
-                } else {
-                    tbl.append($("<tr><th colspan='5'>Step "+page+" (Line "+lineno+")</th></tr>"));
-                }
-                var block = propertyList[page]['block'];
-                Blockly.mainWorkspace.highlightBlock(block);
-                for (var property in propertyList[page]['properties']) {
-                    var value = propertyList[page]['properties'][property];
-                    row = renderData(property, value);
-                    tbl.append(row);
-                }
-            }
            
         }
     </script>
@@ -271,7 +219,7 @@
                                 document.getElementById('toolbox'),
                                 document.getElementById("html-output"));
             kennel.changeMode();
-            kennel.setPythonFromText("print('Hello World!')");
+            kennel.setPythonFromText("for i in range(1, 100):\n\tprint(i)");
           });
         </script>
   

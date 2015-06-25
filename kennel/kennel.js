@@ -88,7 +88,7 @@ Kennel.prototype.clear = function() {
     this._blockly.clear();
 };
 
-Kennel.prototype.metrics_editor_height = '60%';
+Kennel.prototype.metrics_editor_height = '100%';
 
 Kennel.prototype.changeMode = function() {
     if (this._mode == 'blocks') {
@@ -116,29 +116,158 @@ Kennel.prototype.changeMode = function() {
 }
 
 Kennel.prototype._loadMain = function() {
-    var mainTabs = "<div class='kennel-content' style='height:100%'>"+
-                        "<div class='kennel-header'>"+
-                            "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+    var mainTabs = ""+
+    "<div class='kennel-content container-fluid'>"+
+        "<div class='row'>"+
+            "<div class='col-md-12 kennel-presentation'>"+
+                "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+            "</div>"+
+        "</div>"+
+        "<div class='row'>"+
+            "<div class='col-md-12 kennel-toolbar'>"+
+                "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
+                "<button class='btn btn-default kennel-run'>Run</button>"+
+            "</div>"+
+        "</div>"+
+        "<div class='row'>"+
+            "<div class='col-md-8'>"+
+                "<div class='row'>"+
+                    "<div class='col-md-12 kennel-editor'>"+
+                        "<div class='kennel-blocks' "+
+                             "style='height:"+this.metrics_editor_height+"'>"+
+                            "<div class='blockly-div' style='position: absolute'></div>"+
+                            "<div class='blockly-area' style='height:100%'></div>"+
                         "</div>"+
-                        "<div class='kennel-toolbar'>"+
-                            "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
-                            "<button class='btn btn-default kennel-run'>Run</button>"+
-                        "</div>"+
-                        "<div class='kennel-blocks'"+
-                              "style='height:"+this.metrics_editor_height+"'>"+
-                              "<div class='blockly-div' style='position: absolute'></div>"+
-                              "<div class='blockly-area' style='height:100%'></div>"+
-                        "</div>"+
-                        "<div class='kennel-text' style='height:"+this.metrics_editor_height+"'>"+
+                        "<div class='kennel-text'>"+
                             "<textarea class='language-python'"+
                                        "style='height:"+this.metrics_editor_height+
                                        "'>import weather</textarea>"+
                         "</div>"+
-                        "<div class='kennel-console'>"+
-                        "</div>"+
-                        "<div class='kennel-trace'>"+
-                        "</div>"+
-                    "</div>";
+                    "</div>"+
+                "</div>"+
+                "<div class='row'>"+
+                    "<div class='col-md-12 kennel-console'>"+
+                        "Console"+
+                    "</div>"+
+                "</div>"+
+            "</div>"+
+            "<div class='col-md-4 kennel-explorer'>"+
+                "<p>"+
+                    "<table><tr>"+
+                    // Step: X of Y (Line: Z)
+                    "<td colspan='4'>"+
+                        "<strong>Step: </strong>"+
+                        "<span class='kennel-explorer-step-span'>0</span> of "+
+                        "<span class='kennel-explorer-length-span'>0</span> "+
+                        "(<strong>Line: </strong>"+
+                        "<span class='kennel-explorer-line-span'>0</span>)"+
+                    "</td>"+
+                    "</tr><tr>"+
+                    // First Previous Next Last
+                    "<td style='width:25%'>"+
+                        "<button type='button' class='btn btn-default kennel-explorer-first'>"+
+                        "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
+                    "</td><td style='width:25%'>"+
+                        "<button type='button' class='btn btn-default kennel-explorer-back'>"+
+                        "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
+                    "</td><td style='width:25%'>"+
+                        "<button type='button' class='btn btn-default kennel-explorer-next'>"+
+                        "Next <span class='glyphicon glyphicon-forward'></span></button>"+
+                    "</td><td style='width:25%'>"+
+                        "<button type='button' class='btn btn-default kennel-explorer-last'>"+
+                        "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
+                    "</td>"+
+                    "</tr></table>"+
+                    // Actual Trace data
+                    "<table style='width: 100%'"+
+                            "class='table table-condensed table-striped "+
+                                   "table-bordered table-hover kennel-explorer-table'>"+
+                        // Property Type Value
+                        "<tr>"+
+                            "<th>Property</th>"+
+                            "<th>Type</th>"+
+                            "<th>Value</th>"+
+                        "</tr>"+
+                    "</table>"+
+                "</p>"+
+            "</div>"+
+        "</div>"+
+    "</div>";
+    /*
+    "<div class='kennel-content row' style='height:100%'>"+
+        "<div class='col-md-12 col-sm-12 kennel-header'>"+
+            "<div class='row'>"+
+                "<div class='kennel-presentation col-md-12'>"+
+                    "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+                "</div>"+
+            "</div>"+
+            "<div class='row'>"+
+                "<div class='kennel-toolbar col-md-12'>"+
+                    "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
+                    "<button class='btn btn-default kennel-run'>Run</button>"+
+                "</div>"+
+            "</div>"+
+        "</div>"+
+        "<div class='col-md-12 col-sm-12 row'>"+
+            "<div class='kennel-left col-md-7 col-sm-7'"+
+                "<div class='row'>"+
+                    "<div class='col-md-12 col-sm-12 kennel-blocks'"+
+                          "style='height:"+this.metrics_editor_height+"'>"+
+                          "<div class='blockly-div' style='position: absolute'></div>"+
+                          "<div class='blockly-area' style='height:100%'></div>"+
+                    "</div>"+
+                    "<div class='col-md-12 col-sm-12 kennel-text' style='height:"+this.metrics_editor_height+"'>"+
+                        "<textarea class='language-python'"+
+                                   "style='height:"+this.metrics_editor_height+
+                                   "'>import weather</textarea>"+
+                    "</div>"+
+                "</div>"+
+                "<div class='row'>"+
+                    "<div class='col-md-12 col-sm-12 kennel-console'>"+
+                        "Console"+
+                    "</div>"+
+                "</div>"+
+            "</div>"+
+            "<div class='kennel-explorer col-md-5 col-sm-5'>"+
+                "<table><tr>"+
+                // Step: X of Y (Line: Z)
+                "<td colspan='4'>"+
+                    "<strong>Step: </strong>"+
+                    "<span class='kennel-explorer-step-span'>0</span> of "+
+                    "<span class='kennel-explorer-length-span'>0</span> "+
+                    "(<strong>Line: </strong>"+
+                    "<span class='kennel-explorer-line-span'>0</span>)"+
+                "</td>"+
+                "</tr><tr>"+
+                // First Previous Next Last
+                "<td style='width:25%'>"+
+                    "<button type='button' class='btn btn-default kennel-explorer-first'>"+
+                    "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
+                "</td><td style='width:25%'>"+
+                    "<button type='button' class='btn btn-default kennel-explorer-back'>"+
+                    "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
+                "</td><td style='width:25%'>"+
+                    "<button type='button' class='btn btn-default kennel-explorer-next'>"+
+                    "Next <span class='glyphicon glyphicon-forward'></span></button>"+
+                "</td><td style='width:25%'>"+
+                    "<button type='button' class='btn btn-default kennel-explorer-last'>"+
+                    "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
+                "</td>"+
+                "</tr></table>"+
+                // Actual Trace data
+                "<table style='width: 100%'"+
+                        "class='table table-condensed table-striped "+
+                               "table-bordered table-hover kennel-explorer-table'>"+
+                    // Property Type Value
+                    "<tr>"+
+                        "<th>Property</th>"+
+                        "<th>Type</th>"+
+                        "<th>Value</th>"+
+                    "</tr>"+
+                "</table>"+
+            "</div>"+
+        "</div>"+
+    "</div>";*/
     this._mainDiv = $(this._attachmentPoint).html($(mainTabs))
     
     var kennel = this;
@@ -195,7 +324,7 @@ Kennel.prototype._loadText = function() {
                                                     "Shift-Tab": "indentLess"},
                                         //onKeyEvent: handleEdKeys
                                       });
-    this._text.setSize(null, "200px");
+    this._text.setSize(null, "100%");
     $(this._text.getWrapperElement()).hide();
 };
 
@@ -234,7 +363,88 @@ Kennel.prototype._loadConsole = function() {
     Sk.execLimit = 5000;
     // Identify the location to put new charts
     Sk.matplotlibCanvas = this._console;
-    Sk.pre = 'html-output';
+}
+
+Kennel.prototype._loadExplorer = function() {
+    this._explorer = this._mainDiv.find('.kennel-explorer')[0];
+    this._explorerPage = 0;
+    this._explorerElementsFirst = explorer.find('.kennel-explorer-first');
+    this._explorerElementsBack = explorer.find('.kennel-explorer-back');
+    this._explorerElementsNext = explorer.find('.kennel-explorer-next');
+    this._explorerElementsLast = explorer.find('.kennel-explorer-last');
+    this._explorerElementsStep = explorer.find('.kennel-explorer-step');
+    this._explorerElementsLength = explorer.find('.kennel-explorer-length');
+    this._explorerElementsLine = explorer.find('.kennel-explorer-line');
+    this._explorerElementsTable = explorer.find('.kennel-explorer-table');
+}
+
+Kennel.prototype.reloadExplorer = function(page) {
+    var kennel = this;
+    // Fix the current page
+    var traceTable = this.traceTable;
+    var last = traceTable.length-1;
+    if (page < 0) {
+        page = last + page + 1;
+    }
+    if (page > last) {
+        page = last;
+    }
+    // Activate tracing in blockly
+    this._blockly.traceOn(true);
+    // Clear out any existing data
+    var explorer = $(this._explorer);
+    explorer.find("tr:gt(0)").remove();
+    // Update the VCR Controls
+    this._explorerElementsFirst.prop('disabled', page == 0);
+    this._explorerElementsBack.prop('disabled', page == 0);
+    this._explorerElementsNext.prop('disabled', page == last);
+    this._explorerElementsLast.prop('disabled', page == last);
+    if (page > 0) {
+        this._explorerElementsFirst.unbind('click')
+                                   .click(function() {
+                                       kennel.reloadExplorer(0);
+                                   });
+        this._explorerElementsBack.unbind('click')
+                                   .click(function() {
+                                       kennel.reloadExplorer(Math.max(0, page-1));
+                                   });
+    }
+    if (page < last) {
+        this._explorerElementsNext.unbind('click')
+                                   .click(function() {
+                                       kennel.reloadExplorer(Math.min(last, page+1));
+                                   });
+        this._explorerElementsLast.unbind('click')
+                                   .click(function() {
+                                       kennel.reloadExplorer(last);
+                                   });
+    }
+    this._explorerElementsStep.html(page);
+    this._explorerElementsLength.html(last);
+    // If we have data
+    if (traceTable[page] === undefined) {
+        explorerElementsTable.append($("<tr><td colspan='3'>No data found at this step!</td></tr>"));
+    } else {
+        // Update header row
+        var line = traceTable[page]['line'];
+        this._explorerElementsLine.html(line);
+        // Highlight relevant block
+        var block_id = traceTable[page]['block'];
+        if (block_id) {
+            this._blockly.highlightBlock(block_id);
+        }
+        function renderVisualizerRow(property, value) {
+            return $("<tr/>").append($("<td/>").text(value['name']))
+                             .append($("<td/>").text(value['type']))
+                             .append($("<td/>").text(value['value']));
+        }
+        // Render the properties
+        for (var property in traceTable[page]['properties']) {
+            var value = traceTable[page]['properties'][property];
+            var row = renderVisualizerRow(property, value);
+            explorerElementsTable.append(row);
+        }
+    }
 }
 
 /*
@@ -262,27 +472,36 @@ Kennel.prototype.printError = function(error) {
  */
 Kennel.prototype.print = function(text) {
     // Perform any necessary cleaning
-    text = encodeHTML(text);
-    // Append to the current text
-    this._console.innerHTML = this._console.innerHTML + text;
+    if (text !== "\n") {
+        text = encodeHTML(text);
+        text = $("<samp data-toggle='tooltip' data-placement='right' "+
+                     "title='Step "+this.step+", Line "+this.stepLineMap[this.step-1]+"'>"+
+                text+
+               "</samp>");
+        // Append to the current text
+        $(this._console).append(text).append("<br>");
+        text.tooltip();
+    }
 }
 
 Kennel.prototype.resetConsole = function() {
     this._console.innerHTML = "";
-    var step = 0;
+    this.step = 0;
     var highlightMap = this.getHighlightMap();
     this.traceTable = [];
+    this.stepLineMap = [];
     var kennel = this;
     Sk.afterSingleExecution = function(variables, lineNumber, 
                                        columnNumber, filename) {
         if (filename == '<stdin>.py') {
-            kennel.traceTable.push({'step': step, 
+            kennel.traceTable.push({'step': kennel.step, 
                                   'filename': filename,
                                   'block': highlightMap[lineNumber-1],
                                   'line': lineNumber,
                                   'column': columnNumber,
                                   'properties': kennel.parseGlobals(variables)});
-            step += 1;
+            kennel.step += 1;
+            kennel.stepLineMap.push(lineNumber);
         }
     };
 }

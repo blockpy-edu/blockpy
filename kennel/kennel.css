@@ -1,0 +1,37 @@
+.kennel-explorer {
+    border: 1px solid grey;
+    height: 100%;
+}
+
+.kennel-explorer table {
+    width: 100%; 
+    text-align: center;
+}
+
+.kennel-editor {
+    height: 400px;
+}
+
+.kennel-console {
+    height: 180px;
+    overflow: auto;
+    border: 1px solid lightgray;
+}
+
+.kennel-console samp {
+    /* display: block;*/
+    padding-left: 10px;
+}
+
+.kennel-bottom {
+    height: 25%;
+}
+
+.kennel-header {
+    height: 25%;
+}
+
+.row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
