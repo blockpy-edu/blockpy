@@ -40,6 +40,7 @@ function Kennel(attachmentPoint, toolbox, console) {
     this._loadText();
     this._loadConverter();
     this._loadConsole();
+    this._loadExplorer();
     
     // Default mode when you open the screen is blocks
     this._mode = 'blocks';
@@ -130,7 +131,7 @@ Kennel.prototype._loadMain = function() {
             "</div>"+
         "</div>"+
         "<div class='row'>"+
-            "<div class='col-md-7'>"+
+            "<div class='col-md-7 col-sm-7'>"+
                 "<div class='kennel-editor'>"+
                     "<div class='kennel-blocks' "+
                          "style='height:"+this.metrics_editor_height+"'>"+
@@ -144,124 +145,58 @@ Kennel.prototype._loadMain = function() {
                     "</div>"+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-5'>"+
-                "<div class='kennel-console'></div>"+
-                "<div class='kennel-explorer'>"+
-                    "<table><tr>"+
-                    // Step: X of Y (Line: Z)
-                    "<td colspan='4'>"+
-                        "<strong>Step: </strong>"+
-                        "<span class='kennel-explorer-step-span'>0</span> of "+
-                        "<span class='kennel-explorer-length-span'>0</span> "+
-                        "(<strong>Line: </strong>"+
-                        "<span class='kennel-explorer-line-span'>0</span>)"+
-                    "</td>"+
-                    "</tr><tr>"+
-                    // First Previous Next Last
-                    "<td style='width:25%'>"+
-                        "<button type='button' class='btn btn-default kennel-explorer-first'>"+
-                        "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
-                    "</td><td style='width:25%'>"+
-                        "<button type='button' class='btn btn-default kennel-explorer-back'>"+
-                        "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
-                    "</td><td style='width:25%'>"+
-                        "<button type='button' class='btn btn-default kennel-explorer-next'>"+
-                        "Next <span class='glyphicon glyphicon-forward'></span></button>"+
-                    "</td><td style='width:25%'>"+
-                        "<button type='button' class='btn btn-default kennel-explorer-last'>"+
-                        "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
-                    "</td>"+
-                    "</tr></table>"+
-                    // Actual Trace data
-                    "<table style='width: 100%'"+
-                            "class='table table-condensed table-striped "+
-                                   "table-bordered table-hover kennel-explorer-table'>"+
-                        // Property Type Value
-                        "<tr>"+
-                            "<th>Property</th>"+
-                            "<th>Type</th>"+
-                            "<th>Value</th>"+
-                        "</tr>"+
-                    "</table>"+
+            "<div class='col-md-5 col-sm-5'>"+
+                "<div class='panel panel-default'>"+
+                    "<div class='panel-heading'>Console</div>"+
+                    "<div class='panel-body'>"+
+                        "<div class='kennel-console'></div>"+
+                    "</div>"+
+                "<div class='panel panel-default'>"+
+                    "<div class='panel-heading'>Explorer</div>"+
+                    "<div class='panel-body'>"+
+                    "<div class='kennel-explorer'>"+
+                        "<table><tr>"+
+                        // Step: X of Y (Line: Z)
+                        "<td colspan='4'>"+
+                            "<strong>Step: </strong>"+
+                            "<span class='kennel-explorer-step-span'>0</span> of "+
+                            "<span class='kennel-explorer-length-span'>0</span> "+
+                            "(<strong>Line: </strong>"+
+                            "<span class='kennel-explorer-line-span'>0</span>)"+
+                        "</td>"+
+                        "</tr><tr>"+
+                        // First Previous Next Last
+                        "<td style='width:25%'>"+
+                            "<button type='button' class='btn btn-default kennel-explorer-first'>"+
+                            "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
+                        "</td><td style='width:25%'>"+
+                            "<button type='button' class='btn btn-default kennel-explorer-back'>"+
+                            "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
+                        "</td><td style='width:25%'>"+
+                            "<button type='button' class='btn btn-default kennel-explorer-next'>"+
+                            "Next <span class='glyphicon glyphicon-forward'></span></button>"+
+                        "</td><td style='width:25%'>"+
+                            "<button type='button' class='btn btn-default kennel-explorer-last'>"+
+                            "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
+                        "</td>"+
+                        "</tr></table>"+
+                        // Actual Trace data
+                        "<table style='width: 100%'"+
+                                "class='table table-condensed table-striped "+
+                                       "table-bordered table-hover kennel-explorer-table'>"+
+                            // Property Type Value
+                            "<tr>"+
+                                "<th>Property</th>"+
+                                "<th>Type</th>"+
+                                "<th>Value</th>"+
+                            "</tr>"+
+                        "</table>"+
+                    "</div>"+
+                    "</div>"+
                 "</div>"+
             "</div>"+
         "</div>"+
     "</div>";
-    /*
-    "<div class='kennel-content row' style='height:100%'>"+
-        "<div class='col-md-12 col-sm-12 kennel-header'>"+
-            "<div class='row'>"+
-                "<div class='kennel-presentation col-md-12'>"+
-                    "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
-                "</div>"+
-            "</div>"+
-            "<div class='row'>"+
-                "<div class='kennel-toolbar col-md-12'>"+
-                    "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
-                    "<button class='btn btn-default kennel-run'>Run</button>"+
-                "</div>"+
-            "</div>"+
-        "</div>"+
-        "<div class='col-md-12 col-sm-12 row'>"+
-            "<div class='kennel-left col-md-7 col-sm-7'"+
-                "<div class='row'>"+
-                    "<div class='col-md-12 col-sm-12 kennel-blocks'"+
-                          "style='height:"+this.metrics_editor_height+"'>"+
-                          "<div class='blockly-div' style='position: absolute'></div>"+
-                          "<div class='blockly-area' style='height:100%'></div>"+
-                    "</div>"+
-                    "<div class='col-md-12 col-sm-12 kennel-text' style='height:"+this.metrics_editor_height+"'>"+
-                        "<textarea class='language-python'"+
-                                   "style='height:"+this.metrics_editor_height+
-                                   "'>import weather</textarea>"+
-                    "</div>"+
-                "</div>"+
-                "<div class='row'>"+
-                    "<div class='col-md-12 col-sm-12 kennel-console'>"+
-                        "Console"+
-                    "</div>"+
-                "</div>"+
-            "</div>"+
-            "<div class='kennel-explorer col-md-5 col-sm-5'>"+
-                "<table><tr>"+
-                // Step: X of Y (Line: Z)
-                "<td colspan='4'>"+
-                    "<strong>Step: </strong>"+
-                    "<span class='kennel-explorer-step-span'>0</span> of "+
-                    "<span class='kennel-explorer-length-span'>0</span> "+
-                    "(<strong>Line: </strong>"+
-                    "<span class='kennel-explorer-line-span'>0</span>)"+
-                "</td>"+
-                "</tr><tr>"+
-                // First Previous Next Last
-                "<td style='width:25%'>"+
-                    "<button type='button' class='btn btn-default kennel-explorer-first'>"+
-                    "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
-                "</td><td style='width:25%'>"+
-                    "<button type='button' class='btn btn-default kennel-explorer-back'>"+
-                    "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
-                "</td><td style='width:25%'>"+
-                    "<button type='button' class='btn btn-default kennel-explorer-next'>"+
-                    "Next <span class='glyphicon glyphicon-forward'></span></button>"+
-                "</td><td style='width:25%'>"+
-                    "<button type='button' class='btn btn-default kennel-explorer-last'>"+
-                    "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
-                "</td>"+
-                "</tr></table>"+
-                // Actual Trace data
-                "<table style='width: 100%'"+
-                        "class='table table-condensed table-striped "+
-                               "table-bordered table-hover kennel-explorer-table'>"+
-                    // Property Type Value
-                    "<tr>"+
-                        "<th>Property</th>"+
-                        "<th>Type</th>"+
-                        "<th>Value</th>"+
-                    "</tr>"+
-                "</table>"+
-            "</div>"+
-        "</div>"+
-    "</div>";*/
     this._mainDiv = $(this._attachmentPoint).html($(mainTabs))
     
     var kennel = this;
@@ -287,7 +222,6 @@ Kennel.prototype._loadBlockly = function(toolbox) {
             x += element.offsetLeft;
             y += element.offsetTop;
             element = element.offsetParent;
-            console.log("Resize!", x, y, "Next:", element, element === null ? false : element.style.position);
             element = null;
         } while (element);
         // Position blocklyDiv over blocklyArea.
@@ -362,15 +296,16 @@ Kennel.prototype._loadConsole = function() {
 }
 
 Kennel.prototype._loadExplorer = function() {
-    this._explorer = this._mainDiv.find('.kennel-explorer')[0];
+    this._explorer = this._mainDiv.find('.kennel-explorer');
+    var explorer = this._explorer;
     this._explorerPage = 0;
     this._explorerElementsFirst = explorer.find('.kennel-explorer-first');
     this._explorerElementsBack = explorer.find('.kennel-explorer-back');
     this._explorerElementsNext = explorer.find('.kennel-explorer-next');
     this._explorerElementsLast = explorer.find('.kennel-explorer-last');
-    this._explorerElementsStep = explorer.find('.kennel-explorer-step');
-    this._explorerElementsLength = explorer.find('.kennel-explorer-length');
-    this._explorerElementsLine = explorer.find('.kennel-explorer-line');
+    this._explorerElementsStep = explorer.find('.kennel-explorer-step-span');
+    this._explorerElementsLength = explorer.find('.kennel-explorer-length-span');
+    this._explorerElementsLine = explorer.find('.kennel-explorer-line-span');
     this._explorerElementsTable = explorer.find('.kennel-explorer-table');
 }
 
@@ -388,8 +323,7 @@ Kennel.prototype.reloadExplorer = function(page) {
     // Activate tracing in blockly
     this._blockly.traceOn(true);
     // Clear out any existing data
-    var explorer = $(this._explorer);
-    explorer.find("tr:gt(0)").remove();
+    this._explorerElementsTable.find("tr:gt(0)").remove();
     // Update the VCR Controls
     this._explorerElementsFirst.prop('disabled', page == 0);
     this._explorerElementsBack.prop('disabled', page == 0);
@@ -419,7 +353,7 @@ Kennel.prototype.reloadExplorer = function(page) {
     this._explorerElementsLength.html(last);
     // If we have data
     if (traceTable[page] === undefined) {
-        explorerElementsTable.append($("<tr><td colspan='3'>No data found at this step!</td></tr>"));
+        this._explorerElementsTable.append($("<tr><td colspan='3'>No data found at this step!</td></tr>"));
     } else {
         // Update header row
         var line = traceTable[page]['line'];
@@ -438,7 +372,7 @@ Kennel.prototype.reloadExplorer = function(page) {
         for (var property in traceTable[page]['properties']) {
             var value = traceTable[page]['properties'][property];
             var row = renderVisualizerRow(property, value);
-            explorerElementsTable.append(row);
+            this._explorerElementsTable.append(row);
         }
     }
 }
@@ -503,7 +437,83 @@ Kennel.prototype.resetConsole = function() {
 }
 
 Kennel.prototype.parseGlobals = function(variables) {
-    return {};
+    var result = Array();
+    for (var property in variables) {
+        var value = variables[property];
+        if (property !== "__name__") {
+            property = property.replace('_$rw$', '')
+                               .replace('_$rn$', '');
+            var parsed = this.parseValue(property, value);
+            if (parsed !== null) {
+                result.push(parsed);
+            }
+        }
+    }
+    return result;
+}
+
+Kennel.prototype.parseValue = function(property, value) {
+    switch (value.constructor) {
+        case Sk.builtin.func:
+            return {'name': property,
+                    'type': "Function",
+                    "value":  
+                        (value.func_code.co_varnames !== undefined ?
+                         " Arguments: "+value.func_code.co_varnames.join(", ") :
+                         ' No arguments')
+                    };
+        case Sk.builtin.module: return null;
+        case Sk.builtin.str:
+            return {'name': property,
+                'type': "String",
+                "value": value.$r().v
+            };
+        case Sk.builtin.none:
+            return {'name': property,
+                'type': "None",
+                "value": "None"
+            };
+        case Sk.builtin.bool:
+            return {'name': property,
+                'type': "Boolean",
+                "value": value.$r().v
+            };
+        case Sk.builtin.nmber:
+            return {'name': property,
+                'type': "int" == value.skType ? "Integer": "Float",
+                "value": value.$r().v
+            };
+        case Sk.builtin.list:
+            return {'name': property,
+                'type': "List",
+                "value": value.$r().v
+            };
+        case Sk.builtin.dict:
+            return {'name': property,
+                'type': "Dictionary",
+                "value": value.$r().v
+            };
+        case Number:
+            return {'name': property,
+                'type': value % 1 === 0 ? "Integer" : "Float",
+                "value": value
+            };
+        case String:
+            return {'name': property,
+                'type': "String",
+                "value": value
+            };
+        case Boolean:
+                return {'name': property,
+                    'type': "Boolean",
+                    "value": (value ? "True": "False")
+                };
+        default:
+            return {'name': property,
+                    'type': value.$r().v,
+                    "value": value.$r().v
+                    };
+    }
 }
 
 /*
@@ -559,7 +569,7 @@ Kennel.prototype.run = function() {
         console.log(e.stack);
         this.printError(e);
     }
-    this.refreshTraceTable();
+    this.reloadExplorer(-1);
 }
 
 Kennel.prototype.refreshTraceTable = function() {
