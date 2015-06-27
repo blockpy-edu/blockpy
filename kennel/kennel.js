@@ -46,6 +46,8 @@ function Kennel(attachmentPoint, toolbox, console) {
     this._mode = 'blocks';
 };
 
+Kennel.prototype._dirtyEditor = false;
+
 Kennel.prototype.getPythonFromBlocks = function() {
     return Blockly.Python.workspaceToCode(this._blockly);
 }
@@ -171,7 +173,7 @@ Kennel.prototype._loadMain = function() {
                             "<span class='glyphicon glyphicon-fast-backward'></span> First</button>"+
                         "</td><td style='width:25%'>"+
                             "<button type='button' class='btn btn-default kennel-explorer-back'>"+
-                            "<span class='glyphicon glyphicon-backward'></span> Previous</button>"+
+                            "<span class='glyphicon glyphicon-backward'></span> Back</button>"+
                         "</td><td style='width:25%'>"+
                             "<button type='button' class='btn btn-default kennel-explorer-next'>"+
                             "Next <span class='glyphicon glyphicon-forward'></span></button>"+
@@ -190,7 +192,8 @@ Kennel.prototype._loadMain = function() {
                                 "<th>Type</th>"+
                                 "<th>Value</th>"+
                             "</tr>"+
-                        "</table>"+
+                        "</table><br>"+
+                        "Loaded Modules: <i class='kennel-explorer-modules'>None</i>"+
                     "</div>"+
                     "</div>"+
                 "</div>"+
@@ -213,6 +216,9 @@ Kennel.prototype._loadBlockly = function(toolbox) {
                                   scrollbars: true, 
                                   toolbox: toolbox});
     var _kennel_instance = this;
+    this._blockly.addChangeListener(function() {
+        _kennel_instance._dirtyEditor = true;
+    });
     this._resetBlocklySize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
         var element = blocklyArea;
@@ -254,6 +260,10 @@ Kennel.prototype._loadText = function() {
                                                     "Shift-Tab": "indentLess"},
                                         //onKeyEvent: handleEdKeys
                                       });
+    var kennel = this;
+    this._text.on("change", function(cm, change) {
+        kennel._dirtyEditor = true;
+    });
     this._text.setSize(null, "100%");
     $(this._text.getWrapperElement()).hide();
 };
@@ -307,6 +317,7 @@ Kennel.prototype._loadExplorer = function() {
     this._explorerElementsLength = explorer.find('.kennel-explorer-length-span');
     this._explorerElementsLine = explorer.find('.kennel-explorer-line-span');
     this._explorerElementsTable = explorer.find('.kennel-explorer-table');
+    this._explorerElementsModules = explorer.find('.kennel-explorer-modules');
 }
 
 Kennel.prototype.reloadExplorer = function(page) {
@@ -349,8 +360,15 @@ Kennel.prototype.reloadExplorer = function(page) {
                                        kennel.reloadExplorer(last);
                                    });
     }
-    this._explorerElementsStep.html(page);
-    this._explorerElementsLength.html(last);
+    this._explorerElementsStep.html(page+1);
+    this._explorerElementsLength.html(last+1);
+    $(this._console).find('.kennel-console-output').each(function() {
+        if ($(this).attr("data-step")-1 <= page) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
     // If we have data
     if (traceTable[page] === undefined) {
         this._explorerElementsTable.append($("<tr><td colspan='3'>No data found at this step!</td></tr>"));
@@ -358,11 +376,13 @@ Kennel.prototype.reloadExplorer = function(page) {
         // Update header row
         var line = traceTable[page]['line'];
         this._explorerElementsLine.html(line);
+        this.highlightLine(line-1);
         // Highlight relevant block
         var block_id = traceTable[page]['block'];
         if (block_id) {
             this._blockly.highlightBlock(block_id);
         }
+        console.log(traceTable, page, block_id)
         function renderVisualizerRow(property, value) {
             return $("<tr/>").append($("<td/>").text(value['name']))
                              .append($("<td/>").text(value['type']))
@@ -374,7 +394,21 @@ Kennel.prototype.reloadExplorer = function(page) {
             var row = renderVisualizerRow(property, value);
             this._explorerElementsTable.append(row);
         }
+        if (traceTable[page]['modules'].length > 0) {
+            this._explorerElementsModules.html(traceTable[page]['modules'].join(', '));
+        } else {
+            this._explorerElementsModules.html("None");
+        }
     }
+}
+
+Kennel.prototype._previousLine = null;
+Kennel.prototype.highlightLine = function(line) {
+    if (this._previousLine !== null) {
+        this._text.removeLineClass(this._previousLine, 'text', 'editor-active-line');
+    }
+    this._text.addLineClass(line, 'text', 'editor-active-line');
+    this._previousLine = line;
 }
 
 /*
@@ -405,6 +439,7 @@ Kennel.prototype.print = function(text) {
     if (text !== "\n") {
         text = encodeHTML(text);
         text = $("<samp data-toggle='tooltip' data-placement='right' "+
+                     "class='kennel-console-output' data-step='"+this.step+"' "+
                      "title='Step "+this.step+", Line "+this.stepLineMap[this.step-1]+"'>"+
                 text+
                "</samp>");
@@ -422,14 +457,17 @@ Kennel.prototype.resetConsole = function() {
     this.stepLineMap = [];
     var kennel = this;
     Sk.afterSingleExecution = function(variables, lineNumber, 
-                                       columnNumber, filename) {
+                                       columnNumber, filename, astType, ast) {
+        console.log(astType);
         if (filename == '<stdin>.py') {
+            var globals = kennel.parseGlobals(variables);
             kennel.traceTable.push({'step': kennel.step, 
                                   'filename': filename,
                                   'block': highlightMap[lineNumber-1],
                                   'line': lineNumber,
                                   'column': columnNumber,
-                                  'properties': kennel.parseGlobals(variables)});
+                                  'properties': globals["properties"],
+                                  'modules': globals["modules"]});
             kennel.step += 1;
             kennel.stepLineMap.push(lineNumber);
         }
@@ -438,6 +476,7 @@ Kennel.prototype.resetConsole = function() {
 
 Kennel.prototype.parseGlobals = function(variables) {
     var result = Array();
+    var modules = Array();
     for (var property in variables) {
         var value = variables[property];
         if (property !== "__name__") {
@@ -446,10 +485,12 @@ Kennel.prototype.parseGlobals = function(variables) {
             var parsed = this.parseValue(property, value);
             if (parsed !== null) {
                 result.push(parsed);
+            } else if (value.constructor == Sk.builtin.module) {
+                modules.push(value.$d.__name__.v);
             }
         }
     }
-    return result;
+    return {"properties": result, "modules": modules};
 }
 
 Kennel.prototype.parseValue = function(property, value) {
@@ -550,6 +591,7 @@ Kennel.prototype.getHighlightMap = function() {
  * Runs the given python code, resetting the console and Trace Table.
  */
 Kennel.prototype.run = function() {
+    this._updateBlocks();
     var code = "";
     if (this._mode == 'blocks') {
         code = this.getPythonFromBlocks();
@@ -570,12 +612,6 @@ Kennel.prototype.run = function() {
         this.printError(e);
     }
     this.reloadExplorer(-1);
-}
-
-Kennel.prototype.refreshTraceTable = function() {
-    if (this.traceTable === undefined) {
-        return false;
-    }
 }
 
 Kennel.prototype.getXml = function() {

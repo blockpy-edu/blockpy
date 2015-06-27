@@ -17,7 +17,7 @@
 }
 
 .kennel-console {
-    height: 250px;
+    height: 200px;
     overflow: auto;
     border: 1px solid lightgray;
 }
@@ -38,4 +38,9 @@
 .row {
     margin-left: 0px;
     margin-right: 0px;
+}
+
+.editor-active-line {
+    background: #FBC4C4 !important;
+    color: #8a1f11 !important;
 }
