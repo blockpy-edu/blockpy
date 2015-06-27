@@ -3,6 +3,18 @@ corgis-blockly
 
 Synthesizing Blockly, Python Tutor, and Google Drive
 
+Commands
+--------
+
+Push changes to the subtrees' repos: 
+
+    > git subtree push --prefix=skulpt/ --squash skulpt master
+    > git subtree push --prefix=blockly/ --squash blockly master
+    
+Pull changes from upstream repos:
+
+    > git subtree pull --prefix=skulpt --squash skulpt_upstream master
+
 
 Blockly
 -------
