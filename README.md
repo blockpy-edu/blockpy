@@ -14,6 +14,7 @@ Push changes to the subtrees' repos:
 Pull changes from upstream repos:
 
     > git subtree pull --prefix=skulpt --squash skulpt_upstream master
+    > git subtree pull --prefix=blockly --squash blockly_upstream master
 
 
 Blockly

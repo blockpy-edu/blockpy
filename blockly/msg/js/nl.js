@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Terwijl een waarde onwaar is de
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Terwijl een waarde waar is de volgende opdrachten uitvoeren.";
 Blockly.Msg.DELETE_BLOCK = "Blok verwijderen";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 blokken verwijderen";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Blok uitschakelen";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicaat";
 Blockly.Msg.ENABLE_BLOCK = "Blok inschakelen";
@@ -83,10 +71,13 @@ Blockly.Msg.EXPAND_BLOCK = "Blok uitvouwen";
 Blockly.Msg.EXTERNAL_INPUTS = "Externe invoer";
 Blockly.Msg.HELP = "Hulp";
 Blockly.Msg.INLINE_INPUTS = "Inline invoer";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "maak een lege lijst";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Geeft een lijst terug met lengte 0, zonder items";
@@ -353,7 +344,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "lengte van %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Geeft het aantal tekens terug (inclusief spaties) in de opgegeven tekst.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";
 Blockly.Msg.TEXT_PRINT_TITLE = "tekst weergeven: %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Drukt de opgegeven tekst, getal of een andere waarde af.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Vraagt de gebruiker om een getal in te voeren.";
@@ -368,7 +358,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "spaties van de linkerkant verwijderen van
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "spaties van de rechterkant verwijderen van";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Geeft een kopie van de tekst met verwijderde spaties van één of beide kanten.";
 Blockly.Msg.TODAY = "Vandaag";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "item";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Maak \"verander %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";

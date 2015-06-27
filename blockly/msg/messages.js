@@ -29,7 +29,6 @@
  *
  * To convert all of the json files to .js files, run:
  * ../i18n/create_messages.py json/*.json
- * Windows users will want to replace the *.json with the target: e.g., en.json
  */
 'use strict';
 
@@ -52,7 +51,7 @@ goog.require('Blockly.Msg');
 /// default name - A simple, general default name for a variable, preferably short.
 /// For more context, see
 /// [[Translating:Blockly#infrequent_message_types]].\n{{Identical|Item}}
-Blockly.Msg.VARIABLES_DEFAULT_NAME = 'property_name';
+Blockly.Msg.VARIABLES_DEFAULT_NAME = 'item';
 /// button text - Botton that sets a calendar to today's date.\n{{Identical|Today}}
 Blockly.Msg.TODAY = 'Today';
 
@@ -64,9 +63,9 @@ Blockly.Msg.ADD_COMMENT = 'Add Comment';
 /// context menu - Remove the descriptive comment from the selected block.
 Blockly.Msg.REMOVE_COMMENT = 'Remove Comment';
 /// context menu - Change from 'external' to 'inline' mode for displaying blocks used as inputs to the selected block.  See [[Translating:Blockly#context_menus]].
-Blockly.Msg.EXTERNAL_INPUTS = 'Change to External Inputs';
+Blockly.Msg.EXTERNAL_INPUTS = 'External Inputs';
 /// context menu - Change from 'internal' to 'external' mode for displaying blocks used as inputs to the selected block.  See [[Translating:Blockly#context_menus]].
-Blockly.Msg.INLINE_INPUTS = 'Change to Inline Inputs';
+Blockly.Msg.INLINE_INPUTS = 'Inline Inputs';
 /// context menu - Permanently delete the selected block.
 Blockly.Msg.DELETE_BLOCK = 'Delete Block';
 /// context menu - Permanently delete the %1 selected blocks.\n\nParameters:\n* %1 - an integer greater than 1.
@@ -98,13 +97,13 @@ Blockly.Msg.ME = 'Me';
 /// prompt - This message is only seen in the Opera browser.  With most browsers, users can edit numeric values in blocks by just clicking and typing.  Opera does not allows this, so we have to open a new window and prompt users with this message to chanage a value.
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
 /// dropdown choice - When the user clicks on a variable block, this is one of the dropdown menu choices.  It is used to define a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
-Blockly.Msg.NEW_VARIABLE = 'New property...';
+Blockly.Msg.NEW_VARIABLE = 'New variable...';
 /// prompt - Prompts the user to enter the name for a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
-Blockly.Msg.NEW_VARIABLE_TITLE = 'New property name:';
+Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
 /// dropdown choice - When the user clicks on a variable block, this is one of the dropdown menu choices.  It is used to rename the current variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
-Blockly.Msg.RENAME_VARIABLE = 'Rename property...';
+Blockly.Msg.RENAME_VARIABLE = 'Rename variable...';
 /// prompt - Prompts the user to enter the new name for the selected variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].\n\nParameters:\n* %1 - the name of the variable to be renamed.
-Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" properties to:';
+Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
 
 // Colour Blocks.
 /// url - Information about colour.
@@ -265,16 +264,16 @@ Blockly.Msg.LOGIC_NEGATE_TOOLTIP = 'Returns true if the input is false. Returns 
 /// url - Information about the logic values ''true'' and ''false''.  Consider using the translation of [https://en.wikipedia.org/wiki/Truth_value https://en.wikipedia.org/wiki/Truth_value] if it exists in your language.
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = 'https://github.com/google/blockly/wiki/Logic#values';
 /// block text - The word for the [https://en.wikipedia.org/wiki/Truth_value logical value] ''true''.
-Blockly.Msg.LOGIC_BOOLEAN_TRUE = 'True';
+Blockly.Msg.LOGIC_BOOLEAN_TRUE = 'true';
 /// block text - The word for the [https://en.wikipedia.org/wiki/Truth_value logical value] ''false''.
-Blockly.Msg.LOGIC_BOOLEAN_FALSE = 'False';
+Blockly.Msg.LOGIC_BOOLEAN_FALSE = 'false';
 /// tooltip - Indicates that the block returns either of the two possible [https://en.wikipedia.org/wiki/Truth_value logical values].
 Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = 'Returns either true or false.';
 
 /// url - Provide a link to the translation of [https://en.wikipedia.org/wiki/Nullable_type https://en.wikipedia.org/wiki/Nullable_type], if it exists in your language; otherwise, do not worry about translating this advanced concept.
 Blockly.Msg.LOGIC_NULL_HELPURL = 'https://en.wikipedia.org/wiki/Nullable_type';
 /// block text - In computer languages, ''null'' is a special value that indicates that no value has been set.  You may use your language's word for "nothing" or "invalid".
-Blockly.Msg.LOGIC_NULL = 'None';
+Blockly.Msg.LOGIC_NULL = 'null';
 /// tooltip - This should use the word from the previous message.
 Blockly.Msg.LOGIC_NULL_TOOLTIP = 'Returns null.';
 
@@ -410,7 +409,7 @@ Blockly.Msg.MATH_CHANGE_HELPURL = 'https://en.wikipedia.org/wiki/Programming_idi
 Blockly.Msg.MATH_CHANGE_TITLE = 'change %1 by %2';
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 /// tooltip - This updates the value of the variable by adding to it the following numeric input.\n\nParameters:\n* %1 - the name of the variable whose value should be increased.
-Blockly.Msg.MATH_CHANGE_TOOLTIP = 'Add a number to property "%1".';
+Blockly.Msg.MATH_CHANGE_TOOLTIP = 'Add a number to variable "%1".';
 
 /// url - Information about how numbers are rounded to the nearest integer
 Blockly.Msg.MATH_ROUND_HELPURL = 'https://en.wikipedia.org/wiki/Rounding';
@@ -497,7 +496,7 @@ Blockly.Msg.TEXT_TEXT_TOOLTIP = 'A letter, word, or line of text.';
 /// url - Information on concatenating/appending pieces of text.
 Blockly.Msg.TEXT_JOIN_HELPURL = 'https://github.com/google/blockly/wiki/Text#text-creation';
 /// block text - See [https://github.com/google/blockly/wiki/Text#text-creation https://github.com/google/blockly/wiki/Text#text-creation].
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = 'join strings';
+Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = 'create text with';
 /// tooltip - See [https://github.com/google/blockly/wiki/Text#text-creation create text with] for more information.
 Blockly.Msg.TEXT_JOIN_TOOLTIP = 'Create a piece of text by joining together any number of items.';
 
@@ -983,47 +982,6 @@ Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = 'Split text into a list of texts, breaki
 /// https://github.com/google/blockly/wiki/Lists#make-text-from-list] for more information.
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = 'Join a list of texts into one text, separated by a delimiter.';
 
-/// TODO
-Blockly.Msg.LISTS_APPEND = 'append item';
-/// TODO
-Blockly.Msg.LISTS_APPEND_TO = 'to list';
-/// TODO
-Blockly.Msg.LISTS_APPEND_TOOLTIP = 'Append an element to a list';
-/// TODO
-Blockly.Msg.LISTS_APPEND_HELPURL = 'http://google.com'
-
-/// TODO
-Blockly.Msg.DICT_GET = 'get key';
-/// TODO
-Blockly.Msg.DICT_GET_TO = 'from dict';
-/// TODO
-Blockly.Msg.DICT_KEYS = 'get all keys from';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = 'Create Dictionary';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = 'key/value';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = 'create dict with';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = 'key';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ':';
-/// TODO
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = 'empty dictionary';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = '';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = '';
-/// TODO
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = '';
-
-/// TODO
-Blockly.Msg.TYPE_CHECK = 'type of';
-/// TODO
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = 'print';
-/// TODO 
-Blockly.Msg.TEXT_PRINT_TOOLTIP = '';
-
 /// grammar - Text that follows an ordinal number (a number that indicates
 /// position relative to other numbers).  In most languages, such text appears
 /// before the number, so this should be blank.  An exception is Hungarian.
@@ -1041,17 +999,8 @@ Blockly.Msg.VARIABLES_GET_CREATE_SET = 'Create "set %1"';
 
 /// url - Information about ''variables'' in computer programming.  Consider using your language's translation of [https://en.wikipedia.org/wiki/Variable_(computer_science) https://en.wikipedia.org/wiki/Variable_(computer_science)], if it exists.
 Blockly.Msg.VARIABLES_SET_HELPURL = 'https://github.com/google/blockly/wiki/Variables#set';
-<<<<<<< HEAD
-/// block text - The imperative or infinitive form of the verb "set", as in: '''set''' [the value of] x to 7.
-Blockly.Msg.VARIABLES_SET_TITLE = 'set';
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-/// block text - The word that goes after the name of the variable and before its new
-/// value in: set [the value of] x '''to''' 7.
-Blockly.Msg.VARIABLES_SET_TAIL = '=';
-=======
 /// block text - Change the value of a mathematical variable: '''set [the value of] x to 7'''.\n\nParameters:\n* %1 - the name of the variable.\n* %2 - the value to be assigned.
 Blockly.Msg.VARIABLES_SET = 'set %1 to %2';
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 /// tooltip - This initializes or changes the value of the named variable.
 Blockly.Msg.VARIABLES_SET_TOOLTIP = 'Sets this variable to be equal to the input.';
 /// context menu - Selecting this creates a block to get (change) the value of
@@ -1064,12 +1013,12 @@ Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = 'https://en.wikipedia.org/wiki/Proc
 /// block text - This precedes the name of the function when defining it.  See
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#c84aoc this sample
 /// function definition].
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = 'define';
+Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = 'to';
 /// default name - This acts as a placeholder for the name of a function on a
 /// function definition block, as shown on
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#w7cfju this block].
 /// The user will replace it with the function's name.
-Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = 'function_name';
+Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = 'do something';
 /// block text - This precedes the list of parameters on a function's defiition block.  See
 /// [https://blockly-demo.appspot.com/static/apps/code/index.html?lang=en#voztpd this sample
 /// function with parameters].
@@ -1123,16 +1072,16 @@ Blockly.Msg.PROCEDURES_CALLRETURN_TOOLTIP = 'Run the user-defined function "%1" 
 /// on the plus sign or star on a function definition block.  It refers to the set of parameters
 /// (referred to by the simpler term "inputs") to the function.  See
 /// [[Translating:Blockly#function_definitions]].
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = 'parameters';
+Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = 'inputs';
 /// tooltip
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = 'Add, remove, or reorder inputs to this function.';
 /// block text - This text appears on a block in a window that appears when the user clicks
 /// on the plus sign or star on a function definition block].  It appears on the block for
 /// adding an individual parameter (referred to by the simpler term "inputs") to the function.
 /// See [[Translating:Blockly#function_definitions]].
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = 'parameter name:';
+Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = 'input name:';
 /// tooltip
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = 'Add a parameter to the function.';
+Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = 'Add an input to the function.';
 
 /// context menu - This appears on the context menu for function calls.  Selecting
 /// it causes the corresponding function definition to be highlighted (as shown at

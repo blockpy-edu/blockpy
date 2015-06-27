@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "בזמן שהערך שווה ל
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "כל עוד הערך הוא אמת, לעשות כמה פעולות.";
 Blockly.Msg.DELETE_BLOCK = "מחק קטע קוד";
 Blockly.Msg.DELETE_X_BLOCKS = "מחק %1 קטעי קוד";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "נטרל קטע קוד";
 Blockly.Msg.DUPLICATE_BLOCK = "שכפל";
 Blockly.Msg.ENABLE_BLOCK = "הפעל קטע קוד";
@@ -83,10 +71,13 @@ Blockly.Msg.EXPAND_BLOCK = "הרחב קטע קוד";
 Blockly.Msg.EXTERNAL_INPUTS = "קלטים חיצוניים";
 Blockly.Msg.HELP = "עזרה";
 Blockly.Msg.INLINE_INPUTS = "קלטים פנימיים";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "צור רשימה ריקה";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "החזר רשימה,באורך 0, המכילה רשומות נתונים";
@@ -191,7 +182,11 @@ Blockly.Msg.LOGIC_TERNARY_IF_FALSE = "אם שגוי";
 Blockly.Msg.LOGIC_TERNARY_IF_TRUE = "אם נכון";
 Blockly.Msg.LOGIC_TERNARY_TOOLTIP = "בדוק את התנאי ב'מבחן'. אם התנאי נכון, תחזיר את הערך 'אם נכון'; אחרת תחזיר את הערך 'אם שגוי'.";
 Blockly.Msg.MATH_ADDITION_SYMBOL = "+";
+<<<<<<< HEAD
 Blockly.Msg.MATH_ARITHMETIC_HELPURL = "https://en.wikipedia.org/wiki/Arithmetic";  // untranslated
+=======
+Blockly.Msg.MATH_ARITHMETIC_HELPURL = "https://he.wikipedia.org/wiki/ארבע_פעולות_החשבון";
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_ADD = "תחזיר את סכום שני המספרים.";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE = "Return the quotient of the two numbers.";  // untranslated
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS = "Return the difference of the two numbers.";  // untranslated
@@ -353,7 +348,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "length of %1";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returns the number of letters (including spaces) in the provided text.";  // untranslated
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "הדפס %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "להדפיס טקסט, מספר או ערך אחר שצוין";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "בקש מהמשתמש מספר.";
@@ -368,7 +362,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "למחוק רווחים מימין";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "למחוק רווחים משמאל";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "להחזיר עותק של הטקסט לאחר מחיקת רווחים מאחד או משני הקצוות.";
 Blockly.Msg.TODAY = "היום";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "פריט";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "ליצור 'הגדר %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

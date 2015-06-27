@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "只要值为假，执行一些�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "只要值为真，执行一些语句。";
 Blockly.Msg.DELETE_BLOCK = "删除块";
 Blockly.Msg.DELETE_X_BLOCKS = "删除 %1 块";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "禁用块";
 Blockly.Msg.DUPLICATE_BLOCK = "复制";
 Blockly.Msg.ENABLE_BLOCK = "启用块";
@@ -83,10 +71,13 @@ Blockly.Msg.EXPAND_BLOCK = "展开块";
 Blockly.Msg.EXTERNAL_INPUTS = "外部输入";
 Blockly.Msg.HELP = "帮助";
 Blockly.Msg.INLINE_INPUTS = "单行输入";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "创建空列表";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "返回一个列表，长度为 0，不包含任何数据记录";
@@ -353,7 +344,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "%1的长度";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "返回文本的字符数（包括空格）。";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "打印%1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "打印指定的文字、数字或其他值。";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "提示用户输入数字。";
@@ -368,7 +358,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "消除左侧空格";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "消除右侧空格";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "复制这段文字的同时删除两端多余的空格。";
 Blockly.Msg.TODAY = "今天";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "项目";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "创建“设定%1”";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

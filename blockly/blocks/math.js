@@ -28,7 +28,9 @@ goog.provide('Blockly.Blocks.math');
 
 goog.require('Blockly.Blocks');
 
-
+/**
+ * Common HSV hue for all blocks in this category.
+ */
 var DATA_HUE = 100, LOGIC_HUE = 230;
 Blockly.Blocks.math.HUE = 270;
 
@@ -39,7 +41,7 @@ Blockly.Blocks['math_number'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.MATH_NUMBER_HELPURL);
-    this.setColour(DATA_HUE);
+    this.setColour(Blockly.Blocks.math.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
         Blockly.FieldTextInput.numberValidator), 'NUM');
@@ -58,7 +60,6 @@ Blockly.Blocks['math_arithmetic'] = {
         [[Blockly.Msg.MATH_ADDITION_SYMBOL, 'ADD'],
          [Blockly.Msg.MATH_SUBTRACTION_SYMBOL, 'MINUS'],
          [Blockly.Msg.MATH_MULTIPLICATION_SYMBOL, 'MULTIPLY'],
-         ['%', 'MODULO'],
          [Blockly.Msg.MATH_DIVISION_SYMBOL, 'DIVIDE'],
          [Blockly.Msg.MATH_POWER_SYMBOL, 'POWER']];
     this.setHelpUrl(Blockly.Msg.MATH_ARITHMETIC_HELPURL);
@@ -78,7 +79,6 @@ Blockly.Blocks['math_arithmetic'] = {
         'ADD': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_ADD,
         'MINUS': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS,
         'MULTIPLY': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY,
-        'MODULO': "Interpolation or remainder",
         'DIVIDE': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE,
         'POWER': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER
       };
@@ -198,7 +198,7 @@ Blockly.Blocks['math_number_property'] = {
          [Blockly.Msg.MATH_IS_POSITIVE, 'POSITIVE'],
          [Blockly.Msg.MATH_IS_NEGATIVE, 'NEGATIVE'],
          [Blockly.Msg.MATH_IS_DIVISIBLE_BY, 'DIVISIBLE_BY']];
-    this.setColour(LOGIC_HUE);
+    this.setColour(Blockly.Blocks.math.HUE);
     this.appendValueInput('NUMBER_TO_CHECK')
         .setCheck('Number');
     var dropdown = new Blockly.FieldDropdown(PROPERTIES, function(option) {

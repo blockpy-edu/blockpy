@@ -28,7 +28,9 @@ goog.provide('Blockly.Blocks.loops');
 
 goog.require('Blockly.Blocks');
 
-
+/**
+ * Common HSV hue for all blocks in this category.
+ */
 Blockly.Blocks.loops.HUE = 300;
 
 Blockly.Blocks['controls_repeat'] = {
@@ -139,6 +141,7 @@ Blockly.Blocks['controls_for'] = {
         {
           "type": "input_value",
           "name": "TO",
+          "check": "Number",
           "align": "RIGHT"
         },
         {

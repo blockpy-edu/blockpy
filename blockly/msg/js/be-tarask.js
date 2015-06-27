@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Пакуль значэньне
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Пакуль значэньне ісьціна, выконваць пэўныя апэрацыі.";
 Blockly.Msg.DELETE_BLOCK = "Выдаліць блёк";
 Blockly.Msg.DELETE_X_BLOCKS = "Выдаліць %1 блёкі";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Адключыць блёк";
 Blockly.Msg.DUPLICATE_BLOCK = "Капіяваць";
 Blockly.Msg.ENABLE_BLOCK = "Уключыць блёк";
@@ -83,10 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "Разгарнуць блёк";
 Blockly.Msg.EXTERNAL_INPUTS = "Зьнешнія ўваходы";
 Blockly.Msg.HELP = "Дапамога";
 Blockly.Msg.INLINE_INPUTS = "Унутраныя ўваходы";
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "стварыць пусты сьпіс";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Вяртае сьпіс даўжынёй 0, які ня ўтрымлівае запісаў зьвестак";
@@ -353,7 +337,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "даўжыня %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Вяртае колькасьць літараў (у тым ліку прабелы) у пададзеным тэксьце.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "друкаваць %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Надрукаваць пазначаны тэкст, лічбу ці іншыя сымбалі.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Запытаць у карыстальніка лічбу.";
@@ -368,7 +351,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "абрэзаць прабелы зь ле
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "абрэзаць прабелы з правага боку";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Вяртае копію тэксту з прабеламі, выдаленымі ад аднаго ці абодвух бакоў.";
 Blockly.Msg.TODAY = "Сёньня";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "аб’ект";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Стварыць блёк «усталяваць %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -376,10 +362,14 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Вяртае значэньне гэтай 
 Blockly.Msg.VARIABLES_SET = "усталяваць %1 да %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Стварыць блёк «атрымаць %1»";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Надаць гэтай зьменнай значэньне ўстаўкі.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLES_SET_TOOLTIP = "Надаць гэтай зьменнай значэньне ўстаўкі.";
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

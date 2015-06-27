@@ -49,8 +49,6 @@ Blockly.Python.addReservedWords(
     'and,as,assert,break,class,continue,def,del,elif,else,except,exec,finally,for,from,global,if,import,in,is,lambda,not,or,pass,print,raise,return,try,while,with,yield,' +
     //http://docs.python.org/library/constants.html
     'True,False,None,NotImplemented,Ellipsis,__debug__,quit,exit,copyright,license,credits,' +
-    // Reserved libraries
-    'crime,stocks,earthquakes,books,weather,plt,math,'+
     // http://docs.python.org/library/functions.html
     'abs,divmod,input,open,staticmethod,all,enumerate,int,ord,str,any,eval,isinstance,pow,sum,basestring,execfile,issubclass,print,super,bin,file,iter,property,tuple,bool,filter,len,range,type,bytearray,float,list,raw_input,unichr,callable,format,locals,reduce,unicode,chr,frozenset,long,reload,vars,classmethod,getattr,map,repr,xrange,cmp,globals,max,reversed,zip,compile,hasattr,memoryview,round,__import__,complex,hash,min,set,apply,delattr,help,next,setattr,buffer,dict,hex,object,slice,coerce,dir,id,oct,sorted,intern');
 
@@ -104,15 +102,13 @@ Blockly.Python.init = function(workspace) {
     Blockly.Python.variableDB_.reset();
   }
 
-  // Add initialization for variables
-  // Removed, because we shouldn't teach students to do this.
-  /*var defvars = [];
+  var defvars = [];
   var variables = Blockly.Variables.allVariables(workspace);
   for (var x = 0; x < variables.length; x++) {
     defvars[x] = Blockly.Python.variableDB_.getName(variables[x],
         Blockly.Variables.NAME_TYPE) + ' = None';
   }
-  Blockly.Python.definitions_['variables'] = defvars.join('\n');*/
+  Blockly.Python.definitions_['variables'] = defvars.join('\n');
 };
 
 /**

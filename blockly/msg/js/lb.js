@@ -63,30 +63,14 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "While a value is false, then do
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "While a value is true, then do some statements.";  // untranslated
 Blockly.Msg.DELETE_BLOCK = "Block läschen";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 Bléck läschen";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Block desaktivéieren";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplizéieren";
 Blockly.Msg.ENABLE_BLOCK = "Block aktivéieren";
 Blockly.Msg.EXPAND_ALL = "Bléck opklappen";
 Blockly.Msg.EXPAND_BLOCK = "Block opklappen";
-Blockly.Msg.EXTERNAL_INPUTS = "Change to External Inputs";  // untranslated
+Blockly.Msg.EXTERNAL_INPUTS = "External Inputs";  // untranslated
 Blockly.Msg.HELP = "Hëllef";
-Blockly.Msg.INLINE_INPUTS = "Change to Inline Inputs";  // untranslated
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+Blockly.Msg.INLINE_INPUTS = "Inline Inputs";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "create empty list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returns a list, of length 0, containing no data records";  // untranslated
@@ -199,7 +183,11 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY = "D'Produkt vun den zwou Zuelen zr
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "Return the first number raised to the power of the second number.";  // untranslated
 Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE = "änneren %1 ëm %2";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to property '%1'.";  // untranslated
+=======
+Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to variable '%1'.";  // untranslated
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";  // untranslated
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Return one of the common constants: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infinity).";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
@@ -289,7 +277,7 @@ Blockly.Msg.PROCEDURES_CREATE_DO = "Create '%1'";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_DO = "";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE = "eppes maachen";
-Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "define";  // untranslated
+Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE = "to";  // untranslated
 Blockly.Msg.PROCEDURES_DEFNORETURN_TOOLTIP = "Creates a function with no output.";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL = "https://en.wikipedia.org/wiki/Procedure_%28computer_science%29";  // untranslated
 Blockly.Msg.PROCEDURES_DEFRETURN_RETURN = "zréck";
@@ -298,9 +286,9 @@ Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING = "Warning: This function has dupli
 Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";  // untranslated
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "parameter name:";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "parameters";  // untranslated
+Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";  // untranslated
+Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";  // untranslated
+Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
 Blockly.Msg.REMOVE_COMMENT = "Bemierkunge ewechhuelen";
 Blockly.Msg.RENAME_VARIABLE = "Variabel ëmbenennen...";
@@ -346,15 +334,14 @@ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 ass eidel";
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Returns true if the provided text is empty.";  // untranslated
 Blockly.Msg.TEXT_JOIN_HELPURL = "https://github.com/google/blockly/wiki/Text#text-creation";  // untranslated
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "join strings";  // untranslated
+Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "create text with";  // untranslated
 Blockly.Msg.TEXT_JOIN_TOOLTIP = "Create a piece of text by joining together any number of items.";  // untranslated
 Blockly.Msg.TEXT_LENGTH_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TITLE = "Längt vu(n) %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returns the number of letters (including spaces) in the provided text.";  // untranslated
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "%1 drécken";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
-Blockly.Msg.TEXT_PRINT_TOOLTIP = "";  // untranslated
+Blockly.Msg.TEXT_PRINT_TOOLTIP = "Print the specified text, number or other value.";  // untranslated
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Prompt for user for a number.";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT = "Freet de Benotzer en Text.";
@@ -368,7 +355,10 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "trim spaces from left side of";  // untra
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "trim spaces from right side of";  // untranslated
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Return a copy of the text with spaces removed from one or both ends.";  // untranslated
 Blockly.Msg.TODAY = "Haut";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "Element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Create 'set %1'";  // untranslated
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -376,8 +366,11 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returns the value of this variable.";  // u
 Blockly.Msg.VARIABLES_SET = "set %1 to %2";  // untranslated
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Create 'get %1'";  // untranslated
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
+=======
+>>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
