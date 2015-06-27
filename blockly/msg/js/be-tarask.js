@@ -351,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "абрэзаць прабелы зь ле
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "абрэзаць прабелы з правага боку";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Вяртае копію тэксту з прабеламі, выдаленымі ад аднаго ці абодвух бакоў.";
 Blockly.Msg.TODAY = "Сёньня";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "аб’ект";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Стварыць блёк «усталяваць %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -362,14 +358,8 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Вяртае значэньне гэтай 
 Blockly.Msg.VARIABLES_SET = "усталяваць %1 да %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Стварыць блёк «атрымаць %1»";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-<<<<<<< HEAD
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Надаць гэтай зьменнай значэньне ўстаўкі.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLES_SET_TOOLTIP = "Надаць гэтай зьменнай значэньне ўстаўкі.";
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -379,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

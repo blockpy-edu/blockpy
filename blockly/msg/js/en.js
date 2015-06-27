@@ -147,11 +147,7 @@ Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "make text from list";
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = "Join a list of texts into one text, separated by a delimiter.";
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = "Split text into a list of texts, breaking at each delimiter.";
 Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "with delimiter";
-<<<<<<< HEAD
-Blockly.Msg.LOGIC_BOOLEAN_FALSE = "False";
-=======
 Blockly.Msg.LOGIC_BOOLEAN_FALSE = "false";
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = "https://github.com/google/blockly/wiki/Logic#values";
 Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = "Returns either true or false.";
 Blockly.Msg.LOGIC_BOOLEAN_TRUE = "true";
@@ -187,11 +183,7 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY = "Return the product of the two nu
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "Return the first number raised to the power of the second number.";
 Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";
 Blockly.Msg.MATH_CHANGE_TITLE = "change %1 by %2";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to property '%1'.";
-=======
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Add a number to variable '%1'.";
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Return one of the common constants: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infinity).";
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
@@ -366,11 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Returns the value of this variable.";
 Blockly.Msg.VARIABLES_SET = "set %1 to %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Create 'get %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";
-<<<<<<< HEAD
-Blockly.Msg.VARIABLES_SET_TAIL = "=";
-Blockly.Msg.VARIABLES_SET_TITLE = "set";
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -382,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

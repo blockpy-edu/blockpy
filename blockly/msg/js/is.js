@@ -71,13 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "Opna kubb";
 Blockly.Msg.EXTERNAL_INPUTS = "Ytri inntök";
 Blockly.Msg.HELP = "Hjálp";
 Blockly.Msg.INLINE_INPUTS = "Innri inntök";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "búa til tóman lista";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Skilar lista með lengdina 0 án gagna";
@@ -358,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "eyða bilum vinstra megin við";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "eyða bilum hægra megin við";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Skila afriti af textanum þar sem möguleg bil við báða enda hafa verið fjarlægð.";
 Blockly.Msg.TODAY = "Í dag";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "atriði";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Búa til 'stilla %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";
@@ -369,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Skilar gildi þessarar breytu.";
 Blockly.Msg.VARIABLES_SET = "stilla %1 á %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Búa til 'sækja %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Stillir þessa breytu á innihald inntaksins.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -382,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

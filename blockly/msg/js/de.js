@@ -35,7 +35,7 @@ Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "mit der nächsten Iter
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Die umgebende Schleife beenden.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Diese Anweisung abbrechen und mit der nächsten Schleifendurchlauf fortfahren.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "Warnung: Dieser Block sollte nur in einer Schleife verwendet werden.";
-Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each";  // untranslated
+Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://de.wikipedia.org/wiki/For-Schleife";
 Blockly.Msg.CONTROLS_FOREACH_TITLE = "Für Wert %1 aus der Liste %2";
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "Führe eine Anweisung für jeden Wert in der Liste aus und setzte dabei die Variable \"%1\" auf den aktuellen Listenwert.";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "https://de.wikipedia.org/wiki/For-Schleif";
@@ -71,13 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "Block entfalten";
 Blockly.Msg.EXTERNAL_INPUTS = "externe Eingänge";
 Blockly.Msg.HELP = "Hilfe";
 Blockly.Msg.INLINE_INPUTS = "interne Eingänge";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "Erzeuge eine leere Liste";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Erzeugt eine leere Liste ohne Inhalt.";
@@ -365,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Gibt den Wert der Variable zurück.";
 Blockly.Msg.VARIABLES_SET = "Schreibe %1 %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Erzeuge \"Lese %1\"";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://de.wikipedia.org/wiki/Variable_%28Programmierung%29";
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Setzt den Wert einer Variable.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -378,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

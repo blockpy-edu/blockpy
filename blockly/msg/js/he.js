@@ -71,13 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "הרחב קטע קוד";
 Blockly.Msg.EXTERNAL_INPUTS = "קלטים חיצוניים";
 Blockly.Msg.HELP = "עזרה";
 Blockly.Msg.INLINE_INPUTS = "קלטים פנימיים";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "צור רשימה ריקה";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "החזר רשימה,באורך 0, המכילה רשומות נתונים";
@@ -182,11 +175,7 @@ Blockly.Msg.LOGIC_TERNARY_IF_FALSE = "אם שגוי";
 Blockly.Msg.LOGIC_TERNARY_IF_TRUE = "אם נכון";
 Blockly.Msg.LOGIC_TERNARY_TOOLTIP = "בדוק את התנאי ב'מבחן'. אם התנאי נכון, תחזיר את הערך 'אם נכון'; אחרת תחזיר את הערך 'אם שגוי'.";
 Blockly.Msg.MATH_ADDITION_SYMBOL = "+";
-<<<<<<< HEAD
-Blockly.Msg.MATH_ARITHMETIC_HELPURL = "https://en.wikipedia.org/wiki/Arithmetic";  // untranslated
-=======
 Blockly.Msg.MATH_ARITHMETIC_HELPURL = "https://he.wikipedia.org/wiki/ארבע_פעולות_החשבון";
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_ADD = "תחזיר את סכום שני המספרים.";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE = "Return the quotient of the two numbers.";  // untranslated
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS = "Return the difference of the two numbers.";  // untranslated
@@ -341,7 +330,7 @@ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 is empty";  // untranslated
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Returns true if the provided text is empty.";  // untranslated
 Blockly.Msg.TEXT_JOIN_HELPURL = "https://github.com/google/blockly/wiki/Text#text-creation";  // untranslated
-Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "join strings";  // untranslated
+Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH = "create text with";  // untranslated
 Blockly.Msg.TEXT_JOIN_TOOLTIP = "Create a piece of text by joining together any number of items.";  // untranslated
 Blockly.Msg.TEXT_LENGTH_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
 Blockly.Msg.TEXT_LENGTH_TITLE = "length of %1";  // untranslated
@@ -362,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "למחוק רווחים מימין";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "למחוק רווחים משמאל";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "להחזיר עותק של הטקסט לאחר מחיקת רווחים מאחד או משני הקצוות.";
 Blockly.Msg.TODAY = "היום";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "פריט";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "ליצור 'הגדר %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -373,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "להחזיר את הערך של משתנה 
 Blockly.Msg.VARIABLES_SET = "הגדר %1 ל- %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "ליצור 'קרא %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "מגדיר משתנה זה להיות שווה לקלט.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -386,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

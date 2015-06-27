@@ -351,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "تراشیدن فاصله‌ها از  ط
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "تراشیدن فاصله‌ها از  طرف چپ";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "کپی از متن با فاصله‌های حذف‌شده از یک یا هر دو پایان باز می‌گرداند.";
 Blockly.Msg.TODAY = "امروز";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "مورد";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "درست‌کردن «تنظیم %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -362,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "مقدار این متغیر را بر می
 Blockly.Msg.VARIABLES_SET = "مجموعه %1 به %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "درست‌کردن «گرفتن %1»";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "متغیر برابر با خروجی را مشخص می‌کند.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -375,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

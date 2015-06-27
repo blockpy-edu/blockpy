@@ -63,21 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "ตราบเท่าที�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "ตราบเท่าที่ค่าเป็นจริง ก็จะทำบางคำสั่ง";
 Blockly.Msg.DELETE_BLOCK = "ลบบล็อก";
 Blockly.Msg.DELETE_X_BLOCKS = "ลบ %1 บล็อก";
-<<<<<<< HEAD
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.DISABLE_BLOCK = "ปิดใช้งานบล็อก";
 Blockly.Msg.DUPLICATE_BLOCK = "ทำซ้ำ";
 Blockly.Msg.ENABLE_BLOCK = "เปิดใช้งานบล็อก";
@@ -86,13 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "ขยายบล็อก";
 Blockly.Msg.EXTERNAL_INPUTS = "อินพุตภายนอก";
 Blockly.Msg.HELP = "ช่วยเหลือ";
 Blockly.Msg.INLINE_INPUTS = "อินพุตในบรรทัด";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "สร้างรายการเปล่า";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "สร้างรายการเปล่า (ความยาวเป็น 0) ยังไม่มีข้อมูลใดๆ อยู่";
@@ -373,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "ลบช่องว่างด้า�
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "ลบช่องว่างข้างท้ายของ";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "คืนค่าสำเนาของข้อความที่ลบเอาช่องว่างหน้าและหลังข้อความออกแล้ว";
 Blockly.Msg.TODAY = "วันนี้";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "รายการ";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "สร้าง \"กำหนด %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -384,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "คืนค่าของตัวแป�
 Blockly.Msg.VARIABLES_SET = "กำหนด %1 จนถึง %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "สร้าง \"get %1\"";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "กำหนดให้ตัวแปรนี้เท่ากับการป้อนข้อมูล";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -397,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

@@ -29,9 +29,6 @@ goog.provide('Blockly.Blocks.procedures');
 goog.require('Blockly.Blocks');
 
 
-/**
- * Common HSV hue for all blocks in this category.
- */
 Blockly.Blocks.procedures.HUE = 210;
 
 Blockly.Blocks['procedures_defnoreturn'] = {
@@ -470,6 +467,19 @@ Blockly.Blocks['procedures_callnoreturn'] = {
           .replace('%1', newName));
     }
   },
+    /**
+     * Notification that the procedure's return state has changed.
+     * @param {boolean} returnState New return state
+     * @this Blockly.Block
+     */
+    setReturn: function(returnState) {
+        this.setOutput(returnState);
+        this.previousStatement(!returnState);
+        this.nextStatement(!returnState);
+        if (this.rendered) {
+            this.render();
+        }
+    },
   /**
    * Notification that the procedure's parameters have changed.
    * @param {!Array.<string>} paramNames New param names, e.g. ['x', 'y', 'z'].
@@ -762,6 +772,67 @@ Blockly.Blocks['procedures_ifreturn'] = {
           .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
         this.hasReturnValue_ = true;
       }
+      this.setWarningText(null);
+    } else {
+      this.setWarningText(Blockly.Msg.PROCEDURES_IFRETURN_WARNING);
+    }
+  }
+};
+
+Blockly.Blocks['procedures_return'] = {
+  /**
+   * Block for returning a value from a procedure.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl('http://c2.com/cgi/wiki?GuardClause');
+    this.setColour(Blockly.Blocks.procedures.HUE);
+    this.appendValueInput('VALUE')
+        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+    this.setInputsInline(false);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP);
+    this.hasReturnValue_ = true;
+  },
+  /**
+   * Called whenever anything on the workspace changes.
+   * Add warning if this flow block is not nested inside a loop.
+   * @this Blockly.Block
+   */
+  onchange: function() {
+    if (!this.workspace) {
+      // Block has been deleted.
+      return;
+    }
+    var legal = false;
+    // Is the block nested in a procedure?
+    var block = this;
+    do {
+      if (block.type == 'procedures_defnoreturn' ||
+          block.type == 'procedures_defreturn') {
+        legal = true;
+        break;
+      }
+      block = block.getSurroundParent();
+    } while (block);
+    if (legal) {
+      // If needed, toggle whether this block has a return value.
+      /*
+      if (block.type == 'procedures_defnoreturn' && this.hasReturnValue_) {
+        this.removeInput('VALUE');
+        this.appendDummyInput('VALUE')
+            .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+        this.hasReturnValue_ = false;
+      } else if (block.type == 'procedures_defreturn' &&
+                 !this.hasReturnValue_) {
+        this.removeInput('VALUE');
+        this.appendValueInput('VALUE')
+            .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
+        this.hasReturnValue_ = true;
+      }*/
+      /*Blockly.Procedures.mutateCallersReturns(this.getFieldValue('NAME'),
+                                              this.workspace, true);*/
       this.setWarningText(null);
     } else {
       this.setWarningText(Blockly.Msg.PROCEDURES_IFRETURN_WARNING);

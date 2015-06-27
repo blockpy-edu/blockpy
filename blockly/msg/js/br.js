@@ -351,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "Lemel an esaouennoù eus an tu kleiz";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "Lemel an esaouennoù eus an tu dehou";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Distreiñ un eilenn eus an destenn gant an esaouennoù lamet eus un tu pe eus an daou du";
 Blockly.Msg.TODAY = "Hiziv";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "elfenn";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Krouiñ 'termenañ %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -362,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Distreiñ talvoud an argemm-mañ.";
 Blockly.Msg.VARIABLES_SET = "termenañ %1 da %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Krouiñ 'kaout %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Termenañ a ra argemm-mañ evit ma vo par da dalvoudenn ar moned.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -375,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

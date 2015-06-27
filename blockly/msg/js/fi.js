@@ -351,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "poistaa välilyönnit vasemmalta puolelta
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "poistaa välilyönnit oikealta puolelta";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Palauttaa kopion tekstistä siten, että välilyönnit on poistettu yhdestä tai molemmista päistä.";
 Blockly.Msg.TODAY = "Tänään";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "kohde";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Luo 'aseta %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -362,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "Palauttaa muuttujan arvon.";
 Blockly.Msg.VARIABLES_SET = "aseta %1 arvoksi %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Luo 'hae %1'";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Asettaa muutujan arvoksi annetun syötteen.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -375,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

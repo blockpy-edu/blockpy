@@ -71,13 +71,6 @@ Blockly.Msg.EXPAND_BLOCK = "展开块";
 Blockly.Msg.EXTERNAL_INPUTS = "外部输入";
 Blockly.Msg.HELP = "帮助";
 Blockly.Msg.INLINE_INPUTS = "单行输入";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "创建空列表";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "返回一个列表，长度为 0，不包含任何数据记录";
@@ -358,10 +351,6 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "消除左侧空格";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "消除右侧空格";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "复制这段文字的同时删除两端多余的空格。";
 Blockly.Msg.TODAY = "今天";
-<<<<<<< HEAD
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
->>>>>>> f64820a3f698608efa93148a952e887b143a5992
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "项目";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "创建“设定%1”";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -369,8 +358,6 @@ Blockly.Msg.VARIABLES_GET_TOOLTIP = "返回此变量的值。";
 Blockly.Msg.VARIABLES_SET = "赋值 %1 到 %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "创建“获得%1”";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
-Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
-Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "设置此变量，以使它和输入值相等。";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
@@ -382,7 +369,6 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_CALLRETURN_CALL = Blockly.Msg.PROCEDURES_CALLNORETURN_CALL;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
-Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

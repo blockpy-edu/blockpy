@@ -324,8 +324,6 @@
 	"VARIABLES_GET_TOOLTIP": "tooltip - This gets the value of the named variable without modifying it.",
 	"VARIABLES_GET_CREATE_SET": "context menu - Selecting this creates a block to set (change) the value of this variable. \n\nParameters:\n* %1 - the name of the variable.",
 	"VARIABLES_SET_HELPURL": "url - Information about ''variables'' in computer programming.  Consider using your language's translation of [https://en.wikipedia.org/wiki/Variable_(computer_science) https://en.wikipedia.org/wiki/Variable_(computer_science)], if it exists.",
-	"VARIABLES_SET_TITLE": "block text - The imperative or infinitive form of the verb 'set', as in: '''set''' [the value of] x to 7.",
-	"VARIABLES_SET_TAIL": "block text - The word that goes after the name of the variable and before its new value in: set [the value of] x '''to''' 7.",
 	"VARIABLES_SET": "block text - Change the value of a mathematical variable: '''set [the value of] x to 7'''.\n\nParameters:\n* %1 - the name of the variable.\n* %2 - the value to be assigned.",
 	"VARIABLES_SET_TOOLTIP": "tooltip - This initializes or changes the value of the named variable.",
 	"VARIABLES_SET_CREATE_GET": "context menu - Selecting this creates a block to get (change) the value of this variable.\n\nParameters:\n* %1 - the name of the variable.",
