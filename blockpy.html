@@ -113,10 +113,20 @@
                                 document.getElementById('toolbox'),
                                 document.getElementById("html-output"));
             kennel.changeMode();
-            kennel.setPythonFromText("i = 0\nfor j in range(1, 3):\n\talpha = 7\n\tbeta = 'Testing'\n\talpha = 'AlpHA'");
+            kennel.setPythonFromText($("#default-body").text());
           });
         </script>
-  
+<pre id='default-body'>
+import books
+
+
+total = 0
+print('Book List:')
+for a_book in books.get_all():
+    print(a_book['title'])
+    total = a_book['price'] + total
+print(total)
+</pre>
   
 <xml id="toolbox" style="display: none">
     <category name="Properties" custom="VARIABLE">

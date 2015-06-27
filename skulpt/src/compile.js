@@ -92,7 +92,7 @@ Compiler.prototype.getSourceLine = function (lineno) {
     return this.source[lineno - 1];
 };
 
-Compiler.prototype.annotateSource = function (ast) {
+Compiler.prototype.annotateSource = function (ast, shouldStep) {
     var i;
     var col_offset;
     var lineno;
@@ -104,18 +104,15 @@ Compiler.prototype.annotateSource = function (ast) {
             out(" ");
         }
         out("^\n//\n");
+        
+        //Sk.debugout(JSON.stringify(ast, null, 2));
+        //Sk.debugout(ast.constructor.name);
 
 		out("\nSk.currLineNo = ",lineno, ";\nSk.currColNo = ",col_offset,"\n\n");	//	Added by RNL
 		out("\nSk.currFilename = '",this.filename,"';\n\n");	//	Added by RNL
-        /*out("\
-print(Object.keys($gbl));\
-for (var i in $gbl) {\
-    print(i, $gbl[i].v, typeof $gbl[i], Object.keys($gbl[i]));\
-}\
-");*/
-        out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename);\n}\n");
-        //out("\ntry {\n\tSk.afterSingleExecution("+this.st.stss[2].name+");\n} catch (e) {\n\talert(e);\n}");
-        //out("\ntry {\n\tSk.afterSingleExecution("+this.st.stss[2].name+");\n} catch (e) {\n\talert(e);\n}");
+        if (shouldStep) {
+            out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename, '"+ast.constructor.name+"', "+JSON.stringify(ast)+");\n}\n");
+        }
     }
 };
 
@@ -664,7 +661,7 @@ Compiler.prototype.vexpr = function (e, data, augstoreval) {
         case Call:
             result = this.ccall(e);
             // After the function call, we've returned to this line
-            this.annotateSource(e);
+            this.annotateSource(e, false);
             return result;
         case Num:
             if (typeof e.n === "number") {
@@ -1042,7 +1039,7 @@ Compiler.prototype.cwhile = function (s) {
         orelse = s.orelse.length > 0 ? this.newBlock("while orelse") : null;
         body = this.newBlock("while body");
 
-        this.annotateSource(s);
+        this.annotateSource(s, true);
         this._jumpfalse(this.vexpr(s.test), orelse ? orelse : next);
         this._jump(body);
 
@@ -1850,7 +1847,7 @@ Compiler.prototype.vstmt = function (s) {
         this.u.doesSuspend = true;
     }
 
-    this.annotateSource(s);
+    this.annotateSource(s, true);
 
     switch (s.constructor) {
         case FunctionDef:
