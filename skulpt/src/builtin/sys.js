@@ -13,15 +13,24 @@ var $builtinmodule = function (name) {
     
     sys.version_info = Sk.builtin['tuple']([2, 7, 6, 'final', 0]);
 
+    sys.maxint = new Sk.builtin.int_(Math.pow(2,53)-1);
+
+    /*  The largest positive integer supported by the platform’s Py_ssize_t type,
+     *  and thus the maximum size lists, strings, dicts, and many other containers can have.
+     *
+     *  In skulpt this is the same as maxint, due to the underlying implementation in javascript
+     */
+    sys.maxsize = new Sk.builtin.int_(Math.pow(2,53)-1);
+
     sys.modules = Sk.sysmodules;
 
     sys.path = Sk.realsyspath;
 
     sys.getExecutionLimit = new Sk.builtin.func(function () {
         if (Sk.execLimit === null) {
-            return Sk.buildin.none.none$;
+            return Sk.builtin.none.none$;
         }
-        return Sk.builtin.assk$(Sk.execLimit, Sk.builtin.nmber.int$);
+        return new Sk.builtin.int_(Sk.execLimit);
     });
 
     sys.setExecutionLimit = new Sk.builtin.func(function (t) {
@@ -39,9 +48,9 @@ var $builtinmodule = function (name) {
 
     sys.getYieldLimit = new Sk.builtin.func(function () {
         if (Sk.yieldLimit === null) {
-            return Sk.buildin.none.none$;
+            return Sk.builtin.none.none$;
         }
-        return Sk.builtin.assk$(Sk.yieldLimit, Sk.builtin.nmber.int$);
+        return new Sk.builtin.int_(Sk.yieldLimit);
     });
 
     sys.setYieldLimit = new Sk.builtin.func(function (t) {

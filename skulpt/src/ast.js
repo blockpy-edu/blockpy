@@ -14,9 +14,10 @@ var COMP_GENEXP = 0;
 var COMP_SETCOMP = 1;
 
 /** @constructor */
-function Compiling (encoding, filename) {
+function Compiling (encoding, filename, c_flags) {
     this.c_encoding = encoding;
     this.c_filename = filename;
+    this.c_flags = c_flags || 0;
 }
 
 /**
@@ -1716,6 +1717,12 @@ function parsestr (c, s) {
     var rawmode = false;
     var unicode = false;
 
+    // treats every sequence as unicodes even if they are not treated with uU prefix
+    // kinda hacking though working for most purposes
+    if((c.c_flags & Parser.CO_FUTURE_UNICODE_LITERALS || Sk.python3 === true)) {
+        unicode = true;
+    }
+
     if (quote === "u" || quote === "U") {
         s = s.substr(1);
         quote = s.charAt(0);
@@ -1766,9 +1773,9 @@ function parsenumber (c, s, lineno) {
     var tmp;
     var end = s.charAt(s.length - 1);
 
-    // todo; no complex support
+    // call internal complex type constructor for complex strings
     if (end === "j" || end === "J") {
-        throw new Sk.builtin.SyntaxError("complex numbers are currently unsupported", c.c_filename, lineno);
+        return Sk.builtin.complex.complex_subtype_from_string(s);
     }
 
     // Handle longs
@@ -1779,7 +1786,7 @@ function parsenumber (c, s, lineno) {
     // todo; we don't currently distinguish between int and float so
     // str is wrong for these.
     if (s.indexOf(".") !== -1) {
-        return new Sk.builtin.nmber(parseFloat(s), Sk.builtin.nmber.float$);
+        return new Sk.builtin.float_(parseFloat(s));
     }
 
     // Handle integers of various bases
@@ -1796,7 +1803,7 @@ function parsenumber (c, s, lineno) {
         val = parseInt(tmp, 16);
     } else if ((s.indexOf("e") !== -1) || (s.indexOf("E") !== -1)) {
         // Float with exponent (needed to make sure e/E wasn't hex first)
-        return new Sk.builtin.nmber(parseFloat(s), Sk.builtin.nmber.float$);
+        return new Sk.builtin.float_(parseFloat(s));
     } else if (tmp.charAt(0) === "0" && (tmp.charAt(1) === "b" || tmp.charAt(1) === "B")) {
         // Binary
         tmp = tmp.substring(2);
@@ -1820,7 +1827,7 @@ function parsenumber (c, s, lineno) {
     }
 
     // Convert to long
-    if (val > Sk.builtin.nmber.threshold$ &&
+    if (val > Sk.builtin.int_.threshold$ &&
         Math.floor(val) === val &&
         (s.indexOf("e") === -1 && s.indexOf("E") === -1)) {
         return Sk.longFromStr(s, 0);
@@ -1828,9 +1835,9 @@ function parsenumber (c, s, lineno) {
 
     // Small enough, return parsed number
     if (neg) {
-        return new Sk.builtin.nmber(-val, Sk.builtin.int$);
+        return new Sk.builtin.int_(-val);
     } else {
-        return new Sk.builtin.nmber(val, Sk.builtin.int$);
+        return new Sk.builtin.int_(val);
     }
 }
 
@@ -2217,12 +2224,12 @@ function astForStmt (c, n) {
     }
 }
 
-Sk.astFromParse = function (n, filename) {
+Sk.astFromParse = function (n, filename, c_flags) {
     var j;
     var num;
     var ch;
     var i;
-    var c = new Compiling("utf-8", filename);
+    var c = new Compiling("utf-8", filename, c_flags);
     var stmts = [];
     var k = 0;
     switch (n.type) {

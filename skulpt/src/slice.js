@@ -5,13 +5,16 @@
  * @param {Object=} step
  */
 Sk.builtin.slice = function slice (start, stop, step) {
-    if (Sk.builtin.asnum$(step) === 0) {
+    Sk.builtin.pyCheckArgs("slice", arguments, 1, 3, false, false);
+
+    if ((step !== undefined) && Sk.misceval.isIndex(step) && (Sk.misceval.asIndex(step) === 0)) {
         throw new Sk.builtin.ValueError("slice step cannot be zero");
     }
 
     if (!(this instanceof Sk.builtin.slice)) {
         return new Sk.builtin.slice(start, stop, step);
     }
+
 
     if (stop === undefined && step === undefined) {
         stop = start;
@@ -36,8 +39,7 @@ Sk.builtin.slice = function slice (start, stop, step) {
     return this;
 };
 
-Sk.builtin.slice.prototype.tp$name = "slice";
-Sk.builtin.slice.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj("slice", Sk.builtin.slice);
+Sk.abstr.setUpInheritance("slice", Sk.builtin.slice, Sk.builtin.object);
 
 Sk.builtin.slice.prototype["$r"] = function () {
     var a = Sk.builtin.repr(this.start).v;
@@ -45,8 +47,6 @@ Sk.builtin.slice.prototype["$r"] = function () {
     var c = Sk.builtin.repr(this.step).v;
     return new Sk.builtin.str("slice(" + a + ", " + b + ", " + c + ")");
 };
-
-Sk.builtin.slice.prototype.tp$getattr = Sk.builtin.object.prototype.GenericGetAttr;
 
 Sk.builtin.slice.prototype.tp$richcompare = function (w, op) {
     // w not a slice
@@ -71,22 +71,34 @@ Sk.builtin.slice.prototype.tp$richcompare = function (w, op) {
     return t1.tp$richcompare(t2, op);
 };
 
-Sk.builtin.slice.prototype.indices = function (length) {
+/* Internal indices function */
+Sk.builtin.slice.prototype.slice_indices_ = function (length) {
     var start, stop, step;
-    if ((!Sk.builtin.checkInt(this.start) &&
-        !Sk.builtin.checkNone(this.start)) ||
-        (!Sk.builtin.checkInt(this.stop) &&
-            !Sk.builtin.checkNone(this.stop)) ||
-        (!Sk.builtin.checkInt(this.step) &&
-            !Sk.builtin.checkNone(this.step))) {
+
+    if (Sk.builtin.checkNone(this.start)) {
+        start = null;
+    } else if (Sk.misceval.isIndex(this.start)) {
+        start = Sk.misceval.asIndex(this.start);
+    } else {
         throw new Sk.builtin.TypeError("slice indices must be integers or None");
     }
 
-    start = Sk.builtin.asnum$(this.start);
-    stop = Sk.builtin.asnum$(this.stop);
-    step = Sk.builtin.asnum$(this.step);
+    if (Sk.builtin.checkNone(this.stop)) {
+        stop = null;
+    } else if (Sk.misceval.isIndex(this.stop)) {
+        stop = Sk.misceval.asIndex(this.stop);
+    } else {
+        throw new Sk.builtin.TypeError("slice indices must be integers or None");
+    }
 
-    length = Sk.builtin.asnum$(length);
+    if (Sk.builtin.checkNone(this.step)) {
+        step = null;
+    } else if (Sk.misceval.isIndex(this.step)) {
+        step = Sk.misceval.asIndex(this.step);
+    } else {
+        throw new Sk.builtin.TypeError("slice indices must be integers or None");
+    }
+
     // this seems ugly, better way?
     if (step === null) {
         step = 1;
@@ -110,8 +122,7 @@ Sk.builtin.slice.prototype.indices = function (length) {
         if (stop < 0) {
             stop = length + stop;
         }
-    }
-    else {
+    } else {
         if (start === null) {
             start = length - 1;
         }
@@ -130,21 +141,32 @@ Sk.builtin.slice.prototype.indices = function (length) {
             start = length + start;
         }
     }
+
     return [start, stop, step];
 };
+
+Sk.builtin.slice.prototype["indices"] = new Sk.builtin.func(function (self, length) {
+    Sk.builtin.pyCheckArgs("indices", arguments, 2, 2, false, false);
+
+    length = Sk.builtin.asnum$(length);
+    var sss = self.slice_indices_(length);
+
+    return new Sk.builtin.tuple([new Sk.builtin.int_(sss[0]), 
+                                 new Sk.builtin.int_(sss[1]), 
+                                 new Sk.builtin.int_(sss[2])]);
+});
 
 Sk.builtin.slice.prototype.sssiter$ = function (wrt, f) {
     var i;
     var wrtv = Sk.builtin.asnum$(wrt);
-    var sss = this.indices(typeof wrtv === "number" ? wrtv : wrt.v.length);
+    var sss = this.slice_indices_(typeof wrtv === "number" ? wrtv : wrt.v.length);
     if (sss[2] > 0) {
         for (i = sss[0]; i < sss[1]; i += sss[2]) {
             if (f(i, wrtv) === false) {
                 return;
             }
         }	//	wrt or wrtv? RNL
-    }
-    else {
+    } else {
         for (i = sss[0]; i > sss[1]; i += sss[2]) {
             if (f(i, wrtv) === false) {
                 return;
