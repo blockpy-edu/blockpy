@@ -36,8 +36,7 @@ Blockly.Blocks['dict_get'] = {
   // Set element at index.
   init: function() {
     this.setColour(Blockly.Blocks.dicts.HUE);
-    this.appendValueInput('ITEM')
-        .appendField(Blockly.Msg.DICT_GET);
+    this.appendValueInput('ITEM');
     this.appendValueInput('DICT')
         .setCheck('dict')
         .appendField(Blockly.Msg.DICT_GET_TO);
@@ -53,7 +52,7 @@ Blockly.Blocks['dict_get_literal'] = {
   init: function() {
     this.setColour(Blockly.Blocks.dicts.HUE);   
     this.appendValueInput('DICT')
-        .appendField('get') // TODO: fix this to be outside
+        //.appendField('get') // TODO: fix this to be outside
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(
                      Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY),

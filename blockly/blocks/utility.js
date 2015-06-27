@@ -184,12 +184,12 @@ Blockly.Blocks['text_print_multiple'] = {
         // Rebuild block.
         if (this.itemCount_ == 0) {
             this.appendDummyInput('EMPTY')
-                .appendField(Blockly.Msg.TEXT_PRINT_TITLE_PRINT);
+                .appendField("print");
         } else {
             for (var i = 0; i < this.itemCount_; i++) {
                 var input = this.appendValueInput('PRINT' + i);
                 if (i == 0) {
-                    input.appendField(Blockly.Msg.TEXT_PRINT_TITLE_PRINT);
+                    input.appendField("print");
                 }
             }
         }

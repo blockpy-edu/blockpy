@@ -261,7 +261,7 @@ Blockly.WorkspaceSvg.prototype.translate = function(x, y) {
 /**
  * Align the blocks in the workspace vertically.
  */
-Blockly.Workspace.prototype.align = function() {
+Blockly.WorkspaceSvg.prototype.align = function() {
     var blocks = this.getTopBlocks(false);
     var y = 0;
     for (var i = 0; i < blocks.length; i++){
@@ -599,6 +599,16 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     };
     menuOptions.push(expandOption);
   }
+  
+  // Option to align the blocks
+  // Option to expand top blocks.
+  var alignOption = {enabled: true};
+  alignOption.text = "Align Blocks";
+  var _instance = this;
+  alignOption.callback = function() {
+    _instance.align();
+  };
+  menuOptions.push(alignOption);
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };
