@@ -32,7 +32,7 @@ goog.require('Blockly.Python');
 Blockly.Python['procedures_defreturn'] = function(block) {
   // Define a procedure with a return value.
   // First, add a 'global' statement for every variable that is assigned.
-  var globals = []; //Blockly.Variables.allVariables(block);
+  var globals = Blockly.Variables.allVariables(block);
   for (var i = globals.length - 1; i >= 0; i--) {
     var varName = globals[i];
     if (block.arguments_.indexOf(varName) == -1) {
@@ -121,18 +121,3 @@ Blockly.Python['procedures_ifreturn'] = function(block) {
   }
   return code;
 };
-
-
-Blockly.Python['procedures_return'] = function(block) {
-  // return value from a procedure.
-  var code = "return";
-  if (block.hasReturnValue_) {
-    var value = Blockly.Python.valueToCode(block, 'VALUE',
-        Blockly.Python.ORDER_NONE) || 'None';
-    code += ' ' + value + '\n';
-  } else {
-    code += '\n';
-  }
-  return code;
-};
-

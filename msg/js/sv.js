@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Medan ett värde är falskt, ut
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Medan ett värde är sant, utför några kommandon.";
 Blockly.Msg.DELETE_BLOCK = "Radera block";
 Blockly.Msg.DELETE_X_BLOCKS = "Radera %1 block";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Inaktivera block";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicera";
 Blockly.Msg.ENABLE_BLOCK = "Aktivera block";
@@ -83,15 +71,7 @@ Blockly.Msg.EXPAND_BLOCK = "Fäll ut block";
 Blockly.Msg.EXTERNAL_INPUTS = "Externa inmatningar";
 Blockly.Msg.HELP = "Hjälp";
 Blockly.Msg.INLINE_INPUTS = "Radinmatning";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "skapa tom lista";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Ger tillbaka en lista utan någon data, alltså med längden 0";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "lista";
@@ -206,7 +186,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "ändra %1 med %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Lägg till ett tal till variabeln '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://sv.wikipedia.org/wiki/Matematisk_konstant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Returnerar en av de vanliga konstanterna: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…) eller ∞ (oändligt).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "begränsa %1 till mellan %2 och %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Begränsa ett tal till att mellan de angivna gränsvärden (inklusive).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -357,7 +337,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "längden på %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Ger tillbaka antalet bokstäver (inklusive mellanslag) i den angivna texten.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "skriv %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Skriv den angivna texten, talet eller annat värde.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Fråga användaren efter ett tal.";
@@ -371,12 +350,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "ta bort mellanrum från båda sidorna av"
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "ta bort mellanrum från vänstra sidan av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "ta bort mellanrum från högra sidan av";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Returnerar en kopia av texten med borttagna mellanrum från en eller båda ändar.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Idag";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "föremål";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Skapa \"välj %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

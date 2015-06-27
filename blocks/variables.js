@@ -29,14 +29,10 @@ goog.provide('Blockly.Blocks.variables');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
-Blockly.Blocks.variables.HUE = 240;
-=======
 /**
  * Common HSV hue for all blocks in this category.
  */
 Blockly.Blocks.variables.HUE = 330;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['variables_get'] = {
   /**
@@ -98,23 +94,6 @@ Blockly.Blocks['variables_set'] = {
    * @this Blockly.Block
    */
   init: function() {
-<<<<<<< HEAD
-    this.setHelpUrl(Blockly.Msg.VARIABLES_SET_HELPURL);
-    this.setColour(Blockly.Blocks.variables.HUE);
-    this.interpolateMsg(
-        // TODO: Combine these messages instead of using concatenation.
-        Blockly.Msg.VARIABLES_SET_TITLE + ' %1 ' +
-        Blockly.Msg.VARIABLES_SET_TAIL + ' %2',
-        ['VAR', new Blockly.FieldVariable(Blockly.Msg.VARIABLES_SET_ITEM)],
-        ['VALUE', null, Blockly.ALIGN_RIGHT],
-        Blockly.ALIGN_RIGHT);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setInputsInline(false);
-    this.setTooltip(Blockly.Msg.VARIABLES_SET_TOOLTIP);
-    this.contextMenuMsg_ = Blockly.Msg.VARIABLES_SET_CREATE_GET;
-    this.contextMenuType_ = 'variables_get';
-=======
     this.jsonInit({
       "message": Blockly.Msg.VARIABLES_SET,
       "args": [
@@ -134,7 +113,6 @@ Blockly.Blocks['variables_set'] = {
       "tooltip": Blockly.Msg.VARIABLES_SET_TOOLTIP,
       "helpUrl": Blockly.Msg.VARIABLES_SET_HELPURL
     });
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
   },
   /**
    * Return all variables referenced by this block.

@@ -29,15 +29,10 @@ goog.provide('Blockly.Blocks.math');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
-var DATA_HUE = 100, LOGIC_HUE = 230;
-Blockly.Blocks.math.HUE = 270;
-=======
 /**
  * Common HSV hue for all blocks in this category.
  */
 Blockly.Blocks.math.HUE = 230;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['math_number'] = {
   /**
@@ -46,7 +41,7 @@ Blockly.Blocks['math_number'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.MATH_NUMBER_HELPURL);
-    this.setColour(DATA_HUE);
+    this.setColour(Blockly.Blocks.math.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
         Blockly.FieldTextInput.numberValidator), 'NUM');
@@ -65,7 +60,6 @@ Blockly.Blocks['math_arithmetic'] = {
         [[Blockly.Msg.MATH_ADDITION_SYMBOL, 'ADD'],
          [Blockly.Msg.MATH_SUBTRACTION_SYMBOL, 'MINUS'],
          [Blockly.Msg.MATH_MULTIPLICATION_SYMBOL, 'MULTIPLY'],
-         ['%', 'MODULO'],
          [Blockly.Msg.MATH_DIVISION_SYMBOL, 'DIVIDE'],
          [Blockly.Msg.MATH_POWER_SYMBOL, 'POWER']];
     this.setHelpUrl(Blockly.Msg.MATH_ARITHMETIC_HELPURL);
@@ -85,7 +79,6 @@ Blockly.Blocks['math_arithmetic'] = {
         'ADD': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_ADD,
         'MINUS': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS,
         'MULTIPLY': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY,
-        'MODULO': "Interpolation or remainder",
         'DIVIDE': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE,
         'POWER': Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER
       };
@@ -205,7 +198,7 @@ Blockly.Blocks['math_number_property'] = {
          [Blockly.Msg.MATH_IS_POSITIVE, 'POSITIVE'],
          [Blockly.Msg.MATH_IS_NEGATIVE, 'NEGATIVE'],
          [Blockly.Msg.MATH_IS_DIVISIBLE_BY, 'DIVISIBLE_BY']];
-    this.setColour(LOGIC_HUE);
+    this.setColour(Blockly.Blocks.math.HUE);
     this.appendValueInput('NUMBER_TO_CHECK')
         .setCheck('Number');
     var dropdown = new Blockly.FieldDropdown(PROPERTIES, function(option) {
@@ -264,20 +257,6 @@ Blockly.Blocks['math_change'] = {
    * @this Blockly.Block
    */
   init: function() {
-<<<<<<< HEAD
-    this.setHelpUrl(Blockly.Msg.MATH_CHANGE_HELPURL);
-    this.setColour(240);
-    this.interpolateMsg(
-        // TODO: Combine these messages instead of using concatenation.
-        Blockly.Msg.MATH_CHANGE_TITLE_CHANGE + ' %1 ' +
-        Blockly.Msg.MATH_CHANGE_INPUT_BY + ' %2',
-        ['VAR', new Blockly.FieldVariable(Blockly.Msg.MATH_CHANGE_TITLE_ITEM)],
-        ['DELTA', 'Number', Blockly.ALIGN_RIGHT],
-        Blockly.ALIGN_RIGHT);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setInputsInline(true);
-=======
     this.jsonInit({
       "message": Blockly.Msg.MATH_CHANGE_TITLE,
       "args": [
@@ -298,7 +277,6 @@ Blockly.Blocks['math_change'] = {
       "colour": Blockly.Blocks.math.HUE,
       "helpUrl": Blockly.Msg.MATH_CHANGE_HELPURL
     });
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     this.setTooltip(function() {

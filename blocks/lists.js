@@ -29,14 +29,10 @@ goog.provide('Blockly.Blocks.lists');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
-Blockly.Blocks.lists.HUE = 100;
-=======
 /**
  * Common HSV hue for all blocks in this category.
  */
 Blockly.Blocks.lists.HUE = 260;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['lists_create_empty'] = {
   /**
@@ -681,22 +677,5 @@ Blockly.Blocks['lists_split'] = {
       }
       throw 'Unknown mode: ' + mode;
     });
-  }
-};
-
-Blockly.Blocks['lists_append'] = {
-  // Set element at index.
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.LISTS_APPEND_HELPURL);
-    this.setColour(Blockly.Blocks.lists.HUE);
-    this.appendValueInput('ITEM')
-        .appendField(Blockly.Msg.LISTS_APPEND);
-    this.appendValueInput('LIST')
-        .setCheck('Array')
-        .appendField(Blockly.Msg.LISTS_APPEND_TO);
-    this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    //this.setTooltip(Blockly.Msg.LISTS_APPEND_TOOLTIP);
   }
 };

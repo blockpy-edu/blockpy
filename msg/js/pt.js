@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Enquanto um valor for falso, en
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Enquanto um valor for verdadeiro, então faça algumas instruções.";
 Blockly.Msg.DELETE_BLOCK = "Remover Bloco";
 Blockly.Msg.DELETE_X_BLOCKS = "Remover %1 Blocos";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Desabilitar Bloco";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicar";
 Blockly.Msg.ENABLE_BLOCK = "Habilitar Bloco";
@@ -83,15 +71,7 @@ Blockly.Msg.EXPAND_BLOCK = "Expandir Bloco";
 Blockly.Msg.EXTERNAL_INPUTS = "Entradas externas";
 Blockly.Msg.HELP = "Ajuda";
 Blockly.Msg.INLINE_INPUTS = "Entradas Internas";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "http://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "criar lista vazia";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Retorna uma lista, de tamanho 0, contendo nenhum registo";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "lista";
@@ -206,7 +186,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "alterar %1 por %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Soma um número à variável \"%1\".";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "http://pt.wikipedia.org/wiki/Anexo:Lista_de_constantes_matem%C3%A1ticas";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Retorna uma das constantes comuns: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), ou ∞ (infinito).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "http://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "restringe %1 inferior %2 superior %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Restringe um número entre os limites especificados (inclusive).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -357,7 +337,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "tamanho de %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Devolve o número de letras (incluindo espaços) do texto fornecido.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "imprime %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Imprime o texto, número ou outro valor especificado.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Pede ao utilizador um número.";
@@ -371,12 +350,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "remover espaços de ambos os lados";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "remover espaços à esquerda de";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "remover espaços à direita";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Retorna uma cópia do texto com os espaços removidos de uma ou ambas as extremidades.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "Hoje";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "item";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Criar \"definir %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

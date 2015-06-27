@@ -63,18 +63,6 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Så lenge et utsagn ikke stemme
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Så lenge et utsagn stemmer, utfør noen instruksjoner.";
 Blockly.Msg.DELETE_BLOCK = "Slett blokk";
 Blockly.Msg.DELETE_X_BLOCKS = "Slett %1 blokk(er)";
-Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_INPUT_WITH = "create dict with";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_KEY = "key";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_MAPPING = ":";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TITLE = "key/value";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_ITEM_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
-Blockly.Msg.DICT_GET = "get key";  // untranslated
-Blockly.Msg.DICT_GET_TO = "from dict";  // untranslated
-Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
 Blockly.Msg.DISABLE_BLOCK = "Deaktiver blokk";
 Blockly.Msg.DUPLICATE_BLOCK = "duplikat";
 Blockly.Msg.ENABLE_BLOCK = "Aktiver blokk";
@@ -83,15 +71,7 @@ Blockly.Msg.EXPAND_BLOCK = "Utvid blokk";
 Blockly.Msg.EXTERNAL_INPUTS = "Eksterne kilder";
 Blockly.Msg.HELP = "Hjelp";
 Blockly.Msg.INLINE_INPUTS = "Interne kilder";
-<<<<<<< HEAD
-Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
-Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
-Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
-Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
-Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://en.wikipedia.org/wiki/Linked_list#Empty_lists";
-=======
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "opprett en tom liste";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Returnerer en tom liste, altså med lengde 0";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "liste";
@@ -206,7 +186,7 @@ Blockly.Msg.MATH_CHANGE_TITLE = "endre %1 ved %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Addere et tall til variabelen '%1'.";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Returner en av felleskonstantene π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), eller ∞ (uendelig).";
-Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
+Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "begrense %1 lav %2 høy %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Begrens et tall til å være mellom de angitte grenseverdiene (inklusiv).";
 Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
@@ -357,7 +337,6 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "lengden av %1";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Returnerer antall bokstaver (inkludert mellomrom) i den angitte teksten.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "skriv ut %1";
-Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Skriv ut angitt tekst, tall eller annet innhold.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Be brukeren om et tall.";
@@ -371,12 +350,7 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "fjern mellomrom fra begge sider av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "fjern mellomrom fra venstre side av";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "fjern mellomrom fra høyre side av";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Returner en kopi av teksten med mellomrom fjernet fra en eller begge sidene.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-=======
 Blockly.Msg.TODAY = "I dag";
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Opprett 'sett %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated

@@ -29,15 +29,10 @@ goog.provide('Blockly.Blocks.texts');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
-Blockly.Blocks.texts.HUE = 270;
-var DATA_HUE = 100;
-=======
 /**
  * Common HSV hue for all blocks in this category.
  */
 Blockly.Blocks.texts.HUE = 160;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['text'] = {
   /**
@@ -46,10 +41,10 @@ Blockly.Blocks['text'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_TEXT_HELPURL);
-    this.setColour(DATA_HUE);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
-        .appendField(new Blockly.FieldTextInput('string'), 'TEXT')
+        .appendField(new Blockly.FieldTextInput(''), 'TEXT')
         .appendField(this.newQuote_(false));
     this.setOutput(true, 'String');
     this.setTooltip(Blockly.Msg.TEXT_TEXT_TOOLTIP);
@@ -575,8 +570,6 @@ Blockly.Blocks['text_trim'] = {
   }
 };
 
-<<<<<<< HEAD
-=======
 Blockly.Blocks['text_print'] = {
   /**
    * Block for print statement.
@@ -599,7 +592,6 @@ Blockly.Blocks['text_print'] = {
     });
   }
 };
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['text_prompt'] = {
   /**

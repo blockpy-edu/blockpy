@@ -29,15 +29,10 @@ goog.provide('Blockly.Blocks.logic');
 goog.require('Blockly.Blocks');
 
 
-<<<<<<< HEAD
-var DATA_HUE = 230;
-Blockly.Blocks.logic.HUE = 0;
-=======
 /**
  * Common HSV hue for all blocks in this category.
  */
 Blockly.Blocks.logic.HUE = 210;
->>>>>>> de30483bb0f540c8d572d6e382d8a249717855a7
 
 Blockly.Blocks['controls_if'] = {
   /**
@@ -272,19 +267,19 @@ Blockly.Blocks['logic_compare'] = {
    */
   init: function() {
     var OPERATORS = this.RTL ? [
-          ['==', 'EQ'],
-          ['!=', 'NEQ'],
+          ['=', 'EQ'],
+          ['\u2260', 'NEQ'],
           ['>', 'LT'],
-          ['<=', 'LTE'],
+          ['\u2265', 'LTE'],
           ['<', 'GT'],
-          ['>=', 'GTE']
+          ['\u2264', 'GTE']
         ] : [
-          ['==', 'EQ'],
-          ['!=', 'NEQ'],
+          ['=', 'EQ'],
+          ['\u2260', 'NEQ'],
           ['<', 'LT'],
-          ['<=', 'LTE'],
+          ['\u2264', 'LTE'],
           ['>', 'GT'],
-          ['>=', 'GTE']
+          ['\u2265', 'GTE']
         ];
     this.setHelpUrl(Blockly.Msg.LOGIC_COMPARE_HELPURL);
     this.setColour(Blockly.Blocks.logic.HUE);
@@ -402,7 +397,7 @@ Blockly.Blocks['logic_boolean'] = {
         [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
          [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(DATA_HUE);
+    this.setColour(Blockly.Blocks.logic.HUE);
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
@@ -417,7 +412,7 @@ Blockly.Blocks['logic_null'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_NULL_HELPURL);
-    this.setColour(DATA_HUE);
+    this.setColour(Blockly.Blocks.logic.HUE);
     this.setOutput(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg.LOGIC_NULL);

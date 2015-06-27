@@ -332,12 +332,3 @@ Blockly.Python['lists_split'] = function(block) {
   }
   return [code, Blockly.Python.ORDER_FUNCTION_CALL];
 };
-
-Blockly.Python['lists_append'] = function(block) {
-  // Append
-  var list = Blockly.Python.valueToCode(block, 'LIST',
-      Blockly.Python.ORDER_MEMBER) || '[]';
-  var value = Blockly.Python.valueToCode(block, 'ITEM',
-      Blockly.Python.ORDER_NONE) || 'None';
-  return list + '.append(' + value + ')\n';
-};
