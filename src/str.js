@@ -10,57 +10,50 @@ Sk.builtin.str = function (x) {
     if (x === undefined) {
         x = "";
     }
-    if (x instanceof Sk.builtin.str && x !== Sk.builtin.str.prototype.ob$type) {
+    if (x instanceof Sk.builtin.str) {
         return x;
     }
     if (!(this instanceof Sk.builtin.str)) {
         return new Sk.builtin.str(x);
     }
 
+
     // convert to js string
     if (x === true) {
         ret = "True";
-    }
-    else if (x === false) {
+    } else if (x === false) {
         ret = "False";
-    }
-    else if ((x === null) || (x instanceof Sk.builtin.none)) {
+    } else if ((x === null) || (x instanceof Sk.builtin.none)) {
         ret = "None";
-    }
-    else if (x instanceof Sk.builtin.bool) {
+    } else if (x instanceof Sk.builtin.bool) {
         if (x.v) {
             ret = "True";
-        }
-        else {
+        } else {
             ret = "False";
         }
-    }
-    else if (typeof x === "number") {
+    } else if (typeof x === "number") {
         ret = x.toString();
         if (ret === "Infinity") {
             ret = "inf";
-        }
-        else if (ret === "-Infinity") {
+        } else if (ret === "-Infinity") {
             ret = "-inf";
         }
-    }
-    else if (typeof x === "string") {
+    } else if (typeof x === "string") {
         ret = x;
-    }
-    else if (x.tp$str !== undefined) {
+    } else if (x.tp$str !== undefined) {
         ret = x.tp$str();
         if (!(ret instanceof Sk.builtin.str)) {
             throw new Sk.builtin.ValueError("__str__ didn't return a str");
         }
         return ret;
-    }
-    else {
+    } else {
         return Sk.misceval.objectRepr(x);
     }
 
     // interning required for strings in py
-    if (Object.prototype.hasOwnProperty.call(interned, "1" + ret)) // note, have to use Object to avoid __proto__, etc. failing
-    {
+    if (Object.prototype.hasOwnProperty.call(interned, "1" + ret)) {
+        // note, have to use Object to avoid __proto__, etc.
+        // failing
         return interned["1" + ret];
     }
 
@@ -73,12 +66,12 @@ Sk.builtin.str = function (x) {
 };
 goog.exportSymbol("Sk.builtin.str", Sk.builtin.str);
 
-Sk.builtin.str.$emptystr = new Sk.builtin.str("");
+Sk.abstr.setUpInheritance("str", Sk.builtin.str, Sk.builtin.seqtype);
 
 Sk.builtin.str.prototype.mp$subscript = function (index) {
     var ret;
-    index = Sk.builtin.asnum$(index);
-    if (typeof index === "number" && Math.floor(index) === index /* not a float*/) {
+    if (Sk.misceval.isIndex(index)) {
+        index = Sk.misceval.asIndex(index);
         if (index < 0) {
             index = this.v.length + index;
         }
@@ -86,8 +79,7 @@ Sk.builtin.str.prototype.mp$subscript = function (index) {
             throw new Sk.builtin.IndexError("string index out of range");
         }
         return new Sk.builtin.str(this.v.charAt(index));
-    }
-    else if (index instanceof Sk.builtin.slice) {
+    } else if (index instanceof Sk.builtin.slice) {
         ret = "";
         index.sssiter$(this, function (i, wrt) {
             if (i >= 0 && i < wrt.v.length) {
@@ -95,9 +87,8 @@ Sk.builtin.str.prototype.mp$subscript = function (index) {
             }
         });
         return new Sk.builtin.str(ret);
-    }
-    else {
-        throw new Sk.builtin.TypeError("string indices must be numbers, not " + typeof index);
+    } else {
+        throw new Sk.builtin.TypeError("string indices must be integers, not " + Sk.abstr.typeName(index));
     }
 };
 
@@ -117,11 +108,12 @@ Sk.builtin.str.prototype.nb$inplace_add = Sk.builtin.str.prototype.sq$concat;
 Sk.builtin.str.prototype.sq$repeat = function (n) {
     var i;
     var ret;
-    if (!Sk.builtin.checkInt(n)) {
+
+    if (!Sk.misceval.isIndex(n)) {
         throw new Sk.builtin.TypeError("can't multiply sequence by non-int of type '" + Sk.abstr.typeName(n) + "'");
     }
 
-    n = Sk.builtin.asnum$(n);
+    n = Sk.misceval.asIndex(n);
     ret = "";
     for (i = 0; i < n; ++i) {
         ret += this.v;
@@ -143,14 +135,12 @@ Sk.builtin.str.prototype.sq$slice = function (i1, i2) {
 };
 
 Sk.builtin.str.prototype.sq$contains = function (ob) {
-    if (ob.v === undefined || ob.v.constructor != String) {
+    if (!(ob instanceof Sk.builtin.str)) {
         throw new Sk.builtin.TypeError("TypeError: 'In <string> requires string as left operand");
     }
     return this.v.indexOf(ob.v) != -1;
 };
 
-Sk.builtin.str.prototype.tp$name = "str";
-Sk.builtin.str.prototype.tp$getattr = Sk.builtin.object.prototype.GenericGetAttr;
 Sk.builtin.str.prototype.tp$iter = function () {
     var ret =
     {
@@ -165,7 +155,8 @@ Sk.builtin.str.prototype.tp$iter = function () {
                 return undefined;
             }
             return new Sk.builtin.str(ret.$obj.v.substr(ret.$index++, 1));
-        }
+        },
+        tp$name    : "str_iterator"
     };
     return ret;
 };
@@ -212,24 +203,19 @@ Sk.builtin.str.prototype["$r"] = function () {
         c = this.v.charAt(i);
         if (c === quote || c === "\\") {
             ret += "\\" + c;
-        }
-        else if (c === "\t") {
+        } else if (c === "\t") {
             ret += "\\t";
-        }
-        else if (c === "\n") {
+        } else if (c === "\n") {
             ret += "\\n";
-        }
-        else if (c === "\r") {
+        } else if (c === "\r") {
             ret += "\\r";
-        }
-        else if (c < " " || c >= 0x7f) {
+        } else if (c < " " || c >= 0x7f) {
             ashex = c.charCodeAt(0).toString(16);
             if (ashex.length < 2) {
                 ashex = "0" + ashex;
             }
             ret += "\\x" + ashex;
-        }
-        else {
+        } else {
             ret += c;
         }
     }
@@ -248,12 +234,10 @@ Sk.builtin.str.re_escape_ = function (s) {
 
         if (re.test(c)) {
             ret.push(c);
-        }
-        else {
+        } else {
             if (c === "\\000") {
                 ret.push("\\000");
-            }
-            else {
+            } else {
                 ret.push("\\" + c);
             }
         }
@@ -297,7 +281,7 @@ Sk.builtin.str.prototype["join"] = new Sk.builtin.func(function (self, seq) {
     arrOfStrs = [];
     for (it = seq.tp$iter(), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
         if (i.constructor !== Sk.builtin.str) {
-            throw "TypeError: sequence item " + arrOfStrs.length + ": expected string, " + typeof i + " found";
+            throw new Sk.builtin.TypeError("TypeError: sequence item " + arrOfStrs.length + ": expected string, " + typeof i + " found");
         }
         arrOfStrs.push(i.v);
     }
@@ -330,14 +314,14 @@ Sk.builtin.str.prototype["split"] = new Sk.builtin.func(function (self, on, howm
     regex = /[\s]+/g;
     str = self.v;
     if (on === null) {
-        str = str.trimLeft();
+        str = goog.string.trimLeft(str);
     } else {
         // Escape special characters in "on" so we can use a regexp
         s = on.v.replace(/([.*+?=|\\\/()\[\]\{\}^$])/g, "\\$1");
         regex = new RegExp(s, "g");
     }
 
-    // This is almost identical to re.split, 
+    // This is almost identical to re.split,
     // except how the regexp is constructed
 
     result = [];
@@ -372,8 +356,7 @@ Sk.builtin.str.prototype["strip"] = new Sk.builtin.func(function (self, chars) {
     }
     if (chars === undefined) {
         pattern = /^\s+|\s+$/g;
-    }
-    else {
+    } else {
         regex = Sk.builtin.str.re_escape_(chars.v);
         pattern = new RegExp("^[" + regex + "]+|[" + regex + "]+$", "g");
     }
@@ -389,8 +372,7 @@ Sk.builtin.str.prototype["lstrip"] = new Sk.builtin.func(function (self, chars) 
     }
     if (chars === undefined) {
         pattern = /^\s+/g;
-    }
-    else {
+    } else {
         regex = Sk.builtin.str.re_escape_(chars.v);
         pattern = new RegExp("^[" + regex + "]+", "g");
     }
@@ -406,8 +388,7 @@ Sk.builtin.str.prototype["rstrip"] = new Sk.builtin.func(function (self, chars) 
     }
     if (chars === undefined) {
         pattern = /\s+$/g;
-    }
-    else {
+    } else {
         regex = Sk.builtin.str.re_escape_(chars.v);
         pattern = new RegExp("[" + regex + "]+$", "g");
     }
@@ -465,16 +446,14 @@ Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, sta
 
     if (start === undefined) {
         start = 0;
-    }
-    else {
+    } else {
         start = Sk.builtin.asnum$(start);
         start = start >= 0 ? start : self.v.length + start;
     }
 
     if (end === undefined) {
         end = self.v.length;
-    }
-    else {
+    } else {
         end = Sk.builtin.asnum$(end);
         end = end >= 0 ? end : self.v.length + end;
     }
@@ -483,9 +462,9 @@ Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, sta
     slice = self.v.slice(start, end);
     ctl = slice.match(m);
     if (!ctl) {
-        return  new Sk.builtin.nmber(0, Sk.builtin.nmber.int$);
+        return  new Sk.builtin.int_(0);
     } else {
-        return new Sk.builtin.nmber(ctl.length, Sk.builtin.nmber.int$);
+        return new Sk.builtin.int_(ctl.length);
     }
 
 });
@@ -581,16 +560,14 @@ Sk.builtin.str.prototype["find"] = new Sk.builtin.func(function (self, tgt, star
 
     if (start === undefined) {
         start = 0;
-    }
-    else {
+    } else {
         start = Sk.builtin.asnum$(start);
         start = start >= 0 ? start : self.v.length + start;
     }
 
     if (end === undefined) {
         end = self.v.length;
-    }
-    else {
+    } else {
         end = Sk.builtin.asnum$(end);
         end = end >= 0 ? end : self.v.length + end;
     }
@@ -598,7 +575,7 @@ Sk.builtin.str.prototype["find"] = new Sk.builtin.func(function (self, tgt, star
     idx = self.v.indexOf(tgt.v, start);
     idx = ((idx >= start) && (idx < end)) ? idx : -1;
 
-    return new Sk.builtin.nmber(idx, Sk.builtin.nmber.int$);
+    return new Sk.builtin.int_(idx);
 });
 
 Sk.builtin.str.prototype["index"] = new Sk.builtin.func(function (self, tgt, start, end) {
@@ -626,16 +603,14 @@ Sk.builtin.str.prototype["rfind"] = new Sk.builtin.func(function (self, tgt, sta
 
     if (start === undefined) {
         start = 0;
-    }
-    else {
+    } else {
         start = Sk.builtin.asnum$(start);
         start = start >= 0 ? start : self.v.length + start;
     }
 
     if (end === undefined) {
         end = self.v.length;
-    }
-    else {
+    } else {
         end = Sk.builtin.asnum$(end);
         end = end >= 0 ? end : self.v.length + end;
     }
@@ -644,7 +619,7 @@ Sk.builtin.str.prototype["rfind"] = new Sk.builtin.func(function (self, tgt, sta
     idx = (idx !== end) ? idx : self.v.lastIndexOf(tgt.v, end - 1);
     idx = ((idx >= start) && (idx < end)) ? idx : -1;
 
-    return new Sk.builtin.nmber(idx, Sk.builtin.nmber.int$);
+    return new Sk.builtin.int_(idx);
 });
 
 Sk.builtin.str.prototype["rindex"] = new Sk.builtin.func(function (self, tgt, start, end) {
@@ -660,14 +635,14 @@ Sk.builtin.str.prototype["rindex"] = new Sk.builtin.func(function (self, tgt, st
 Sk.builtin.str.prototype["startswith"] = new Sk.builtin.func(function (self, tgt) {
     Sk.builtin.pyCheckArgs("startswith", arguments, 2, 2);
     Sk.builtin.pyCheckType("tgt", "string", Sk.builtin.checkString(tgt));
-    return Sk.builtin.bool(self.v.indexOf(tgt.v) === 0);
+    return new Sk.builtin.bool( self.v.indexOf(tgt.v) === 0);
 });
 
 // http://stackoverflow.com/questions/280634/endswith-in-javascript
 Sk.builtin.str.prototype["endswith"] = new Sk.builtin.func(function (self, tgt) {
     Sk.builtin.pyCheckArgs("endswith", arguments, 2, 2);
     Sk.builtin.pyCheckType("tgt", "string", Sk.builtin.checkString(tgt));
-    return Sk.builtin.bool(self.v.indexOf(tgt.v, self.v.length - tgt.v.length) !== -1);
+    return new Sk.builtin.bool( self.v.indexOf(tgt.v, self.v.length - tgt.v.length) !== -1);
 });
 
 Sk.builtin.str.prototype["replace"] = new Sk.builtin.func(function (self, oldS, newS, count) {
@@ -700,49 +675,205 @@ Sk.builtin.str.prototype["replace"] = new Sk.builtin.func(function (self, oldS, 
     return new Sk.builtin.str(self.v.replace(patt, replacer));
 });
 
+Sk.builtin.str.prototype["zfill"] = new Sk.builtin.func(function (self, len) {
+    var str = self.v;
+    var ret;
+    var zeroes;
+    var offset;
+    var pad = "";
+
+    Sk.builtin.pyCheckArgs("zfill", arguments, 2, 2);
+    if (! Sk.builtin.checkInt(len)) {
+        throw new Sk.builtin.TypeError("integer argument exepected, got " + Sk.abstr.typeName(len));
+    }
+
+    // figure out how many zeroes are needed to make the proper length
+    zeroes = len.v - str.length;
+    // offset by 1 if there is a +/- at the beginning of the string
+    offset = (str[0] === "+" || str[0] === "-") ? 1 : 0;
+    for(var i = 0; i < zeroes; i++){
+        pad += "0";
+    }
+    // combine the string and the zeroes
+    ret = str.substr(0, offset) + pad + str.substr(offset);
+    return new Sk.builtin.str(ret);
+
+
+});
+
 Sk.builtin.str.prototype["isdigit"] = new Sk.builtin.func(function (self) {
-    var ch;
-    var i;
     Sk.builtin.pyCheckArgs("isdigit", arguments, 1, 1);
-    if (self.v.length === 0) {
-        return Sk.builtin.bool(false);
+    return new Sk.builtin.bool( /^\d+$/.test(self.v));
+});
+
+Sk.builtin.str.prototype["isspace"] = new Sk.builtin.func(function (self) {
+    Sk.builtin.pyCheckArgs("isspace", arguments, 1, 1);
+    return new Sk.builtin.bool( /^\s+$/.test(self.v));
+});
+
+
+Sk.builtin.str.prototype["expandtabs"] = new Sk.builtin.func(function (self, tabsize) {
+    // var input = self.v;
+    // var expanded = "";
+    // var split;
+    // var spacestr = "";
+    // var spacerem;
+
+
+    var spaces;
+    var expanded;
+
+    Sk.builtin.pyCheckArgs("expandtabs", arguments, 1, 2);
+
+
+    if ((tabsize !== undefined) && ! Sk.builtin.checkInt(tabsize)) {
+        throw new Sk.builtin.TypeError("integer argument exepected, got " + Sk.abstr.typeName(tabsize));
     }
-    for (i = 0; i < self.v.length; i++) {
-        ch = self.v.charAt(i);
-        if (ch < "0" || ch > "9") {
-            return Sk.builtin.bool(false);
+    if (tabsize === undefined) {
+        tabsize = 8;
+    } else {
+        tabsize = Sk.builtin.asnum$(tabsize);
+    }
+
+    spaces = (new Array(tabsize + 1)).join(" ");
+    expanded = self.v.replace(/([^\r\n\t]*)\t/g, function(a, b) {
+        return b + spaces.slice(b.length % tabsize);
+    });
+    return new Sk.builtin.str(expanded);
+});
+
+Sk.builtin.str.prototype["swapcase"] = new Sk.builtin.func(function (self) {
+    var ret;
+    Sk.builtin.pyCheckArgs("swapcase", arguments, 1, 1);
+
+
+    ret = self.v.replace(/[a-z]/gi, function(c) {
+        var lc = c.toLowerCase();
+        return lc === c ? c.toUpperCase() : lc;
+    });
+
+    return new Sk.builtin.str(ret);
+});
+
+Sk.builtin.str.prototype["splitlines"] = new Sk.builtin.func(function (self, keepends) {
+    var data = self.v;
+    var i = 0;
+    var j = i;
+    var selflen = self.v.length;
+    var strs_w = [];
+    var ch;
+    var eol;
+    var sol = 0;
+    var slice;
+    Sk.builtin.pyCheckArgs("splitlines", arguments, 1, 2);
+    if ((keepends !== undefined) && ! Sk.builtin.checkBool(keepends)) {
+        throw new Sk.builtin.TypeError("boolean argument expected, got " + Sk.abstr.typeName(keepends));
+    }
+    if (keepends === undefined) {
+        keepends = false;
+    } else {
+        keepends = keepends.v;
+    }
+
+
+    for (i = 0; i < selflen; i ++) {
+        ch = data.charAt(i);
+        if (data.charAt(i + 1) === "\n" && ch === "\r") {
+            eol = i + 2;
+            slice = data.slice(sol, eol);
+            if (! keepends) {
+                slice = slice.replace(/(\r|\n)/g, "");
+            }
+            strs_w.push(new Sk.builtin.str(slice));
+            sol = eol;
+        } else if ((ch === "\n" && data.charAt(i - 1) !== "\r") || ch === "\r") {
+            eol = i + 1;
+            slice = data.slice(sol, eol);
+            if (! keepends) {
+                slice = slice.replace(/(\r|\n)/g, "");
+            }
+            strs_w.push(new Sk.builtin.str(slice));
+            sol = eol;
         }
+
     }
-    return Sk.builtin.bool(true);
+    if (sol < selflen) {
+        eol = selflen;
+        slice = data.slice(sol, eol);
+        if (! keepends) {
+            slice = slice.replace(/(\r|\n)/g, "");
+        }
+        strs_w.push(new Sk.builtin.str(slice));
+    }
+    return new Sk.builtin.list(strs_w);
+});
+
+Sk.builtin.str.prototype["title"] = new Sk.builtin.func(function (self) {
+    var ret;
+
+    Sk.builtin.pyCheckArgs("title", arguments, 1, 1);
+
+    ret = self.v.replace(/[a-z][a-z]*/gi, function(str) {
+        return str[0].toUpperCase() + str.substr(1).toLowerCase();
+    });
+
+    return new Sk.builtin.str(ret);
 });
 
 Sk.builtin.str.prototype["isalpha"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("isalpha", arguments, 1, 1);
-    return Sk.builtin.bool(self.v.length && goog.string.isAlpha(self.v));
+    return new Sk.builtin.bool( self.v.length && goog.string.isAlpha(self.v));
 });
 
 Sk.builtin.str.prototype["isalnum"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("isalnum", arguments, 1, 1);
-    return Sk.builtin.bool(self.v.length && goog.string.isAlphaNumeric(self.v));
+    return new Sk.builtin.bool( self.v.length && goog.string.isAlphaNumeric(self.v));
 });
 
 // does not account for unicode numeric values
 Sk.builtin.str.prototype["isnumeric"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("isnumeric", arguments, 1, 1);
-    return Sk.builtin.bool(self.v.length && goog.string.isNumeric(self.v));
+    return new Sk.builtin.bool( self.v.length && goog.string.isNumeric(self.v));
 });
 
 Sk.builtin.str.prototype["islower"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("islower", arguments, 1, 1);
-    return Sk.builtin.bool(self.v.length && /[a-z]/.test(self.v) && !/[A-Z]/.test(self.v));
+    return new Sk.builtin.bool( self.v.length && /[a-z]/.test(self.v) && !/[A-Z]/.test(self.v));
 });
 
 Sk.builtin.str.prototype["isupper"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("isupper", arguments, 1, 1);
-    return Sk.builtin.bool(self.v.length && !/[a-z]/.test(self.v) && /[A-Z]/.test(self.v));
+    return new Sk.builtin.bool( self.v.length && !/[a-z]/.test(self.v) && /[A-Z]/.test(self.v));
 });
 
-Sk.builtin.str.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj("str", Sk.builtin.str);
+Sk.builtin.str.prototype["istitle"] = new Sk.builtin.func(function (self) {
+    // Comparing to str.title() seems the most intuitive thing, but it fails on "",
+    // Other empty-ish strings with no change.
+    var input = self.v;
+    var cased = false;
+    var previous_is_cased = false;
+    var pos;
+    var ch;
+    Sk.builtin.pyCheckArgs("istitle", arguments, 1, 1);
+    for (pos = 0; pos < input.length; pos ++) {
+        ch = input.charAt(pos);
+        if (! /[a-z]/.test(ch) && /[A-Z]/.test(ch)) {
+            if (previous_is_cased) {
+                return new Sk.builtin.bool( false);
+            }
+            previous_is_cased = true;
+            cased = true;
+        } else if (/[a-z]/.test(ch) && ! /[A-Z]/.test(ch)) {
+            if (! previous_is_cased) {
+                return new Sk.builtin.bool( false);
+            }
+            cased = true;
+        } else {
+            previous_is_cased = false;
+        }
+    }
+    return new Sk.builtin.bool( cased);
+});
 
 Sk.builtin.str.prototype.nb$remainder = function (rhs) {
     // % format op. rhs can be a value, a tuple, or something with __getitem__ (dict)
@@ -752,12 +883,11 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
     // 1. The '%' character, which marks the start of the specifier.
     // 2. Mapping key (optional), consisting of a parenthesised sequence of characters (for example, (somename)).
     // 3. Conversion flags (optional), which affect the result of some conversion types.
-    // 4. Minimum field width (optional). If specified as an '*' (asterisk), the actual width is read from the next element of the tuple in values, and the object to convert comes after the minimum field width and optional precision.
-    // 5. Precision (optional), given as a '.' (dot) followed by the precision. If specified as '*' (an asterisk), the actual width is read from the next element of the tuple in values, and the value to convert comes after the precision.
-    // 6. Length modifier (optional).
-    // 7. Conversion type.
-    //
-    // length modifier is ignored
+    // 4. Minimum field width (optional). If specified as an '*' (asterisk), the actual width is read from the next
+    // element of the tuple in values, and the object to convert comes after the minimum field width and optional
+    // precision. 5. Precision (optional), given as a '.' (dot) followed by the precision. If specified as '*' (an
+    // asterisk), the actual width is read from the next element of the tuple in values, and the value to convert comes
+    // after the precision. 6. Length modifier (optional). 7. Conversion type.  length modifier is ignored
 
     var ret;
     var replFunc;
@@ -808,15 +938,13 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
         if (conversionFlags) {
             if (conversionFlags.indexOf("-") !== -1) {
                 leftAdjust = true;
-            }
-            else if (conversionFlags.indexOf("0") !== -1) {
+            } else if (conversionFlags.indexOf("0") !== -1) {
                 zeroPad = true;
             }
 
             if (conversionFlags.indexOf("+") !== -1) {
                 precedeWithSign = true;
-            }
-            else if (conversionFlags.indexOf(" ") !== -1) {
+            } else if (conversionFlags.indexOf(" ") !== -1) {
                 blankBeforePositive = true;
             }
 
@@ -843,15 +971,16 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
                     neg = true;
                 }
                 r = n.toString(base);
-            }
-            else if (n instanceof Sk.builtin.nmber) {
+            } else if (n instanceof Sk.builtin.float_) {
                 r = n.str$(base, false);
                 if (r.length > 2 && r.substr(-2) === ".0") {
                     r = r.substr(0, r.length - 2);
                 }
                 neg = n.nb$isnegative();
-            }
-            else if (n instanceof Sk.builtin.lng) {
+            } else if (n instanceof Sk.builtin.int_) {
+                r = n.str$(base, false);
+                neg = n.nb$isnegative();
+            } else if (n instanceof Sk.builtin.lng) {
                 r = n.str$(base, false);
                 neg = n.nb$isnegative();	//	neg = n.size$ < 0;	RNL long.js change
             }
@@ -872,19 +1001,16 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
 
             if (neg) {
                 prefix = "-";
-            }
-            else if (precedeWithSign) {
+            } else if (precedeWithSign) {
                 prefix = "+" + prefix;
-            }
-            else if (blankBeforePositive) {
+            } else if (blankBeforePositive) {
                 prefix = " " + prefix;
             }
 
             if (alternateForm) {
                 if (base === 16) {
                     prefix += "0x";
-                }
-                else if (base === 8 && !precZeroPadded && r !== "0") {
+                } else if (base === 8 && !precZeroPadded && r !== "0") {
                     prefix += "0";
                 }
             }
@@ -904,13 +1030,11 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
                     for (j = totLen; j < fieldWidth; ++j) {
                         r = "0" + r;
                     }
-                }
-                else if (leftAdjust) {
+                } else if (leftAdjust) {
                     for (j = totLen; j < fieldWidth; ++j) {
                         r = r + " ";
                     }
-                }
-                else {
+                } else {
                     for (j = totLen; j < fieldWidth; ++j) {
                         prefix = " " + prefix;
                     }
@@ -922,13 +1046,14 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
         //print("Rhs:",rhs, "ctor", rhs.constructor);
         if (rhs.constructor === Sk.builtin.tuple) {
             value = rhs.v[i];
-        }
-        else if (rhs.mp$subscript !== undefined) {
+        } else if (rhs.mp$subscript !== undefined && mappingKey !== undefined) {
             mk = mappingKey.substring(1, mappingKey.length - 1);
             //print("mk",mk);
             value = rhs.mp$subscript(new Sk.builtin.str(mk));
-        }
-        else {
+        } else if (rhs.constructor === Sk.builtin.dict || rhs.constructor === Sk.builtin.list) {
+            // new case where only one argument is provided
+            value = rhs;
+        } else {
             throw new Sk.builtin.AttributeError(rhs.tp$name + " instance has no attribute 'mp$subscript'");
         }
         base = 10;
@@ -958,12 +1083,19 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
             if (precision === undefined || precision === "") {
                 if (conversionType === "e" || conversionType === "E") {
                     precision = 6;
-                }
-                else if (conversionType === "f" || conversionType === "F") {
+                } else if (conversionType === "f" || conversionType === "F") {
                     precision = 7;
                 }
             }
-            result = (convValue)[convName](precision);
+            result = (convValue)[convName](precision); // possible loose of negative zero sign
+
+            // apply sign to negative zeros, floats only!
+            if(Sk.builtin.checkFloat(value)) {
+                if(convValue === 0 && 1/convValue === -Infinity) {
+                    result = "-" + result; // add sign for zero
+                }
+            }
+
             if ("EFG".indexOf(conversionType) !== -1) {
                 result = result.toUpperCase();
             }
@@ -971,17 +1103,15 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
         } else if (conversionType === "c") {
             if (typeof value === "number") {
                 return String.fromCharCode(value);
-            }
-            else if (value instanceof Sk.builtin.nmber) {
+            } else if (value instanceof Sk.builtin.int_) {
                 return String.fromCharCode(value.v);
-            }
-            else if (value instanceof Sk.builtin.lng) {
+            } else if (value instanceof Sk.builtin.float_) {
+                return String.fromCharCode(value.v);
+            } else if (value instanceof Sk.builtin.lng) {
                 return String.fromCharCode(value.str$(10, false)[0]);
-            }
-            else if (value.constructor === Sk.builtin.str) {
+            } else if (value.constructor === Sk.builtin.str) {
                 return value.v.substr(0, 1);
-            }
-            else {
+            } else {
                 throw new Sk.builtin.TypeError("an integer is required");
             }
         } else if (conversionType === "r") {
@@ -994,6 +1124,9 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
             r = new Sk.builtin.str(value);
             if (precision) {
                 return r.v.substr(0, precision);
+            }
+            if(fieldWidth) {
+                r.v = handleWidth([" ", r.v]);
             }
             return r.v;
         } else if (conversionType === "%") {

@@ -8,22 +8,21 @@ Sk.builtin.tuple = function (L) {
         return new Sk.builtin.tuple(L);
     }
 
+
     if (L === undefined) {
         L = [];
     }
 
     if (Object.prototype.toString.apply(L) === "[object Array]") {
         this.v = L;
-    }
-    else {
-        if (L.tp$iter) {
+    } else {
+        if (Sk.builtin.checkIterable(L)) {
             this.v = [];
-            for (it = L.tp$iter(), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
+            for (it = Sk.abstr.iter(L), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
                 this.v.push(i);
             }
-        }
-        else {
-            throw new Sk.builtin.ValueError("expecting Array or iterable");
+        } else {
+            throw new Sk.builtin.TypeError("expecting Array or iterable");
         }
     }
 
@@ -33,7 +32,8 @@ Sk.builtin.tuple = function (L) {
     return this;
 };
 
-Sk.builtin.tuple.prototype.tp$name = "tuple";
+Sk.abstr.setUpInheritance("tuple", Sk.builtin.tuple, Sk.builtin.seqtype);
+
 Sk.builtin.tuple.prototype["$r"] = function () {
     var ret;
     var i;
@@ -66,8 +66,7 @@ Sk.builtin.tuple.prototype.mp$subscript = function (index) {
             }
             return this.v[i];
         }
-    }
-    else if (index instanceof Sk.builtin.slice) {
+    } else if (index instanceof Sk.builtin.slice) {
         ret = [];
         index.sssiter$(this, function (i, wrt) {
             ret.push(wrt.v[i]);
@@ -91,7 +90,7 @@ Sk.builtin.tuple.prototype.tp$hash = function () {
     for (i = 0; i < len; ++i) {
         y = Sk.builtin.hash(this.v[i]).v;
         if (y === -1) {
-            return new Sk.builtin.nmber(-1, Sk.builtin.nmber.int$);
+            return new Sk.builtin.int_(-1);
         }
         x = (x ^ y) * mult;
         mult += 82520 + len + len;
@@ -100,14 +99,15 @@ Sk.builtin.tuple.prototype.tp$hash = function () {
     if (x === -1) {
         x = -2;
     }
-    return new Sk.builtin.nmber(x | 0, Sk.builtin.nmber.int$);
+    return new Sk.builtin.int_(x | 0);
 };
 
 Sk.builtin.tuple.prototype.sq$repeat = function (n) {
     var j;
     var i;
     var ret;
-    n = Sk.builtin.asnum$(n);
+
+    n = Sk.misceval.asIndex(n);
     ret = [];
     for (i = 0; i < n; ++i) {
         for (j = 0; j < this.v.length; ++j) {
@@ -118,9 +118,6 @@ Sk.builtin.tuple.prototype.sq$repeat = function (n) {
 };
 Sk.builtin.tuple.prototype.nb$multiply = Sk.builtin.tuple.prototype.sq$repeat;
 Sk.builtin.tuple.prototype.nb$inplace_multiply = Sk.builtin.tuple.prototype.sq$repeat;
-
-
-Sk.builtin.tuple.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj("tuple", Sk.builtin.tuple);
 
 Sk.builtin.tuple.prototype.tp$iter = function () {
     var ret =
@@ -136,7 +133,8 @@ Sk.builtin.tuple.prototype.tp$iter = function () {
                 return undefined;
             }
             return ret.$obj.v[ret.$index++];
-        }
+        },
+        tp$name    : "tuple_iterator"
     };
     return ret;
 };
@@ -147,8 +145,6 @@ Sk.builtin.tuple.prototype["__iter__"] = new Sk.builtin.func(function (self) {
     return self.tp$iter();
 });
 
-Sk.builtin.tuple.prototype.tp$getattr = Sk.builtin.object.prototype.GenericGetAttr;
-
 Sk.builtin.tuple.prototype.tp$richcompare = function (w, op) {
     //print("  tup rc", JSON.stringify(this.v), JSON.stringify(w), op);
 
@@ -158,7 +154,7 @@ Sk.builtin.tuple.prototype.tp$richcompare = function (w, op) {
     var wl;
     var vl;
     var v;
-    if (!w.__class__ || w.__class__ != Sk.builtin.tuple) {
+    if (!w.__class__ || !Sk.builtin.isinstance(w, Sk.builtin.tuple)) {
         // shortcuts for eq/not
         if (op === "Eq") {
             return false;
@@ -229,6 +225,18 @@ Sk.builtin.tuple.prototype.sq$concat = function (other) {
     return new Sk.builtin.tuple(this.v.concat(other.v));
 };
 
+Sk.builtin.tuple.prototype.sq$contains = function (ob) {
+    var it, i;
+
+    for (it = this.tp$iter(), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
+        if (Sk.misceval.richCompareBool(i, ob, "Eq")) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 Sk.builtin.tuple.prototype.nb$add = Sk.builtin.tuple.prototype.sq$concat;
 Sk.builtin.tuple.prototype.nb$inplace_add = Sk.builtin.tuple.prototype.sq$concat;
 
@@ -243,7 +251,7 @@ Sk.builtin.tuple.prototype["index"] = new Sk.builtin.func(function (self, item) 
     var obj = self.v;
     for (i = 0; i < len; ++i) {
         if (Sk.misceval.richCompareBool(obj[i], item, "Eq")) {
-            return Sk.builtin.assk$(i, Sk.builtin.nmber.int$);
+            return new Sk.builtin.int_(i);
         }
     }
     throw new Sk.builtin.ValueError("tuple.index(x): x not in tuple");
@@ -259,7 +267,7 @@ Sk.builtin.tuple.prototype["count"] = new Sk.builtin.func(function (self, item) 
             count += 1;
         }
     }
-    return  new Sk.builtin.nmber(count, Sk.builtin.nmber.int$);
+    return  new Sk.builtin.int_(count);
 });
 
 goog.exportSymbol("Sk.builtin.tuple", Sk.builtin.tuple);
