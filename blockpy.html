@@ -71,7 +71,26 @@
 </head>
 <body>
 <div id="kennel-div" style='height:100%'></div>
-        <script>
+<script>
+    Blockly.Blocks['assess_suggest'] = {
+        init: function() {
+            this.jsonInit({
+                "id": "assess_suggest",
+                "message0": "assign %1 and suggest %2",
+                "args0": [
+                    {"type": "field_input",
+                     "name": "POINTS"},
+                    {"type": "field_input",
+                     "name": "SUGGESTION"}
+                ],
+                "previousStatement": null,
+                "nextStatement": null,
+                "colour": 330,
+                "tooltip": "Assigns a grade, and adds a suggestion in this case.",
+                "helpUrl": "http://www.example.com/"
+            });
+        }
+    };
           
           var UNDO_STACK = Array();
           var REDO_STACK = Array();
@@ -115,12 +134,16 @@
             kennel = new Kennel(document.getElementById('kennel-div'),
                                 document.getElementById('toolbox'),
                                 'instructor', // Instructor mode
-                                "This is the default problem description" // problem
+                                "This is the default problem description", // problem
+                                $("#default-body").text(), // Current code
+                                "def on_run(code, output, properties):\n    pass", // On run code
+                                "def on_step(code, output, properties):\n    pass", // On step code
+                                "alpha = 0" // Starting code
                                 );
             kennel.changeEditorMode();
           });
         </script>
-<pre id='default-body'>
+<pre id='default-body' style='display:none'>
 import matplotlib.pyplot as plt
 import weather
 
@@ -130,6 +153,9 @@ plt.show()
 </pre>
   
 <xml id="toolbox" style="display: none">
+    <category name="Assessment">
+        <block type="assess_suggest"></block>
+    </category>
     <category name="Properties" custom="VARIABLE">
     </category>
     <category name="Decisions">
