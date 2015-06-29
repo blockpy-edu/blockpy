@@ -31,6 +31,19 @@ goog.require('Blockly.Blocks');
 
 Blockly.Blocks.utility.HUE = 160;
 
+Blockly.Blocks['raw_table'] = {
+  // Container.
+  init: function() {
+    this.setColour(Blockly.Blocks.utility.HUE);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.appendDummyInput()
+        .appendField('Tabular Abstraction:');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTable(''), 'TEXT');
+  }
+};
+
 Blockly.Blocks['raw_block'] = {
   // Container.
   init: function() {
@@ -53,6 +66,18 @@ Blockly.Blocks['raw_expression'] = {
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextArea(''), 'TEXT');
     this.setOutput(true);
+  }
+};
+
+Blockly.Blocks['raw_empty'] = {
+  // Container.
+  init: function() {
+    this.setColour(Blockly.Blocks.utility.HUE);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.appendValueInput('VALUE')
+        .appendField('');
+    this.setInputsInline(false);
   }
 };
 

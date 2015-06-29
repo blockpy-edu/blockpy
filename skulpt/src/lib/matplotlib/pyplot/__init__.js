@@ -1,7 +1,7 @@
 /**
-	Made by Michael Ebert for skulpt, see this modules at https://github.com/waywaaard/skulpt
+    Made by Michael Ebert for skulpt, see this modules at https://github.com/waywaaard/skulpt
 
-	matplotlib.pyplot inspired by https://github.com/rameshvs/jsplotlib, though heavily modified.
+    matplotlib.pyplot inspired by https://github.com/rameshvs/jsplotlib, though heavily modified.
 
   jsplotlib for supporting plot commands and kwargs for the matplotlib skulpt module
   Supports:
@@ -51,8 +51,8 @@ jsplotlib.rc = {
 var chart_counter = 0; // for creating unique ids
 
 /** Line2D class for encapsulating all line relevant attributes and methods
-		Rebuilds partial matplotlib.Line2D functionality. Does not inherit from
-		abstract Artist class. Rather more a data representation.
+        Rebuilds partial matplotlib.Line2D functionality. Does not inherit from
+        abstract Artist class. Rather more a data representation.
  **/
 jsplotlib.Line2D = function(xdata, ydata, linewidth, linestyle, color, marker,
     markersize, markeredgewidth, markeredgecolor, markerfacecolor,
@@ -60,7 +60,9 @@ jsplotlib.Line2D = function(xdata, ydata, linewidth, linestyle, color, marker,
     solid_capstyle, dash_joinstyle, solid_joinstyle, pickradius,
     drawstyle, markevery, kwargs) {
 
+    // "that": completed Line2D object that is returned
     var that = {};
+    // Initialize parameter defaults
     that._x = xdata;
     that._y = ydata;
     that._linewidth = linewidth || null;
@@ -802,7 +804,7 @@ jsplotlib.plot = function(chart) {
         };
     };
     /**
-     Draws the lines. Lines are resonsible for their drawing. Here we just initialize
+     Draws the lines. Lines are respnsible for their drawing. Here we just initialize
      the axes and the scaling.
     **/
     that.draw = function() {
@@ -1102,7 +1104,7 @@ jsplotlib.get_color = function(cs) {
 jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
     attributes) {
     chart_counter++;
-    var DEFAULT_PADDING = 40;
+    var DEFAULT_PADDING = 10;
     insert_container = insert_container || document.body;
     width = width - 2 * DEFAULT_PADDING || 500;
     height = height - 2 * DEFAULT_PADDING || 200;
@@ -1353,9 +1355,9 @@ values are ('-', 'b').  Example format strings include:
 
 .. seealso::
 
-	:func:`~matplotlib.Line2D.lineStyles` and
-	:func:`~matplotlib.pyplot.colors`
-		for all possible styles and color format string.
+    :func:`~matplotlib.Line2D.lineStyles` and
+    :func:`~matplotlib.pyplot.colors`
+        for all possible styles and color format string.
 **/
 jsplotlib._process_plot_format = function(fmt) {
     var linestyle = null;
@@ -1585,7 +1587,6 @@ jsplotlib.ones = function(N) {
 };
 
 // Skulpt translation
-
 var $builtinmodule = function(name) {
     var mod = {};
     var chart;
@@ -1600,14 +1601,14 @@ var $builtinmodule = function(name) {
     var ndarray = Sk.misceval.callsim(np['$d'].array.func_code, new Sk.builtin.list([1, 2, 3, 4]));
 
     var create_chart = function() {
-        /* test if Canvas ist available should be moved to create_chart function */
+        /* test if Canvas is available should be moved to create_chart function */
         if (Sk.matplotlibCanvas === undefined) {
             throw new Sk.builtin.NameError(
                 "Can not resolve drawing area. Sk.matplotlibCanvas is undefined!");
         }
 
         if (!chart) {
-            Sk.matplotlibCanvas.empty();
+            $(Sk.matplotlibCanvas).empty();
             chart = jsplotlib.make_chart(400, 400, Sk.matplotlibCanvas, false);
         }
     };
@@ -1629,11 +1630,11 @@ var $builtinmodule = function(name) {
         // or x1, y1, stylestring1, x2, y2, stylestring2
         // or ydata, stylestring
         /*
-			plot(x, y)        # plot x and y using default line style and color
-			plot(x, y, 'bo')  # plot x and y using blue circle markers
-			plot(y)           # plot y using x as index array 0..N-1
-			plot(y, 'r+')     # ditto, but with red plusses
-		*/
+            plot(x, y)        # plot x and y using default line style and color
+            plot(x, y, 'bo')  # plot x and y using blue circle markers
+            plot(y)           # plot y using x as index array 0..N-1
+            plot(y, 'r+')     # ditto, but with red plusses
+        */
 
         // variable definitions for args
         var xdata = [];
@@ -1682,9 +1683,9 @@ var $builtinmodule = function(name) {
         }
 
         /* handle special cases
-			only supplied y
-			only supplied 1 array and stylestring
-		*/
+            only supplied y
+            only supplied 1 array and stylestring
+        */
         if ((args.length === 1) || (args.length === 2 && (xdata.length === 1 &&
                 ydata.length === 0))) {
             // only y supplied
@@ -1706,6 +1707,7 @@ var $builtinmodule = function(name) {
 
         if (xdata.length === 1 && ydata.length === 1 && stylestring.length === 0) {
             // handle case for plot(x, y)
+            // Where the x and y are integers, not lists
             line = new jsplotlib.Line2D(xdata[0], ydata[0]);
             plot.add_line(line);
         } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
@@ -1743,7 +1745,7 @@ var $builtinmodule = function(name) {
                 "Can not call show without any plot created.");
         }
 
-        Sk.matplotlibCanvas.show();
+        $(Sk.matplotlibCanvas).show();
     };
     mod.show = new Sk.builtin.func(show_f);
 

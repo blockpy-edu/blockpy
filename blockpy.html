@@ -33,9 +33,12 @@
     
     <!-- JQuery, D3, Math.js, Bootstrap -->
     <script type="text/javascript" src="libs/jquery.js"></script>
+    <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
     <script type="text/javascript" src="libs/d3.min.js"></script>
     <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
     <script type="text/javascript" src="libs/bootstrap.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap-wysiwyg.js"></script>
+    <script type="text/javascript" src="libs/mindmup-editabletable.js"></script>
     <script type="text/javascript" src="libs/codemirror.js"></script>
     <script type="text/javascript" src="libs/codemirror_python.js"></script>
   
@@ -111,21 +114,19 @@
           $(document).ready(function() {
             kennel = new Kennel(document.getElementById('kennel-div'),
                                 document.getElementById('toolbox'),
-                                document.getElementById("html-output"));
-            kennel.changeMode();
-            kennel.setPythonFromText($("#default-body").text());
+                                'instructor', // Instructor mode
+                                "This is the default problem description" // problem
+                                );
+            kennel.changeEditorMode();
           });
         </script>
 <pre id='default-body'>
-import books
+import matplotlib.pyplot as plt
+import weather
 
 
-total = 0
-print('Book List:')
-for a_book in books.get_all():
-    print(a_book['title'])
-    total = a_book['price'] + total
-print(total)
+plt.plot(weather.get_forecasts('Blacksburg, VA'))
+plt.show()
 </pre>
   
 <xml id="toolbox" style="display: none">
@@ -143,10 +144,12 @@ print(total)
     <category name="Functions" custom="PROCEDURE">
     </category>
     <category name="Calculation">
+        <block type="raw_table"></block>
         <block type="math_arithmetic"></block>
         <block type="type_check"></block>
         <block type="raw_block"></block>
         <block type="raw_expression"></block>
+        <block type="raw_empty"></block>
         <!--<block type="math_single"></block>
         <block type="math_number_property"></block>
         <block type="math_round"></block>

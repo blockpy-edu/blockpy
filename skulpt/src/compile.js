@@ -110,11 +110,13 @@ Compiler.prototype.annotateSource = function (ast, shouldStep) {
         //Sk.debugout(JSON.stringify(ast, null, 2));
         //Sk.debugout(ast.constructor.name);
 
-		out("\nSk.currLineNo = ",lineno, ";\nSk.currColNo = ",col_offset,"\n\n");	//	Added by RNL
+		out("\nSk.currLineNo = ",lineno, ";\nSk.currColNo = ",col_offset,";\n\n");	//	Added by RNL
 		out("\nSk.currFilename = '",this.filename,"';\n\n");	//	Added by RNL
         if (shouldStep) {
             out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename, '"+ast.constructor.name+"', "+JSON.stringify(ast)+");\n}\n");
         }
+        out("currLineNo = ", lineno, ";\ncurrColNo = ", col_offset, ";\n\n");
+    }
 };
 
 Compiler.prototype.gensym = function (hint) {

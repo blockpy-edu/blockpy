@@ -161,10 +161,10 @@ class Gen_compressed(threading.Thread):
   def run(self):
     self.gen_core()
     self.gen_blocks()
-    self.gen_generator("javascript")
+    #self.gen_generator("javascript")
     self.gen_generator("python")
-    self.gen_generator("php")
-    self.gen_generator("dart")
+    #self.gen_generator("php")
+    #self.gen_generator("dart")
 
   def gen_core(self):
     target_filename = "blockly_compressed.js"

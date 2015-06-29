@@ -732,8 +732,9 @@ PythonToBlocks.prototype.convert = function(python_source) {
     var filename = 'user_code.py';
     var parse_tree, symbol_table, error_message;
     try {
-        parse_tree = Sk.astFromParse(Sk.parse(filename, python_source), filename);
-        symbol_table = Sk.symboltable(parse_tree, filename);
+        var parse = Sk.parse(filename, python_source);
+        parse_tree = Sk.astFromParse(parse.cst, filename, parse.flags);
+        symbol_table = Sk.symboltable(parse_tree, filename, parse_tree);
         error_message = false;
     } catch (e) {
         error_message = e;
@@ -755,7 +756,7 @@ PythonToBlocks.prototype.convertToRaw = function(python_source) {
     var parse_tree, symbol_table, error_message;
     try {
         parse_tree = Sk.astFromParse(Sk.parse(filename, python_source), filename);
-        symbol_table = Sk.symboltable(parse_tree, filename);
+        symbol_table = Sk.symboltable(parse_tree.cst, filename, parse_tree.flag);
         error_message = false;
     } catch (e) {
         error_message = e;

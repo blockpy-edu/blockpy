@@ -27,10 +27,23 @@
 /**
  * @constructor 
  */
-function Kennel(attachmentPoint, toolbox, console) {    
+function Kennel(attachmentPoint, toolbox, mode, presentation) {
     // The weightQueue will prevents spamming of updates
     this._textUpdateQueue = new WaitQueue();
     this._blocklyUpdateQueue = new WaitQueue();
+    
+    // User programs
+    this.model = {
+        "settings": {
+            'editor': 'blocks'
+        },
+        "programs": {},
+        "presentation": presentation,
+    };
+    this.programs = {"__main__": $("#default-body").text(),
+                     "on_run": "def on_run(code, output, properties):\n    pass",
+                     "on_change": "def on_change(code, output, properties):\n    pass",
+                     "starting_code": ""};
     
     // The Div or whatever HTML element we attach everything to
     this._attachmentPoint = attachmentPoint;
@@ -43,7 +56,9 @@ function Kennel(attachmentPoint, toolbox, console) {
     this._loadExplorer();
     
     // Default mode when you open the screen is blocks
-    this._mode = 'blocks';
+    this._mode = mode;
+    
+    $("#__main__").click();
 };
 
 Kennel.prototype._dirtyEditor = false;
@@ -53,27 +68,33 @@ Kennel.prototype.getPythonFromBlocks = function() {
 }
 
 Kennel.prototype._updateText = function() {
-    var code = this.getPythonFromBlocks();
-    this._text.setValue(code);
+    if (this._dirtyEditor) {
+        var code = this.getPythonFromBlocks();
+        this._text.setValue(code);
+        this._dirtyEditor = false;
+    }
 }
 
 Kennel.prototype._updateBlocks = function() {
-    var backupXML = this.getXml();
-    var error = true;
-    try {
-        var code = this._text.getValue();
-        var xml = this._converter.convert(code);
-        var blocklyXML = Blockly.Xml.textToDom(xml);
-        this._blockly.clear();
-        Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
-        this._blockly.align();
-        error = false;
-    } catch (e) {
-        this.printError(e);
-    }
-    if (error) {
-        this._blockly.clear();
-        Blockly.Xml.domToWorkspace(this._blockly, backupXML);
+    if (this._dirtyEditor) {
+        var backupXML = this.getXml();
+        var error = true;
+        try {
+            var code = this._text.getValue();
+            var xml = this._converter.convert(code);
+            var blocklyXML = Blockly.Xml.textToDom(xml);
+            this._blockly.clear();
+            Blockly.Xml.domToWorkspace(this._blockly, blocklyXML);
+            this._blockly.align();
+            error = false;
+        } catch (e) {
+            this.printError(e);
+        }
+        if (error) {
+            this._blockly.clear();
+            Blockly.Xml.domToWorkspace(this._blockly, backupXML);
+        }
+        this._dirtyEditor = false;
     }
 }
 
@@ -93,9 +114,25 @@ Kennel.prototype.clear = function() {
 
 Kennel.prototype.metrics_editor_height = '100%';
 
-Kennel.prototype.changeMode = function() {
-    if (this._mode == 'blocks') {
-        this._mode = 'text';
+Kennel.prototype.changeKennelMode = function() {
+    if (this._mode == 'instructor') {
+        // Make the presentation editable
+        // Display the extra programs
+        // Expose Teacher API
+        // Extra Config options
+    } else if (this._mode == 'student') {
+        // Make the presentation
+    } else if (this._mode == 'grade') {
+    } else if (this._mode == 'public') {
+        // Hide the feedback box
+        // Hide the property explorer
+        // Hide the toolbar
+    }
+}
+
+Kennel.prototype.changeEditorMode = function() {
+    if (this.model.settings.editor == 'blocks') {
+        this.model.settings.editor = 'text';
         this._updateText();
         $(this._text.getWrapperElement()).show(); //.css('height', this.metrics_editor_height);
         $(this._mainDiv).find('.kennel-blocks').css('height', '0%');
@@ -104,8 +141,8 @@ Kennel.prototype.changeMode = function() {
         this._text.refresh();
         $(this._mainDiv).find('.kennel-change-mode').html('Change to Block View');
         this._blockly.setVisible(false);
-    } else if (this._mode == 'text') {
-        this._mode = 'blocks';
+    } else if (this.model.settings.editor == 'text') {
+        this.model.settings.editor = 'blocks';
         this._updateBlocks();
         $(this._text.getWrapperElement()).hide();
         $(this._mainDiv).find('.kennel-text').css('height', '0%');
@@ -114,7 +151,7 @@ Kennel.prototype.changeMode = function() {
         this._resetBlocklySize();
         this._blockly.setVisible(true);
     } else {
-        console.error("Invalid mode:", this._mode);
+        console.error("Invalid mode:", this.model.settings.editor);
     }
 }
 
@@ -122,7 +159,10 @@ Kennel.prototype._loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
-            "<div class='col-md-12 kennel-presentation'>"+
+            "<div class='col-md-7 kennel-presentation'>"+
+                this.model.presentation+
+            "</div>"+
+            "<div class='col-md-5' kennel-feedback'>"+
                 "The tool below is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
             "</div>"+
         "</div>"+
@@ -130,6 +170,8 @@ Kennel.prototype._loadMain = function() {
             "<div class='col-md-12 kennel-toolbar'>"+
                 "<button class='btn btn-default kennel-change-mode'>Change to Text View</button>"+
                 "<button class='btn btn-default kennel-run'>Run</button>"+
+                "<button class='btn btn-default kennel-mode'>Instructor Mode</button>"+
+                "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
             "</div>"+
         "</div>"+
         "<div class='row'>"+
@@ -143,7 +185,7 @@ Kennel.prototype._loadMain = function() {
                     "<div class='kennel-text'>"+
                         "<textarea class='language-python'"+
                                    "style='height:"+this.metrics_editor_height+
-                                   "'>import weather</textarea>"+
+                                   "'></textarea>"+
                     "</div>"+
                 "</div>"+
             "</div>"+
@@ -203,8 +245,28 @@ Kennel.prototype._loadMain = function() {
     this._mainDiv = $(this._attachmentPoint).html($(mainTabs))
     
     var kennel = this;
-    this._mainDiv.find('.kennel-change-mode').click(function() {kennel.changeMode()});
+    this._mainDiv.find('.kennel-change-mode').click(function() {kennel.changeEditorMode()});
+    this._mainDiv.find('.kennel-mode').click(function() {kennel.changeKennelMode()});
     this._mainDiv.find('.kennel-run').click(function() {kennel.run()});
+    
+    var _programTabs = this._mainDiv.find('.kennel-programs');
+    for (var name in this.programs) {
+        var code = this.programs[name];
+        console.log(name, code);
+        _programTabs.append(
+            "<label class='btn btn-default'>"+
+                "<input type='radio' id='"+name+"' "+
+                       "data-name='"+name+"' autocomplete='off'>"+
+                name+
+            "</label>");
+    }
+    _programTabs.button('toggle').change(function(event) {
+        var name = $(event.target).attr("data-name");
+        kennel.setPythonFromText(kennel.programs[name]);
+        if (kennel.model.settings.editor == 'blocks') {
+            kennel._updateBlocks();
+        }
+    });
 };
 
 Kennel.prototype._loadBlockly = function(toolbox) {
@@ -382,7 +444,6 @@ Kennel.prototype.reloadExplorer = function(page) {
         if (block_id) {
             this._blockly.highlightBlock(block_id);
         }
-        console.log(traceTable, page, block_id)
         function renderVisualizerRow(property, value) {
             return $("<tr/>").append($("<td/>").text(value['name']))
                              .append($("<td/>").text(value['type']))
@@ -458,7 +519,6 @@ Kennel.prototype.resetConsole = function() {
     var kennel = this;
     Sk.afterSingleExecution = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
-        console.log(astType);
         if (filename == '<stdin>.py') {
             var globals = kennel.parseGlobals(variables);
             kennel.traceTable.push({'step': kennel.step, 
@@ -593,7 +653,7 @@ Kennel.prototype.getHighlightMap = function() {
 Kennel.prototype.run = function() {
     this._updateBlocks();
     var code = "";
-    if (this._mode == 'blocks') {
+    if (this.model.settings.editor == 'blocks') {
         code = this.getPythonFromBlocks();
     } else {
         code = this.getPythonFromText();
