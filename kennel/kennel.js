@@ -27,7 +27,8 @@
 /**
  * @constructor 
  */
-function Kennel(attachmentPoint, toolbox, mode, presentation) {
+function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
+                on_run, on_change, starting_code) {
     // The weightQueue will prevents spamming of updates
     this._textUpdateQueue = new WaitQueue();
     this._blocklyUpdateQueue = new WaitQueue();
@@ -37,13 +38,14 @@ function Kennel(attachmentPoint, toolbox, mode, presentation) {
         "settings": {
             'editor': 'blocks'
         },
-        "programs": {},
+        "programs": {"__main__": current_code},
+        "feedback": {
+            on_run: on_run, 
+            on_change: on_change, 
+            starting_code: starting_code
+        },
         "presentation": presentation,
     };
-    this.programs = {"__main__": $("#default-body").text(),
-                     "on_run": "def on_run(code, output, properties):\n    pass",
-                     "on_change": "def on_change(code, output, properties):\n    pass",
-                     "starting_code": ""};
     
     // The Div or whatever HTML element we attach everything to
     this._attachmentPoint = attachmentPoint;
@@ -121,7 +123,9 @@ Kennel.prototype.changeKennelMode = function() {
         // Expose Teacher API
         // Extra Config options
     } else if (this._mode == 'student') {
-        // Make the presentation
+        // Make the presentation read-only
+        // Hide the extram programs
+        // Hide the Teacher API
     } else if (this._mode == 'grade') {
     } else if (this._mode == 'public') {
         // Hide the feedback box
@@ -250,19 +254,22 @@ Kennel.prototype._loadMain = function() {
     this._mainDiv.find('.kennel-run').click(function() {kennel.run()});
     
     var _programTabs = this._mainDiv.find('.kennel-programs');
-    for (var name in this.programs) {
-        var code = this.programs[name];
-        console.log(name, code);
-        _programTabs.append(
-            "<label class='btn btn-default'>"+
-                "<input type='radio' id='"+name+"' "+
-                       "data-name='"+name+"' autocomplete='off'>"+
-                name+
-            "</label>");
+    var addTab = function(name, code) {
+        _programTabs.append("<label class='btn btn-default'>"+
+                                "<input type='radio' id='"+name+"' "+
+                                        "data-name='"+name+"' autocomplete='off'>"+
+                                        name+
+                                "</label>");
+    }
+    for (var name in this.model.programs) {
+        addTab(name, this.model.programs[name]);
+    }
+    for (var name in this.model.feedback) {
+        addTab(name, this.model.feedback[name]);
     }
     _programTabs.button('toggle').change(function(event) {
         var name = $(event.target).attr("data-name");
-        kennel.setPythonFromText(kennel.programs[name]);
+        kennel.setPythonFromText(kennel.model.programs[name]);
         if (kennel.model.settings.editor == 'blocks') {
             kennel._updateBlocks();
         }
