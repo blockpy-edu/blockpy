@@ -1,10 +1,6 @@
 Undo/Redo in Blockly
-"Create Question" mode
-    Editable Presentation box
 Table Block
 Assessment API/Blocks
 Check mode
 Insertable charts
-"GUI" Mode
 Search for help in context menu
-??? Dirtiness for editor

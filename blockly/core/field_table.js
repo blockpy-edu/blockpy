@@ -100,6 +100,9 @@ Blockly.FieldTable.prototype.init = function(block) {
  */
 Blockly.FieldTable.prototype.setData = function(data) {
     if (data === null) {
+        if (this.data_ == null) {
+            this.setData([[""]]);
+        }
         // No change if null.
         return;
     }

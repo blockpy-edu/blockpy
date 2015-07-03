@@ -770,3 +770,6 @@ PythonToBlocks.prototype.convertToRaw = function(python_source) {
     }
     return this.XML;
 }
+
+
+PythonToBlocks.prototype.convertOrFail
