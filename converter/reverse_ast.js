@@ -98,7 +98,6 @@ ReverseAST.prototype.convertBody = function(node)
         var newChild = this.convertStatement(node[i], sourceCodeLines[i]);
         var nextElement = document.createElement("next");
         nextElement.appendChild(newChild);
-        console.log(currentChild);
         currentChild.appendChild(nextElement);
         currentChild = newChild;
     }
@@ -112,6 +111,23 @@ function block(type, fields, values, settings, mutations, statements) {
     for (var setting in settings) {
         var settingValue = settings[setting];
         newBlock.setAttribute(setting, settingValue);
+    }
+    // Mutations
+    if (mutations !== undefined && Object.keys(mutations).length > 0) {
+        var newMutation = document.createElement("mutation");
+        for (var mutation in mutations) {
+            var mutationValue = mutations[mutation];
+            if (mutation.charAt(0) == '@') {
+                newMutation.setAttribute(mutation.substr(1), mutationValue);
+            } else {
+                for (var i = 0; i < mutationValue.length; i++) {
+                    var mutationNode = document.createElement(mutation);
+                    mutationNode.setAttribute("name", mutationValue[i]);
+                    newMutation.appendChild(mutationNode);
+                }
+            }
+        }
+        newBlock.appendChild(newMutation);
     }
     // Fields
     for (var field in fields) {
@@ -129,21 +145,9 @@ function block(type, fields, values, settings, mutations, statements) {
         newValue.appendChild(valueValue);
         newBlock.appendChild(newValue);
     }
-    // Mutations
-    if (mutations !== undefined && mutations.length > 0) {
-        var newMutation = document.createElement("mutation");
-        for (var i = 0; i < mutations.length; i++) {
-            var mutationValue = mutations[i];
-            var mutationNode = document.createElement("arg");
-            mutationNode.setAttribute("name", mutationValue);
-            newMutation.appendChild(mutationNode);
-        }
-        newBlock.appendChild(newMutation);
-    }
     // Statements
     if (statements !== undefined && Object.keys(statements).length > 0) {
         for (var statement in statements) {
-            console.log(statement);
             var statementValue = statements[statement];
             var newStatement = document.createElement("statement");
             newStatement.setAttribute("name", statement);
@@ -233,9 +237,9 @@ ReverseAST.prototype.FunctionDef = function(node)
     }, {
     }, {
         "inline": "false"
-    },
-    this.arguments_(args),
-    {
+    }, {
+        "args": this.arguments_(args)
+    }, {
         "STACK": this.convertBody(body)
     });
 }
@@ -295,7 +299,7 @@ ReverseAST.prototype.Assign = function(node)
         throw new Error("Nothing to assign to!");
     } else if (targets.length == 1) {
         return block("variables_set", {
-            "VAR": this.Name(targets[0]) //targets
+            "VAR": this.Name_str(targets[0]) //targets
         }, {
             "VALUE": this.convert(value)
         });
@@ -320,7 +324,7 @@ ReverseAST.prototype.AugAssign = function(node)
         throw new Error("Only addition is currently supported for augmented assignment!");
     } else {
         return block("math_change", {
-            "VAR": this.Name(target)
+            "VAR": this.Name_str(target)
         }, {
             "DELTA": this.convert(value)
         });
@@ -338,25 +342,49 @@ ReverseAST.prototype.Print = function(node)
     var dest = node.dest;
     var values = node.values;
     var nl = node.nl;
-    /*
+    
     if (values.length == 1) {
-        return block("text_print",
+        return block("text_print", {}, {
+            "TEXT": this.convert(values[0])
+        });
     } else {
-        return block("text_print_multiple"
-    }*/
+        return block("text_print_multiple", {}, 
+            this.convertElements("PRINT", values), 
+        {
+            "inline": "true"
+        }, {
+            "@items": values.length
+        });
+    }
 }
 
 /*
  * target: expr_ty
+ * iter: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
  *
  */
-ReverseAST.prototype.For_ = function(/* {expr_ty} */ target, /* {expr_ty} */ iter, /* {asdl_seq *} */
-                   body, /* {asdl_seq *} */ orelse)
-{
-    this.target = target;
-    this.iter = iter;
-    this.body = body;
-    this.orelse = orelse;
+ReverseAST.prototype.For_ = function(node) {
+    var target = node.target;
+    var iter = node.iter;
+    var body = node.body;
+    var orelse = node.orelse;
+    
+    if (orelse.length > 0) {
+        // TODO
+        throw new Error("Or-else block of For is not implemented.");
+    }
+    
+    return block("controls_forEach", {
+        "VAR": this.Name_str(target)
+    }, {
+        "LIST": this.convert(iter)
+    }, {
+        "inline": "false"
+    }, {}, {
+        "DO": this.convertBody(body)
+    });
 }
 
 /*
@@ -554,7 +582,6 @@ ReverseAST.prototype.BinOp = function(node)
     var left = node.left;
     var op = node.op;
     var right = node.right;
-    console.log(op);
     return block("math_arithmetic", {
         "OP": this.binaryOperator(op) // TODO
     }, {
@@ -760,17 +787,46 @@ ReverseAST.prototype.Name = function(node)
 {
     var id = node.id;
     var ctx = node.ctx;
-    return this.identifier(id);
+    return block('variables_get', {
+        "VAR": this.identifier(id)
+    });
 }
 
 /*
- *
+ * id: identifier
+ * ctx: expr_context_ty
+ */
+ReverseAST.prototype.Name_str = function(node)
+{
+    var id = node.id;
+    var ctx = node.ctx;
+    return this.identifier(id);
+}
+
+ReverseAST.prototype.convertElements = function(key, values) {
+    var output = {};
+    for (var i = 0; i < values.length; i++) {
+        output[key+i] = this.convert(values[i]);
+    }
+    return output;
+}
+
+/*
+ * elts: asdl_seq
+ * ctx: expr_context_ty
  *
  */
-ReverseAST.prototype.List = function(/* {asdl_seq *} */ elts, /* {expr_context_ty} */ ctx)
-{
-    this.elts = elts;
-    this.ctx = ctx;
+ReverseAST.prototype.List = function(node) {
+    var elts = node.elts;
+    var ctx = node.ctx;
+    
+    return block("lists_create_with", {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": "false"
+    }, {
+        "@items": elts.length
+    });
 }
 
 /*
