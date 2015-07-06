@@ -34,6 +34,7 @@ goog.require('Blockly.Blocks');
  */
 Blockly.Blocks.texts.HUE = 270;
 var DATA_HUE = 100;
+var UTILITY_HUE = 160;
 
 Blockly.Blocks['text'] = {
   /**
@@ -587,7 +588,7 @@ Blockly.Blocks['text_print'] = {
       ],
       "previousStatement": null,
       "nextStatement": null,
-      "colour": Blockly.Blocks.texts.HUE,
+      "colour": UTILITY_HUE,
       "tooltip": Blockly.Msg.TEXT_PRINT_TOOLTIP,
       "helpUrl": Blockly.Msg.TEXT_PRINT_HELPURL
     });
