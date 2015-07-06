@@ -285,7 +285,11 @@ KennelEditor.prototype.updateBlocks = function() {
     try {
         // Try to convert it!
         var code = this.text.getValue();
-        var xml = this.converter.convert(code);
+        var result = this.converter.convert(code);
+        var xml = result.xml;
+        if (result.errors != "") {
+            console.error(result.errors);
+        }
         var blocklyXml = Blockly.Xml.textToDom(xml);
         this.setBlocksFromXml(blocklyXml);
         this.blockly.align();
@@ -385,7 +389,10 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     
     // Initialize the editor.
     this.editor = new KennelEditor(
-        function(content) { kennel.model.programs[kennel.model.settings.program] = content; },
+        function(content) { 
+            localStorage.setItem('__main__', content);
+            kennel.model.programs[kennel.model.settings.program] = content;
+        },
         function() { return kennel.model.programs[kennel.model.settings.program]; },
         function(new_editor) { kennel.model.settings.editor = new_editor; },
         function() { return kennel.model.settings.editor; },
@@ -799,19 +806,31 @@ Kennel.prototype.run = function() {
         this.printError("Your canvas is currently blank.");
     }
     this.resetConsole();
-    try {
-        // Actually run the python code
-        var module = Sk.importMainWithBody("<stdin>", false, code);
-        // And run the afterSingleExecution one extra time to get final program state
-        Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
-    } catch (e) {
-        console.log(e.stack);
-        this.printError(e);
-    }
-    this.explorer.reload(this.traceTable, -1);
+    // Actually run the python code
+    var executionPromise = Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody("<stdin>", false, code, true);
+    });
     
-    // Handle checks
-    this.check(code, this.traceTable, this.outputList);
+    // Change "Run" to "Executing"
+    this.toolbar.elements.run.prop('disabled', true);
+    
+    var kennel = this;
+    executionPromise.then(
+        function (module) {
+            // Run the afterSingleExecution one extra time for final state
+            Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
+            kennel.explorer.reload(kennel.traceTable, -1);
+            // Handle checks
+            kennel.check(code, kennel.traceTable, kennel.outputList);
+            // Reenable "Run"
+            kennel.toolbar.elements.run.prop('disabled', false);
+        },
+        function(error) {
+            console.log(error.stack);
+            kennel.printError(error);
+            kennel.toolbar.elements.run.prop('disabled', false);
+        }
+    );
 }
 
 Kennel.prototype.check = function(student_code, traceTable, output) {
