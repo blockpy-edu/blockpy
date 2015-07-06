@@ -44,6 +44,8 @@ Blockly.Blocks['procedures_defnoreturn'] = {
     var nameField = new Blockly.FieldTextInput(name,
         Blockly.Procedures.rename);
     nameField.setSpellcheck(false);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
     this.appendDummyInput()
         .appendField(Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE)
         .appendField(nameField, 'NAME')
@@ -348,6 +350,8 @@ Blockly.Blocks['procedures_defreturn'] = {
         .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
     this.arguments_ = [];
     this.setStatements_(true);
     this.statementConnection_ = null;

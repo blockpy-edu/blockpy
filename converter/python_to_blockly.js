@@ -25,22 +25,19 @@
 'use strict';
 
 /**
- *
- */
-function PythonAST() {
-};
-
-PythonAST.prototype.AugAssign = function() {
-};
-
-/**
  * @constructor 
  */
 function PythonToBlocks() {
 };
 
-PythonToBlocks.prototype._createRawBlock = function(body) {
-    return this._createSimpleBlock("raw_block", "TEXT", body.$r().v);
+PythonToBlocks.prototype.raw_block = function(text) {
+    var RawBlock = document.createElement("block");
+    RawBlock.setAttribute("type", "raw_block");
+    var Field = document.createElement("field");
+    Field.setAttribute("name", "TEXT");
+    Field.appendChild(document.createTextNode(text));
+    RawBlock.appendChild(Field);
+    return RawBlock;
 }
 PythonToBlocks.prototype._createRawExpression = function(body) {
     return this._createSimpleBlock("raw_expression", "TEXT", body.$r().v);
@@ -332,10 +329,10 @@ PythonToBlocks.prototype._createUnaryBlock = function(type, inline, title, value
 PythonToBlocks.prototype._createSimpleBlock = function(type, name, value) {
     var Raw = document.createElement("block");
     Raw.setAttribute("type", type);
-    var Title = document.createElement("title");
-    Title.setAttribute("name", name);
-    Title.appendChild(document.createTextNode(value));
-    Raw.appendChild(Title);
+    var Field = document.createElement("field");
+    Field.setAttribute("name", name);
+    Field.appendChild(document.createTextNode(value));
+    Raw.appendChild(Field);
     return Raw;
 }
 
@@ -727,49 +724,30 @@ PythonToBlocks.prototype._convertBody = function(parent, statements) {
 }
 
 PythonToBlocks.prototype.convert = function(python_source) {
-    this.XML = document.createElement("xml");
-    this.XML.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    this.reverse = new ReverseAST(python_source.split("\n"));
+    var xml = document.createElement("xml");
+    xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     var filename = 'user_code.py';
-    var parse_tree, symbol_table, error_message;
+    var ast, symbol_table, error_message;
     try {
         var parse = Sk.parse(filename, python_source);
-        parse_tree = Sk.astFromParse(parse.cst, filename, parse.flags);
-        symbol_table = Sk.symboltable(parse_tree, filename, parse_tree);
+        ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+        symbol_table = Sk.symboltable(ast, filename, python_source, filename, parse.flags);
         error_message = false;
+        console.log("AST:", ast);
     } catch (e) {
         error_message = e;
         console.log(error_message);
     }
     this.sourceCodeLines = python_source.split("\n");
     
-    if (error_message !== false) {
-        throw "Error: "+error_message;
-    } else {
-        this._convertBody(this.XML, parse_tree.body);
+    xml.appendChild(this.raw_block(python_source))
+    var converted = this.reverse.convert(ast);
+    var other_xml = document.createElement("xml");
+    if (converted !== null) {
+        other_xml.appendChild(converted);
     }
-    console.log(parse_tree.body)
-    return new XMLSerializer().serializeToString(this.XML);
+    xml = other_xml;
+    console.log(converted);
+    return {"xml": new XMLSerializer().serializeToString(xml), "errors": error_message};
 }
-
-PythonToBlocks.prototype.convertToRaw = function(python_source) {
-    var filename = 'user_code.py';
-    var parse_tree, symbol_table, error_message;
-    try {
-        parse_tree = Sk.astFromParse(Sk.parse(filename, python_source), filename);
-        symbol_table = Sk.symboltable(parse_tree.cst, filename, parse_tree.flag);
-        error_message = false;
-    } catch (e) {
-        error_message = e;
-    }
-    this.sourceCodeLines = python_source.split("\n");
-    
-    if (error_message !== false) {
-        console.log("Error: "+error_message);
-    } else {
-        this.XML.appendChild(this._createRawBlock(python_source));
-    }
-    return this.XML;
-}
-
-
-PythonToBlocks.prototype.convertOrFail

@@ -182,10 +182,13 @@ Blockly.FieldTable.prototype.setData = function(data) {
  * @private
  */
 Blockly.FieldTable.prototype.render_ = function() {
-    console.log(this);
     if (this.visible_ && this.tableElements_) {
         // Calculate the width of the header row
-        this.size_.width = this.tableElements_[0].getBBox().width;
+        if (this.tableElements_.length >= 1) {
+            this.size_.width = this.tableElements_[0].getBBox().width;
+        } else {
+            this.size_.width = 50;
+        }
         // Calculate the height of the entire thing
         this.size_.height= (this.data_.length || 1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
         // And update the border rectangle

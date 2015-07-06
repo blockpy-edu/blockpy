@@ -103,7 +103,26 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
     return;
   }
   this.text_ = text;
-  
+  this.updateTextNode_();
+
+  if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+    this.sourceBlock_.render();
+    this.sourceBlock_.bumpNeighbours_();
+    this.sourceBlock_.workspace.fireChangeEvent();
+  }
+};
+
+
+/**
+ * Update the text node of this field to display the current text.
+ * @private
+ */
+Blockly.Field.prototype.updateTextNode_ = function() {
+  if (!this.textElement_) {
+    // Not rendered yet.
+    return;
+  }
+  var text = this.text_;
   // Empty the text element.
   if (this.textElement_ !== undefined) {
     goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
@@ -119,11 +138,6 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
     text = Blockly.Field.NBSP;
   }
   //text = text.replace(/\s/g, Blockly.Field.NBSP);
-  
-        /*<text x="10" y="20" style="fill:red;">Several lines:
-    <tspan x="10" y="45">First line.</tspan>
-    <tspan x="10" y="70">Second line.</tspan>
-  </text>*/
   var y=2;
   var that=this;
   //var textNode = document.createTextNode(text);
@@ -133,17 +147,9 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
                           .appendChild(document.createTextNode(textline));
                 y+=20;
   });
-  
-  //this.textElement_.appendChild(textNode);
 
   // Cached width is obsolete.  Clear it.
   this.size_.width = 0;
-
-  if (this.sourceBlock_ && this.sourceBlock_.rendered) {
-    this.sourceBlock_.render();
-    this.sourceBlock_.bumpNeighbours_();
-    this.sourceBlock_.workspace.fireChangeEvent();
-  }
 };
 
 /**

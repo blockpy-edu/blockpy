@@ -32,7 +32,8 @@ goog.require('Blockly.Python');
 Blockly.Python['procedures_defreturn'] = function(block) {
   // Define a procedure with a return value.
   // First, add a 'global' statement for every variable that is assigned.
-  var globals = Blockly.Variables.allVariables(block);
+  // acbart: Actually, skip that, globals are bad news!
+  var globals = []; //Blockly.Variables.allVariables(block);
   for (var i = globals.length - 1; i >= 0; i--) {
     var varName = globals[i];
     if (block.arguments_.indexOf(varName) == -1) {
@@ -45,18 +46,23 @@ Blockly.Python['procedures_defreturn'] = function(block) {
     }
   }
   globals = globals.length ? '  global ' + globals.join(', ') + '\n' : '';
+  // Get the function's name
   var funcName = Blockly.Python.variableDB_.getName(block.getFieldValue('NAME'),
       Blockly.Procedures.NAME_TYPE);
+  // Get the stack of code
   var branch = Blockly.Python.statementToCode(block, 'STACK');
+  // Handle prefixing
   if (Blockly.Python.STATEMENT_PREFIX) {
     branch = Blockly.Python.prefixLines(
         Blockly.Python.STATEMENT_PREFIX.replace(/%1/g,
         '\'' + block.id + '\''), Blockly.Python.INDENT) + branch;
   }
+  // Handle infinite loop trapping
   if (Blockly.Python.INFINITE_LOOP_TRAP) {
     branch = Blockly.Python.INFINITE_LOOP_TRAP.replace(/%1/g,
         '"' + block.id + '"') + branch;
   }
+  // Handle return value
   var returnValue = Blockly.Python.valueToCode(block, 'RETURN',
       Blockly.Python.ORDER_NONE) || '';
   if (returnValue) {
@@ -71,9 +77,11 @@ Blockly.Python['procedures_defreturn'] = function(block) {
   }
   var code = 'def ' + funcName + '(' + args.join(', ') + '):\n' +
       globals + branch + returnValue;
-  code = Blockly.Python.scrub_(block, code);
-  Blockly.Python.definitions_[funcName] = code;
-  return null;
+  //acbart: I'm not sure why this is used here. It was fine before when
+  //        functions didn't have anything after them, but now it's deadly.
+  //code = Blockly.Python.scrub_(block, code);
+  //Blockly.Python.definitions_[funcName] = code;
+  return code;
 };
 
 // Defining a procedure without a return value uses the same generator as
@@ -118,6 +126,19 @@ Blockly.Python['procedures_ifreturn'] = function(block) {
     code += '  return ' + value + '\n';
   } else {
     code += '  return\n';
+  }
+  return code;
+};
+
+Blockly.Python['procedures_return'] = function(block) {
+  // return value from a procedure.
+  var code = "return";
+  if (block.hasReturnValue_) {
+    var value = Blockly.Python.valueToCode(block, 'VALUE',
+        Blockly.Python.ORDER_NONE) || 'None';
+    code += ' ' + value + '\n';
+  } else {
+    code += '\n';
   }
   return code;
 };
