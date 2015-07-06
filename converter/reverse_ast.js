@@ -388,19 +388,20 @@ ReverseAST.prototype.For_ = function(node) {
 }
 
 /*
- *
- *
+ * test: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
  */
-ReverseAST.prototype.While_ = function(/* {expr_ty} */ test, /* {asdl_seq *} */ body, /* {asdl_seq *}
-                     */ orelse)
-{
-    this.test = test;
-    this.body = body;
-    this.orelse = orelse;
+ReverseAST.prototype.While_ = function(node) {
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    // TODO
+    throw new Error("While loop not implemented");
 }
 
 /*
- *
+ * 
  *
  */
 ReverseAST.prototype.If_ = function(/* {expr_ty} */ test, /* {asdl_seq *} */ body, /* {asdl_seq *} */
