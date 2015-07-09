@@ -740,6 +740,7 @@ PythonToBlocks.prototype.convert = function(python_source) {
         console.log(error_message);
     }
     this.sourceCodeLines = python_source.split("\n");
+    this.reverse.measureNode(ast);
     
     xml.appendChild(this.raw_block(python_source))
     var converted = this.reverse.convert(ast);
