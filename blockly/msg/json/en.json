@@ -1,7 +1,7 @@
 {
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
-		"lastupdated": "2015-06-27 14:34:51.261000",
+		"lastupdated": "2015-07-07 07:43:53.788000",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},
@@ -51,7 +51,7 @@
 	"CONTROLS_REPEAT_INPUT_DO": "do",
 	"CONTROLS_REPEAT_TOOLTIP": "Do some statements several times.",
 	"CONTROLS_WHILEUNTIL_HELPURL": "https://github.com/google/blockly/wiki/Loops#repeat",
-	"CONTROLS_WHILEUNTIL_OPERATOR_WHILE": "repeat while",
+	"CONTROLS_WHILEUNTIL_OPERATOR_WHILE": "while",
 	"CONTROLS_WHILEUNTIL_OPERATOR_UNTIL": "repeat until",
 	"CONTROLS_WHILEUNTIL_TOOLTIP_WHILE": "While a value is true, then do some statements.",
 	"CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL": "While a value is false, then do some statements.",

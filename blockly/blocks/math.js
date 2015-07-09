@@ -87,6 +87,7 @@ Blockly.Blocks['math_arithmetic'] = {
   }
 };
 
+
 Blockly.Blocks['math_single'] = {
   /**
    * Block for advanced math operators with single operand.

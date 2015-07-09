@@ -73,6 +73,16 @@ Blockly.Python['controls_whileUntil'] = function(block) {
   return 'while ' + argument0 + ':\n' + branch;
 };
 
+Blockly.Python['controls_while'] = function(block) {
+  // Do while/until loop.
+  var argument0 = Blockly.Python.valueToCode(block, 'BOOL',
+      Blockly.Python.ORDER_NONE) || 'False';
+  var branch = Blockly.Python.statementToCode(block, 'DO');
+  branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+      Blockly.Python.PASS;
+  return 'while ' + argument0 + ':\n' + branch;
+};
+
 Blockly.Python['controls_for'] = function(block) {
   // For loop.
   var variable0 = Blockly.Python.variableDB_.getName(
@@ -211,4 +221,8 @@ Blockly.Python['controls_flow_statements'] = function(block) {
       return 'continue\n';
   }
   throw 'Unknown flow statement.';
+};
+
+Blockly.Python['controls_pass'] = function(block) {
+  return 'pass\n';
 };

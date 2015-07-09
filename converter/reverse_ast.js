@@ -66,6 +66,86 @@ ReverseAST.prototype.identifier = function(node) {
     return Sk.ffi.remapToJs(node);
 }
 
+ReverseAST.prototype.recursiveMeasure = function(node, nextBlockLine) {
+    if (node === undefined)  {
+        return;
+    }
+    var myNext = nextBlockLine;
+    if ("orelse" in node && node.orelse.length > 0) {
+        if (node.orelse.length == 1 && node.orelse[0].constructor.name == "If_") {
+            myNext = node.orelse[0].lineno-1;
+        } else {
+            myNext = node.orelse[0].lineno-1-1;
+        }
+        //this.heights.push(next);
+        //this.ys.push([i+1, node.orelse.length]);
+    }
+    //console.log("RECURSE", node, "Current:", node.lineno, "MyNext", myNext, "ParentNext:", nextBlockLine);
+    this.heights.push(myNext);
+    if ("body" in node) {
+        for (var i = 0; i < node.body.length; i++) {
+            var next;
+            if (i+1 == node.body.length) {
+                next = myNext;
+            } else {
+                next = node.body[i+1].lineno-1;
+            }
+            //console.log("\t", "My next:", next);
+            //this.heights.push(next);
+            this.ys.push([i+1, node.body.length]);
+            this.recursiveMeasure(node.body[i], next);
+        }
+    }
+    // TODO
+    /*
+    var current = node;
+    var orelse = null;
+    while ("orelse" in current && current.orelse.length > 0) {
+        orelse = current.orelse;
+        current = current.orelse[0];
+        if (current.name == "If_") {
+            this.heights.push();
+        } else {
+            this.recursiveMeasure(orelse, next);
+        }
+    }*/
+    if ("orelse" in node) {
+        for (var i = 0; i < node.orelse.length; i++) {
+            var next;
+            if (i == node.orelse.length) {
+                next = nextBlockLine;
+            } else {
+                next = 1+(node.orelse[i].lineno-1);
+            }
+            //this.heights.push(next);
+            this.ys.push([i+1, node.orelse.length]);
+            //console.log("ORELSE:", node.orelse[i].name, "Next:", next, "ParentNext:", nextBlockLine);
+            this.recursiveMeasure(node.orelse[i], next);
+        }
+    }
+}
+
+ReverseAST.prototype.measureNode = function(node) {
+    this.heights = [];
+    this.ys = [];
+    this.recursiveMeasure(node, this.source.length-1);
+    this.heights.shift();
+    console.log(this.heights);
+    console.log(this.ys);
+}
+
+ReverseAST.prototype.getSourceCode = function(from, to) {
+    var lines = this.source.slice(from-1, to);
+    // Strip out any starting indentation.
+    if (lines.length > 0) {
+        var indentation = lines[0].search(/\S/);
+        for (var i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].substring(indentation);
+        }
+    }
+    return lines.join("\n");
+}
+
 ReverseAST.prototype.convertBody = function(node)
 {
     // Empty body. Boring!
@@ -75,27 +155,37 @@ ReverseAST.prototype.convertBody = function(node)
     
     // Build up the correct source code mappings
     // This is tricked by semicolons. Hard to get around that...
-    var sourceCodeLines = [];
+    /*var sourceCodeLines = [];
+    
     for (var i = 0; i < node.length; i++) {
         var lines = [];
         var current = node[i];
+        //console.log("Node", current.lineno, this.heights.shift());
         var end;
         if (i == node.length-1) {
             end = this.source.length-1;
         } else {
             end = node[i+1].lineno-1;
         }
+        if ("body" in current) {
+            console.log(Object.keys(current));
+        }
+        console.log("TRAVERSE:", current.lineno-1, end, node.length, this.source.length-1);
         for (var start = current.lineno-1; start < end; start++) {
             lines.push(this.source[start]);
         }
         sourceCodeLines.push(lines.join("\n"));
-    }
+    }*/
     
     // Build the actual blocks
-    var firstChild = this.convertStatement(node[0], sourceCodeLines[0]); // XML Block
+    var from = node[0].lineno;
+    var to = this.heights.shift();
+    console.log("DEEPER", node[0].constructor.name, from, to);
+    var firstChild = this.convertStatement(node[0], this.getSourceCode(from, to)); // XML Block
     var currentChild = firstChild;
     for (var i = 1; i < node.length; i++) {
-        var newChild = this.convertStatement(node[i], sourceCodeLines[i]);
+        console.log("DEEPER", node[i].constructor.name, node[i].lineno,this.heights.shift());
+        var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
         var nextElement = document.createElement("next");
         nextElement.appendChild(newChild);
         currentChild.appendChild(nextElement);
@@ -117,7 +207,7 @@ function block(type, fields, values, settings, mutations, statements) {
         var newMutation = document.createElement("mutation");
         for (var mutation in mutations) {
             var mutationValue = mutations[mutation];
-            if (mutation.charAt(0) == '@') {
+                if (mutation.charAt(0) == '@') {
                 newMutation.setAttribute(mutation.substr(1), mutationValue);
             } else {
                 for (var i = 0; i < mutationValue.length; i++) {
@@ -152,8 +242,8 @@ function block(type, fields, values, settings, mutations, statements) {
             var newStatement = document.createElement("statement");
             newStatement.setAttribute("name", statement);
             newStatement.appendChild(statementValue);
+            newBlock.appendChild(newStatement);
         }
-        newBlock.appendChild(newStatement);
     }
     return newBlock;
 }
@@ -251,8 +341,7 @@ ReverseAST.prototype.FunctionDef = function(node)
  * body: asdl_seq
  * decorator_list: asdl_seq
  */
-ReverseAST.prototype.ClassDef = function(/* {identifier} */ name, /* {asdl_seq *} */ bases, /*
-                       {asdl_seq *} */ body, /* {asdl_seq *} */ decorator_list)
+ReverseAST.prototype.ClassDef = function(node)
 {
     this.name = name;
     this.bases = bases;
@@ -396,169 +485,252 @@ ReverseAST.prototype.While_ = function(node) {
     var test = node.test;
     var body = node.body;
     var orelse = node.orelse;
-    // TODO
-    throw new Error("While loop not implemented");
+    if (orelse.length > 0) {
+        // TODO
+        throw new Error("Or-else block of While is not implemented.");
+    }
+    return block("controls_while", {}, {
+        "BOOL": this.convert(test)
+    }, {}, {}, {
+        "DO": this.convertBody(body)
+    });
 }
 
 /*
- * 
+ * test: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
  *
  */
-ReverseAST.prototype.If_ = function(/* {expr_ty} */ test, /* {asdl_seq *} */ body, /* {asdl_seq *} */
-                  orelse)
+ReverseAST.prototype.If_ = function(node)
 {
-    this.test = test;
-    this.body = body;
-    this.orelse = orelse;
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    
+    var IF_values = {"IF0": this.convert(test)};
+    var DO_values = {"DO0": this.convertBody(body)};
+    
+    var elseifCount = 0;
+    var elseCount = 0;
+    var potentialElseBody = null;
+    
+    // Handle weird orelse stuff
+    if (orelse !== undefined) {
+        if (orelse.length == 1 && orelse[0].constructor.name == "If_") {
+            // This is an 'ELIF'
+            while (orelse.length == 1  && orelse[0].constructor.name == "If_") {
+                elseifCount += 1;
+                console.log("FREKAING", orelse.lineno, this.heights.shift());
+                body = orelse[0].body;
+                test = orelse[0].test;
+                orelse = orelse[0].orelse;
+                DO_values["DO"+elseifCount] = this.convertBody(body);
+                if (test !== undefined) {
+                    IF_values["IF"+elseifCount] = this.convert(test);
+                }
+            }
+        }
+        if (orelse !== undefined) {
+            // Or just the body of an Else statement
+            elseCount += 1;
+            DO_values["ELSE"] = this.convertBody(orelse);
+        }
+    }
+    
+    return block("controls_if", {
+    }, IF_values, {
+        "inline": "false"
+    }, {
+        "@elseif": elseifCount,
+        "@else": elseCount
+    }, DO_values);
+}
+
+/*
+ * context_expr: expr_ty
+ * optional_vars: expr_ty
+ * body: asdl_seq
+ */
+ReverseAST.prototype.With_ = function(node)
+{
+    var context_expr = node.context_expr;
+    var optional_vars = node.optional_vars;
+    var body = node.body;
+    throw new Error("With_ not implemented");
+}
+
+/*
+ * type: expr_ty
+ * inst: expr_ty
+ * tback: expr_ty
+ */
+ReverseAST.prototype.Raise = function(node)
+{
+    var type = node.type;
+    var inst = node.inst;
+    var tback = node.tback;
+    throw new Error("Raise not implemented");
+}
+
+/*
+ * body: asdl_seq
+ * handlers: asdl_seq
+ * orelse: asdl_seq
+ *
+ */
+ReverseAST.prototype.TryExcept = function(node)
+{
+    var body = node.body;
+    var handlers = node.handlers;
+    var orelse = node.orelse;
+    throw new Error("TryExcept not implemented");
+}
+
+/*
+ * body: asdl_seq
+ * finalbody: asdl_seq
+ *
+ */
+ReverseAST.prototype.TryFinally = function(node)
+{
+    var body = node.body;
+    var finalbody = node.finalbody;
+    throw new Error("TryExcept not implemented");
+}
+
+/*
+ * test: expr_ty
+ * msg: expr_ty
+ */
+ReverseAST.prototype.Assert = function(node)
+{
+    var test = node.test;
+    var msg = node.msg;
+    throw new Error("Assert not implemented");
+}
+
+/*
+ * names: asdl_seq
+ *
+ */
+ReverseAST.prototype.Import_ = function(node)
+{
+    var names = node.names;
+    // The import statement isn't used in blockly because it happens implicitly
+    return null;
+}
+
+/*
+ * module: identifier
+ * names: asdl_seq
+ * level: int
+ *
+ */
+ReverseAST.prototype.ImportFrom = function(node)
+{
+    var module = node.module;
+    var names = node.names;
+    var level = node.level;
+    // The import statement isn't used in blockly because it happens implicitly
+    return null;
+}
+
+/*
+ * body: expr_ty
+ * globals: expr_ty
+ * locals: expr_ty
+ *
+ */
+ReverseAST.prototype.Exec = function(node) {
+    var body = node.body;
+    var globals = node.globals;
+    var locals = node.locals;
+    throw new Error("Exec not implemented");
+}
+
+/*
+ * names: asdl_seq
+ *
+ */
+ReverseAST.prototype.Global = function(node)
+{
+    var names = node.names;
+    throw new Error("Globals not implemented");
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+ReverseAST.prototype.Expr = function(node) {
+    var value = node.value;
+    
+    return block("raw_empty", {}, {
+        "VALUE": this.convert(value)
+    });
 }
 
 /*
  *
  *
  */
-ReverseAST.prototype.With_ = function(/* {expr_ty} */ context_expr, /* {expr_ty} */ optional_vars, /*
-                    {asdl_seq *} */ body)
-{
-    this.context_expr = context_expr;
-    this.optional_vars = optional_vars;
-    this.body = body;
+ReverseAST.prototype.Pass = function() {
+    return block("controls_pass");
 }
 
 /*
  *
  *
  */
-ReverseAST.prototype.Raise = function(/* {expr_ty} */ type, /* {expr_ty} */ inst, /* {expr_ty} */
-                    tback)
-{
-    this.type = type;
-    this.inst = inst;
-    this.tback = tback;
+ReverseAST.prototype.Break_ = function() {
+    return block("controls_flow_statements", {
+        "FLOW": "BREAK"
+    });
 }
 
 /*
  *
  *
  */
-ReverseAST.prototype.TryExcept = function(/* {asdl_seq *} */ body, /* {asdl_seq *} */ handlers, /*
-                        {asdl_seq *} */ orelse)
-{
-    this.body = body;
-    this.handlers = handlers;
-    this.orelse = orelse;
+ReverseAST.prototype.Continue_ = function() {
+    return block("controls_flow_statements", {
+        "FLOW": "CONTINUE"
+    });
 }
 
 /*
- *
+ * TODO: what does this do?
  *
  */
-ReverseAST.prototype.TryFinally = function(/* {asdl_seq *} */ body, /* {asdl_seq *} */ finalbody)
-{
-    this.body = body;
-    this.finalbody = finalbody;
+ReverseAST.prototype.Debugger_ = function() {
+    return null;
+}
+
+ReverseAST.prototype.booleanOperator = function(op) {
+    switch (op.name) {
+        case "And": return "AND";
+        case "Or": return "OR";
+        default: throw new Error("Operator not supported:"+op.name);
+    }
 }
 
 /*
- *
- *
+ * op: boolop_ty
+ * values: asdl_seq
  */
-ReverseAST.prototype.Assert = function(/* {expr_ty} */ test, /* {expr_ty} */ msg)
-{
-    this.test = test;
-    this.msg = msg;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Import_ = function(/* {asdl_seq *} */ names)
-{
-    this.names = names;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.ImportFrom = function(/* {identifier} */ module, /* {asdl_seq *} */ names, /*
-                         {int} */ level)
-{
-    this.module = module;
-    this.names = names;
-    this.level = level;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Exec = function(/* {expr_ty} */ body, /* {expr_ty} */ globals, /* {expr_ty} */
-                   locals)
-{
-    this.body = body;
-    this.globals = globals;
-    this.locals = locals;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Global = function(/* {asdl_seq *} */ names)
-{
-    this.names = names;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Expr = function(/* {expr_ty} */ value)
-{
-    this.value = value;
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Pass = function()
-{
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Break_ = function()
-{
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Continue_ = function()
-{
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.Debugger_ = function()
-{
-}
-
-/*
- *
- *
- */
-ReverseAST.prototype.BoolOp = function(/* {boolop_ty} */ op, /* {asdl_seq *} */ values)
-{
-    this.op = op;
-    this.values = values;
+ReverseAST.prototype.BoolOp = function(node) {
+    var op = node.op;
+    var values = node.values;
+    // TODO: is there ever a case where it's != 2 values?
+    return block("logic_operation", {
+        "OP": this.booleanOperator(op)
+    }, {
+        "A": this.convert(values[0]),
+        "B": this.convert(values[1])
+    }, {
+        "inline": "true"
+    });
 }
 
 ReverseAST.prototype.binaryOperator = function(op) {
@@ -569,7 +741,7 @@ ReverseAST.prototype.binaryOperator = function(op) {
         case "Mult": return "MULTIPLY";
         case "Pow": return "POWER";
         case "Mod": return "MODULO";
-        default: return "Error";
+        default: throw new Error("Operator not supported:"+op.name);
     }
 }
 
@@ -594,13 +766,20 @@ ReverseAST.prototype.BinOp = function(node)
 }
 
 /*
- *
- *
+ * op: unaryop_ty
+ * operand: expr_ty
  */
-ReverseAST.prototype.UnaryOp = function(/* {unaryop_ty} */ op, /* {expr_ty} */ operand)
+ReverseAST.prototype.UnaryOp = function(node)
 {
-    this.op = op;
-    this.operand = operand;
+    var op = node.op;
+    var operand = node.operand;
+    if (op.name == "Not") {
+        return block("logic_negate", {}, {
+        "BOOL": this.convert(operand) 
+        }, {
+            "inline": "false"
+        });
+    }               
 }
 
 /*
@@ -695,16 +874,44 @@ ReverseAST.prototype.Yield = function(/* {expr_ty} */ value)
     this.value = value;
 }
 
+
+ReverseAST.prototype.compareOperator = function(op) {
+    switch (op.name) {
+        case "Eq": return "EQ";
+        case "NotEq": return "NEQ";
+        case "Lt": return "LT";
+        case "Gt": return "GT";
+        case "LtE": return "LTE";
+        case "GtE": return "GTE";
+        // Is, IsNot, In, NotIn
+        default: throw new Error("Operator not supported:"+op.name);
+    }
+}
+
 /*
- *
- *
+ * left: expr_ty
+ * ops: asdl_int_seq
+ * asdl_seq: comparators
  */
-ReverseAST.prototype.Compare = function(/* {expr_ty} */ left, /* {asdl_int_seq *} */ ops, /* {asdl_seq
-                      *} */ comparators)
+ReverseAST.prototype.Compare = function(node)
 {
-    this.left = left;
-    this.ops = ops;
-    this.comparators = comparators;
+    var left = node.left;
+    var ops = node.ops;
+    var comparators = node.comparators;
+    
+    if (ops.length != 1) {
+        throw new Error("Only one comparison operator is supported");
+    } else {
+        return block("logic_compare", {
+            "OP": this.compareOperator(ops[0])
+        }, {
+            "A": this.convert(left),
+            "B": this.convert(comparators[0])
+        }, {
+            "inline": "true"
+        });
+    }
+    
 }
 
 /*

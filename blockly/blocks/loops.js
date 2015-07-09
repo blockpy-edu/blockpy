@@ -118,6 +118,25 @@ Blockly.Blocks['controls_whileUntil'] = {
   }
 };
 
+Blockly.Blocks['controls_while'] = {
+  /**
+   * Block for 'while' loop.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.CONTROLS_WHILEUNTIL_HELPURL);
+    this.setColour(Blockly.Blocks.loops.HUE);
+    this.appendValueInput('BOOL')
+        .setCheck('Boolean')
+        .appendField(Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_WHILE);
+    this.appendStatementInput('DO')
+        .appendField(Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE);
+  }
+};
+
 Blockly.Blocks['controls_for'] = {
   /**
    * Block for 'for' loop.
@@ -263,6 +282,18 @@ Blockly.Blocks['controls_forEach'] = {
   customContextMenu: Blockly.Blocks['controls_for'].customContextMenu
 };
 
+Blockly.Blocks['controls_pass'] = {
+    init: function() {
+        this.setHelpUrl("");
+        this.setColour(Blockly.Blocks.loops.HUE);
+        this.appendDummyInput()
+            .appendField("do nothing");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setTooltip("This block does absolutely nothing.");
+    }
+}
+
 Blockly.Blocks['controls_flow_statements'] = {
   /**
    * Block for flow statements: continue, break.
@@ -306,7 +337,8 @@ Blockly.Blocks['controls_flow_statements'] = {
           block.type == 'controls_repeat_ext' ||
           block.type == 'controls_forEach' ||
           block.type == 'controls_for' ||
-          block.type == 'controls_whileUntil') {
+          block.type == 'controls_whileUntil' ||
+          block.type == 'controls_while') {
         legal = true;
         break;
       }

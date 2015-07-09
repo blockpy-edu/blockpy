@@ -601,7 +601,6 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   }
   
   // Option to align the blocks
-  // Option to expand top blocks.
   var alignOption = {enabled: true};
   alignOption.text = "Align Blocks";
   var _instance = this;
@@ -609,6 +608,15 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     _instance.align();
   };
   menuOptions.push(alignOption);
+  
+  // Option to clear all the blocks.
+  var clearOption = {enabled: true};
+  clearOption.text = "Clear Blocks";
+  var _instance = this;
+  clearOption.callback = function() {
+    _instance.clear();
+  };
+  menuOptions.push(clearOption);
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };
