@@ -1,0 +1,18 @@
+<p>
+  <b>signature_base_string</b><br>
+  <textarea style="width: 100%; height: 150px" readonly="readonly"><%= @signature_base_string %></textarea>
+</p>
+
+<p>
+  <b>secret</b><br>
+  <textarea rows="1" style="width: 100%" readonly="readonly"><%= @secret %></textarea>
+</p>
+
+<input type="submit" name="Launch Tool" onclick="document.getElementById('proxy_form').submit()">
+<form id="proxy_form" action="<%= params['launch_url'] %>" method="post">
+  oauth_signature: <input name="oauth_signature" value="<%= @oauth_signature %>"><br>
+  <% @lti_params.each do |k,v| %>
+    <%= k %>: <input name="<%= k %>" value="<%= v %>"><br>
+  <% end %>
+</form>
+<input type="submit" name="Launch Tool" onclick="document.getElementById('proxy_form').submit()">

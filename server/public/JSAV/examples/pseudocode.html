@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSAV Example of Pseudocode Objects</title>
+    <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <style>
+    #av {
+      width: 98%;
+      position: relative;
+    }
+    .jsavcounter {
+      position: absolute;
+      top: 15px;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>JSAV Pseudocode Demonstration</h1>
+    <div id="av">
+      <div class="jsavcontrols"></div><span class="jsavcounter"></span>
+      <p class="jsavoutput jsavline"></p>
+    </div>
+    <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="../lib/jquery.transit.js"></script>
+    <script src="../lib/raphael.js"></script>
+    <script src="../build/JSAV.js"></script>
+    <script>
+    var av = new JSAV("av");
+    var pseudo = av.code("line1 - from a string\n  line2\nline3\nline4", {lineNumbers: false});
+    av.umsg("Let's start by creating a pseudocode from string");
+    av.displayInit();
+    av.step();
+    av.umsg(", continue by initializing one from an array", {preserve: true});
+    var pseudo2 = av.code(["line1 - from an array", "  line2", " line3"]);
+    av.step();
+    av.umsg(", and finally load a code from a url. You need to load this AV from a server for this to work!", {preserve: true});
+    var pseudo3 = av.code({url: "samplecode.txt", htmlEscape: false});
+
+    av.step();
+    av.umsg("You can hide all the code with the .hide() function");
+    pseudo2.hide();
+
+    av.step();
+    av.umsg("You can also highlight a line.");
+    pseudo.highlight(0);
+    av.step();
+    av.umsg(" Or multiple lines!", {preserve: true});
+    pseudo.highlight([2,3]);
+
+    av.step();
+    av.umsg("Let's unhighlight the lines and show the code!");
+    pseudo.unhighlight([0, 2, 3]);
+    pseudo2.show();
+
+    av.step();
+    av.umsg("Next, we'll hide some lines from the lowest code..")
+    av.step();
+    av.umsg("lines [1,2]..", {preserve: true});
+    pseudo3.hide([1,2]);
+    av.step();
+    av.umsg(" ..and show them again", {preserve: true});
+    pseudo3.show([1,2]);
+
+
+    av.step();
+    av.umsg("Let's do some line-by-line execution of the code");
+    pseudo.setCurrentLine(0);
+    av.step();
+    pseudo.setCurrentLine(1);
+    av.step();
+    pseudo.setCurrentLine(2);
+    av.step();
+    pseudo.setCurrentLine(3);
+    av.step();
+    av.umsg("And that's about it! You can continue by reading the API docs.");
+    pseudo.setCurrentLine(-1);
+    
+    av.recorded(); // done recording changes, will rewind
+
+    </script>
+  </body>
+</html>

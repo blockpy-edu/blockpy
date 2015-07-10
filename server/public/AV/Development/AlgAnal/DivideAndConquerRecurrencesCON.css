@@ -1,0 +1,21 @@
+#DivideAndConquerRecurrencesCON{
+  width: 800px;
+  height: 600px;
+}
+#DivideAndConquerRecurrencesCON .jsavline {
+  width:800px;
+  height:100px;
+}
+.rotated {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+h1{
+  font-size: 1em;
+}
+.dashed{
+  stroke-dasharray: 5, 5;
+}

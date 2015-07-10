@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example of Binary Tree</title>
+    <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <style>
+    #av {
+      width: 98%;
+      position: relative;
+    }
+    .jsavcounter {
+      position: absolute;
+      top: 15px;
+    }
+    .jsavtree {
+      position: relative;
+      width: 500px;
+      height: 300px;
+    }
+    svg {
+      height: 600px;
+    }
+    path {
+      pointer-events: visible;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>JSAV slideshow for binary trees</h1>
+    <div id="av">
+      <div class="jsavcontrols"></div><span class="jsavcounter"></span>
+    </div>
+    <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="../lib/jquery.transit.js"></script>
+    <script src="../lib/raphael.js"></script>
+    <script src="../build/JSAV.js"></script>
+    <script>
+    var jsav = new JSAV("av");
+    var bt = jsav.ds.binarytree();
+    jsav.step();
+    bt.root("ki"); // set the value of the root
+    bt.layout(); // ..update layout
+    jsav.step(); // add new step
+    
+    bt.root().css({"background-color": "yellow"}); //highlight root
+    bt.root().left("3"); // set left child
+    bt.layout(); //..layout
+    jsav.step();
+    
+    var right = bt.root().right("4"); // set right, store reference
+    bt.layout();
+    jsav.step();
+    
+    right.left("4L"); // set left child of 4
+    bt.layout();
+    jsav.step();
+    
+    bt.root().left().left("3L").parent().right("3R"); // chaining, set left and right of 3
+    bt.layout();
+    jsav.step();
+
+    var node = bt.newNode("4R");
+    node.css({"color": "red", "top": right.css("top"), "left": parseInt(right.css("left"), 10) + 60});
+    jsav.step();
+    
+    right.right(node);
+    bt.layout();
+    
+    jsav.recorded(); // done recording changes, will rewind
+    
+    
+    
+    $(".jsavtreenode").live("hover", function() {
+      //console.log($(this).text(), $(this).offset().left, $(this).offset().top);
+    });
+    $("path").live("hover", function() {
+      //console.log($(this).attr("d"));
+    });
+    </script>
+  </body>
+</html>

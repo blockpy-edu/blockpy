@@ -1,0 +1,65 @@
+<html>
+<head>
+  <title>SLang 2 Grammar</title>
+    <script type="text/javascript"
+	    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+   </script>
+   <style>
+   .box {
+        text-align: center;
+        font-weight: bold;
+        font-size: large;
+        background-color: #ACF;
+        margin-bottom: 30px;
+        margin-top: 20px;
+        padding: 5px;
+   }
+   </style>
+</head>
+<body>
+<div class="box">Phrase structure grammar</div>
+
+
+\(
+    \begin{array}{lcl}
+       < program > & ::= & < exp > \\
+       < exp >     & ::= &  < var\ exp > | < fn\ exp > | < app\ exp > | < intlit\ exp >  \\
+                   &  |  & < papp1\ exp > | < papp2\ exp > | < if\ exp>  |  < let\ exp > \\
+                   &  |  & < print\ exp > | < print2\ exp > |  < assign\ exp > \\
+   < fn\  exp >    & ::= & fn\quad '('\  < var\ exp >^*\ ')'\ =>\  < exp > \\
+   < app\ exp >    & ::= & '('\  < exp >\   < exp >^*\ ')' \\
+   < papp1\ exp >   & ::= & < prim1\ op >\  '('\  < exp >\  ')' \\
+   < papp2\ exp >   & ::= & '('\  < exp >\ < prim2\ op >\   < exp >\  ')' \\
+   < args >        & ::= & (  < exp >\   (\ ','\  < exp >  )^*\  )?\\
+   < let\ exp >    & ::= & let\ (< var\ exp >\ =\ < exp >)^+\ in\ < exp > (\ ';'\ < exp >)^*\ end\\
+   < print\ exp >  & ::= & print  < exp > \\
+   < print2\ exp >  & ::= & print\  " < var exp > " ( ':'\ |\ < exp >) \\
+   < assign\ exp > & ::= & set\ < var\ exp >\ =\ < exp > \\
+   < if\ exp > & ::= & if < exp >\ then\ < exp >\ else\ < exp > \\
+
+
+    \end{array}
+\)
+
+
+</pre>
+
+<div class="box">Lexical grammar</div>
+
+\(
+    \begin{array}{lcl}
+ < var\ exp >    & ::=  & < letter >\  (\ < letter >\ |\ < digit >\ |\ \ \_\ \ )^*\\
+
+ < intlit\ exp > & ::=  & < digit >^+\\
+
+ < digit >       & ::=  & 0\ |\ 1\ |\ 2\ |\ ...\ |\ 8\ |\ 9\\
+
+ < letter >      & ::=  & a\ |\ b\ |\ ...\ |\ z\ |\ A\ |\ B\ |\ ...\ |\ Z\\
+
+ < prim1\ op >    & ::=  & not\  |\ \sim\ |\ add1\\
+
+ < prim2\ op >    & ::=  & +\ |\ -\ |\ *\ |\ /\ |\ \%\ |\ \lt\ |\ \gt\ |\ === \\
+\end{array}
+\)
+</body>
+</html>
