@@ -1,0 +1,51 @@
+.jsavcontainer {
+  border: none;
+}
+.jsavlabel {
+  font-size: 16px;
+  font-family: "Times New Roman";
+  font-weight: bold;
+}
+.jsavtreenode.emptynode {
+  border: 1px dashed #777 !important;
+  background-color: #fff !important;
+  color: #777 !important;
+}
+.selected, .selected .jsavvalue, .jsavarray.jsavbararray .jsavindex.selected .jsavvalue {
+  font-size: 110%;
+  background-color: #ddf;
+}
+.jsavtreenode.rednode {
+  background-color: #f00;
+  color: #fff;
+}
+.jsavtreenode.blacknode {
+  background-color: #000;
+  color: #fff;
+}
+.jsavtreenode.jsavredblacknode.selected {
+  box-shadow: 0px 0px 5px 10px #ddf;
+}
+.greybg, .greybg.jsavvalue, .jsavarray.jsavbararray .jsavindex.greybg .jsavvalue {
+  background-color: #eee;
+}
+.greenbg, .greenbg.jsavvalue, .jsavarray.jsavbararray .jsavindex.greenbg .jsavvalue {
+  background-color: #3f5;
+}
+.jsavcodeline:hover {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 1px 10px;
+}
+
+.jsavstack {
+  position: relative;
+  background-color: inherit;
+}
+.jsavstacknode {
+  position: absolute;
+  border-radius: 5px;
+  width: 45px;
+  height: 45px;
+  z-index: 100;
+}

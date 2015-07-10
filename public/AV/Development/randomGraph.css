@@ -1,0 +1,12 @@
+#container {
+  width: 800px;
+  height: 650px;
+}
+
+.avcontainer{
+  overflow: visible;
+}
+
+.jsavline{
+  height: 50px;
+}

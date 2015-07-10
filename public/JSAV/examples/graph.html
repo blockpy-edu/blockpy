@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Depth-First Search</title>
+    <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <style>
+    #av {
+      width: 98%;
+      position: relative;
+    }
+    .jsavcounter {
+      position: absolute;
+      top: 15px;
+    }
+    .jsavcanvas { height: 300px;}
+    .visited {
+      background-color: #ddd;
+    }
+    .processing {
+      border-color: red;
+    }
+    .finished {
+      background-color: black;
+      color: white;
+    }
+    .jsavlabel {
+      font-size: 2em;
+      text-align: center;
+    }
+
+    </style>
+  </head>
+  <body>
+    <h1>JSAV slideshow for graphs</h1>
+    <div id="av">
+      <div class="jsavcontrols"></div><span class="jsavcounter"></span>
+      <p class="jsavoutput jsavline"></p>
+    </div>
+    <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="../lib/jquery.transit.js"></script>
+    <script src="../lib/raphael.js"></script>
+    <script src="../lib/dagre.min.js"></script>
+    <script src="../build/JSAV.js"></script>
+    <script>
+    var jsav = new JSAV("av");
+    var initGraph = function(opts) {
+      var g = jsav.ds.graph($.extend({width: 500, height: 350}, opts));
+      var a = g.addNode("A"),
+          b = g.addNode("B"),
+          c = g.addNode("C"),
+          d = g.addNode("D"),
+          e = g.addNode("E"),
+          f = g.addNode("F");
+      g.addEdge(a, b);
+      g.addEdge(a, c);
+      g.addEdge(b, d);
+      g.addEdge(e, a);
+      g.addEdge(d, e);
+      g.addEdge(d, f);
+      return g;
+     };
+    var l2 = jsav.label("Default automatic graph layout")
+    var g2 = initGraph({layout: "automatic"});
+    g2.layout();
+    jsav.label("Layered graph layout")
+    var g = initGraph({layout: "layered"});
+    g.layout();
+    jsav.displayInit();
+
+    // hide the "other" graph
+    g2.hide();
+    l2.hide();
+    jsav.step();
+
+    var preVisit = function(node, prev) {
+      node.addClass("processing");
+      jsav.umsg("Add node " + node.value() + " to the DFS search tree");
+      if (prev) {
+        node.edgeFrom(prev).css("stroke", "red"); // highlight
+        node.edgeTo(prev).css("stroke", "red"); // highlight
+      }
+      jsav.step();
+    };
+    var visit = function(node) {
+      node.addClass("visited");
+      jsav.umsg("Call DFS for node " + node.value());
+      jsav.step();
+    };
+    var postVisit = function(node) {
+      node.addClass("finished");
+      jsav.umsg("Done with node " + node.value());
+      jsav.step();
+    };
+    var dfs = function(start, prev) {
+      var successors,
+          next;
+      preVisit(start, prev);
+      successors = start.neighbors();
+      for (next = successors.next(); next; next = successors.next()) {
+        if (!next.hasClass("visited")) {
+          visit(next);
+          dfs(next, start);
+        }
+      }
+      postVisit(start);
+    };
+    visit(g.nodes()[0]);
+    dfs(g.nodes()[0]);
+    jsav.recorded();
+    </script>
+  </body>
+</html>

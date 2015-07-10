@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Depth-First Search</title>
+    <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+ </head>
+  <body>
+    <h1>JSAV example for graph with manual layout</h1>
+    <div id="av">
+      <div class="jsavcontrols"></div><span class="jsavcounter"></span>
+      <p class="jsavoutput jsavline"></p>
+    </div>
+    <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="../lib/jquery.transit.js"></script>
+    <script src="../lib/raphael.js"></script>
+    <script src="../build/JSAV.js"></script>
+    <script>
+    var jsav = new JSAV("av"),
+        g, a, b, c, d, e;
+    var initGraph = function() {
+      g = jsav.ds.graph({width: 500, height: 200, layout: "manual", directed: true});
+       a = g.addNode("A", {"left": 0, "top": 80})
+          b = g.addNode("B", {"left": 120})
+          c = g.addNode("C", {"left": 120, "top": 160})
+          d = g.addNode("D", {"left": 260})
+          e = g.addNode("E", {"left": 260, "top": 160});
+      g.addEdge(a, b, {weight: 20});
+      g.addEdge(a, c, {weight: 10});
+      g.addEdge(a, d, {weight: 2});
+      g.addEdge(b, d, {weight: 7});
+      g.addEdge(c, b, {weight: 11});
+      g.addEdge(c, e, {weight: 35});
+      g.addEdge(d, e, {weight: 14});
+     };
+    initGraph();
+    g.layout();
+    jsav.displayInit();
+    a.css({top: "+=20px"});
+    g.layout();
+    jsav.recorded();
+
+    g.mouseenter(function() { this.highlight({record: false}); })
+     .mouseleave(function() { this.unhighlight({record: false}); });
+    </script>
+  </body>
+</html>

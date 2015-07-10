@@ -1,0 +1,15 @@
+/* Styling for HuffProofCON.js / HuffProof.rst static image */
+#InvalidTree{
+  height: 250px;
+  width: 270px;
+}
+
+.jsavcanvas{
+  height: 250px;
+  width: 270px;
+}
+
+.jsavlabel{
+  z-index:1000;
+}
+

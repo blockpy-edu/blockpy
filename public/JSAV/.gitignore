@@ -1,0 +1,20 @@
+#Temp files
+*~
+#Mac stuff
+.DS_Store
+
+#build directory
+build
+
+#Eclipse settings
+.project
+.settings
+
+#InteliJ IDE settings
+.idea
+
+#Generated files
+src/version.txt
+src/front.js
+src/version.js
+node_modules

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Example of All Data Structures in JSAV</title>
+  <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+  <style>
+    #av {
+      width: 98%;
+      position: relative;
+    }
+    .jsavcounter {
+      position: absolute;
+      top: 15px;
+    }
+    .jsavtree {
+      position: relative;
+      width: 500px;
+      height: 300px;
+    }
+    .jsavgraph {
+      margin-top: 50px;
+    }
+    .jsavlabel {
+      font-size: 200%;
+      text-align: center;
+      margin: 30px 0 10px 0;
+    }
+    .jsavedgelabel {
+      font-size: 100%;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<h1>Example of All Data Structures in JSAV</h1>
+<div id="av">
+</div>
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script src="../lib/jquery.transit.js"></script>
+<script src="../lib/raphael.js"></script>
+<script src="../build/JSAV.js"></script>
+<script>
+  var jsav = new JSAV("av");
+  var arr = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  jsav.label("Normal Array");
+  var arr1 = jsav.ds.array(arr);
+  arr1.highlight(2);
+  arr1.css(4, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  arr1.layout();
+  jsav.label("Bar Array");
+  var arr2 = jsav.ds.array(arr, {layout: "bar"});
+  arr2.highlight(2);
+  arr2.css(4, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  arr2.layout();
+
+
+  jsav.label("Binary Tree");
+  var bt = jsav.ds.binarytree();
+  bt.root("ki"); // set the value of the root
+  bt.root().highlight();
+  bt.root().left("3"); // set left child
+  bt.root().left().css({"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  var right = bt.root().right("4"); // set right, store reference
+  right.left("4L"); // set left child of 4
+  bt.root().left().left("3L").parent().right("3R"); // chaining, set left and right of 3
+  bt.layout();
+
+
+  jsav.label("Graph with Automatic Layout");
+  var g = jsav.ds.graph({width: 500, height: 200, layout: "automatic"});
+  var a = g.addNode("A"),
+          b = g.addNode("B"),
+          c = g.addNode("C"),
+          d = g.addNode("D"),
+          e = g.addNode("E"),
+          f = g.addNode("F");
+  g.addEdge(a, b, {weight: 7});
+  g.addEdge(a, c);
+  g.addEdge(b, d);
+  g.addEdge(e, a);
+  g.addEdge(d, e);
+  g.addEdge(d, f);
+  a.highlight();
+  b.css({"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  g.layout();
+
+  jsav.label("Linked List");
+  var l = jsav.ds.list();
+  l.addFirst(1)
+          .addFirst(2)
+          .addFirst(4);
+  l.first().highlight();
+  l.last().css({"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  l.layout();
+
+
+  jsav.label("Matrix with style: plain");
+  var m1 = jsav.ds.matrix([arr, arr, arr], {style: "plain"});
+  m1.toggleClass(0, 2, "jsavhighlight");
+  m1.css(0, 0, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  m1.layout();
+  jsav.label("Matrix with style: table");
+  var m2 = jsav.ds.matrix([arr, arr, arr], {style: "table"});
+  m2.highlight(1, 2);
+  m2.css(0, 0, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  m2.layout();
+  jsav.label("Matrix with style: matrix");
+  var m3 = jsav.ds.matrix([arr, arr, arr], {style: "matrix"});
+  m3.highlight(2, 2);
+  m3.css(0, 0, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  m3.layout();
+
+  jsav.label("Vertical Array");
+  var arr3 = jsav.ds.array(arr, {layout: "vertical"});
+  arr3.highlight(2);
+  arr3.css(4, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  arr3.layout();
+  jsav.label("Indexed Array");
+  var arr4 = jsav.ds.array(arr, {indexed: true});
+  arr4.highlight(2);
+  arr4.css(4, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  arr4.layout();
+  jsav.label("Indexed Vertical Array");
+  var arr5 = jsav.ds.array(arr, {layout: "vertical", indexed: true});
+  arr5.highlight(2);
+  arr5.css(4, {"background-color": "aqua", "color": "rgb(150, 55, 50)"});
+  arr5.layout();
+
+  jsav.displayInit();
+  jsav.recorded(); // done recording changes, will rewind
+
+
+
+  $(".jsavtreenode").live("hover", function() {
+    //console.log($(this).text(), $(this).offset().left, $(this).offset().top);
+  });
+  $("path").live("hover", function() {
+    //console.log($(this).attr("d"));
+  });
+</script>
+</body>
+</html>
