@@ -1,0 +1,118 @@
+<% if params["problem_type"] == 'ss' %>
+	<% 
+		js_resources = {
+		  "quicksortCON"=>"quicksortCODE", 
+		  "shellsortCON"=>"shellsortCODE"
+		}
+	%>
+	<!DOCTYPE html>
+	<html lang="en">
+	  <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	  
+	    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+	    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+	    <link rel="stylesheet" href="../../../lib/normalize.css" type="text/css" />
+	    <link rel="stylesheet" href="../../../JSAV/css/JSAV.css" type="text/css" />
+	    <link rel="stylesheet" href="../../../lib/odsaMOD-min.css" type="text/css" />
+	    <link rel="stylesheet" href="../../../lib/jquery-ui.css" type="text/css" />
+	    <link rel="stylesheet" href="../../../lib/odsaStyle.css" type="text/css" />
+	    
+	    <script type="text/javascript">
+	    var DOCUMENTATION_OPTIONS = {
+	    URL_ROOT:    './',
+	    VERSION:     '0.4.1',
+	    COLLAPSE_INDEX: false,
+	    FILE_SUFFIX: '.html',
+	    HAS_SOURCE:  true
+	    };
+	    </script>
+	    
+	    <script type="text/x-mathjax-config">
+	    MathJax.Hub.Config({
+	    tex2jax: {
+	    inlineMath: [['$','$'], ['\\(','\\)']],
+	    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+	    processEscapes: true
+	    },
+	    "HTML-CSS": {
+	    scale: "80"
+	    }
+	    });
+	    </script>
+	  </head>
+	  <body>
+			<script type="text/javascript" src="../../../lib/jquery.min.js"></script>
+			<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+			<script type="text/javascript" src="../../../lib/jquery-ui.min.js"></script>
+			<script type="text/javascript" src="../../../JSAV/lib/jquery.transit.js"></script>
+			<script type="text/javascript" src="../../../JSAV/lib/raphael.js"></script>
+			<script type="text/javascript" src="../../../JSAV/build/JSAV-min.js"></script>
+			<script type="text/javascript" src="_static/config.js"></script>
+			<script type="text/javascript" src="../../../lib/odsaUtils-min.js"></script>
+			<script type="text/javascript" src="../../../lib/odsaMOD-min.js"></script>
+			<script type="text/javascript" src="../../../lib/conceptMap.js"></script>
+	    <div class="content">
+	      <script>
+	      ODSA.SETTINGS.DISP_MOD_COMP = true;
+	      ODSA.SETTINGS.MODULE_NAME = "MODULE_NAME";
+	      ODSA.SETTINGS.MODULE_LONG_NAME = "";
+	      ODSA.SETTINGS.MODULE_CHAPTER = "";
+	      ODSA.SETTINGS.BUILD_DATE = "";
+	      ODSA.SETTINGS.BUILD_CMAP = false;
+	      JSAV_OPTIONS['lang']='en';
+	      JSAV_EXERCISE_OPTIONS['code']='processing';
+	      </script>
+	      <link href="../../../AV/Sorting/<%= params["short_name"] %>.css" rel="stylesheet" type="text/css" />
+        <div id="<%= params["short_name"] %>" class="ssAV" data-points="0.0" data-threshold="1.0" data-type="ss" data-required="False" data-long-name="Quicksort Partition Slideshow">
+          <span class="jsavcounter"></span>
+          <a class="jsavsettings" href="#">Settings</a>
+          <div class="jsavcontrols"></div>
+          <p class="jsavoutput jsavline"></p>
+          <div class="jsavcanvas"></div>
+          <div class="prof_indicators">
+            <img id="<%= params["short_name"] %>_check_mark" class="prof_check_mark" src="_static/Images/green_check.png" alt="Proficient" />
+            <span id="<%= params["short_name"] %>_cm_saving_msg" class="cm_saving_msg">Saving...</span>
+            <span id="<%= params["short_name"] %>_cm_error_msg" class="cm_error_msg">
+            <img id="<%= params["short_name"] %>_cm_warning_icon" class="cm_warning_icon" src="_static/Images/warning.png" alt="Error Saving" /><br />
+            Server Error<br />
+            <a href="#" class="resubmit_link">Resubmit</a>
+            </span>
+          </div>
+        </div>
+				<% if js_resources.has_key?(params["short_name"]) %>
+	        <script type="text/javascript" src="../../../AV/Sorting/<%= js_resources[params["short_name"]] %>.js"></script>
+				<% end %>
+          <script type="text/javascript" src="../../../AV/Sorting/<%= params["short_name"] %>.js"></script>
+	      </div>
+	    </div>
+	  </body>
+	</html>
+<% else %>
+	<%= @JSAV_html %>
+<% end %>
+
+<script>
+  var TP = TP || {};
+  <% if @tp.outcome_service? %>
+	  TP.outcomeService = true;
+  <% else %>
+  	TP.outcomeService = false;
+  <% end %>
+  TP.ODSAParams = {};
+  TP.toParams = {};
+  TP.toParams.launch_params = {};
+  <% @tp.to_params.each do |key, value| %>
+    TP.toParams.launch_params.<%= key %> = "<%= value %>";
+  <% end%>
+
+  TP.ODSAParams.problem_url = "<%= params["problem_url"] %>";
+  TP.ODSAParams.problem_type = "<%= params["problem_type"] %>";
+  TP.ODSAParams.short_name = "<%= params["short_name"] %>";
+  TP.ODSAParams["JOP-lang"] = "<%= params["JOP-lang"] %>";
+  TP.ODSAParams["JXOP-feedback"] = "<%= params["JXOP-feedback"] %>";
+  TP.ODSAParams["JXOP-fixmode"] = "<%= params["JXOP-fixmode"] %>";
+  TP.ODSAParams["JXOP-code"] = "<%= params["JXOP-code"] %>";
+  TP.ODSAParams["JXOP-debug"] = "<%= params["JXOP-debug"] %>";
+
+</script>

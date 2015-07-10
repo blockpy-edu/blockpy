@@ -1,0 +1,3 @@
+<% if @tp && @tp.launch_presentation_return_url %>
+  <a href="<%= @tp.build_return_url %>">Click here to return to <%= @tp.tool_consumer_instance_name || "your LMS" %>.</a>
+<% end %>

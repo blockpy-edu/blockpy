@@ -1,0 +1,16 @@
+#container {
+  width: 825px;
+  min-height: 600px;
+}
+
+#decrement {
+  float: left;
+}
+
+#procontrols {
+  text-align: center;
+}
+
+.jsavhighlight {
+  font-size: 110%;
+}

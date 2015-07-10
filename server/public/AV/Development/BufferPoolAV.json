@@ -1,0 +1,13 @@
+{
+  "translations" : {
+    "en": {
+      ".avTitle": "Buffer Pool Visualization",
+      "av_Authors": "Hee Gu \"Paul\" Yea and Cliff Shaffer",
+      "#about": "About",
+      "#read": "Read",
+      "#write": "Write",
+      "#next": "Next",
+      "#restart": "Restart"
+    }
+  }
+}

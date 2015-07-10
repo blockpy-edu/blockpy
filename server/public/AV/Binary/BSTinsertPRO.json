@@ -1,0 +1,29 @@
+{
+  "translations" :{
+    "en": {
+      ".avTitle": "BST Insert Proficiency Exercise",
+      "av_Authors": "Kasper Hellström",
+      ".instructLabel": "Instructions:",
+      ".instructions": "Use the BST Insert algorithm to insert values as they are shown at the top. Click on any empty node in the tree to place the value to be inserted there. Remember that equal values go to the left.",
+      "#about": "About"
+    },
+    "fi": {
+      ".avTitle": "Lisäys binääriseen hakupuuhun",
+      "av_Authors": "Kasper Hellström",
+      ".instructLabel": "Ohjeet:",
+      ".instructions": "Lisää pinon avaimet järjestyksessä alla olevaan aluksi tyhjään binääriseen hakupuuhun. Klikkaa puun tyhjää solmua lisätäksesi pinon päällimmäinen avain kyseiseen solmuun. Muista että yhtäsuuret avaimet sijoitetaan solmun vasemmalle puolelle.",
+      "#about": "Lisätietoa"
+    }
+  },
+  "params": {
+    "JXOP-feedback": "atend"
+  },
+  "code": {
+    "processing": {
+      "url": "../../SourceCode/Processing/Binary/BST.pde",
+      "startAfter": "/* *** ODSATag: inserthelp *** */",
+      "endBefore": "/* *** ODSAendTag: inserthelp *** */",
+      "tags": {}
+    }
+  }
+}

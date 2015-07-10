@@ -1,0 +1,12 @@
+<input type="submit" value="Sign Request" onclick="document.getElementById('proxy_form').submit()">
+<form id="proxy_form" action="/proxy_launch" method="post">
+  launch_url: <input name="launch_url"><br>
+  oauth_consumer_key: <input name="lti[oauth_consumer_key]" value="<%= params['oauth_consumer_key'] %>"><br>
+  oauth_consumer_secret: <input name="oauth_consumer_secret"><br>
+  <hr>
+  <% params.each do |k,v| %>
+    <% next if k == 'oauth_consumer_key' || k == 'oauth_signature' %>
+    <%= k %>: <input name="lti[<%= k %>]" value="<%= v %>"><br>
+  <% end %>
+</form>
+<input type="submit" value="Sign Request" onclick="document.getElementById('proxy_form').submit()">

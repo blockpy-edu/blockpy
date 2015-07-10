@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Example of Sounds in JSAV</title>
+  <link rel="stylesheet" href="../../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+  <style>
+    #av {
+      width: 98%;
+      height: 200px;
+      position: relative;
+    }
+    .jsavoutput {
+      font-size: 150%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<h1>Example of All Data Structures in JSAV</h1>
+<p><strong>Note:</strong> the sounds used are part of the <a href="http://ionden.com/a/plugins/ion.sound/en.html">Ion.Sound</a> jQuery plugin and are licensed under the MIT license.</p>
+<div id="av">
+  <p class="jsavcounter"></p>
+  <p class="jsavcontrols"></p>
+  <p class="jsavoutput jsavline"></p>
+</div>
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script src="../../lib/jquery.transit.js"></script>
+<script src="../../lib/raphael.js"></script>
+<script src="../../build/JSAV.js"></script>
+<script src="../../extras/lib/ion.sound.js"></script>
+<script src="../../extras/sound.js"></script>
+<script>
+  $(function() {
+
+    var av = new JSAV("av", {soundPath: "../sounds/"});
+    av.umsg("Sounds can be added using the <code>.sound(soundname)</code> function");
+    av.displayInit();
+    av.umsg("Like the sound of beer can opening");
+    av.sound("beer_can_opening");
+    av.step();
+    av.umsg("Each step can have one sound, and the sounds are played when moving backward or forward.");
+    av.sound("glass");
+    av.recorded();
+  });
+</script>
+</body>
+</html>

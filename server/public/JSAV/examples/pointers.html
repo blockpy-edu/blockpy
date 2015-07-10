@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Linked Pointer Example</title>
+    <link rel="stylesheet" href="../css/JSAV.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <style>
+    #container {
+      width: 98%;
+      position: relative;
+
+    }
+    .jsavcounter {
+      position: absolute;
+      top: 15px;
+    }
+    .jsavcanvas { height: 300px;}
+    .mypointer {
+      text-decoration: underline;
+    }
+    .mypointer .jsavpointerarea {
+      border-color: blue;
+      background-color: red;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>JSAV slideshow for pointer</h1>
+  <div id="container">
+    <div class="jsavcontrols"></div><span class="jsavcounter"></span>
+    <p class="jsavoutput jsavline"></p>
+    <div class="jsavcanvas"></div>
+  </div>
+  <style>
+  </style>
+    <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script src="../lib/jquery.transit.js"></script>
+    <script src="../lib/raphael.js"></script>
+    <script src="../build/JSAV.js"></script>
+    <script>
+  (function ($) {
+
+    // Helper function for drawing arrow around the node
+    function arrowAround(node, options){
+      var jsav = node.jsav;
+      var nodeWidth = node.element.outerWidth();
+      var nodeHeight = node.element.outerHeight();
+      var nodegap = 40;
+      var nextnode = node.next();
+      if(nextnode){
+        nodegap = nextnode.element.offset().left - node.element.offset().left - nodeWidth;
+      }
+      var left = node.element.offset().left -    jsav.container.find(".jsavcanvas:first").offset().left;
+      var top = node.element.offset().top - jsav.container.find(".jsavcanvas:first").offset().top;
+      var opts = $.extend({leftOffset: nodegap/2,
+                            rightOffset: nodegap/2, topOffset: 15, nodeGap: nodegap, nodeWidth: nodeWidth, nodeHeight: nodeHeight}, options);
+      return jsav.g.polyline([[left - opts.nodeGap - 6, top + opts.nodeHeight/2], 
+      [left - opts.leftOffset, top + opts.nodeHeight/2], [left - opts.leftOffset, top - opts.topOffset],[left + opts.nodeWidth + opts.rightOffset, top - opts.topOffset],[left + opts.nodeWidth + opts.rightOffset, top + opts.nodeHeight/2],[left + opts.nodeWidth + opts.nodeGap + 1,top + opts.nodeHeight/2]],{"arrow-end":"classic-wide-long","stroke-width":2,"stroke-dasharray":"-"});
+    }
+
+    var jsav = new JSAV("container");
+    // Should move JSAV array 50px down to make room for pointer arrow canvas.
+    var arr = jsav.ds.array([21,3,5,10,18,7],{indexed: true, layout: "array"});
+	arr.css({top : 50});
+
+
+    jsav.umsg("We start by creating an array with 6 elements.");
+    jsav.displayInit();
+    jsav.umsg("Create a pointer for the element with index 1.");
+    var arrayPointer = jsav.pointer("pointer", arr,{
+                       targetIndex : 1,
+                       visible: true,
+                       anchor: "left top",
+                       myAnchor: "right bottom",
+                       left: 15,
+                       top: -20});
+	  jsav.step();
+    jsav.umsg("Change the color of the pointer label");
+    arrayPointer.css({"color": "yellow"});
+    jsav.step();
+    jsav.umsg("Change the appearance of the pointer with a CSS class");
+    arrayPointer.addClass("mypointer");
+    jsav.step();
+
+    jsav.umsg("Move the pointer");
+    arrayPointer.target(arr, {targetIndex : 3});
+    jsav.step();
+
+    jsav.umsg("Hide the JSAV array for the list pointer example");
+    arr.hide();
+    arrayPointer.hide();
+    jsav.step();
+
+    // Should move JSAV list 50px down to make room for pointer arrow canvas.
+    var l = jsav.ds.list();
+    l.css({top: 50});
+    jsav.umsg("We create a list and add some elements.");
+    l.addFirst(5)
+     .addFirst(4)
+     .addFirst(3)
+     .addFirst(2)
+     .addFirst(1);
+    l.layout();
+
+    jsav.step();
+    jsav.umsg("Add two pointers, one with the name \"pointer1\" above the first node of the list, another with the name \"pointer2\" above the third node of the list,.");
+
+    var listPointer1 = jsav.pointer("pointer1", l.get(0),{visible: true,
+                      anchor: "left top",
+                      myAnchor: "right bottom",
+                      left: 15,
+                      top: -20});
+    var listPointer2 = jsav.pointer("pointer2", l.get(2),{
+                      anchor: "left top",
+                      myAnchor: "right bottom",
+                      left: 15,
+                      top: -20,
+                      fixed: true
+                    });
+    listPointer2.arrow.css({"stroke":"yellow"});
+    l.get(2).edgeToNext().css({"stroke":"red"});
+    jsav.step();
+    jsav.umsg("Set the target of second pointer. The pointer is fixed, so it won't move.")
+    listPointer2.target(l.get(3));
+    jsav.step();
+    jsav.umsg("Set the target of the second pointer to null");
+	  listPointer2.target(null);
+    jsav.step();
+    listPointer2.hide();
+    jsav.umsg("Moves the pointer from the first node to the last node");
+    listPointer1.target(l.get(4));
+    jsav.step(); 
+
+    listPointer1.hide();
+    jsav.umsg("'arrowAround()' function is a helper function for drawing an arrow around a node. You can just make a copy of this function to the place you want to use it");
+    jsav.step();
+
+    jsav.umsg("Shows the arrow around the node with index 2 and hide the edges connecting to that node.");
+    l.get(1).edgeToNext().hide();
+    l.get(2).edgeToNext().hide();
+
+	// Create a arrow around the node with index 2.
+    var arrow = arrowAround(l.get(2));
+    jsav.step();
+
+    jsav.umsg("You can hide the arrow using the .hide() function.");
+    arrow.hide();
+	jsav.step();
+
+    jsav.umsg("You can show the arrow using the .show() function.");
+    arrow.show();
+    jsav.recorded();
+}(jQuery));
+    </script>
+  </body>
+</html>
