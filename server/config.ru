@@ -1,5 +1,6 @@
 require 'sinatra/reloader'
-require './tool_provider'
+require './main'
+require 'active_record'
 
 use Rack::Static,
   :urls => ["/AV", "/config", "/JSAV", "/lib"],

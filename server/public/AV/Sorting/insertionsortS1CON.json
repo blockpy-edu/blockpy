@@ -1,9 +1,0 @@
-{
-  "translations" :{
-    "en": {
-      "av_c1": "Insertion Sort starts with the record in position 1.",
-      "av_c2": "Since this is smaller than the value to its left, swap them.",
-      "av_c3": "Now we are done with this record since it cannot move further left."
-    }
-  }
-}

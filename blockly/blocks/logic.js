@@ -471,3 +471,22 @@ Blockly.Blocks['logic_ternary'] = {
     this.prevParentConnection_ = parentConnection;
   }
 };
+
+Blockly.Blocks['logic_isIn'] = {
+  /**
+   * Block for testing if something contains something.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var OPERATORS =
+        [["is in", 'IN'],
+         ["is not in", 'NOTIN']];
+    this.setColour(Blockly.Blocks.logic.HUE);
+    this.setOutput(true, 'Boolean');
+    this.appendValueInput('ITEM');
+    this.appendValueInput('LIST')
+        .setCheck(['Array', 'String'])
+        .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
+    this.setInputsInline(true);
+  }
+};

@@ -125,3 +125,13 @@ Blockly.Python['logic_ternary'] = function(block) {
   var code = value_then + ' if ' + value_if + ' else ' + value_else;
   return [code, Blockly.Python.ORDER_CONDITIONAL];
 };
+
+Blockly.Python['logic_isIn'] = function(block) {
+  // Operations 'in', 'not in'.
+  var operator = (block.getFieldValue('OP') == 'IN') ? 'in' : 'not in';
+  var order = Blockly.Python.ORDER_RELATIONAL;
+  var argument0 = Blockly.Python.valueToCode(block, 'ITEM', order) || 'None';
+  var argument1 = Blockly.Python.valueToCode(block, 'LIST', order) || '[]';
+  var code = argument0 + ' ' + operator + ' ' + argument1;
+  return [code, order];
+};

@@ -1,6 +1,0 @@
-";
-
-  JSAV.version = function() {
-    return theVERSION;
-  };
-})();
