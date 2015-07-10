@@ -151,40 +151,43 @@
             kennel = new Kennel(document.getElementById('kennel-div'),
                                 document.getElementById('toolbox'),
                                 'instructor', // Instructor mode
-                                "This is the default problem description", // problem
+                                "Print the name of the state that had the highest violent crime rate in 1995.", // problem
                                 body, // Current code
-                                "def on_run(code, output, properties):\n    pass", // On run code
+                                $('#default-on-run').html(), // On run code
                                 "def on_step(code, output, properties):\n    pass", // On step code
                                 "alpha = 0" // Starting code
                                 );
           });
         </script>
 <pre id='default-body' style='display:none'>
-[].append(values)
-alpha = magic_call(5, 43)
-gamma = crime.get_property_crimes("Virginia")
-a = {'Test': 5}
-if not(True) and 7 == 3:
-    if 5 == 5:
-        pass
-6
-while 3:
-    if 5:
-        break
-    elif 3:
-        continue
+def on_run(code, output, properties):
+    if 'crime.get_by_year' not in code:
+        return "You'll need to use the 'get by year' block!"
+    elif 'violent' not in code:
+        return "You need to get the violent crime rate."
+    elif 'state' not in code:
+        return "You also need to store the state name while you iterate!"
+    elif 'if' not in code:
+        return "You will need some decision in your code. This is similar to the problems we did before where we found the maximum."
+    elif output.strip() == 'District of Columbia':
+        return true
     else:
-        a = 7
-for item in [1,2,3]:
-    print(item)
-a = a + b / 7
-print a
-print 5, 4
-print 5+3, a, 7
-
-def corgis(x, y):
-    print(x+y)
-    return x
+        return 'You can do it!'
+</pre>
+<pre id='default-on-run' style='display:none'>
+def on_run(code, output, properties):
+    if 'crime.get_by_year' not in code:
+        return "You'll need to use the 'get by year' block!"
+    elif 'violent' not in code:
+        return "You need to get the violent crime rate."
+    elif 'state' not in code:
+        return "You also need to store the state name while you iterate!"
+    elif 'if' not in code:
+        return "You will need some decision in your code. This is similar to the problems we did before where we found the maximum."
+    elif output.strip() == 'District of Columbia':
+        return true
+    else:
+        return 'You can do it!'
 </pre>
   
 <xml id="toolbox" style="display: none">

@@ -876,6 +876,8 @@ ReverseAST.prototype.compareOperator = function(op) {
         case "Gt": return "GT";
         case "LtE": return "LTE";
         case "GtE": return "GTE";
+        case "In": return "IN";
+        case "NotIn": return "NOTIN";
         // Is, IsNot, In, NotIn
         default: throw new Error("Operator not supported:"+op.name);
     }
@@ -894,6 +896,15 @@ ReverseAST.prototype.Compare = function(node)
     
     if (ops.length != 1) {
         throw new Error("Only one comparison operator is supported");
+    } else if (ops[0].name == "In" || ops[0].name == "NotIn") {
+        return block("logic_isIn", {
+            "OP": this.compareOperator(ops[0])
+        }, {
+            "ITEM": this.convert(left),
+            "LIST": this.convert(comparators[0])
+        }, {
+            "inline": "true"
+        });
     } else {
         return block("logic_compare", {
             "OP": this.compareOperator(ops[0])
@@ -964,7 +975,7 @@ ReverseAST.prototype.KNOWN_MODULES = {
         "show": ["plot_show"]
     }
 };
-ReverseAST.prototype.KNOWN_FUNCTIONS = ["append"];
+ReverseAST.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
 ReverseAST.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
     var name = this.identifier(func.attr);
     if (func.value.constructor.name == "Name") {
@@ -1004,6 +1015,15 @@ ReverseAST.prototype.CallAttribute = function(func, args, keywords, starargs, kw
                 }, {
                     "inline": "true"
                 })];
+            case "strip":
+                return block("text_trim", { "MODE": "BOTH" }, 
+                    { "TEXT": this.convert(func.value) });
+            case "lstrip":
+                return block("text_trim", { "MODE": "LEFT" }, 
+                    { "TEXT": this.convert(func.value) });
+            case "rstrip":
+                return block("text_trim", { "MODE": "RIGHT" }, 
+                    { "TEXT": this.convert(func.value) });
             default: throw new Error("Unknown function call!");
         }
     } else {

@@ -1,9 +1,0 @@
-{
-  "translations" :{
-    "en": {
-      "av_c1": "Since insertions take place at the current position, and since we want to be able to insert to the front or the back of the list as well as anywhere in between, there are actually $n+1$ possible \"current positions\" when there are $n$ elements in the list.",
-      "av_c2": "Here is a list with 4 elements.",
-      "av_c3": "The arrows show the five possible positions for \"current\"."
-    }
-  }
-}

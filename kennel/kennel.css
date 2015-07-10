@@ -45,3 +45,18 @@
     background: #C4FBC4 !important;
     color: #8a1f11 !important;
 }
+
+
+.col-md-1 { padding-left: 0px; padding-right: 0px; }
+.col-md-2 { padding-left: 0px; padding-right: 0px; }
+.col-md-3 { padding-left: 0px; padding-right: 0px; }
+.col-md-4 { padding-left: 0px; padding-right: 0px; }
+.col-md-5 { padding-left: 0px; padding-right: 0px; }
+.col-md-6 { padding-left: 0px; padding-right: 0px; }
+.col-md-7 { padding-left: 0px; padding-right: 0px; }
+.col-md-8 { padding-left: 0px; padding-right: 0px; }
+.col-md-9 { padding-left: 0px; padding-right: 0px; }
+.col-md-10 { padding-left: 0px; padding-right: 0px; }
+.col-md-11 { padding-left: 0px; padding-right: 0px; }
+.col-md-12 { padding-left: 0px; padding-right: 0px; }   
+.container-fluid {padding-left: 0px; padding-right: 0px; } 
