@@ -140,10 +140,17 @@ ReverseAST.prototype.convertBody = function(node)
         from = node[i].lineno;
         to = this.heights.shift();
         var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
-        var nextElement = document.createElement("next");
-        nextElement.appendChild(newChild);
-        currentChild.appendChild(nextElement);
-        currentChild = newChild;
+        if (newChild !== null) {
+            var nextElement = document.createElement("next");
+            nextElement.appendChild(newChild);
+            if (currentChild !== null) {
+                if (firstChild === null) {
+                    firstChild = currentChild;
+                }
+                currentChild.appendChild(nextElement);
+            }
+            currentChild = newChild;
+        }
     }
     return firstChild;
 }
