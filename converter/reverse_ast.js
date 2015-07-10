@@ -77,10 +77,7 @@ ReverseAST.prototype.recursiveMeasure = function(node, nextBlockLine) {
         } else {
             myNext = node.orelse[0].lineno-1-1;
         }
-        //this.heights.push(next);
-        //this.ys.push([i+1, node.orelse.length]);
     }
-    //console.log("RECURSE", node, "Current:", node.lineno, "MyNext", myNext, "ParentNext:", nextBlockLine);
     this.heights.push(myNext);
     if ("body" in node) {
         for (var i = 0; i < node.body.length; i++) {
@@ -90,25 +87,9 @@ ReverseAST.prototype.recursiveMeasure = function(node, nextBlockLine) {
             } else {
                 next = node.body[i+1].lineno-1;
             }
-            //console.log("\t", "My next:", next);
-            //this.heights.push(next);
-            this.ys.push([i+1, node.body.length]);
             this.recursiveMeasure(node.body[i], next);
         }
     }
-    // TODO
-    /*
-    var current = node;
-    var orelse = null;
-    while ("orelse" in current && current.orelse.length > 0) {
-        orelse = current.orelse;
-        current = current.orelse[0];
-        if (current.name == "If_") {
-            this.heights.push();
-        } else {
-            this.recursiveMeasure(orelse, next);
-        }
-    }*/
     if ("orelse" in node) {
         for (var i = 0; i < node.orelse.length; i++) {
             var next;
@@ -117,9 +98,6 @@ ReverseAST.prototype.recursiveMeasure = function(node, nextBlockLine) {
             } else {
                 next = 1+(node.orelse[i].lineno-1);
             }
-            //this.heights.push(next);
-            this.ys.push([i+1, node.orelse.length]);
-            //console.log("ORELSE:", node.orelse[i].name, "Next:", next, "ParentNext:", nextBlockLine);
             this.recursiveMeasure(node.orelse[i], next);
         }
     }
@@ -127,11 +105,8 @@ ReverseAST.prototype.recursiveMeasure = function(node, nextBlockLine) {
 
 ReverseAST.prototype.measureNode = function(node) {
     this.heights = [];
-    this.ys = [];
     this.recursiveMeasure(node, this.source.length-1);
     this.heights.shift();
-    console.log(this.heights);
-    console.log(this.ys);
 }
 
 ReverseAST.prototype.getSourceCode = function(from, to) {
@@ -153,38 +128,17 @@ ReverseAST.prototype.convertBody = function(node)
         return null;
     }
     
-    // Build up the correct source code mappings
     // This is tricked by semicolons. Hard to get around that...
-    /*var sourceCodeLines = [];
-    
-    for (var i = 0; i < node.length; i++) {
-        var lines = [];
-        var current = node[i];
-        //console.log("Node", current.lineno, this.heights.shift());
-        var end;
-        if (i == node.length-1) {
-            end = this.source.length-1;
-        } else {
-            end = node[i+1].lineno-1;
-        }
-        if ("body" in current) {
-            console.log(Object.keys(current));
-        }
-        console.log("TRAVERSE:", current.lineno-1, end, node.length, this.source.length-1);
-        for (var start = current.lineno-1; start < end; start++) {
-            lines.push(this.source[start]);
-        }
-        sourceCodeLines.push(lines.join("\n"));
-    }*/
+    // TODO: Force semicolon breaks in a preprocessor, and extract comments too
     
     // Build the actual blocks
     var from = node[0].lineno;
     var to = this.heights.shift();
-    console.log("DEEPER", node[0].constructor.name, from, to);
     var firstChild = this.convertStatement(node[0], this.getSourceCode(from, to)); // XML Block
     var currentChild = firstChild;
     for (var i = 1; i < node.length; i++) {
-        console.log("DEEPER", node[i].constructor.name, node[i].lineno,this.heights.shift());
+        from = node[i].lineno;
+        to = this.heights.shift();
         var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
         var nextElement = document.createElement("next");
         nextElement.appendChild(newChild);
@@ -207,14 +161,19 @@ function block(type, fields, values, settings, mutations, statements) {
         var newMutation = document.createElement("mutation");
         for (var mutation in mutations) {
             var mutationValue = mutations[mutation];
-                if (mutation.charAt(0) == '@') {
+            if (mutation.charAt(0) == '@') {
                 newMutation.setAttribute(mutation.substr(1), mutationValue);
-            } else {
+            } else if (mutationValue.constructor === Array) {
                 for (var i = 0; i < mutationValue.length; i++) {
                     var mutationNode = document.createElement(mutation);
                     mutationNode.setAttribute("name", mutationValue[i]);
                     newMutation.appendChild(mutationNode);
                 }
+            } else {
+                var mutationNode = document.createElement("arg");
+                mutationNode.setAttribute("name", mutation);
+                mutationNode.appendChild(mutationValue);
+                newMutation.appendChild(mutationNode);
             }
         }
         newBlock.appendChild(newMutation);
@@ -521,7 +480,6 @@ ReverseAST.prototype.If_ = function(node)
             // This is an 'ELIF'
             while (orelse.length == 1  && orelse[0].constructor.name == "If_") {
                 elseifCount += 1;
-                console.log("FREKAING", orelse.lineno, this.heights.shift());
                 body = orelse[0].body;
                 test = orelse[0].test;
                 orelse = orelse[0].orelse;
@@ -531,7 +489,7 @@ ReverseAST.prototype.If_ = function(node)
                 }
             }
         }
-        if (orelse !== undefined) {
+        if (orelse !== undefined && orelse.length > 0) {
             // Or just the body of an Else statement
             elseCount += 1;
             DO_values["ELSE"] = this.convertBody(orelse);
@@ -666,9 +624,14 @@ ReverseAST.prototype.Global = function(node)
 ReverseAST.prototype.Expr = function(node) {
     var value = node.value;
     
-    return block("raw_empty", {}, {
-        "VALUE": this.convert(value)
-    });
+    var converted = this.convert(value);
+    if (converted.constructor == Array) {
+        return converted[0];
+    } else {
+        return block("raw_empty", {}, {
+            "VALUE": this.convert(value)
+        });
+    }
 }
 
 /*
@@ -775,103 +738,126 @@ ReverseAST.prototype.UnaryOp = function(node)
     var operand = node.operand;
     if (op.name == "Not") {
         return block("logic_negate", {}, {
-        "BOOL": this.convert(operand) 
+            "BOOL": this.convert(operand) 
         }, {
             "inline": "false"
         });
-    }               
+    } else {
+        throw new Error("Other unary operators are not implemented yet.");
+    }
 }
 
 /*
- *
- *
+ * args: arguments__ty
+ * body: expr_ty
  */
-ReverseAST.prototype.Lambda = function(/* {arguments__ty} */ args, /* {expr_ty} */ body)
-{
-    this.args = args;
-    this.body = body;
+ReverseAST.prototype.Lambda = function(node) {
+    var args = node.args;
+    var body = node.body;
+    throw new Error("Lambda functions are not implemented yet.");
 }
 
 /*
- *
- *
+ * test: expr_ty
+ * body: expr_ty
+ * orelse: expr_ty
  */
-ReverseAST.prototype.IfExp = function(/* {expr_ty} */ test, /* {expr_ty} */ body, /* {expr_ty} */
-                    orelse)
+ReverseAST.prototype.IfExp = function(node)
 {
-    this.test = test;
-    this.body = body;
-    this.orelse = orelse;
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    throw new Error("Inline IF expressions are not implemented yet.");
 }
 
 /*
- *
- *
+ * keys: asdl_seq
+ * values: asdl_seq
  */
-ReverseAST.prototype.Dict = function(/* {asdl_seq *} */ keys, /* {asdl_seq *} */ values)
-{
-    this.keys = keys;
-    this.values = values;
+ReverseAST.prototype.Dict = function(node) {
+    var keys = node.keys;
+    var values = node.values;
+    
+    var keyList = [];
+    var valueList = [];
+    for (var i = 0; i < keys.length; i+= 1) {
+        if (keys[i].constructor.name != "Str") {
+            throw new Error("Dictionary Keys should be Strings.");
+        }
+        keyList["KEY"+i] = this.Str_value(keys[i]);
+        valueList["VALUE"+i] = this.convert(values[i]);
+    }
+    
+    return block("dicts_create_with", keyList, valueList, {
+        "inline": "false"
+    }, {
+        "@items": keys.length
+    });
 }
 
 /*
- *
+ * elts: asdl_seq
  *
  */
-ReverseAST.prototype.Set = function(/* {asdl_seq *} */ elts)
+ReverseAST.prototype.Set = function(node)
 {
-    this.elts = elts;
+    var elts = node.elts;
+    throw new Error("Sets are not implemented");
 }
 
 /*
- *
- *
+ * elt: expr_ty
+ * generators: asdl_seq
  */
-ReverseAST.prototype.ListComp = function(/* {expr_ty} */ elt, /* {asdl_seq *} */ generators)
+ReverseAST.prototype.ListComp = function(node)
 {
-    this.elt = elt;
-    this.generators = generators;
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("List Comprehensions are not implemented"); 
 }
 
 /*
- *
- *
+ * elt: expr_ty
+ * generators: asdl_seq
  */
-ReverseAST.prototype.SetComp = function(/* {expr_ty} */ elt, /* {asdl_seq *} */ generators)
+ReverseAST.prototype.SetComp = function(node)
 {
-    this.elt = elt;
-    this.generators = generators;
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("Set Comprehensions are not implemented"); 
 }
 
 /*
- *
- *
+ * key: expr_ty
+ * value: expr_ty
+ * generators: asdl_seq
  */
-ReverseAST.prototype.DictComp = function(/* {expr_ty} */ key, /* {expr_ty} */ value, /* {asdl_seq *}
-                       */ generators)
+ReverseAST.prototype.DictComp = function(node)
 {
-    this.key = key;
-    this.value = value;
-    this.generators = generators;
+    var key = node.key;
+    var value = node.value;
+    var generators = node.generators;
+    throw new Error("Dictionary Comprehensions are not implemented"); 
 }
 
 /*
- *
- *
+ * elt: expr_ty
+ * generators: asdl_seq
  */
-ReverseAST.prototype.GeneratorExp = function(/* {expr_ty} */ elt, /* {asdl_seq *} */ generators)
-{
-    this.elt = elt;
-    this.generators = generators;
+ReverseAST.prototype.GeneratorExp = function(node) {
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("Generator Expresions are not implemented"); 
 }
 
 /*
- *
+ * value: expr_ty
  *
  */
-ReverseAST.prototype.Yield = function(/* {expr_ty} */ value)
+ReverseAST.prototype.Yield = function(node)
 {
-    this.value = value;
+    var value = value;
+    throw new Error("Yield expression is not implemented");
 }
 
 
@@ -914,28 +900,156 @@ ReverseAST.prototype.Compare = function(node)
     
 }
 
-/*
- *
- *
- */
-ReverseAST.prototype.Call = function(/* {expr_ty} */ func, /* {asdl_seq *} */ args, /* {asdl_seq *} */
-                   keywords, /* {expr_ty} */ starargs, /* {expr_ty} */ kwargs
-                   )
-{
-    this.func = func;
-    this.args = args;
-    this.keywords = keywords;
-    this.starargs = starargs;
-    this.kwargs = kwargs;
+convertStockSymbols = function(symbol) {
+    switch (symbol) {
+        case 'FB': case "Facebook":
+            return "Facebook";
+        case "AAPL": case "Apple":
+            return "Apple";
+        case "MSFT": case "Microsoft":
+            return "Microsoft";
+        case "GOOG": case "Google":
+            return "Google";
+        default:
+            throw new Error("Unknown Stock Symbol.");
+    }
+}
+
+toTitleCase = function(str) {
+    return str.replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+            
+ReverseAST.prototype.KNOWN_MODULES = {
+    "weather": {
+        "get_temperature": ["weather_temperature", "CITY"],
+        "get_report": ["weather_report", "CITY"],
+        "get_forecasts": ["weather_forecasts", "CITY"],
+        "get_highs_lows": ["weather_highs_lows", "CITY"],
+        "get_all_forecasted_temperatures": ["weather_all_forecasts"],
+        "get_forecasted_reports": ["weather_report_forecasts", "CITY"]
+    }, 
+    "earthquakes": {
+        "get": ["earthquake_get", "PROPERTY"],
+        "get_both": ["earthquake_both"],
+        "get_all": ["earthquake_all"]
+    },
+    "stocks": {
+        "get_current": ["stocks_current", ["TICKER", convertStockSymbols]],
+        "get_past": ["stocks_past", ["TICKER", convertStockSymbols]]
+    },
+    "crime": {
+        // STATE = toTitleCase
+        "get_property_crimes": ["crime_state", ["STATE", toTitleCase],
+                                              ["TYPE", "property"]],
+        "get_violent_crimes": ["crime_state",  ["STATE", toTitleCase],
+                                              ["TYPE", "violent"]],
+        "get_by_year": ["crime_year", "YEAR"],
+        "get_all": ["crime_all"]
+    },
+    "books": {
+        "get": ["books_get"]
+    },
+    "plt": {
+        "title": ["plot_title", "TEXT"],
+        "plot": ["plot_line"],
+        "show": ["plot_show"]
+    }
+};
+ReverseAST.prototype.KNOWN_FUNCTIONS = ["append"];
+ReverseAST.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
+    var name = this.identifier(func.attr);
+    if (func.value.constructor.name == "Name") {
+        var module = this.identifier(func.value.id);
+        if (module in this.KNOWN_MODULES && name in this.KNOWN_MODULES[module]) {
+            var definition = this.KNOWN_MODULES[module][name];
+            var blockName = definition[0];
+            var fields = {};
+            for (var i = 0; i < args.length; i++) {
+                var argument = definition[1+i];
+                if (typeof argument ==  "string") {
+                    fields[argument] = this.Str_value(args[i]);
+                } else {
+                    var argumentName = argument[0];
+                    var argumentMapper = argument[1];
+                    fields[argumentName] = argumentMapper(this.Str_value(args[i]));
+                }
+            }
+            for (var i = 1+args.length; i < definition.length; i++) {
+                var first = definition[i][0];
+                var second = definition[i][1];
+                fields[first] = second;
+            }
+            return block(blockName, fields);
+        }
+    } 
+    if (this.KNOWN_FUNCTIONS.indexOf(name) > -1) {
+        switch (name) {
+            case "append":
+                if (args.length !== 1) {
+                    throw new Error("Incorrect number of arguments to .append");
+                }
+                // Return as statement
+                return [block("lists_append", {}, {
+                    "ITEM": this.convert(args[0]),
+                    "LIST": this.convert(func.value)
+                }, {
+                    "inline": "true"
+                })];
+            default: throw new Error("Unknown function call!");
+        }
+    } else {
+        throw new Error("Unknown function call or not implemented");
+    }
 }
 
 /*
- *
+ * func: expr_ty
+ * args: asdl_seq
+ * keywords: asdl_seq
+ * starargs: expr_ty
+ * kwargs: expr_ty
  *
  */
-ReverseAST.prototype.Repr = function(/* {expr_ty} */ value)
+ReverseAST.prototype.Call = function(node) {
+    var func = node.func;
+    var args = node.args;
+    var keywords = node.keywords;
+    var starargs = node.starargs;
+    var kwargs = node.kwargs;
+    
+    switch (func.constructor.name) {
+        case "Name":
+            if (starargs !== null && starargs.length > 0) {
+                throw new Error("*args (variable arguments) are not implemented yet.");
+            } else if (kwargs !== null && kwargs.length > 0) {
+                throw new Error("**args (keyword arguments) are not implemented yet.");
+            }
+            var arguments = {};
+            var argumentsMutation = {"@name": this.identifier(func.id)};
+            for (var i = 0; i < args.length; i+= 1) {
+                arguments["ARG"+i] = this.convert(args[i]);
+                argumentsMutation[i] = this.convert(args[i]);
+            }
+            return block("procedures_callreturn", {}, arguments, {
+                "inline": "false"
+            }, argumentsMutation);
+        // Direct function call
+        case "Attribute":
+        // Module function call
+            return this.CallAttribute(func, args, keywords, starargs, kwargs);
+    }
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+ReverseAST.prototype.Repr = function(node)
 {
-    this.value = value;
+    var value = node.value;
+    throw new Error("Repr is not yet implemented");
 }
 
 /*
@@ -964,27 +1078,33 @@ ReverseAST.prototype.Str_value = function(node) {
 }
 
 /*
- *
+ * value: expr_ty
+ * attr: identifier
+ * ctx: expr_context_ty
  *
  */
-ReverseAST.prototype.Attribute = function(/* {expr_ty} */ value, /* {identifier} */ attr, /*
-                        {expr_context_ty} */ ctx)
+ReverseAST.prototype.Attribute = function(node)
 {
-    this.value = value;
-    this.attr = attr;
-    this.ctx = ctx;
+    var value = node.value;
+    var attr = node.attr;
+    var ctx = node.ctx;
+    
+    throw new Error("Attribute access not implemented");
 }
 
 /*
- *
+ * value: expr_ty
+ * slice: slice_ty
+ * ctx: expr_context_ty
  *
  */
-ReverseAST.prototype.Subscript = function(/* {expr_ty} */ value, /* {slice_ty} */ slice, /*
-                        {expr_context_ty} */ ctx)
+ReverseAST.prototype.Subscript = function(node)
 {
-    this.value = value;
-    this.slice = slice;
-    this.ctx = ctx;
+    var value = node.value;
+    var slice = node.slice;
+    var ctx = node.ctx;
+    
+    throw new Error("Subscript access not implemented.");
 }
 
 /*
@@ -995,9 +1115,16 @@ ReverseAST.prototype.Name = function(node)
 {
     var id = node.id;
     var ctx = node.ctx;
-    return block('variables_get', {
-        "VAR": this.identifier(id)
-    });
+    switch (this.Name_str(node)) {
+        case "True":
+            return block("logic_boolean", {"BOOL": "TRUE"});
+        case "False":
+            return block("logic_boolean", {"BOOL": "FALSE"});
+        default:
+            return block('variables_get', {
+                "VAR": this.identifier(id)
+            });
+    }
 }
 
 /*
@@ -1038,75 +1165,90 @@ ReverseAST.prototype.List = function(node) {
 }
 
 /*
- *
- *
+ * elts: asdl_seq
+ * ctx: expr_context_ty
  */
-ReverseAST.prototype.Tuple = function(/* {asdl_seq *} */ elts, /* {expr_context_ty} */ ctx)
+ReverseAST.prototype.Tuple = function(node)
 {
-    this.elts = elts;
-    this.ctx = ctx;
+    var elts = node.elts;
+    var ctx = node.ctx;
+    
+    throw new Error("Tuples not implemented");
 }
 
 /*
  *
  *
  */
-ReverseAST.prototype.Ellipsis = function()
-{
+ReverseAST.prototype.Ellipsis = function() {
+    throw new Error("Ellipsis not implemented");
 }
 
 /*
- *
+ * lower: expr_ty
+ * upper: expr_ty
+ * step: expr_ty
  *
  */
-ReverseAST.prototype.Slice = function(/* {expr_ty} */ lower, /* {expr_ty} */ upper, /* {expr_ty} */
-                    step)
+ReverseAST.prototype.Slice = function(node)
 {
-    this.lower = lower;
-    this.upper = upper;
-    this.step = step;
+    var lower = node.lower;
+    var upper = node.upper;
+    var step = node.step;
+    
+    throw new Error("Slices not implemented");
 }
 
 /*
- *
+ * dims: asdl_seq
  *
  */
-ReverseAST.prototype.ExtSlice = function(/* {asdl_seq *} */ dims)
+ReverseAST.prototype.ExtSlice = function(node)
 {
-    this.dims = dims;
+    var dims = node.dims;
+    
+    throw new Error("ExtSlice is not implemented.");
 }
 
 /*
- *
+ * value: expr_ty
  *
  */
-ReverseAST.prototype.Index = function(/* {expr_ty} */ value)
+ReverseAST.prototype.Index = function(value)
 {
-    this.value = value;
+    var value = node.value;
+    
+    throw new Error("Index is not implemented");
 }
 
 /*
- *
+ * target: expr_ty
+ * iter: expr_ty
+ * ifs: asdl_seq
  *
  */
-ReverseAST.prototype.comprehension = function(/* {expr_ty} */ target, /* {expr_ty} */ iter, /*
-                            {asdl_seq *} */ ifs)
+ReverseAST.prototype.comprehension = function(node)
 {
-    this.target = target;
-    this.iter = iter;
-    this.ifs = ifs;
+    var target = node.target;
+    var iter = node.iter;
+    var ifs = node.ifs;
+    
+    throw new Error("Comprehensions not implemented.");
 }
 
 /*
- *
+ * type: expr_ty
+ * name: expr_ty
+ * body: asdl_seq
  *
  */
-ReverseAST.prototype.ExceptHandler = function(/* {expr_ty} */ type, /* {expr_ty} */ name, /* {asdl_seq
-                            *} */ body)
+ReverseAST.prototype.ExceptHandler = function(node)
 {
-    this.type = type;
-    this.name = name;
-    this.body = body;
+    var type = node.type;
+    var name = node.name;
+    var body = node.boy;
+    
+    throw new Error("Except handlers are not implemented");
 }
 
 ReverseAST.prototype.argument_ = function(node) {
@@ -1137,21 +1279,27 @@ ReverseAST.prototype.arguments_ = function(node)
 }
 
 /*
- *
+ * arg: identifier
+ * value: expr_ty
  *
  */
-ReverseAST.prototype.keyword = function(/* {identifier} */ arg, /* {expr_ty} */ value)
+ReverseAST.prototype.keyword = function(node)
 {
-    this.arg = arg;
-    this.value = value;
+    var arg = node.arg;
+    var value = node.value;
+    
+    throw new Error("Keywords are not implemented");
 }
 
 /*
- *
+ * name: identifier
+ * asname: identifier
  *
  */
-ReverseAST.prototype.alias = function(/* {identifier} */ name, /* {identifier} */ asname)
+ReverseAST.prototype.alias = function(node)
 {
-    this.name = name;
-    this.asname = asname;
+    var name = node.name;
+    var asname = node.asname;
+    
+    throw new Error("Aliases are not implemented");
 }
