@@ -436,7 +436,10 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     
     // Add the presentation block
     this.presentation = new KennelPresentation(
-        function(content) { kennel.model.presentation = content; },
+        function(content) { 
+            kennel.model.presentation = content;
+            kennel.editor.blockly.resize();
+        },
         function() { return kennel.model.presentation; },
         kennel.mainDiv.find('.kennel-presentation')
     );
@@ -508,16 +511,20 @@ Kennel.prototype.loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
-            "<div class='col-md-7'>"+
-                "<div class='well kennel-presentation'>"+
+            "<div class='col-md-7 col-sm-7 alert alert-warning'>"+
+                "<fieldset>"+
+                    "<legend>BlockPy/Kennel/Silicon</legend>"+
+                "</fieldset>"+
+                "<div class='kennel-presentation'>"+
                     this.model.presentation+
                 "</div>"+
-            "</div>"+
-            "<div class='col-md-5 kennel-feedback alert' role='alert' style='padding-left:5px'>"+
-            "</div>"+
-        "</div>"+
-        "<div class='row'>"+
-            "<div class='col-md-7 col-sm-7'>"+
+                "<strong>Feedback:</strong> <span class='kennel-feedback'></span>"+
+                "<div class='kennel-toolbar btn-toolbar' role='toolbar'>"+
+                    "<button class='btn btn-default kennel-change-mode'>To text</button>"+
+                    "<button class='btn btn-default kennel-run'>Run</button>"+
+                    (this.model.settings.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
+                    "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
+                "</div>"+
                 "<div class='kennel-editor'>"+
                     "<div class='kennel-blocks' "+
                          "style='height:"+this.metrics_editor_height+"'>"+
@@ -531,20 +538,18 @@ Kennel.prototype.loadMain = function() {
                     "</div>"+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-5 col-sm-5'>"+
-                "<div class='kennel-toolbar'>"+
-                    "<button class='btn btn-default kennel-change-mode'>To text</button>"+
-                    "<button class='btn btn-default kennel-run'>Run</button>"+
-                    (this.model.settings.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
-                    "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
-                "</div>"+
+            "<div class='col-md-5 col-sm-5 alert alert-info'>"+
+                "<fieldset>"+
+                    "<legend>State</legend>"+
+                "</fieldset>"+
                 "<div class='panel panel-default'>"+
-                    "<div class='panel-heading'>Console</div>"+
+                    "<div class='panel-heading'>Printer</div>"+
                     "<div class='panel-body'>"+
                         "<div class='kennel-console'></div>"+
                     "</div>"+
+                "</div>"+
                 "<div class='panel panel-default'>"+
-                    "<div class='panel-heading'>Explorer</div>"+
+                    "<div class='panel-heading'>Data Explorer</div>"+
                     "<div class='panel-body'>"+
                     "<div class='kennel-explorer'>"+
                         "<table><tr>"+
@@ -589,8 +594,13 @@ Kennel.prototype.loadMain = function() {
                 "</div>"+
             "</div>"+
         "</div>"+
-        "<div>"+
-            "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+        "<div class='row'>"+
+            "<div class='col-md-4'>"+
+                "<img src='images/blockly-corgi-logo.png' />"+
+            "</div>"+
+            "<div class='col-md-8'>"+
+                "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+            "</div>"+
         "</div>"+
     "</div>";
     this.mainDiv = $(this.attachmentPoint).html($(mainTabs))
