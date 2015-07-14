@@ -10,6 +10,7 @@ Push changes to the subtrees' repos:
 
     > git subtree push --prefix=skulpt/ --squash skulpt master
     > git subtree push --prefix=blockly/ --squash blockly master
+    > git subtree push --prefix=server/ --squash server master
     
 Pull changes from upstream repos:
 
