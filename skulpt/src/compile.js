@@ -2326,7 +2326,6 @@ Sk.compile = function (source, filename, mode, canSuspend) {
 };
 
 goog.exportSymbol("Sk.compile", Sk.compile);
-goog.exportSymbol("Sk.recompile", Sk.recompile);
 
 Sk.resetCompiler = function () {
     Sk.gensymcount = 0;

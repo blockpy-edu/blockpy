@@ -108,3 +108,21 @@ Blockly.Blocks['plot_line'] = {
     this.setTooltip('Plots onto the canvas');
   }
 };
+
+Blockly.Blocks['plot_lineXY'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.plot.HUE);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.appendValueInput("x_values")
+        .appendField("plot Xs:")
+        .setCheck('Array');
+    this.appendValueInput("y_values")
+        .appendField("vs. Ys:")
+        .setCheck('Array');
+    this.setInputsInline(false);
+    this.setOutput(false);
+    this.setTooltip('Plots onto the canvas');
+  }
+};

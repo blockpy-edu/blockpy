@@ -1101,11 +1101,11 @@ jsplotlib.get_color = function(cs) {
 /**
  Creates the d3 svg element at the specified dom element with given width and height
 **/
-jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
+jsplotlib.make_chart = function(width, height, console, insert_mode,
     attributes) {
     chart_counter++;
     var DEFAULT_PADDING = 10;
-    insert_container = insert_container || document.body;
+    console = console || document.body;
     width = width - 2 * DEFAULT_PADDING || 500;
     height = height - 2 * DEFAULT_PADDING || 200;
     attributes = attributes || {};
@@ -1115,14 +1115,17 @@ jsplotlib.make_chart = function(width, height, insert_container, insert_mode,
         attributes.id = 'chart' + chart_counter;
     }
 
-    var chart;
+    var chart = d3.select(console.console).append('div').append('svg');
+    /*
     if (!insert_mode) {
         chart = d3.select(insert_container).append('svg');
     } else {
         chart = d3.select(insert_container).insert('svg', insert_mode);
     }
+    */
 
     // set css classes
+    $(chart[0]).parent().hide();
     chart.attr('class', 'chart');
     chart.attr('width', width);
     chart.attr('height', height);
@@ -1602,14 +1605,16 @@ var $builtinmodule = function(name) {
 
     var create_chart = function() {
         /* test if Canvas is available should be moved to create_chart function */
-        if (Sk.matplotlibCanvas === undefined) {
+        if (Sk.console === undefined) {
             throw new Sk.builtin.NameError(
-                "Can not resolve drawing area. Sk.matplotlibCanvas is undefined!");
+                "Can not resolve drawing area. Sk.console is undefined!");
         }
 
         if (!chart) {
-            $(Sk.matplotlibCanvas).empty();
-            chart = jsplotlib.make_chart(400, 400, Sk.matplotlibCanvas, false);
+            //$(Sk.matplotlibCanvas).empty();
+            var height = Sk.console.height * 1.25;
+            chart = jsplotlib.make_chart(height, height, Sk.console, false);
+            
         }
     };
 
@@ -1745,7 +1750,8 @@ var $builtinmodule = function(name) {
                 "Can not call show without any plot created.");
         }
 
-        $(Sk.matplotlibCanvas).show();
+        Sk.console.printHtml(chart, 'Values');
+        //$(Sk.matplotlibCanvas).show();
     };
     mod.show = new Sk.builtin.func(show_f);
 
@@ -1859,9 +1865,9 @@ var $builtinmodule = function(name) {
         chart = null;
         plot = null;
 
-        if (Sk.matplotlibCanvas !== undefined) {
+        /*if (Sk.matplotlibCanvas !== undefined) {
             $(Sk.matplotlibCanvas).empty();
-        }
+        }*/
     };
 
     mod.clf = new Sk.builtin.func(clf_f);

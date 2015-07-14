@@ -46,6 +46,7 @@ goog.require('goog.userAgent');
  * @constructor
  */
 Blockly.FieldTextArea = function(text, opt_changeHandler) {
+    console.log("FTA.constructor");
   Blockly.FieldTextArea.superClass_.constructor.call(this, text);
   this.changeHandler_ = opt_changeHandler;
 };
@@ -85,6 +86,7 @@ Blockly.FieldTextArea.prototype.dispose = function() {
  * @override
  */
 Blockly.FieldTextArea.prototype.setText = function(text) {
+    console.log("FTA.setText");
   if (text === null) {
     // No change if null.
     return;
@@ -117,11 +119,13 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
  * Update the text node of this field to display the current text.
  * @private
  */
-Blockly.Field.prototype.updateTextNode_ = function() {
+Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
+    console.log("FTA.UpdateTextNode");
   if (!this.textElement_) {
     // Not rendered yet.
     return;
   }
+  this.textElement_.setAttribute('class', 'blocklyText blocklyTextCode');
   var text = this.text_;
   // Empty the text element.
   if (this.textElement_ !== undefined) {
@@ -158,7 +162,11 @@ Blockly.Field.prototype.updateTextNode_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.render_ = function() {
-    this.size_.width = this.textElement_.getBBox().width + 5;
+    console.log("FTA.Render", this, this.textElement_);
+    if (!this.visible_ || !this.textElement_) {
+        return;
+    }
+    this.size_.width = this.textElement_.getComputedTextLength() + 5;
     this.size_.height= (this.text_.split(/\n/).length ||1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
     if (this.borderRect_) {
         this.borderRect_.setAttribute('width',
@@ -177,6 +185,7 @@ Blockly.FieldTextArea.prototype.render_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
+    console.log("FTA.showEditor");
   var quietInput = opt_quietInput || false;
   if (!quietInput && (goog.userAgent.MOBILE || goog.userAgent.ANDROID ||
                       goog.userAgent.IPAD)) {
@@ -297,6 +306,7 @@ Blockly.FieldTextArea.prototype.validate_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.resizeEditor_ = function() {
+    console.log("FTA.resizeEditor");
   var div = Blockly.WidgetDiv.DIV;
   var bBox = this.fieldGroup_.getBBox();
   var htmlInput = Blockly.FieldTextArea.htmlInput_;

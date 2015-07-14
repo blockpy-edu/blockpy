@@ -3,15 +3,13 @@ set outputdir=C:\Users\acbart\Dropbox\Public\blockpy
 copy blockpy.html %outputdir%
 
 mkdir %outputdir%\analyzer\
-copy analyzer\analyzer.js %outputdir%\analyzer\
+copy analyzer\* %outputdir%\analyzer\
 
 mkdir %outputdir%\kennel\
-copy kennel\kennel.js %outputdir%\kennel\
-copy kennel\kennel.css %outputdir%\kennel\
+copy kennel\* %outputdir%\kennel\
 
 mkdir %outputdir%\converter\
-copy converter\python_to_blockly.js %outputdir%\converter\
-copy converter\renderBlocklyToPng.js %outputdir%\converter\
+copy converter\* %outputdir%\converter\
 
 mkdir %outputdir%\blockly\
 copy blockly\blockly_compressed.js %outputdir%\blockly\blockly_compressed.js
@@ -32,6 +30,9 @@ copy skulpt\dist\skulpt-stdlib.js %outputdir%\skulpt\dist\skulpt-stdlib.js
 
 mkdir %outputdir%\libs\
 copy libs\* %outputdir%\libs\
+
+mkdir %outputdir%\fonts\
+copy fonts\* %outputdir%\fonts\
 
 mkdir %outputdir%\images\
 copy images\blockly-corgi-logo.png %outputdir%\images\blockly-corgi-logo.png
