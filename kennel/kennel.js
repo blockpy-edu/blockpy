@@ -327,6 +327,18 @@ function KennelFeedback(tag) {
     this.tag = tag;
 };
 
+KennelFeedback.prototype.error = function(html) {
+    this.tag.html(html);
+    this.tag.removeClass("alert-success");
+    this.tag.addClass("alert-warning");
+}
+
+KennelFeedback.prototype.success = function() {
+    this.tag.html("Success!");
+    this.tag.removeClass("alert-warning");
+    this.tag.addClass("alert-success");
+}
+
 function KennelToolbar(tag) {
     this.tag = tag;
     this.elements = {
@@ -386,7 +398,7 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     var kennel = this;
     
     // Add the Feedback block (unused)
-    this.feedback = new KennelFeedback();
+    this.feedback = new KennelFeedback(this.mainDiv.find('.kennel-feedback'));
     
     // Initialize the toolbar so other things can refer to it
     this.toolbar = new KennelToolbar(this.mainDiv.find('.kennel-toolbar'));
@@ -497,19 +509,11 @@ Kennel.prototype.loadMain = function() {
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
             "<div class='col-md-7'>"+
-                "<div class='kennel-presentation'>"+
+                "<div class='well kennel-presentation'>"+
                     this.model.presentation+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-5' kennel-feedback'>"+
-            "</div>"+
-        "</div>"+
-        "<div class='row'>"+
-            "<div class='col-md-12 kennel-toolbar'>"+
-                "<button class='btn btn-default kennel-change-mode'>To text</button>"+
-                "<button class='btn btn-default kennel-run'>Run</button>"+
-                (this.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
-                "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
+            "<div class='col-md-5 kennel-feedback alert' role='alert' style='padding-left:5px'>"+
             "</div>"+
         "</div>"+
         "<div class='row'>"+
@@ -528,6 +532,12 @@ Kennel.prototype.loadMain = function() {
                 "</div>"+
             "</div>"+
             "<div class='col-md-5 col-sm-5'>"+
+                "<div class='kennel-toolbar'>"+
+                    "<button class='btn btn-default kennel-change-mode'>To text</button>"+
+                    "<button class='btn btn-default kennel-run'>Run</button>"+
+                    (this.model.settings.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
+                    "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
+                "</div>"+
                 "<div class='panel panel-default'>"+
                     "<div class='panel-heading'>Console</div>"+
                     "<div class='panel-body'>"+
@@ -680,7 +690,6 @@ Kennel.prototype.print = function(text) {
  */
 Kennel.prototype.printHtml = function(chart, value) {
     this.outputList.push(value);
-    console.log(chart);
     var outerDiv = $(chart[0]);//.parent();
     outerDiv.parent().show();
     outerDiv.attr({
@@ -876,8 +885,34 @@ Kennel.prototype.run = function() {
 }
 
 Kennel.prototype.check = function(student_code, traceTable, output) {
-    if (this.model.programs["on_run"]) {
-        
+    var kennel = this;
+    var on_run = this.model.programs['on_run'];
+    if (on_run.trim() !== "") {
+        var backupExecution = Sk.afterSingleExecution;
+        Sk.afterSingleExecution = undefined;
+        on_run += "\nresult = on_run('''"+student_code+"''', "+
+                  JSON.stringify(traceTable)+", "+
+                  "'''"+output+"'''"+
+                  ")";
+        console.log(on_run);
+        var executionPromise = Sk.misceval.asyncToPromise(function() {
+            return Sk.importMainWithBody("<stdin>", false, on_run, true);
+        });
+        executionPromise.then(
+            function (module) {
+                var result = Sk.ffi.remapToJs(module.$d.result);
+                console.log(result);
+                if (result === 1) {
+                    kennel.feedback.success();
+                } else {
+                    kennel.feedback.error(result);
+                }
+                Sk.afterSingleExecution = backupExecution;
+            }, function (error) {
+                Sk.afterSingleExecution = backupExecution;
+                kennel.feedback.error("Error in instructor's feedback. "+error);
+                console.error(error);
+            });
     }
 }
 

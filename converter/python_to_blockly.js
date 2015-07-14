@@ -749,6 +749,6 @@ PythonToBlocks.prototype.convert = function(python_source) {
         other_xml.appendChild(converted);
     }
     xml = other_xml;
-    console.log(converted);
+    //console.log(converted);
     return {"xml": new XMLSerializer().serializeToString(xml), "errors": error_message};
 }
