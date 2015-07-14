@@ -52,6 +52,7 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
     this.stepEditor = stepEditor;
     this.tag = tag;
     this.tags = {
+        "message": tag.find('.kennel-explorer-run-hide'),
         "first": tag.find('.kennel-explorer-first'),
         "back": tag.find('.kennel-explorer-back'),
         "next": tag.find('.kennel-explorer-next'),
@@ -62,6 +63,10 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
         "table": tag.find('.kennel-explorer-table'),
         "modules": tag.find('.kennel-explorer-modules')
     };
+    this.tags.first.prop("disabled", true);
+    this.tags.back.prop("disabled", true);
+    this.tags.next.prop("disabled", true);
+    this.tags.last.prop("disabled", true);
 }
 
 PropertyExplorer.prototype.move = function(step) {
@@ -131,6 +136,7 @@ PropertyExplorer.prototype.clear = function() {
 PropertyExplorer.prototype.reload = function(traceTable) {
     this.traceTable = traceTable;
     this.move(-1);
+    this.tags.message.hide();
 }
 
 function KennelEditor(setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
@@ -424,11 +430,15 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     
     // Add the Property Explorer
     this.explorer = new PropertyExplorer(
-        function(step, page) { kennel.stepConsole(step); },
+        function(step, page) { 
+            kennel.stepConsole(step);
+        },
         function(step, page) { 
             kennel.editor.highlightLine(page.line-1);
             if (page.block) {
                 kennel.editor.highlightBlock(page.block);
+            } else {
+                kennel.editor.highlightBlock(null);
             }
         },
         kennel.mainDiv.find('.kennel-explorer')
@@ -539,15 +549,6 @@ Kennel.prototype.loadMain = function() {
                 "</div>"+
             "</div>"+
             "<div class='col-md-5 col-sm-5 alert alert-info'>"+
-                "<fieldset>"+
-                    "<legend>State</legend>"+
-                "</fieldset>"+
-                "<div class='panel panel-default'>"+
-                    "<div class='panel-heading'>Printer</div>"+
-                    "<div class='panel-body'>"+
-                        "<div class='kennel-console'></div>"+
-                    "</div>"+
-                "</div>"+
                 "<div class='panel panel-default'>"+
                     "<div class='panel-heading'>Data Explorer</div>"+
                     "<div class='panel-body'>"+
@@ -555,11 +556,16 @@ Kennel.prototype.loadMain = function() {
                         "<table><tr>"+
                         // Step: X of Y (Line: Z)
                         "<td colspan='4'>"+
-                            "<strong>Step: </strong>"+
-                            "<span class='kennel-explorer-step-span'>0</span> of "+
-                            "<span class='kennel-explorer-length-span'>0</span> "+
-                            "(<strong>Line: </strong>"+
-                            "<span class='kennel-explorer-line-span'>0</span>)"+
+                            "<div class='kennel-explorer-run-hide'>"+
+                                "<i>Run your code to explore it.</i>"+
+                            "</div>"+
+                            "<div class='kennel-explorer-status'>"+
+                                "<strong>Step: </strong>"+
+                                "<span class='kennel-explorer-step-span'>0</span> of "+
+                                "<span class='kennel-explorer-length-span'>0</span> "+
+                                "(<strong>Line: </strong>"+
+                                "<span class='kennel-explorer-line-span'>0</span>)"+
+                            "</div>"+
                         "</td>"+
                         "</tr><tr>"+
                         // First Previous Next Last
@@ -577,8 +583,17 @@ Kennel.prototype.loadMain = function() {
                             "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
                         "</td>"+
                         "</tr></table>"+
+                        // Printer
+                        "<br><strong>Printer</strong>"+
+                        "<div class='kennel-console'></div>"+
+                        // Modules
+                        "<br><div>"+
+                            "<strong>Loaded Modules: </strong>"+
+                            "<i class='kennel-explorer-modules'>None</i>"+
+                        "</div>"+
                         // Actual Trace data
-                        "<table style='width: 100%'"+
+                        "<br><strong>Trace Table</strong>"+
+                        "<br><table style='width: 100%'"+
                                 "class='table table-condensed table-striped "+
                                        "table-bordered table-hover kennel-explorer-table'>"+
                             // Property Type Value
@@ -587,8 +602,7 @@ Kennel.prototype.loadMain = function() {
                                 "<th>Type</th>"+
                                 "<th>Value</th>"+
                             "</tr>"+
-                        "</table><br>"+
-                        "Loaded Modules: <i class='kennel-explorer-modules'>None</i>"+
+                        "</table>"+
                     "</div>"+
                     "</div>"+
                 "</div>"+
@@ -646,7 +660,7 @@ Kennel.prototype.loadConsole = function() {
 
 Kennel.prototype.stepConsole = function(step, page) {
     $(this.console).find('.kennel-console-output').each(function() {
-        if ($(this).attr("data-step")-1 <= step) {
+        if ($(this).attr("data-step") <= step) {
             $(this).show();
         } else {
             $(this).hide();
