@@ -107,7 +107,6 @@ ReverseAST.prototype.measureNode = function(node) {
     this.heights = [];
     this.recursiveMeasure(node, this.source.length-1);
     this.heights.shift();
-    console.log(this.heights);
 }
 
 ReverseAST.prototype.getSourceCode = function(from, to) {
@@ -136,12 +135,10 @@ ReverseAST.prototype.convertBody = function(node)
     var from = node[0].lineno;
     var to = this.heights.shift();
     var firstChild = this.convertStatement(node[0], this.getSourceCode(from, to)); // XML Block
-    console.log(node[0].constructor.name, from, to);
     var currentChild = firstChild;
     for (var i = 1; i < node.length; i++) {
         from = node[i].lineno;
         to = this.heights.shift();
-        console.log(node[i].constructor.name, from, to);
         var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
         if (newChild !== null) {
             var nextElement = document.createElement("next");
@@ -151,6 +148,8 @@ ReverseAST.prototype.convertBody = function(node)
                     firstChild = currentChild;
                 }
                 currentChild.appendChild(nextElement);
+            } else if (firstChild === null) {
+                firstChild = newChild;
             }
             currentChild = newChild;
         }
@@ -226,7 +225,6 @@ ReverseAST.prototype.convert = function(node) {
 }
 
 ReverseAST.prototype.convertStatement = function(node, full_source) {
-    console.log(node, full_source);
     try {
         return this.convert(node);
     } catch (e) {
@@ -1053,6 +1051,7 @@ ReverseAST.prototype.CallAttribute = function(func, args, keywords, starargs, kw
             default: throw new Error("Unknown function call!");
         }
     } else {
+        console.log(func, args, keywords, starargs, kwargs);
         throw new Error("Unknown function call or not implemented");
     }
 }
