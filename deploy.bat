@@ -1,22 +1,40 @@
-set outputdir=C:\Users\acbart\Projects\blockpy\kennel_dist
+set outputdir=C:\Users\acbart\Projects\blockpy\server\public
 
-mkdir %outputdir%
+mkdir %outputdir%\analyzer\
+copy analyzer\* %outputdir%\analyzer\
 
-copy analyzer\analyzer.js %outputdir%
+mkdir %outputdir%\kennel\
+copy kennel\* %outputdir%\kennel\
 
-copy converter\python_to_blockly.js %outputdir%
+mkdir %outputdir%\converter\
+copy converter\* %outputdir%\converter\
 
-copy blockly\blockly_compressed.js %outputdir%
-copy blockly\blocks_compressed.js %outputdir%
-copy blockly\python_compressed.js %outputdir%
+mkdir %outputdir%\blockly\
+copy blockly\blockly_compressed.js %outputdir%\blockly\blockly_compressed.js
+copy blockly\blockly_uncompressed.js %outputdir%\blockly\blockly_uncompressed.js
+copy blockly\blocks_compressed.js %outputdir%\blockly\blocks_compressed.js
+copy blockly\python_compressed.js %outputdir%\blockly\python_compressed.js
+copy blockly\javascript_compressed.js %outputdir%\blockly\javascript_compressed.js
 
-mkdir %outputdir%\msg\js\
-copy blockly\msg\js\en.js %outputdir%\msg\js\en.js
+mkdir %outputdir%\blockly\msg\js\
+copy blockly\msg\js\en.js %outputdir%\blockly\msg\js\en.js
 
-mkdir %outputdir%\media\
-copy blockly\media\* %outputdir%\media\
+mkdir %outputdir%\blockly\media\
+copy blockly\media\* %outputdir%\blockly\media\
 
-copy skulpt\dist\skulpt.min.js %outputdir%
-copy skulpt\dist\skulpt-stdlib.js %outputdir%
+mkdir %outputdir%\skulpt\dist\
+copy skulpt\dist\skulpt.min.js %outputdir%\skulpt\dist\skulpt.min.js
+copy skulpt\dist\skulpt-stdlib.js %outputdir%\skulpt\dist\skulpt-stdlib.js
 
-copy libs\* %outputdir%
+mkdir %outputdir%\libs\
+copy libs\* %outputdir%\libs\
+mkdir %outputdir%\libs\summernote
+copy libs\summernote\* %outputdir%\libs\summernote\
+mkdir %outputdir%\libs\codemirror
+copy libs\codemirror\* %outputdir%\libs\codemirror\
+
+mkdir %outputdir%\fonts\
+copy fonts\* %outputdir%\fonts\
+
+mkdir %outputdir%\images\
+copy images\blockly-corgi-logo.png %outputdir%\images\blockly-corgi-logo.png

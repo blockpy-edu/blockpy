@@ -10,28 +10,6 @@
     <link rel="stylesheet" href="libs/summernote/summernote.css">
     <link rel="stylesheet" href="kennel/kennel.css">
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            background-color: #fff;
-            font-family: sans-serif;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-        h1 {
-            font-weight: normal;
-            font-size: 140%;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border-style: solid;
-            border-color: #ddd;
-            border-width: 0 1px 1px 0;
-        }
-    </style>
     
     <!-- JQuery, D3, Math.js, Bootstrap -->
     <script type="text/javascript" src="libs/jquery.js"></script>
@@ -160,19 +138,15 @@
           });
         </script>
 <pre id='default-body' style='display:none'>
-def on_run(code, output, properties):
-    if 'crime.get_by_year' not in code:
-        return "You'll need to use the 'get by year' block!"
-    elif 'violent' not in code:
-        return "You need to get the violent crime rate."
-    elif 'state' not in code:
-        return "You also need to store the state name while you iterate!"
-    elif 'if' not in code:
-        return "You will need some decision in your code. This is similar to the problems we did before where we found the maximum."
-    elif output.strip() == 'District of Columbia':
-        return true
-    else:
-        return 'You can do it!'
+import matplotlib.pyplot as plt
+import weather
+
+
+plt.plot(weather.get_forecasts("Blacksburg, VA"))
+plt.show()
+plt.clf()
+plt.plot(weather.get_forecasts("Blacksburg, VA"))
+plt.show()
 </pre>
 <pre id='default-on-run' style='display:none'>
 def on_run(code, output, properties):
