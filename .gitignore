@@ -16,6 +16,7 @@ bin/
 build/
 develop-eggs/
 dist/
+!server/public/skulpt/dist
 eggs/
 lib/
 lib64/
