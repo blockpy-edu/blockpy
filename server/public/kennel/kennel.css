@@ -1,11 +1,14 @@
 .kennel-explorer {
-    border: 1px solid grey;
     height: 100%;
 }
 
 .kennel-explorer table {
     width: 100%; 
     text-align: center;
+}
+
+.kennel-explorer-errors {
+    text-align: left;
 }
 
 .kennel-editor {
@@ -46,7 +49,24 @@
     color: #8a1f11 !important;
 }
 
+.editor-error-line {
+    background: #FBC4C4 !important;
+    color: #8a1f11 !important;
+}
 
+.kennel-content .btn {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.kennel-content .alert {
+    color: black;
+}
+
+
+
+
+/*
 .col-md-1 { padding-left: 0px; padding-right: 0px; }
 .col-md-2 { padding-left: 0px; padding-right: 0px; }
 .col-md-3 { padding-left: 0px; padding-right: 0px; }
@@ -60,3 +80,4 @@
 .col-md-11 { padding-left: 0px; padding-right: 0px; }
 .col-md-12 { padding-left: 0px; padding-right: 0px; }   
 .container-fluid {padding-left: 0px; padding-right: 0px; } 
+*/

@@ -46,7 +46,6 @@ goog.require('goog.userAgent');
  * @constructor
  */
 Blockly.FieldTextArea = function(text, opt_changeHandler) {
-    console.log("FTA.constructor");
   Blockly.FieldTextArea.superClass_.constructor.call(this, text);
   this.changeHandler_ = opt_changeHandler;
 };
@@ -86,7 +85,6 @@ Blockly.FieldTextArea.prototype.dispose = function() {
  * @override
  */
 Blockly.FieldTextArea.prototype.setText = function(text) {
-    console.log("FTA.setText");
   if (text === null) {
     // No change if null.
     return;
@@ -120,7 +118,6 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
  * @private
  */
 Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
-    console.log("FTA.UpdateTextNode");
   if (!this.textElement_) {
     // Not rendered yet.
     return;
@@ -146,10 +143,11 @@ Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
   var that=this;
   //var textNode = document.createTextNode(text);
   text.split(/\n/).map(function(textline){
-          textline = textline.replace(/\s/g, Blockly.Field.NBSP);
-                var tspan = Blockly.createSvgElement('tspan', {x:0,y:y}, that.textElement_)
-                          .appendChild(document.createTextNode(textline));
-                y+=20;
+    textline = textline.replace(/\s/g, Blockly.Field.NBSP);
+    var tspan = Blockly.createSvgElement('tspan', {x:0,y:y}, that.textElement_);
+    var textNode = document.createTextNode(textline);
+    tspan.appendChild(textNode);
+    y+=20;
   });
 
   // Cached width is obsolete.  Clear it.
@@ -162,11 +160,10 @@ Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.render_ = function() {
-    console.log("FTA.Render", this, this.textElement_);
     if (!this.visible_ || !this.textElement_) {
         return;
     }
-    this.size_.width = this.textElement_.getComputedTextLength() + 5;
+    this.size_.width = this.textElement_.getBBox().width + 5;
     this.size_.height= (this.text_.split(/\n/).length ||1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
     if (this.borderRect_) {
         this.borderRect_.setAttribute('width',
@@ -185,7 +182,6 @@ Blockly.FieldTextArea.prototype.render_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
-    console.log("FTA.showEditor");
   var quietInput = opt_quietInput || false;
   if (!quietInput && (goog.userAgent.MOBILE || goog.userAgent.ANDROID ||
                       goog.userAgent.IPAD)) {
@@ -306,7 +302,6 @@ Blockly.FieldTextArea.prototype.validate_ = function() {
  * @private
  */
 Blockly.FieldTextArea.prototype.resizeEditor_ = function() {
-    console.log("FTA.resizeEditor");
   var div = Blockly.WidgetDiv.DIV;
   var bBox = this.fieldGroup_.getBBox();
   var htmlInput = Blockly.FieldTextArea.htmlInput_;
@@ -355,7 +350,7 @@ Blockly.FieldTextArea.prototype.widgetDispose_ = function() {
       }
     }
     thisField.setText(text);
-        thisField.sourceBlock_.rendered && thisField.sourceBlock_.render();
+    thisField.sourceBlock_.rendered && thisField.sourceBlock_.render();
     Blockly.unbindEvent_(htmlInput.onKeyUpWrapper_);
     Blockly.unbindEvent_(htmlInput.onKeyPressWrapper_);
     Blockly.unbindEvent_(htmlInput.onWorkspaceChangeWrapper_);
