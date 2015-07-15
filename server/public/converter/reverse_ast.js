@@ -970,7 +970,7 @@ ReverseAST.prototype.KNOWN_MODULES = {
         "get_all": ["crime_all"]
     },
     "books": {
-        "get": ["books_get"]
+        "get_all": ["books_get"]
     },
     "plt": {
         "title": ["*plot_title", "TEXT"],
@@ -1156,7 +1156,15 @@ ReverseAST.prototype.Subscript = function(node)
     var slice = node.slice;
     var ctx = node.ctx;
     
-    throw new Error("Subscript access not implemented.");
+    if (slice.value.constructor.name !== "Str") {
+        throw new Error("Currently, dictionary access only works for strings!");
+    }
+    
+    return block("dict_get_literal", {
+        "ITEM": this.Str_value(slice.value)
+    }, {
+        "DICT": this.convert(value)
+    });
 }
 
 /*
