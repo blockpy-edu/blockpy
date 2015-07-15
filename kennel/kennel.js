@@ -804,7 +804,6 @@ Kennel.prototype.parseGlobals = function(variables) {
 }
 
 Kennel.prototype.parseValue = function(property, value) {
-    console.log(property, value);
     switch (value.constructor) {
         case Sk.builtin.func:
             return {'name': property,
@@ -955,14 +954,12 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
                   JSON.stringify(traceTable)+", "+
                   "'''"+output+"'''"+
                   ")";
-        console.log(on_run);
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
         executionPromise.then(
             function (module) {
                 var result = Sk.ffi.remapToJs(module.$d.result);
-                console.log(result);
                 if (result === 1) {
                     kennel.feedback.success();
                 } else {
