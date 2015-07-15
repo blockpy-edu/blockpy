@@ -45,6 +45,7 @@
     
     <!-- Analyzer -->
     <script type="text/javascript" src="analyzer/analyzer.js"></script>
+    <script type="text/javascript" src="analyzer/python_errors.js"></script>
     
     <!-- Converter -->
     <script type="text/javascript" src="converter/reverse_ast.js"></script>
@@ -142,7 +143,7 @@
 print("Hello")
 a = 0
 print("World")
-b = 3
+b = 6
 print("Another world")
 c = a
 print("Another story")
@@ -164,9 +165,6 @@ def on_run(code, output, properties):
 </pre>
   
 <xml id="toolbox" style="display: none">
-    <category name="Assessment">
-        <block type="assess_suggest"></block>
-    </category>
     <category name="Properties" custom="VARIABLE">
     </category>
     <category name="Decisions">
