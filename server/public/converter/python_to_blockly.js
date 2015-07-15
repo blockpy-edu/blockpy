@@ -728,27 +728,25 @@ PythonToBlocks.prototype.convert = function(python_source) {
     var xml = document.createElement("xml");
     xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     var filename = 'user_code.py';
-    var ast, symbol_table, error_message;
+    // Attempt parsing - might fail!
+    var parse, ast, symbol_table, error;
     try {
-        var parse = Sk.parse(filename, python_source);
+        parse = Sk.parse(filename, python_source);
         ast = Sk.astFromParse(parse.cst, filename, parse.flags);
         symbol_table = Sk.symboltable(ast, filename, python_source, filename, parse.flags);
-        error_message = false;
-        console.log("AST:", ast);
     } catch (e) {
-        error_message = e;
-        console.log(error_message);
+        error = e;
+        xml.appendChild(this.raw_block(python_source))
+        return {"xml": new XMLSerializer().serializeToString(xml),
+                "error": error};
     }
+
     this.sourceCodeLines = python_source.split("\n");
-    this.reverse.measureNode(ast);
-    
-    xml.appendChild(this.raw_block(python_source))
+    this.reverse.measureNode(ast);   
     var converted = this.reverse.convert(ast);
-    var other_xml = document.createElement("xml");
     if (converted !== null) {
-        other_xml.appendChild(converted);
+        xml.appendChild(converted);
     }
-    xml = other_xml;
-    console.log(converted);
-    return {"xml": new XMLSerializer().serializeToString(xml), "errors": error_message};
+    return {"xml": new XMLSerializer().serializeToString(xml),
+            "error": null};
 }

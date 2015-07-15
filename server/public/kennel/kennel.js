@@ -52,6 +52,8 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
     this.stepEditor = stepEditor;
     this.tag = tag;
     this.tags = {
+        "message": tag.find('.kennel-explorer-run-hide'),
+        "errors": tag.find('.kennel-explorer-errors'),
         "first": tag.find('.kennel-explorer-first'),
         "back": tag.find('.kennel-explorer-back'),
         "next": tag.find('.kennel-explorer-next'),
@@ -62,6 +64,11 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
         "table": tag.find('.kennel-explorer-table'),
         "modules": tag.find('.kennel-explorer-modules')
     };
+    this.tags.first.prop("disabled", true);
+    this.tags.back.prop("disabled", true);
+    this.tags.next.prop("disabled", true);
+    this.tags.last.prop("disabled", true);
+    this.tags.errors.hide();
 }
 
 PropertyExplorer.prototype.move = function(step) {
@@ -117,7 +124,7 @@ PropertyExplorer.prototype.move = function(step) {
         this.tags.table.append(
             $("<tr/>").append($("<td/>").text(value.name))
                       .append($("<td/>").text(value.type))
-                      .append($("<td/>").text(value.value)));
+                      .append('<td><samp>'+value.value+'</samp></td>'));
     }
 };
 
@@ -131,9 +138,11 @@ PropertyExplorer.prototype.clear = function() {
 PropertyExplorer.prototype.reload = function(traceTable) {
     this.traceTable = traceTable;
     this.move(-1);
+    this.tags.message.hide();
 }
 
-function KennelEditor(setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
+function KennelEditor(printError, setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
+    this.printError = printError;
     this.setModel = setModel;
     this.getModel = getModel;
     this.setSettings = setSettings;
@@ -290,13 +299,14 @@ KennelEditor.prototype.updateBlocks = function() {
         var code = this.getModel(); //this.text.getValue();
         var result = this.converter.convert(code);
         var xml = result.xml;
-        if (result.errors != "") {
+        if (result.error !== null) {
             console.error(result.errors);
         }
         var blocklyXml = Blockly.Xml.textToDom(xml);
         this.setBlocksFromXml(blocklyXml);
         this.blockly.align();
     } catch (e) {
+        this.printError(e);
         console.error(e);
         this.setBlocksFromXml(backupXml);
     }
@@ -315,8 +325,17 @@ KennelEditor.prototype.previousLine = null;
 KennelEditor.prototype.highlightLine = function(line) {
     if (this.previousLine !== null) {
         this.text.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-error-line');
     }
     this.text.addLineClass(line, 'text', 'editor-active-line');
+    this.previousLine = line;
+}
+KennelEditor.prototype.highlightError = function(line) {
+    if (this.previousLine !== null) {
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+    }
+    this.text.addLineClass(line, 'text', 'editor-error-line');
     this.previousLine = line;
 }
 KennelEditor.prototype.highlightBlock = function(block) {
@@ -326,6 +345,18 @@ KennelEditor.prototype.highlightBlock = function(block) {
 function KennelFeedback(tag) {
     this.tag = tag;
 };
+
+KennelFeedback.prototype.error = function(html) {
+    this.tag.html(html);
+    this.tag.removeClass("alert-success");
+    this.tag.addClass("alert-warning");
+}
+
+KennelFeedback.prototype.success = function() {
+    this.tag.html("Success!");
+    this.tag.removeClass("alert-warning");
+    this.tag.addClass("alert-success");
+}
 
 function KennelToolbar(tag) {
     this.tag = tag;
@@ -386,10 +417,26 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     var kennel = this;
     
     // Add the Feedback block (unused)
-    this.feedback = new KennelFeedback();
+    this.feedback = new KennelFeedback(this.mainDiv.find('.kennel-feedback'));
     
     // Initialize the toolbar so other things can refer to it
     this.toolbar = new KennelToolbar(this.mainDiv.find('.kennel-toolbar'));
+    
+    // Add the Property Explorer
+    this.explorer = new PropertyExplorer(
+        function(step, page) { 
+            kennel.stepConsole(step);
+        },
+        function(step, page) { 
+            kennel.editor.highlightLine(page.line-1);
+            if (page.block) {
+                kennel.editor.highlightBlock(page.block);
+            } else {
+                kennel.editor.highlightBlock(null);
+            }
+        },
+        kennel.mainDiv.find('.kennel-explorer')
+    );
     
     // Initialize the editor.
     this.model.get = function() {
@@ -400,6 +447,7 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
         kennel.model.programs[kennel.model.settings.program] = content;
     }
     this.editor = new KennelEditor(
+        function(e) {kennel.printError(e); },
         function(content) {  kennel.model.set(content); },
         function() { return kennel.model.get(); },
         function(new_editor) { kennel.model.settings.editor = new_editor; },
@@ -410,21 +458,12 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     );
     this.loadConsole();
     
-    // Add the Property Explorer
-    this.explorer = new PropertyExplorer(
-        function(step, page) { kennel.stepConsole(step); },
-        function(step, page) { 
-            kennel.editor.highlightLine(page.line-1);
-            if (page.block) {
-                kennel.editor.highlightBlock(page.block);
-            }
-        },
-        kennel.mainDiv.find('.kennel-explorer')
-    );
-    
     // Add the presentation block
     this.presentation = new KennelPresentation(
-        function(content) { kennel.model.presentation = content; },
+        function(content) { 
+            kennel.model.presentation = content;
+            kennel.editor.blockly.resize();
+        },
         function() { return kennel.model.presentation; },
         kennel.mainDiv.find('.kennel-presentation')
     );
@@ -496,24 +535,20 @@ Kennel.prototype.loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
-            "<div class='col-md-7'>"+
+            "<div class='col-md-7 col-sm-7 alert alert-warning'>"+
+                "<fieldset>"+
+                    "<legend>BlockPy/Kennel/Silicon</legend>"+
+                "</fieldset>"+
                 "<div class='kennel-presentation'>"+
                     this.model.presentation+
                 "</div>"+
-            "</div>"+
-            "<div class='col-md-5' kennel-feedback'>"+
-            "</div>"+
-        "</div>"+
-        "<div class='row'>"+
-            "<div class='col-md-12 kennel-toolbar'>"+
-                "<button class='btn btn-default kennel-change-mode'>To text</button>"+
-                "<button class='btn btn-default kennel-run'>Run</button>"+
-                (this.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
-                "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
-            "</div>"+
-        "</div>"+
-        "<div class='row'>"+
-            "<div class='col-md-7 col-sm-7'>"+
+                "<strong>Feedback:</strong> <span class='kennel-feedback'></span>"+
+                "<div class='kennel-toolbar btn-toolbar' role='toolbar'>"+
+                    "<button class='btn btn-default kennel-change-mode'>To text</button>"+
+                    "<button class='btn btn-default kennel-run'>Run</button>"+
+                    (this.model.settings.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
+                    "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
+                "</div>"+
                 "<div class='kennel-editor'>"+
                     "<div class='kennel-blocks' "+
                          "style='height:"+this.metrics_editor_height+"'>"+
@@ -527,24 +562,26 @@ Kennel.prototype.loadMain = function() {
                     "</div>"+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-5 col-sm-5'>"+
+            "<div class='col-md-5 col-sm-5 alert alert-info'>"+
                 "<div class='panel panel-default'>"+
-                    "<div class='panel-heading'>Console</div>"+
-                    "<div class='panel-body'>"+
-                        "<div class='kennel-console'></div>"+
-                    "</div>"+
-                "<div class='panel panel-default'>"+
-                    "<div class='panel-heading'>Explorer</div>"+
+                    "<div class='panel-heading'>Data Explorer</div>"+
                     "<div class='panel-body'>"+
                     "<div class='kennel-explorer'>"+
                         "<table><tr>"+
                         // Step: X of Y (Line: Z)
                         "<td colspan='4'>"+
-                            "<strong>Step: </strong>"+
-                            "<span class='kennel-explorer-step-span'>0</span> of "+
-                            "<span class='kennel-explorer-length-span'>0</span> "+
-                            "(<strong>Line: </strong>"+
-                            "<span class='kennel-explorer-line-span'>0</span>)"+
+                            "<div class='kennel-explorer-run-hide'>"+
+                                "<i>Run your code to explore it.</i>"+
+                            "</div>"+
+                            "<div class='kennel-explorer-errors alert alert-danger' role='alert'>"+
+                            "</div>"+
+                            "<div class='kennel-explorer-status'>"+
+                                "<strong>Step: </strong>"+
+                                "<span class='kennel-explorer-step-span'>0</span> of "+
+                                "<span class='kennel-explorer-length-span'>0</span> "+
+                                "(<strong>Line: </strong>"+
+                                "<span class='kennel-explorer-line-span'>0</span>)"+
+                            "</div>"+
                         "</td>"+
                         "</tr><tr>"+
                         // First Previous Next Last
@@ -562,8 +599,17 @@ Kennel.prototype.loadMain = function() {
                             "Last <span class='glyphicon glyphicon-fast-forward'></span> </button>"+
                         "</td>"+
                         "</tr></table>"+
+                        // Printer
+                        "<br><strong>Printer</strong>"+
+                        "<div class='kennel-console'></div>"+
+                        // Modules
+                        "<br><div>"+
+                            "<strong>Loaded Modules: </strong>"+
+                            "<i class='kennel-explorer-modules'>None</i>"+
+                        "</div>"+
                         // Actual Trace data
-                        "<table style='width: 100%'"+
+                        "<br><strong>Trace Table</strong>"+
+                        "<br><table style='width: 100%'"+
                                 "class='table table-condensed table-striped "+
                                        "table-bordered table-hover kennel-explorer-table'>"+
                             // Property Type Value
@@ -572,15 +618,19 @@ Kennel.prototype.loadMain = function() {
                                 "<th>Type</th>"+
                                 "<th>Value</th>"+
                             "</tr>"+
-                        "</table><br>"+
-                        "Loaded Modules: <i class='kennel-explorer-modules'>None</i>"+
+                        "</table>"+
                     "</div>"+
                     "</div>"+
                 "</div>"+
             "</div>"+
         "</div>"+
-        "<div>"+
-            "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+        "<div class='row'>"+
+            "<div class='col-md-3 col-sm-3 col-xs-3'>"+
+                "<img src='images/blockly-corgi-logo.png'  class='img-responsive' />"+
+            "</div>"+
+            "<div class='col-md-9 col-sm-9 col-xs-9'>"+
+                "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
+            "</div>"+
         "</div>"+
     "</div>";
     this.mainDiv = $(this.attachmentPoint).html($(mainTabs))
@@ -626,7 +676,7 @@ Kennel.prototype.loadConsole = function() {
 
 Kennel.prototype.stepConsole = function(step, page) {
     $(this.console).find('.kennel-console-output').each(function() {
-        if ($(this).attr("data-step")-1 <= step) {
+        if ($(this).attr("data-step") <= step) {
             $(this).show();
         } else {
             $(this).hide();
@@ -639,11 +689,20 @@ Kennel.prototype.stepConsole = function(step, page) {
  */
 Kennel.prototype.printError = function(error) {
     console.log(error);
+    this.explorer.tags.errors.show();
     // Is it a string?
     if (typeof error !== "string") {
         // A weird skulpt thing?
         if (error.tp$str !== undefined) {
-            error = error.tp$str().v;
+            try {
+                this.editor.highlightError(error.args.v[2]-1);
+            } catch (e) {
+            }
+            if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
+                error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
+            } else {
+                error = error.tp$str().v;
+            }
         } else {
             // An error?
             error = ""+error.name + ": " + error.message;
@@ -651,7 +710,7 @@ Kennel.prototype.printError = function(error) {
         }
     }
     // Perform any necessary cleaning
-    this.console.innerHTML = this.console.innerHTML + encodeHTML(error);
+    this.explorer.tags.errors.html(error);
 }
 
 /*
@@ -680,7 +739,6 @@ Kennel.prototype.print = function(text) {
  */
 Kennel.prototype.printHtml = function(chart, value) {
     this.outputList.push(value);
-    console.log(chart);
     var outerDiv = $(chart[0]);//.parent();
     outerDiv.parent().show();
     outerDiv.attr({
@@ -702,6 +760,7 @@ Kennel.prototype.printHtml = function(chart, value) {
 
 Kennel.prototype.resetConsole = function() {
     this.console.innerHTML = "";
+    this.explorer.tags.errors.hide();
     this.step = 0;
     var highlightMap = this.getHighlightMap();
     this.traceTable = [];
@@ -745,6 +804,7 @@ Kennel.prototype.parseGlobals = function(variables) {
 }
 
 Kennel.prototype.parseValue = function(property, value) {
+    console.log(property, value);
     switch (value.constructor) {
         case Sk.builtin.func:
             return {'name': property,
@@ -773,6 +833,16 @@ Kennel.prototype.parseValue = function(property, value) {
         case Sk.builtin.nmber:
             return {'name': property,
                 'type': "int" == value.skType ? "Integer": "Float",
+                "value": value.$r().v
+            };
+        case Sk.builtin.int_:
+            return {'name': property,
+                'type': "Integer",
+                "value": value.$r().v
+            };
+        case Sk.builtin.float_:
+            return {'name': property,
+                'type': "Float",
                 "value": value.$r().v
             };
         case Sk.builtin.list:
@@ -876,8 +946,34 @@ Kennel.prototype.run = function() {
 }
 
 Kennel.prototype.check = function(student_code, traceTable, output) {
-    if (this.model.programs["on_run"]) {
-        
+    var kennel = this;
+    var on_run = this.model.programs['on_run'];
+    if (on_run.trim() !== "") {
+        var backupExecution = Sk.afterSingleExecution;
+        Sk.afterSingleExecution = undefined;
+        on_run += "\nresult = on_run('''"+student_code+"''', "+
+                  JSON.stringify(traceTable)+", "+
+                  "'''"+output+"'''"+
+                  ")";
+        console.log(on_run);
+        var executionPromise = Sk.misceval.asyncToPromise(function() {
+            return Sk.importMainWithBody("<stdin>", false, on_run, true);
+        });
+        executionPromise.then(
+            function (module) {
+                var result = Sk.ffi.remapToJs(module.$d.result);
+                console.log(result);
+                if (result === 1) {
+                    kennel.feedback.success();
+                } else {
+                    kennel.feedback.error(result);
+                }
+                Sk.afterSingleExecution = backupExecution;
+            }, function (error) {
+                Sk.afterSingleExecution = backupExecution;
+                kennel.feedback.error("Error in instructor's feedback. "+error);
+                console.error(error);
+            });
     }
 }
 
