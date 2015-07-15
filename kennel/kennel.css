@@ -7,6 +7,10 @@
     text-align: center;
 }
 
+.kennel-explorer-errors {
+    text-align: left;
+}
+
 .kennel-editor {
     height: 500px;
 }
@@ -42,6 +46,11 @@
 
 .editor-active-line {
     background: #C4FBC4 !important;
+    color: #8a1f11 !important;
+}
+
+.editor-error-line {
+    background: #FBC4C4 !important;
     color: #8a1f11 !important;
 }
 

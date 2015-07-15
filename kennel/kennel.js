@@ -53,6 +53,7 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
     this.tag = tag;
     this.tags = {
         "message": tag.find('.kennel-explorer-run-hide'),
+        "errors": tag.find('.kennel-explorer-errors'),
         "first": tag.find('.kennel-explorer-first'),
         "back": tag.find('.kennel-explorer-back'),
         "next": tag.find('.kennel-explorer-next'),
@@ -67,6 +68,7 @@ function PropertyExplorer(stepConsole, stepEditor, tag) {
     this.tags.back.prop("disabled", true);
     this.tags.next.prop("disabled", true);
     this.tags.last.prop("disabled", true);
+    this.tags.errors.hide();
 }
 
 PropertyExplorer.prototype.move = function(step) {
@@ -122,7 +124,7 @@ PropertyExplorer.prototype.move = function(step) {
         this.tags.table.append(
             $("<tr/>").append($("<td/>").text(value.name))
                       .append($("<td/>").text(value.type))
-                      .append($("<td/>").text(value.value)));
+                      .append('<td><samp>'+value.value+'</samp></td>'));
     }
 };
 
@@ -139,7 +141,8 @@ PropertyExplorer.prototype.reload = function(traceTable) {
     this.tags.message.hide();
 }
 
-function KennelEditor(setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
+function KennelEditor(printError, setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
+    this.printError = printError;
     this.setModel = setModel;
     this.getModel = getModel;
     this.setSettings = setSettings;
@@ -296,13 +299,14 @@ KennelEditor.prototype.updateBlocks = function() {
         var code = this.getModel(); //this.text.getValue();
         var result = this.converter.convert(code);
         var xml = result.xml;
-        if (result.errors != "") {
+        if (result.error !== null) {
             console.error(result.errors);
         }
         var blocklyXml = Blockly.Xml.textToDom(xml);
         this.setBlocksFromXml(blocklyXml);
         this.blockly.align();
     } catch (e) {
+        this.printError(e);
         console.error(e);
         this.setBlocksFromXml(backupXml);
     }
@@ -321,8 +325,17 @@ KennelEditor.prototype.previousLine = null;
 KennelEditor.prototype.highlightLine = function(line) {
     if (this.previousLine !== null) {
         this.text.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-error-line');
     }
     this.text.addLineClass(line, 'text', 'editor-active-line');
+    this.previousLine = line;
+}
+KennelEditor.prototype.highlightError = function(line) {
+    if (this.previousLine !== null) {
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+        this.text.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+    }
+    this.text.addLineClass(line, 'text', 'editor-error-line');
     this.previousLine = line;
 }
 KennelEditor.prototype.highlightBlock = function(block) {
@@ -409,25 +422,6 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     // Initialize the toolbar so other things can refer to it
     this.toolbar = new KennelToolbar(this.mainDiv.find('.kennel-toolbar'));
     
-    // Initialize the editor.
-    this.model.get = function() {
-        return kennel.model.programs[kennel.model.settings.program];
-    }
-    this.model.set = function(content) {
-        localStorage.setItem('__main__', content);
-        kennel.model.programs[kennel.model.settings.program] = content;
-    }
-    this.editor = new KennelEditor(
-        function(content) {  kennel.model.set(content); },
-        function() { return kennel.model.get(); },
-        function(new_editor) { kennel.model.settings.editor = new_editor; },
-        function() { return kennel.model.settings.editor; },
-        toolbox,
-        this.mainDiv.find('.kennel-blocks'),
-        this.mainDiv.find('.kennel-text')
-    );
-    this.loadConsole();
-    
     // Add the Property Explorer
     this.explorer = new PropertyExplorer(
         function(step, page) { 
@@ -443,6 +437,26 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
         },
         kennel.mainDiv.find('.kennel-explorer')
     );
+    
+    // Initialize the editor.
+    this.model.get = function() {
+        return kennel.model.programs[kennel.model.settings.program];
+    }
+    this.model.set = function(content) {
+        localStorage.setItem('__main__', content);
+        kennel.model.programs[kennel.model.settings.program] = content;
+    }
+    this.editor = new KennelEditor(
+        function(e) {kennel.printError(e); },
+        function(content) {  kennel.model.set(content); },
+        function() { return kennel.model.get(); },
+        function(new_editor) { kennel.model.settings.editor = new_editor; },
+        function() { return kennel.model.settings.editor; },
+        toolbox,
+        this.mainDiv.find('.kennel-blocks'),
+        this.mainDiv.find('.kennel-text')
+    );
+    this.loadConsole();
     
     // Add the presentation block
     this.presentation = new KennelPresentation(
@@ -559,6 +573,8 @@ Kennel.prototype.loadMain = function() {
                             "<div class='kennel-explorer-run-hide'>"+
                                 "<i>Run your code to explore it.</i>"+
                             "</div>"+
+                            "<div class='kennel-explorer-errors alert alert-danger' role='alert'>"+
+                            "</div>"+
                             "<div class='kennel-explorer-status'>"+
                                 "<strong>Step: </strong>"+
                                 "<span class='kennel-explorer-step-span'>0</span> of "+
@@ -609,10 +625,10 @@ Kennel.prototype.loadMain = function() {
             "</div>"+
         "</div>"+
         "<div class='row'>"+
-            "<div class='col-md-4'>"+
-                "<img src='images/blockly-corgi-logo.png' />"+
+            "<div class='col-md-3 col-sm-3 col-xs-3'>"+
+                "<img src='images/blockly-corgi-logo.png'  class='img-responsive' />"+
             "</div>"+
-            "<div class='col-md-8'>"+
+            "<div class='col-md-9 col-sm-9 col-xs-9'>"+
                 "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
             "</div>"+
         "</div>"+
@@ -673,11 +689,20 @@ Kennel.prototype.stepConsole = function(step, page) {
  */
 Kennel.prototype.printError = function(error) {
     console.log(error);
+    this.explorer.tags.errors.show();
     // Is it a string?
     if (typeof error !== "string") {
         // A weird skulpt thing?
         if (error.tp$str !== undefined) {
-            error = error.tp$str().v;
+            try {
+                this.editor.highlightError(error.args.v[2]-1);
+            } catch (e) {
+            }
+            if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
+                error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
+            } else {
+                error = error.tp$str().v;
+            }
         } else {
             // An error?
             error = ""+error.name + ": " + error.message;
@@ -685,7 +710,7 @@ Kennel.prototype.printError = function(error) {
         }
     }
     // Perform any necessary cleaning
-    this.console.innerHTML = this.console.innerHTML + encodeHTML(error);
+    this.explorer.tags.errors.html(error);
 }
 
 /*
@@ -735,6 +760,7 @@ Kennel.prototype.printHtml = function(chart, value) {
 
 Kennel.prototype.resetConsole = function() {
     this.console.innerHTML = "";
+    this.explorer.tags.errors.hide();
     this.step = 0;
     var highlightMap = this.getHighlightMap();
     this.traceTable = [];
@@ -778,6 +804,7 @@ Kennel.prototype.parseGlobals = function(variables) {
 }
 
 Kennel.prototype.parseValue = function(property, value) {
+    console.log(property, value);
     switch (value.constructor) {
         case Sk.builtin.func:
             return {'name': property,
@@ -806,6 +833,16 @@ Kennel.prototype.parseValue = function(property, value) {
         case Sk.builtin.nmber:
             return {'name': property,
                 'type': "int" == value.skType ? "Integer": "Float",
+                "value": value.$r().v
+            };
+        case Sk.builtin.int_:
+            return {'name': property,
+                'type': "Integer",
+                "value": value.$r().v
+            };
+        case Sk.builtin.float_:
+            return {'name': property,
+                'type': "Float",
                 "value": value.$r().v
             };
         case Sk.builtin.list:
