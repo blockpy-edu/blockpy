@@ -63,13 +63,41 @@
 <div id="kennel-div" style='height:100%'></div>
 
 <script>
+function getQueryParams(){
+    try{
+        url = window.location.href;
+        query_str = url.substr(url.indexOf('?')+1, url.length-1);
+        r_params = query_str.split('&');
+        params = {}
+        for( i in r_params){
+            param = r_params[i].split('=');
+            params[ param[0] ] = param[1];
+        }
+        return params;
+    }
+    catch(e){
+       return {};
+    }
+}
 $(document).ready(function() {
+    var params = getQueryParams();
     if (localStorage.getItem('__main__') === null) {
         body = $("#default-body").text();
     } else {
         body = localStorage.getItem('__main__');
     }
     body = $("#default-body").text();
+    var view = "blocks"
+    if ("view" in params) {
+        if (params["view"] == "text") {
+            view = "text";
+        } else if (params["view"] == "blocks") {
+            view = "blocks";
+        } else {
+            console.log("Unknown view:", params["view"]);
+            view = "blocks";
+        }
+    }
     kennel = new Kennel(document.getElementById('kennel-div'),
                         document.getElementById('toolbox'),
                         'instructor', // Instructor mode
@@ -78,8 +106,12 @@ $(document).ready(function() {
                         $('#default-on-run').html(), // On run code
                         "def on_step(code, output, properties):\n    pass", // On step code
                         "alpha = 0", // Starting code
-                        false
+                        false,
+                        view
                         );
+    if ("url" in params) {
+        $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
+    }
   });
 </script>
 <pre id='problem-presentation' style='display:none'>

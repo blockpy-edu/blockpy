@@ -724,9 +724,13 @@ PythonToBlocks.prototype._convertBody = function(parent, statements) {
 }
 
 PythonToBlocks.prototype.convert = function(python_source) {
-    this.reverse = new ReverseAST(python_source.split("\n"));
     var xml = document.createElement("xml");
     xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    if (python_source.trim() === "") {
+        return {"xml": new XMLSerializer().serializeToString(xml),
+                "error": null};
+    }
+    this.reverse = new ReverseAST(python_source.split("\n"));
     var filename = 'user_code.py';
     // Attempt parsing - might fail!
     var parse, ast, symbol_table, error;
