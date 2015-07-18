@@ -288,7 +288,12 @@ KennelEditor.prototype.setPython = function(text) {
 
 KennelEditor.prototype.updateText = function() {
     var code = this.getModel();//this.getPythonFromBlocks();
-    this.text.setValue(code);
+    console.log(code);
+    if (code == "") {
+        this.text.setValue("\n");
+    } else {
+        this.text.setValue(code);
+    }
 }
 
 KennelEditor.prototype.updateBlocks = function() {
@@ -390,11 +395,11 @@ KennelToolbar.prototype.hidePrograms = function() {
  * @constructor 
  */
 function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
-                on_run, on_change, starting_code, instructor) {
+                on_run, on_change, starting_code, instructor, view) {
     // User programs
     this.model = {
         "settings": {
-            'editor': 'blocks',
+            'editor': view,
             'instructor': instructor,
             'program': "__main__"
         },
@@ -407,7 +412,7 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
         "presentation": presentation,
     };
     
-    // Default mode when you open the screen is blocks
+    // Default mode when you open the screen is instructor
     this.mode = mode;
     
     // The Div or whatever HTML element we attach everything to
@@ -495,6 +500,14 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
 };
 
 Kennel.prototype.metrics_editor_height = '100%';
+
+Kennel.prototype.setCode = function(code, name) {
+    if (name === undefined) {
+        name = "__main__";
+    }
+    this.model.programs[name] = code;
+    this.editor.setPython(code);
+}
 
 Kennel.prototype.changeKennelMode = function() {
     if (this.mode == 'instructor') {
