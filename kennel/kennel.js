@@ -662,29 +662,6 @@ function encodeHTML(text) {
  */
 Kennel.prototype.loadConsole = function() {
     this.console = this.mainDiv.find('.kennel-console')[0];
-    //this.console = document.getElementById('html-output');
-    var kennel = this;
-    Sk.configure({
-        // Function to handle the text outputted by Skulpt
-        output: function(text) { kennel.print(text); },
-        // Function to handle loading in new files
-        read: function (filename) {
-                    if (Sk.builtinFiles === undefined ||
-                        Sk.builtinFiles["files"][filename] === undefined) {
-                        throw "File not found: '" + filename + "'";
-                    }
-                    return Sk.builtinFiles["files"][filename];
-                }
-    });
-    // Limit execution to 5 seconds
-    Sk.execLimit = 5000;
-    // Identify the location to put new charts
-    Sk.console = {
-        'printHtml': function(html, value) {kennel.printHtml(html, value);},
-        'width': $(this.console).width(),
-        'height': $(this.console).height(),
-        'console': this.console
-    }
 }
 
 Kennel.prototype.stepConsole = function(step, page) {
@@ -780,6 +757,32 @@ Kennel.prototype.resetConsole = function() {
     this.outputList = [];
     this.stepLineMap = [];
     var kennel = this;
+    // Skulpt settings
+    // Limit execution to 5 seconds
+    Sk.execLimit = 5000;
+    // Ensure version 3, so we get proper print handling
+    Sk.python3 = true
+    // Major Skulpt configurations
+    Sk.configure({
+        // Function to handle the text outputted by Skulpt
+        output: function(text) { kennel.print(text); },
+        // Function to handle loading in new files
+        read: function (filename) {
+                    if (Sk.builtinFiles === undefined ||
+                        Sk.builtinFiles["files"][filename] === undefined) {
+                        throw "File not found: '" + filename + "'";
+                    }
+                    return Sk.builtinFiles["files"][filename];
+                }
+    });
+    // Identify the location to put new charts
+    Sk.console = {
+        'printHtml': function(html, value) {kennel.printHtml(html, value);},
+        'width': $(this.console).width(),
+        'height': $(this.console).height(),
+        'console': this.console
+    }
+    // Stepper!
     Sk.afterSingleExecution = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
         if (filename == '<stdin>.py') {
