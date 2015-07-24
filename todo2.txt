@@ -1,0 +1,21 @@
+Speed grader
+    Filter by
+        Cohort # | "My Cohorts"
+        Homework/Classwork/Day
+        Student <-- When filtering by cohort, limit it to the list of students in that cohort
+    Display summary
+*Grading Guide* attached to each question
+UPload file on student's behalf
+Clickable Area
+Editable table
+Grading:
+    Tuesday is due before class thursday (start of next class)
+    Thursday is due before class tuesday (start of next class)
+backport blockpy
+Student summary
+    # of times logged in
+    # of times checked review
+    # of times they've read pages
+    Attendance
+    Blockly completed
+    
