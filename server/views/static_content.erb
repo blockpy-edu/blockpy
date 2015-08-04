@@ -62,6 +62,15 @@
 <body>
 <div id="kennel-div" style='height:100%'></div>
 
+<div class='row'>
+    <div class='col-md-3 col-sm-3 col-xs-3'>
+        <img src='images/blockly-corgi-logo.png'  class='img-responsive' />
+    </div>
+    <div class='col-md-9 col-sm-9 col-xs-9'>
+        The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! 
+    </div>
+</div>
+
 <script>
 function getQueryParams(){
     try{
@@ -87,7 +96,7 @@ $(document).ready(function() {
         body = localStorage.getItem('__main__');
     }
     body = $("#default-body").text();
-    var view = "blocks"
+    var view = "blocks";
     if ("view" in params) {
         if (params["view"] == "text") {
             view = "text";
@@ -98,16 +107,24 @@ $(document).ready(function() {
             view = "blocks";
         }
     }
+    var mode = "student";
+    if ("mode" in params) {
+        if (params["mode"] == "student") {
+            mode = "student";
+        } else if (params["mode"] == "instructor") {
+            mode = "instructor";
+        }
+    } 
     kennel = new Kennel(document.getElementById('kennel-div'),
-                        document.getElementById('toolbox'),
-                        'instructor', // Instructor mode
+                        mode, // Instructor mode
                         $("#problem-presentation").text(), // problem
                         body, // Current code
                         $('#default-on-run').html(), // On run code
                         "def on_step(code, output, properties):\n    pass", // On step code
                         "alpha = 0", // Starting code
-                        false,
-                        view
+                        mode == "instructor",
+                        view,
+                        'blockly/'
                         );
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
@@ -123,85 +140,6 @@ $(document).ready(function() {
 <pre id='default-on-run' style='display:none'>
 <%= @program_on_run %>
 </pre>
-
-<xml id="toolbox" style="display: none">
-    <category name="Properties" custom="VARIABLE">
-    </category>
-    <category name="Decisions">
-        <block type="controls_if"></block>
-        <block type="logic_compare"></block>
-        <block type="logic_operation"></block>
-        <block type="logic_negate"></block>
-    </category>
-    <category name="Iteration">
-        <block type="controls_forEach"></block>
-    </category>
-    <category name="Functions" custom="PROCEDURE">
-    </category>
-    <category name="Calculation">
-        <block type="raw_table"></block>
-        <block type="math_arithmetic"></block>
-        <block type="type_check"></block>
-        <block type="raw_block"></block>
-        <block type="raw_expression"></block>
-        <block type="raw_empty"></block>
-        <!--<block type="math_single"></block>
-        <block type="math_number_property"></block>
-        <block type="math_round"></block>
-        <block type="text_join"></block>-->
-    </category>
-    <category name="Output">
-        <block type="text_print"></block>
-        <block type="text_print_multiple"></block>
-        <block type="plot_line"></block>
-        <block type="plot_scatter"></block>
-        <block type="plot_show"></block>
-        <block type="plot_title"></block>
-    </category>
-    <sep></sep>
-    <category name="Values">
-        <block type="text"></block>
-        <block type="math_number"></block>
-        <block type="logic_boolean"></block>
-    </category>
-    <category name="Lists">
-        <block type="lists_create_with"></block>
-        <block type="lists_create_empty"></block>
-        <block type="lists_append"></block>
-        <block type="lists_length"></block>
-    </category>
-    <category name="Dictionaries">
-        <block type="dicts_create_with"></block>
-        <block type="dict_get_literal"></block>
-        <block type="dict_keys"></block>
-    </category>
-    <sep></sep>
-    <category name="Data - Weather">
-        <block type="weather_temperature"></block>
-        <block type="weather_report"></block>
-        <block type="weather_forecasts"></block>
-        <block type="weather_report_forecasts"></block>
-        <block type="weather_all_forecasts"></block>
-        <block type="weather_highs_lows"></block>
-    </category>
-    <category name="Data - Stock">
-        <block type="stocks_current"></block>
-        <block type="stocks_past"></block>
-    </category>
-    <category name="Data - Earthquakes">
-        <block type="earthquake_get"></block>
-        <block type="earthquake_both"></block>
-        <block type="earthquake_all"></block>
-    </category>
-    <category name="Data - Crime">
-        <block type="crime_state"></block>
-        <block type="crime_year"></block>
-        <block type="crime_all"></block>
-    </category>
-    <category name="Data - Books">
-        <block type="books_get"></block>
-    </category>
-</xml>
   
 <!-- Google Analytics -->
 <script>

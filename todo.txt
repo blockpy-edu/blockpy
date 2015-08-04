@@ -1,6 +1,3 @@
 Undo/Redo in Blockly
 Table Block
 Assessment API/Blocks
-Editing presentation text and adding new lines can cause overlap with the toolbox.
-
-

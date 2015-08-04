@@ -1084,9 +1084,25 @@ ReverseAST.prototype.Call = function(node) {
                 arguments["ARG"+i] = this.convert(args[i]);
                 argumentsMutation[i] = this.convert(args[i]);
             }
-            return block("procedures_callreturn", {}, arguments, {
-                "inline": "false"
-            }, argumentsMutation);
+            if (this.identifier(func.id) == "print") {
+                if (args.length == 1) {
+                    return [block("text_print", {}, {
+                        "TEXT": this.convert(args[0])
+                    })];
+                } else {
+                    return [block("text_print_multiple", {}, 
+                        this.convertElements("PRINT", args), 
+                    {
+                        "inline": "true"
+                    }, {
+                        "@items": args.length
+                    })];
+                }
+            } else {
+                return block("procedures_callreturn", {}, arguments, {
+                    "inline": "false"
+                }, argumentsMutation);
+            }
         // Direct function call
         case "Attribute":
         // Module function call
