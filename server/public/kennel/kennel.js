@@ -141,64 +141,45 @@ PropertyExplorer.prototype.reload = function(traceTable) {
     this.tags.message.hide();
 }
 
-function KennelEditor(printError, setModel, getModel, setSettings, getSettings, toolbox, blockTag, textTag) {
+function KennelEditor(printError, setModel, getModel, setSettings, getSettings, blockTag, textTag, blocklyPath) {
     this.printError = printError;
     this.setModel = setModel;
     this.getModel = getModel;
     this.setSettings = setSettings;
     this.getSettings = getSettings;
     this.converter = new PythonToBlocks();
-    this.loadBlockly(toolbox, blockTag);
+    this.loadBlockly(blockTag, blocklyPath);
     this.loadText(textTag);
     this.setMode(getSettings());
 }
 
-KennelEditor.prototype.loadBlockly = function(toolbox, tag) {
+KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
     this.blockTag = tag;
-    this.toolbox = toolbox;
     this.blocklyDiv = tag.find('.blockly-div');
-    this.blocklyArea = tag.find('.blockly-area');
     this.blockly = Blockly.inject(this.blocklyDiv[0],
-                                   {path: 'blockly/', 
+                                   {path: blocklyPath, 
                                     scrollbars: true, 
-                                    toolbox: toolbox});
+                                    toolbox: this.getToolbox()});
     // Activate tracing in blockly
     this.blockly.traceOn(true);
     var editor = this;
     // Register model changer
+    this.blockly.enableUndo();
     this.blockly.addChangeListener(function() {
         editor.setModel(editor.getPythonFromBlocks());
     });
     // Register window size changes for Blockly
-    window.addEventListener('resize', function() {
+    /*window.addEventListener('resize', function() {
         editor.resizeBlockly()
-    }, false);
+    }, false);*/
     this.resizeBlockly();
 };
-
-KennelEditor.prototype.updateToolbox = function() {
-    this.blockly.updateToolbox(this.toolbox);
-}
 
 KennelEditor.prototype.resizeBlockly = function(e) {
     // Compute the absolute coordinates and dimensions of blocklyArea.
     if ($(document).width() < 900) {
         
     }
-    var element = this.blocklyArea[0];
-    var x = 0;
-    var y = 0;
-    do {
-        x += element.offsetLeft;
-        y += element.offsetTop;
-        element = element.offsetParent;
-        element = null;
-    } while (element);
-    // Position blocklyDiv over blocklyArea.
-    this.blocklyDiv[0].style.left = x + 'px';
-    this.blocklyDiv[0].style.top = y + 'px';
-    this.blocklyDiv[0].style.width = this.blocklyArea[0].offsetWidth + 'px';
-    this.blocklyDiv[0].style.height = this.blocklyArea[0].offsetHeight + 'px';
     this.blockly.resize();
 }
 
@@ -280,15 +261,22 @@ KennelEditor.prototype.getPythonFromText = function() {
 }
           
 KennelEditor.prototype.setPython = function(text) {
-    this.text.setValue(text);
-    if (this.getSettings() == 'blocks') {
-        this.updateBlocks();
+    if (text.trim().charAt(0) == "<") {
+        var xml = Blockly.Xml.textToDom(text);
+        this.setBlocksFromXml(xml);
+        if (this.getSettings() == 'text') {
+            this.updateText();
+        }
+    } else {
+        this.text.setValue(text);
+        if (this.getSettings() == 'blocks') {
+            this.updateBlocks();
+        }
     }
 }
 
 KennelEditor.prototype.updateText = function() {
     var code = this.getModel();//this.getPythonFromBlocks();
-    console.log(code);
     if (code == "") {
         this.text.setValue("\n");
     } else {
@@ -302,12 +290,14 @@ KennelEditor.prototype.updateBlocks = function() {
     try {
         // Try to convert it!
         var code = this.getModel(); //this.text.getValue();
-        var result = this.converter.convert(code);
-        var xml = result.xml;
-        if (result.error !== null) {
-            console.error(result.errors);
+        if (code.trim().charAt(0) !== '<') {
+            var result = this.converter.convert(code);
+            code = result.xml;
+            if (result.error !== null) {
+                console.error(result.error);
+            }
         }
-        var blocklyXml = Blockly.Xml.textToDom(xml);
+        var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         this.blockly.align();
     } catch (e) {
@@ -347,6 +337,89 @@ KennelEditor.prototype.highlightBlock = function(block) {
     this.blockly.highlightBlock(block);
 }
 
+KennelEditor.prototype.getToolbox = function() {
+    return '<xml id="toolbox" style="display: none">'+
+                '<category name="Properties" custom="VARIABLE">'+
+                '</category>'+
+                '<category name="Decisions">'+
+                    '<block type="controls_if"></block>'+
+                    '<block type="logic_compare"></block>'+
+                    '<block type="logic_operation"></block>'+
+                    '<block type="logic_negate"></block>'+
+                '</category>'+
+                '<category name="Iteration">'+
+                    '<block type="controls_forEach"></block>'+
+                '</category>'+
+                '<category name="Functions" custom="PROCEDURE">'+
+                '</category>'+
+                '<category name="Calculation">'+
+                    //'<block type="raw_table"></block>'+
+                    '<block type="math_arithmetic"></block>'+
+                    //'<block type="type_check"></block>'+
+                    //'<block type="raw_empty"></block>'+
+                    //'<block type="math_single"></block>'+
+                    //'<block type="math_number_property"></block>'+
+                    '<block type="math_round"></block>'+
+                    //'<block type="text_join"></block>'+
+                '</category>'+
+                '<category name="Python">'+
+                    '<block type="raw_block"></block>'+
+                    '<block type="raw_expression"></block>'+
+                '</category>'+
+                '<category name="Output">'+
+                    '<block type="text_print"></block>'+
+                    //'<block type="text_print_multiple"></block>'+
+                    '<block type="plot_line"></block>'+
+                    //'<block type="plot_scatter"></block>'+
+                    '<block type="plot_show"></block>'+
+                    '<block type="plot_title"></block>'+
+                '</category>'+
+                '<sep></sep>'+
+                '<category name="Values">'+
+                    '<block type="text"></block>'+
+                    '<block type="math_number"></block>'+
+                    '<block type="logic_boolean"></block>'+
+                '</category>'+
+                '<category name="Lists">'+
+                    '<block type="lists_create_with"></block>'+
+                    '<block type="lists_create_empty"></block>'+
+                    '<block type="lists_append"></block>'+
+                    '<block type="lists_length"></block>'+
+                '</category>'+
+                '<category name="Dictionaries">'+
+                    '<block type="dicts_create_with"></block>'+
+                    '<block type="dict_get_literal"></block>'+
+                    '<block type="dict_keys"></block>'+
+                '</category>'+
+                '<sep></sep>'+
+                '<category name="Data - Weather">'+
+                    '<block type="weather_temperature"></block>'+
+                    '<block type="weather_report"></block>'+
+                    '<block type="weather_forecasts"></block>'+
+                    '<block type="weather_report_forecasts"></block>'+
+                    '<block type="weather_all_forecasts"></block>'+
+                    '<block type="weather_highs_lows"></block>'+
+                '</category>'+
+                '<category name="Data - Stock">'+
+                    '<block type="stocks_current"></block>'+
+                    '<block type="stocks_past"></block>'+
+                '</category>'+
+                '<category name="Data - Earthquakes">'+
+                    '<block type="earthquake_get"></block>'+
+                    '<block type="earthquake_both"></block>'+
+                    '<block type="earthquake_all"></block>'+
+                '</category>'+
+                '<category name="Data - Crime">'+
+                    '<block type="crime_state"></block>'+
+                    '<block type="crime_year"></block>'+
+                    '<block type="crime_all"></block>'+
+                '</category>'+
+                '<category name="Data - Books">'+
+                    '<block type="books_get"></block>'+
+                '</category>'+
+            '</xml>';
+}
+
 function KennelFeedback(tag) {
     this.tag = tag;
 };
@@ -358,18 +431,69 @@ KennelFeedback.prototype.error = function(html) {
 }
 
 KennelFeedback.prototype.success = function() {
-    this.tag.html("Success!");
+    this.tag.html("<span class='label label-success'><span class='glyphicon glyphicon-ok'></span> Success!</span>");
     this.tag.removeClass("alert-warning");
-    this.tag.addClass("alert-success");
+    //this.tag.addClass("alert-success");
 }
 
 function KennelToolbar(tag) {
     this.tag = tag;
+    var groupHtml = '<div class="btn-group" role="group"></div>';
+    var runGroup =      $(groupHtml).appendTo(tag);
+    var modeGroup =     $(groupHtml).appendTo(tag);
+    var doGroup =       $(groupHtml).appendTo(tag);
+    var blocksGroup =   $(groupHtml).appendTo(tag);
+    var codeGroup =     $(groupHtml).appendTo(tag);
+    var programsGroup = $(groupHtml).appendTo(tag);
     this.elements = {
-        'editor_mode': this.tag.find('.kennel-change-mode'),
-        'kennel_mode': this.tag.find('.kennel-mode'),
-        'run': this.tag.find('.kennel-run'),
-        'programs': this.tag.find('.kennel-programs')
+        'run': $("<button>Run</button>")
+                            .addClass('btn btn-success kennel-run')
+                            .prependTo(runGroup),
+        'editor_mode': $("<button> Text</button>")
+                            .addClass('btn btn-default kennel-change-mode')
+                            .prepend("<span class='glyphicon glyphicon-italic'><span>")
+                            .appendTo(modeGroup),
+        'kennel_mode': $("<button>Instructor Mode</button>")
+                            .addClass('btn btn-default kennel-mode')
+                            .appendTo(modeGroup),
+        'undo': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-undo')
+                            .attr("role", "group")
+                            .html('<i class="fa fa-undo"></i> Undo')
+                            .appendTo(doGroup),
+        'redo': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-redo')
+                            .attr("role", "group")
+                            .html('<i class="fa fa-repeat"></i> Redo')
+                            .appendTo(doGroup),
+        'align': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-align')
+                            .attr("role", "group")
+                            .html('<i class="fa fa-align-left"></i> Align')
+                            .appendTo(blocksGroup),
+        'wide': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-wide')
+                            .attr("role", "group")
+                            .attr("data-side", "wide")
+                            .html('<i class="fa fa-ellipsis-h"></i> Wide')
+                            .appendTo(modeGroup),
+        'reset': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-reset')
+                            .attr("role", "group")
+                            .html('<i class="fa fa-refresh"></i> Reset')
+                            .appendTo(doGroup),
+        'clear': $("<button></button>")
+                            .addClass('btn btn-default kennel-toolbar-clear')
+                            .attr("role", "group")
+                            .html('<i class="fa fa-trash-o"></i> Clear')
+                            .appendTo(doGroup),
+        'wrench': '',
+        'copy': '',
+        'paste': '',
+        'programs': $("<div></div>")
+                            .addClass('btn-group kennel-programs')
+                            .attr("data-toggle", "buttons")
+                            .appendTo(programsGroup)
     };    
     this.elements.programs.hide();
 }
@@ -394,8 +518,8 @@ KennelToolbar.prototype.hidePrograms = function() {
 /**
  * @constructor 
  */
-function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
-                on_run, on_change, starting_code, instructor, view) {
+function Kennel(attachmentPoint, mode, presentation, current_code,
+                on_run, on_change, starting_code, instructor, view, blocklyPath) {
     // User programs
     this.model = {
         "settings": {
@@ -457,9 +581,9 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
         function() { return kennel.model.get(); },
         function(new_editor) { kennel.model.settings.editor = new_editor; },
         function() { return kennel.model.settings.editor; },
-        toolbox,
         this.mainDiv.find('.kennel-blocks'),
-        this.mainDiv.find('.kennel-text')
+        this.mainDiv.find('.kennel-text'),
+        blocklyPath
     );
     this.loadConsole();
     
@@ -474,16 +598,93 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
     );
     
     // Add events to the toolbar
-    this.toolbar.elements.editor_mode.click(function() {
-        $(this).html("To "+kennel.model.settings.editor);
+    this.activateToolbar();
+    
+    this.changeProgram('__main__');
+};
+
+Kennel.prototype.activateToolbar = function() {
+    var elements = this.toolbar.elements;
+    var kennel = this;
+    // Editor mode
+    elements.editor_mode.click(function() {
+        if (kennel.model.settings.editor == "blocks") {
+            elements.editor_mode.html("<span class='glyphicon glyphicon-th'></span> Blocks");
+        } else {
+            elements.editor_mode.html("<span class='glyphicon glyphicon-italic'></span> Text");
+        }
         kennel.editor.changeMode();
     });
-    this.toolbar.elements.kennel_mode.click(function() {
+    // Instructor/Student/Grade mode
+    elements.kennel_mode.click(function() {
         kennel.changeKennelMode();
     });
-    this.toolbar.elements.run.click(function() {
+    if (!this.model.settings.instructor) {
+        elements.kennel_mode.hide();
+    }
+    // Run
+    elements.run.click(function() {
         kennel.run();
     });
+    // Undo
+    elements.undo.click(function() {
+        if (kennel.model.settings.editor == 'blocks') {
+            kennel.editor.blockly.undo();
+        } else {
+            kennel.editor.text.undo();
+        }
+    });
+    // Redo
+    elements.redo.click(function() {
+        if (kennel.model.settings.editor == 'blocks') {
+            kennel.editor.blockly.redo();
+        } else {
+            kennel.editor.text.redo();
+        }
+    });
+    // Wide
+    var left = kennel.mainDiv.find('.kennel-content-left'),
+        right = kennel.mainDiv.find('.kennel-content-right');
+    elements.wide.click(function() {
+        if (elements.wide.attr("data-side") == "skinny") {
+            // Make it skinny
+            elements.wide.attr("data-side", "wide")
+                         .html('<i class="fa fa-ellipsis-h"></i> Wide');
+            // Left side
+            left.removeClass('col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1');
+            left.addClass('col-md-7 col-xs-7');
+            // Right side
+            right.removeClass('col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1');
+            right.addClass('col-md-5 col-xs-5');
+        } else {
+            // Make it wide
+            elements.wide.attr("data-side", "skinny")
+                         .html('<i class="fa fa-ellipsis-v"></i> Skinny');
+            // Left side
+            left.removeClass('col-md-7 col-xs-7');
+            left.addClass('col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1');
+            // Right side
+            right.removeClass('col-md-5 col-xs-5');
+            right.addClass('col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1');
+        }
+        // Hack: Force the blockly window to fit the width
+        if (kennel.model.settings.editor == 'blocks') {
+            kennel.editor.blockly.render();
+        }
+    });
+    // Reset code
+    elements.reset.click(function() {
+        kennel.setCode(kennel.model.programs.starting_code);
+    });
+    // Clear code
+    elements.clear.click(function() {
+        kennel.setCode("");
+    });
+    // Align blocks
+    elements.align.click(function() {
+        kennel.editor.blockly.align();
+    });
+    // Change programs
     for (var name in this.model.programs) {
         this.toolbar.addProgram(name);
     }
@@ -495,9 +696,7 @@ function Kennel(attachmentPoint, toolbox, mode, presentation, current_code,
             kennel.changeProgram(name);
         }
     });
-    
-    this.changeProgram('__main__');
-};
+}
 
 Kennel.prototype.metrics_editor_height = '100%';
 
@@ -548,7 +747,7 @@ Kennel.prototype.loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
-            "<div class='col-md-7 col-sm-7 alert alert-warning'>"+
+            "<div class='kennel-content-left col-md-7 col-sm-7 alert alert-warning'>"+
                 "<fieldset>"+
                     "<legend>BlockPy/Kennel/Silicon</legend>"+
                 "</fieldset>"+
@@ -557,16 +756,12 @@ Kennel.prototype.loadMain = function() {
                 "</div>"+
                 "<strong>Feedback:</strong> <span class='kennel-feedback'></span>"+
                 "<div class='kennel-toolbar btn-toolbar' role='toolbar'>"+
-                    "<button class='btn btn-default kennel-change-mode'>To text</button>"+
-                    "<button class='btn btn-default kennel-run'>Run</button>"+
-                    (this.model.settings.instructor ? "<button class='btn btn-default kennel-mode'>Instructor Mode</button>" : "") +
-                    "<div class='btn-group kennel-programs' data-toggle='buttons'></div>"+
                 "</div>"+
                 "<div class='kennel-editor'>"+
                     "<div class='kennel-blocks' "+
                          "style='height:"+this.metrics_editor_height+"'>"+
-                        "<div class='blockly-div' style='position: absolute'></div>"+
-                        "<div class='blockly-area' style='height:100%'></div>"+
+                        "<div class='blockly-div' style='height:450px; width: 100%' '></div>"+
+                        //"<div class='blockly-area'></div>"+
                     "</div>"+
                     "<div class='kennel-text'>"+
                         "<textarea class='language-python'"+
@@ -575,7 +770,7 @@ Kennel.prototype.loadMain = function() {
                     "</div>"+
                 "</div>"+
             "</div>"+
-            "<div class='col-md-5 col-sm-5 alert alert-info'>"+
+            "<div class='kennel-content-right col-md-5 col-sm-5 alert alert-info'>"+
                 "<div class='panel panel-default'>"+
                     "<div class='panel-heading'>Data Explorer</div>"+
                     "<div class='panel-body'>"+
@@ -637,14 +832,6 @@ Kennel.prototype.loadMain = function() {
                 "</div>"+
             "</div>"+
         "</div>"+
-        "<div class='row'>"+
-            "<div class='col-md-3 col-sm-3 col-xs-3'>"+
-                "<img src='images/blockly-corgi-logo.png'  class='img-responsive' />"+
-            "</div>"+
-            "<div class='col-md-9 col-sm-9 col-xs-9'>"+
-                "The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! "+
-            "</div>"+
-        "</div>"+
     "</div>";
     this.mainDiv = $(this.attachmentPoint).html($(mainTabs))
 };
@@ -662,29 +849,7 @@ function encodeHTML(text) {
  */
 Kennel.prototype.loadConsole = function() {
     this.console = this.mainDiv.find('.kennel-console')[0];
-    //this.console = document.getElementById('html-output');
-    var kennel = this;
-    Sk.configure({
-        // Function to handle the text outputted by Skulpt
-        output: function(text) { kennel.print(text); },
-        // Function to handle loading in new files
-        read: function (filename) {
-                    if (Sk.builtinFiles === undefined ||
-                        Sk.builtinFiles["files"][filename] === undefined) {
-                        throw "File not found: '" + filename + "'";
-                    }
-                    return Sk.builtinFiles["files"][filename];
-                }
-    });
-    // Limit execution to 5 seconds
-    Sk.execLimit = 5000;
-    // Identify the location to put new charts
-    Sk.console = {
-        'printHtml': function(html, value) {kennel.printHtml(html, value);},
-        'width': $(this.console).width(),
-        'height': $(this.console).height(),
-        'console': this.console
-    }
+    this.resetConsole();
 }
 
 Kennel.prototype.stepConsole = function(step, page) {
@@ -780,6 +945,32 @@ Kennel.prototype.resetConsole = function() {
     this.outputList = [];
     this.stepLineMap = [];
     var kennel = this;
+    // Skulpt settings
+    // Limit execution to 5 seconds
+    Sk.execLimit = 5000;
+    // Ensure version 3, so we get proper print handling
+    Sk.python3 = true
+    // Major Skulpt configurations
+    Sk.configure({
+        // Function to handle the text outputted by Skulpt
+        output: function(text) { kennel.print(text); },
+        // Function to handle loading in new files
+        read: function (filename) {
+                    if (Sk.builtinFiles === undefined ||
+                        Sk.builtinFiles["files"][filename] === undefined) {
+                        throw "File not found: '" + filename + "'";
+                    }
+                    return Sk.builtinFiles["files"][filename];
+                }
+    });
+    // Identify the location to put new charts
+    Sk.console = {
+        'printHtml': function(html, value) {kennel.printHtml(html, value);},
+        'width': $(this.console).width(),
+        'height': $(this.console).height(),
+        'console': this.console
+    }
+    // Stepper!
     Sk.afterSingleExecution = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
         if (filename == '<stdin>.py') {
@@ -964,9 +1155,10 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
         var backupExecution = Sk.afterSingleExecution;
         Sk.afterSingleExecution = undefined;
         on_run += "\nresult = on_run('''"+student_code+"''', "+
+                  JSON.stringify(output)+", "+
                   JSON.stringify(traceTable)+", "+
-                  "'''"+output+"'''"+
                   ")";
+        console.log(on_run);
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });

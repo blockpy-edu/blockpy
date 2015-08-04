@@ -367,6 +367,12 @@ Blockly.onKeyDown_ = function(e) {
       if (Blockly.clipboardXml_) {
         Blockly.clipboardSource_.paste(Blockly.clipboardXml_);
       }
+    } else if (e.keyCode == 90) {
+        // 'z' for undo
+        Blockly.getMainWorkspace().undo();
+    } else if (e.keyCode == 89) {
+        // 'y' for undo
+        Blockly.getMainWorkspace().redo();
     }
   }
 };

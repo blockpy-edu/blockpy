@@ -274,6 +274,67 @@ Blockly.WorkspaceSvg.prototype.align = function() {
     }
 }
 
+Blockly.WorkspaceSvg.prototype.undo_stack = [];
+Blockly.WorkspaceSvg.prototype.redo_stack = [];
+Blockly.WorkspaceSvg.prototype.last_change_by_undo = false;
+Blockly.WorkspaceSvg.prototype.save_undo_flag = true;
+Blockly.WorkspaceSvg.prototype.maximum_undos = 20;
+
+Blockly.WorkspaceSvg.prototype.enableUndo = function() {
+    this.saveUndo();
+    var _instance = this;
+    this.addChangeListener(function() {_instance.saveUndo()});
+}
+
+Blockly.WorkspaceSvg.prototype.saveUndo = function() {
+    if (this.save_undo_flag) {
+        if (this.undo_stack.length >= this.maximum_undos) {
+            this.undo_stack.shift();
+        }
+        var current = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(this));
+        this.undo_stack.push(current);
+        this.redo_stack = Array();
+        this.last_change_by_undo = false;
+    } else {
+        this.save_undo_flag = true;
+    }
+};
+    
+Blockly.WorkspaceSvg.prototype.undo = function() {
+    if (this.undo_stack.length > 0) {
+        this.save_undo_flag = false;
+        var state = this.undo_stack.pop();
+        this.redo_stack.push(state);
+        if (!this.last_change_by_undo && 
+            this.undo_stack.length > 0) {
+            state = this.undo_stack.pop();
+            this.redo_stack.push(state);
+        }
+        this.clear();
+        var xml = Blockly.Xml.textToDom(state);
+        Blockly.Xml.domToWorkspace(this, xml);
+        this.last_change_by_undo = true;
+    }
+}
+
+Blockly.WorkspaceSvg.prototype.redo = function() {
+    if (this.redo_stack.length > 0) {
+        this.save_undo_flag = false;
+        var state = this.redo_stack.pop();
+        this.undo_stack.push(state);
+        if (this.redo_stack.length == 1) {
+            state = this.redo_stack.pop();
+            this.undo_stack.push(state);
+        }
+        this.clear();
+        var xml = Blockly.Xml.textToDom(state);
+        Blockly.Xml.domToWorkspace(this, xml);
+    }
+    if (this.redo_stack.length == 0) {
+        this.last_change_by_undo = false;
+    }
+}
+
 /**
  * Add a block to the list of top blocks.
  * @param {!Blockly.Block} block Block to remove.
@@ -600,14 +661,24 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     menuOptions.push(expandOption);
   }
   
-  // Option to align the blocks
-  var alignOption = {enabled: true};
-  alignOption.text = "Align Blocks";
   var _instance = this;
-  alignOption.callback = function() {
-    _instance.align();
-  };
-  menuOptions.push(alignOption);
+  
+  // Option to align the blocks
+  menuOptions.push({enabled: true, 
+                text: "Align Blocks",
+                callback: function() {
+                    _instance.align();
+  }});
+  menuOptions.push({enabled: true, 
+                text: "Undo",
+                callback: function() {
+                    _instance.undo();
+  }});
+  menuOptions.push({enabled: true, 
+                text: "Redo",
+                callback: function() {
+                    _instance.redo();
+  }});
   
   // Option to clear all the blocks.
   var clearOption = {enabled: true};
