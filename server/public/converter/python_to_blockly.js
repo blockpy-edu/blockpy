@@ -1,736 +1,17 @@
-/**
- * @license
- * Kennel
- *
- * Copyright 2015 Austin Cory Bart
- * https://github.com/RealTimeWeb/corgis-blockly
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- 
- /**
- * @fileoverview Core Library for Converting a Skulpt AST to a Blockly XML Tree
- * @author acbart@vt.edu (Austin Cory Bart)
- */
-'use strict';
-
-/**
- * @constructor 
- */
 function PythonToBlocks() {
-};
-
-PythonToBlocks.prototype.raw_block = function(text) {
-    var RawBlock = document.createElement("block");
-    RawBlock.setAttribute("type", "raw_block");
-    var Field = document.createElement("field");
-    Field.setAttribute("name", "TEXT");
-    Field.appendChild(document.createTextNode(text));
-    RawBlock.appendChild(Field);
-    return RawBlock;
-}
-PythonToBlocks.prototype._createRawExpression = function(body) {
-    return this._createSimpleBlock("raw_expression", "TEXT", body.$r().v);
-}
-PythonToBlocks.prototype._createLogicBoolean = function(truth) {
-    if (truth) {
-        return this._createSimpleBlock("logic_boolean", "BOOL", "TRUE");
-    } else {
-        return this._createSimpleBlock("logic_boolean", "BOOL", "FALSE");
-    }
 }
 
-PythonToBlocks.prototype._createString = function(value) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "text");
-    var Field = document.createElement("field");
-    Field.setAttribute("name", "TEXT");
-    Field.appendChild(document.createTextNode(value.s.v));
-    Raw.appendChild(Field);
-    return Raw;
+function xmlToString(xml) {
+    return new XMLSerializer().serializeToString(xml);
 }
 
-PythonToBlocks.prototype._createNone = function() {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "logic_null");
-    Raw.setAttribute("inline", "false");
-    return Raw;
-}
-
-
-
-var skulptToBlockly_logicOperations = function(op) {
-    switch (op) {
-        case "Eq": return "EQ";
-        case "NotEq": return "NEQ";
-        case "Lt": return "LT";
-        case "Gt": return "GT";
-        case "LtE": return "LTE";
-        case "GtE": return "GTE";
-        case "And": return "AND";
-        case "Or": return "OR";
-        // Is, IsNot, In, NotIn
-        default: return "Error";
-    }
-}
-var skulptToBlockly_mathArithmetic = function(op) {
-    switch (op) {
-        case "Add": return "ADD";
-        case "Sub": return "MINUS";
-        case "Div": case "FloorDiv": return "DIVIDE";
-        case "Mult": return "MULTIPLY";
-        case "Pow": return "POWER";
-        case "Mod": return "MODULO";
-        default: return "Error";
-    }
-}
-
-PythonToBlocks.prototype.convertAugAssign_ = function(expression) {
-    //math_change
-    // TODO
-    throw "Augmented Assignment is not currently supported.";
-}
-
-PythonToBlocks.prototype._createLogicCompare = function(expression) {
-    return this._createBinaryBlock("logic_compare", "true", "OP",
-                                   skulptToBlockly_logicOperations(expression.ops[0].name),
-                                   this._convertExpression("", expression.left),
-                                   this._convertExpression("", expression.comparators[0]))
-}
-PythonToBlocks.prototype._createBinOp = function(expression) {
-    return this._createBinaryBlock("math_arithmetic", "true", "OP",
-                                   skulptToBlockly_mathArithmetic(expression.op.name),
-                                   this._convertExpression("", expression.left),
-                                   this._convertExpression("", expression.right))
-}
-PythonToBlocks.prototype.createAppendBlock_ = function(func, args) {
-    var Block_ = document.createElement("block");
-    Block_.setAttribute("type", "lists_append");
-    Block_.setAttribute("inline", "false");
-    if (args.length === 1) {
-        var ItemValue = document.createElement("value");
-        ItemValue.setAttribute("name", "ITEM");
-        ItemValue.appendChild(this._convertExpression("", args[0]));
-        Block_.appendChild(ItemValue);
-    } else {
-        throw "Incorrect number of arguments to append";
-    }
-    var ListValue = document.createElement("value");
-    ListValue.setAttribute("name", "LIST");
-    ListValue.appendChild(this._convertExpression("", func.value));
-    Block_.appendChild(ListValue);
-    return Block_;
-}
-PythonToBlocks.prototype.createDictSubscript_ = function(expression) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "dict_get_literal");
-    Raw.setAttribute("inline", "false");
-    //console.log(expression.slice);
-    if (expression.slice.value.constructor.name == "Str") {
-        var ItemValue = document.createElement("field");
-        ItemValue.setAttribute("name", "ITEM");
-        //TODO: Handle Index
-        ItemValue.appendChild(document.createTextNode(expression.slice.value.s.v));
-        Raw.appendChild(ItemValue);
-    } else {
-        throw "Non-string indexes not supported yet";
-    }
-    var DictValue = document.createElement("value");
-    DictValue.setAttribute("name", "DICT");
-    DictValue.appendChild(this._convertExpression("", expression.value));
-    Raw.appendChild(DictValue);
-    return Raw;
-}
-PythonToBlocks.prototype._createLogicOperation = function(expression) {
-    return this._createBinaryBlock("logic_operation", "true", "OP",
-                                   skulptToBlockly_logicOperations(expression.op.name),
-                                   this._convertExpression("", expression.values[0]),
-                                   this._convertExpression("", expression.values[1]))
-}
-PythonToBlocks.prototype._createLogicNegate = function(expression) {
-    return this._createUnaryBlock("logic_negate", "false", "BOOL",
-                                  this._convertExpression("", expression.operand));
-}
-
-PythonToBlocks.prototype._createBuiltinBlock = function(type, fields) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", type);
-    Raw.setAttribute("inline", "true");
-    for (var i = 0; i < fields.length; i+= 1) {
-        var name = fields[i][0],
-            value = fields[i][1];
-        var Field_ = document.createElement("field");
-        Field_.setAttribute("name", name);
-        Field_.appendChild(document.createTextNode(value));
-        Raw.appendChild(Field_);
-    }
-    
-    return Raw;
-}
-
-PythonToBlocks.prototype._createPlot = function(expression) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "plot_line");
-    Raw.setAttribute("inline", "false");
-    
-    var Value_ = document.createElement("value");
-    Value_.setAttribute("name", "y_values");
-    Value_.appendChild(this._convertExpression("", expression.args[0]));
-    Raw.appendChild(Value_);
-    
-    return Raw;
-}
-
-PythonToBlocks.prototype._createCallBlock = function(expression) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "procedures_callreturn");
-    Raw.setAttribute("inline", "false");
-    
-    var Mutation = document.createElement("mutation");
-    Mutation.setAttribute("name", expression.func.id.v);
-    
-    for (var i = 0; i < expression.args.length; i+= 1) {
-        var Argument_ = document.createElement("arg");
-        Argument_.setAttribute("name", "ARG"+i);
-        Argument_.appendChild(this._convertExpression("", expression.args[i]));
-        Mutation.appendChild(Argument_);
-    }
-    Raw.appendChild(Mutation);
-    
-    for (var i = 0; i < expression.args.length; i+= 1) {
-        var Value_ = document.createElement("value");
-        Value_.setAttribute("name", "ARG"+i);
-        Value_.appendChild(this._convertExpression("", expression.args[i]));
-        Raw.appendChild(Value_);
-    }
-        
-    return Raw;
-}
-
-PythonToBlocks.prototype.createDict_ = function(expression) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "dicts_create_with");
-    Raw.setAttribute("inline", "false");
-    
-    var Mutation = document.createElement("mutation");
-    Mutation.setAttribute("items", expression.keys.length);
-    Raw.appendChild(Mutation);
-    
-    for (var i = 0; i < expression.keys.length; i+= 1) {
-        var Value = document.createElement("value");
-        Value.setAttribute("name", "VALUE"+i);
-        Value.appendChild(this._convertExpression("", expression.values[i]));
-        Raw.appendChild(Value);
-        var Field_ = document.createElement("field");
-        Field_.setAttribute("name", "KEY"+i);
-        Field_.appendChild(this._convertExpression("", expression.keys[i]));
-        Raw.appendChild(Field_);
-    }
-        
-    return Raw;
-}
-
-PythonToBlocks.prototype._createList = function(expression) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "lists_create_with");
-    Raw.setAttribute("inline", "false");
-    
-    var Mutation = document.createElement("mutation");
-    Mutation.setAttribute("items", expression.elts.length);
-    Raw.appendChild(Mutation);
-    
-    for (var i = 0; i < expression.elts.length; i+= 1) {
-        var Value = document.createElement("value");
-        Value.setAttribute("name", "ADD"+i);
-        Value.appendChild(this._convertExpression("", expression.elts[i]));
-        Raw.appendChild(Value);
-    }
-        
-    return Raw;
-}
-
-PythonToBlocks.prototype.convertReturn_ = function(parent, statement) {
-    var Block_ = document.createElement("block");
-    Block_.setAttribute("type", "procedures_return");
-    Block_.setAttribute("inline", "false");
-    
-    var returnValue = this._convertExpression(parent, statement.value);
-    var ValueTitle = document.createElement("value");
-    ValueTitle.setAttribute("name", "VALUE");
-    ValueTitle.appendChild(returnValue);
-    Block_.appendChild(ValueTitle);
-    
-    return Block_;
-}
-
-PythonToBlocks.prototype._createPrint = function(parent, statement) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", "text_print_multiple");
-    Raw.setAttribute("inline", "false");
-    
-    var Mutation = document.createElement("mutation");
-    Mutation.setAttribute("items", statement.values.length);
-    Raw.appendChild(Mutation);
-    
-    if (statement.nl) {
-        // Add support for no line break (also, "dest"?)
-    }
-    
-    for (var i = 0; i < statement.values.length; i+= 1) {
-        var Value = document.createElement("value");
-        Value.setAttribute("name", "PRINT"+i);
-        Value.appendChild(this._convertExpression("", statement.values[i]));
-        Raw.appendChild(Value);
-    }
-        
-    return Raw;
-}
-
-PythonToBlocks.prototype._createBinaryBlock = function(type, inline, title, choice, valueA, valueB) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", type);
-    Raw.setAttribute("inline", inline);
-    var Title = document.createElement("title");
-    Title.setAttribute("name", title);
-    Title.appendChild(document.createTextNode(choice));
-    Raw.appendChild(Title);
-    var ValueTitle = document.createElement("value");
-    ValueTitle.setAttribute("name", "A");
-    ValueTitle.appendChild(valueA);
-    Raw.appendChild(ValueTitle);
-    ValueTitle = document.createElement("value");
-    ValueTitle.setAttribute("name", "B");
-    ValueTitle.appendChild(valueB);
-    Raw.appendChild(ValueTitle);
-    return Raw;
-}
-
-PythonToBlocks.prototype._createUnaryBlock = function(type, inline, title, value) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", type);
-    Raw.setAttribute("inline", inline);
-    var ValueTitle = document.createElement("value");
-    ValueTitle.setAttribute("name", title);
-    ValueTitle.appendChild(value);
-    Raw.appendChild(ValueTitle);
-    return Raw;
-}
-
-PythonToBlocks.prototype._createSimpleBlock = function(type, name, value) {
-    var Raw = document.createElement("block");
-    Raw.setAttribute("type", type);
-    var Field = document.createElement("field");
-    Field.setAttribute("name", name);
-    Field.appendChild(document.createTextNode(value));
-    Raw.appendChild(Field);
-    return Raw;
-}
-
-PythonToBlocks.prototype._createMathNumber = function(body) {
-    return this._createSimpleBlock("math_number", "NUM", body.n.v);
-}
-
-PythonToBlocks.prototype._createVariableGet = function(body) {
-    return this._createSimpleBlock("variables_get", "VAR", body.id.v);
-}
-
-//<block type="math_number"> <title name="NUM">0</title> </block>
-PythonToBlocks.prototype._convertAssignment = function(parent, statement) {
-    
-    // Handle expr_context
-    if (statement.targets.length == 1) {
-        var var_name = statement.targets[0].id.v;
-        var var_value = this._convertExpression(parent, statement.value);
-        
-        var Assignment = document.createElement("block");
-        Assignment.setAttribute("type", "variables_set");
-        Assignment.setAttribute("inline", "false");
-        
-        var VariableTitle = document.createElement("title");
-        VariableTitle.setAttribute("name", "VAR");
-        VariableTitle.appendChild(document.createTextNode(var_name));
-        Assignment.appendChild(VariableTitle);
-        
-        var ValueTitle = document.createElement("value");
-        ValueTitle.setAttribute("name", "VALUE");
-        ValueTitle.appendChild(var_value);
-        Assignment.appendChild(ValueTitle);
-        
-        return Assignment;
-    } else {
-        return this._createRawBlock(statement);
-    }
-}
-
-PythonToBlocks.prototype._convertFor = function(parent, statement) {
-    var For_ = document.createElement("block");
-    For_.setAttribute("type", "controls_forEach");
-    For_.setAttribute("inline", "false");
-    
-    var TargetTitle = document.createElement("title");
-    TargetTitle.setAttribute("name", "VAR");
-    TargetTitle.appendChild(this._convertExpression(For_, statement.target));
-    For_.appendChild(TargetTitle);
-    
-    var IterValue = document.createElement("value");
-    IterValue.setAttribute("name", "LIST");
-    IterValue.appendChild(this._convertExpression(For_, statement.iter));
-    For_.appendChild(IterValue);
-    
-    var BodyStatement = document.createElement("statement");
-    BodyStatement.setAttribute("name", "DO");
-    this._convertBody(BodyStatement, statement.body);
-    For_.appendChild(BodyStatement);
-    
-    if (statement.orelse) {
-        // TODO: Need to have a orelse block in the For_
-    }
-    
-    return For_;
-}
-
-PythonToBlocks.prototype._convertFunctionDef = function(parent, statement) {
-    var Def_ = document.createElement("block");
-    Def_.setAttribute("type", "procedures_defnoreturn");
-    Def_.setAttribute("inline", "false");
-    
-    var DefTitle = document.createElement("title");
-    DefTitle.setAttribute("name", "NAME");
-    DefTitle.appendChild(document.createTextNode(statement.name.v));
-    Def_.appendChild(DefTitle);
-    
-    if (statement.decorator_list) {
-        // TODO
-    }
-    
-    // statement.args.kwarg
-    // statement.args.vararg
-    // statement.args.defaults
-    var Mutation = document.createElement("mutation");
-    for (var i = 0; i < statement.args.args.length; i += 1) {
-        var Argument = document.createElement("arg");
-        Argument.setAttribute("name", statement.args.args[i].id.v);
-        Mutation.appendChild(Argument);
-    }
-    Def_.appendChild(Mutation);
-    
-    var BodyStatement = document.createElement("statement");
-    BodyStatement.setAttribute("name", "STACK");
-    this._convertBody(BodyStatement, statement.body);
-    Def_.appendChild(BodyStatement);
-    
-    return Def_;
-    
-}
-
-PythonToBlocks.prototype._convertIf = function(parent, statement) {
-    var If_ = document.createElement("block");
-    If_.setAttribute("type", "controls_if");
-    If_.setAttribute("inline", "false");
-    
-    if (statement.test) {
-        var Test = document.createElement("value");
-        Test.setAttribute("name", "IF0");
-        Test.appendChild(this._convertExpression(If_, statement.test));
-        If_.appendChild(Test);
-    }
-        
-    var MutationCounter = document.createElement("mutation");
-    If_.appendChild(MutationCounter);
-
-    
-    var BodyStatement = document.createElement("statement");
-    BodyStatement.setAttribute("name", "DO0");
-    this._convertBody(BodyStatement, statement.body);
-    If_.appendChild(BodyStatement);
-    
-    var walker = statement;
-    var elseifCount = 0;
-    var elseCount = 0;
-    var potentialElseBody = null;
-    while ("orelse" in walker && walker.orelse.length > 0) {
-        potentialElseBody = walker.orelse;
-        walker = walker.orelse[0];
-        var BodyStatement = document.createElement("statement");
-        if (walker.constructor.name == "If_") {
-            // Elseif
-            elseifCount += 1;
-            BodyStatement.setAttribute("name", "DO"+elseifCount);
-            this._convertBody(BodyStatement, walker.body);
-            
-            if (walker.test) {
-                var Test = document.createElement("value");
-                Test.setAttribute("name", "IF"+elseifCount);
-                Test.appendChild(this._convertExpression(If_, walker.test));
-                If_.appendChild(Test);
-            }
-        } else {
-            // Else
-            elseCount += 1;
-            BodyStatement.setAttribute("name", "ELSE");
-            this._convertBody(BodyStatement, potentialElseBody);
-        }
-        If_.appendChild(BodyStatement);
-    }
-    
-    MutationCounter.setAttribute("elseif", elseifCount);
-    MutationCounter.setAttribute("else", elseCount);
-    
-    return If_;
-}
-
-var _STOCK_MAP = {
-    'FB': "Facebook", 'Facebook': "Facebook",
-    "AAPL": "Apple", 'Apple': "Apple",
-    "MSFT": "Microsoft", 'Microsoft': "Microsoft",
-    "GOOG": "Google", 'Google': "Google"
-}
-
-function toTitleCase(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
-
-PythonToBlocks.prototype._convertExpression = function(parent, expression) {
-    switch (expression.constructor.name) {
-        case "Name":
-            switch (expression.id.v) {
-                case "True":  return this._createLogicBoolean(true);
-                case "False": return this._createLogicBoolean(false);
-                case "None":  return this._createNone();
-                default:      return this._createVariableGet(expression);
-            }
-        case "Call":
-            if (expression.func.constructor.name == "Attribute") {
-                // Check if its a special function - TODO make this smarter
-                switch (expression.func.attr.v) {
-                    case "append":
-                        return this.createAppendBlock_(expression.func, expression.args);
-                    default: break;
-                }
-                switch (expression.func.value.id.v) {
-                case "weather":
-                    switch (expression.func.attr.v) {
-                    case "get_temperature": default:
-                        return this._createBuiltinBlock("weather_temperature", 
-                                                        [["CITY", expression.args[0].s.v]]);
-                    case "get_report":
-                        return this._createBuiltinBlock("weather_report", 
-                                                        [["CITY", expression.args[0].s.v]]);
-                    case "get_forecasts":
-                        return this._createBuiltinBlock("weather_forecasts", 
-                                                        [["CITY", expression.args[0].s.v]]);
-                    case "get_highs_lows":
-                        return this._createBuiltinBlock("weather_highs_lows", 
-                                                        [["CITY", expression.args[0].s.v]]);
-                    case "get_all_forecasted_temperatures":
-                        return this._createBuiltinBlock("weather_all_forecasts", []);
-                    case "get_forecasted_reports":
-                        return this._createBuiltinBlock("weather_report_forecasts", 
-                                                        [["CITY", expression.args[0].s.v]]);
-                    }
-                case "earthquakes":
-                    switch (expression.func.attr.v) {
-                    case "get":
-                        return this._createBuiltinBlock("earthquake_get",
-                                                        [["PROPERTY", expression.args[0].s.v]]);
-                    case "get_both":
-                        return this._createBuiltinBlock("earthquake_both", []);
-                    case "get_all": default:
-                        return this._createBuiltinBlock("earthquake_all", []);
-                    }
-                case "stocks":
-                    switch (expression.func.attr.v) {
-                    case "get_current": default:
-                        return this._createBuiltinBlock("stocks_current",
-                                                        [["TICKER", _STOCK_MAP[expression.args[0].s.v]]]);
-                    case "get_past":
-                        return this._createBuiltinBlock("stocks_past",
-                                                        [["TICKER", _STOCK_MAP[expression.args[0].s.v]]]);
-                    }
-                case "crime":
-                    switch (expression.func.attr.v) {
-                    case "get_property_crimes":
-                        return this._createBuiltinBlock("crime_state",
-                                                        [["TYPE", "property"],
-                                                         ["STATE", toTitleCase(expression.args[0].s.v)]]);
-                    case "get_violent_crimes":
-                        return this._createBuiltinBlock("crime_state",
-                                                        [["TYPE", "violent"],
-                                                         ["STATE", toTitleCase(expression.args[0].s.v)]]);
-                    case "get_by_year":
-                        return this._createBuiltinBlock("crime_year",
-                                                        [["YEAR", expression.args[0].s.v]]);
-                    case "get_all": default:
-                        return this._createBuiltinBlock("crime_all",
-                                                        []);
-                    }
-                case "books":
-                    return this._createBuiltinBlock("books_get", []);
-                case "plt":
-                    switch (expression.func.attr.v) {
-                    case "title":
-                        return this._createBuiltinBlock("plot_title",
-                                                        [["TEXT", expression.args[0].s.v]]);
-                    case "plot":
-                        return this._createPlot(expression);
-                    case "show": default:
-                        return this._createBuiltinBlock("plot_show", []);
-                    }
-                default:  return this._createCallBlock(expression.func.attr.v);
-                }
-            } else if (expression.func.constructor.name == "Name") {
-                return this._createCallBlock(expression);
-            }
-        case "Attribute":
-            throw "Attribute access is not currently supported.";
-        case "Subscript":
-            return this.createDictSubscript_(expression);
-        case "Dict":
-            return this.createDict_(expression);
-        case "Tuple":
-            throw "Tuples are not currently supported.";
-        case "Set":
-            throw "Sets are not currently supported.";
-        case "List":
-            return this._createList(expression);
-        case "Num":
-            return this._createMathNumber(expression);
-        case "Str":
-            return this._createString(expression);
-        case "Compare":
-            return this._createLogicCompare(expression);
-        case "UnaryOp":
-            return this._createLogicNegate(expression);
-        case "BinOp":
-            return this._createBinOp(expression);
-        case "Lambda":
-            throw "Lambdas are not currently supported.";
-        case "IfExp":
-            throw "Inline If Expressions are not currently supported.";
-        case "ListComp":
-            throw "List Comprehensions are not currently supported.";
-        case "DictComp":
-            throw "Dictionary Comprehensions are not currently supported.";
-        case "GeneratorExp":
-            throw "Generators Expressions are not currently supported.";
-        case "Yield":
-            throw "Yield Expressions are not currently supported.";
-        case "Repr":
-            throw "Repr expressions are not currently supported.";
-        case "BoolOp":
-            return this._createLogicOperation(expression);
-    }
-    return this._createRawExpression(expression);
-}
-
-PythonToBlocks.prototype._hasNextStatement = function(statement) {
-    switch (statement.constructor.name) {
-        case "Import_": return true;
-        case "Expr":
-            if (statement.value.constructor.name == "Call") {
-                if (statement.value.func && statement.value.func.constructor.name == "Attribute") {
-                    if (statement.value.func.value && statement.value.func.value.id.v == "plt") {
-                        return true;
-                    }
-                    return true;
-                }
-            }
-            return false;
-        case "FunctionDef": return false;
-        case "If_": return true;
-        case "For_": return true;
-        case "Assign": return true;
-        default: return true;
-    }
-}
-
-/*
-Main dispatch function
-*/
-PythonToBlocks.prototype._convertStatement = function(parent, statement) {
-    switch (statement.constructor.name) {
-        case "Import_":
-            return null;
-        case "ImportFrom":
-            return null;
-        case "Return_":
-            return this.convertReturn_(parent, statement);
-        case "Expr":
-            return this._convertExpression(parent, statement.value);
-        case "With":
-            throw "With is not currently supported.";
-        case "While":
-            throw "While loops are not currently supported.";
-        case "ClassDef":
-            throw "Class definitions are not currently supported.";
-        case "FunctionDef":
-            return this._convertFunctionDef(parent, statement);
-        case "Print":
-            return this._createPrint(parent, statement);
-        case "If_":
-            return this._convertIf(parent, statement);
-        case "For_":
-            return this._convertFor(parent, statement);
-        case "AugAssign":
-            return this.convertAugAssign_(parent, statement);
-        case "Assign":
-            return this._convertAssignment(parent, statement);
-        case "Delete":
-            throw "Deletion is not currently supported.";
-        // Raise, TryExcept, TryFinally, Assert, Global, Break, Continue, Pass
-        default:
-            //console.log(statement);
-            break;
-    }
-    return this._createRawBlock(statement);//this.sourceCodeLines[statement.lineno-1]);
-}
-
-PythonToBlocks.prototype._convertBody = function(parent, statements) {
-    var current = parent;
-    for (var i = 0; i < statements.length; i+= 1) {
-        if (statements[i].constructor.name != "Pass") {
-            var node = this._convertStatement(parent,statements[i]);
-            if (node == null) {
-                continue;
-            }
-            if (!this._hasNextStatement(statements[i])) {
-                current = parent;
-            }
-            if (current == parent) {
-                current.appendChild(node);
-                current = node;
-            } else {
-                var Next = document.createElement("next");
-                Next.appendChild(node);
-                current.appendChild(Next);
-                current = node;
-            }
-            if (!this._hasNextStatement(statements[i])) {
-                current = parent;
-            }
-        }
-    }
-}
-
-PythonToBlocks.prototype.convert = function(python_source) {
+PythonToBlocks.prototype.convertSource = function(python_source) {
     var xml = document.createElement("xml");
     xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     if (python_source.trim() === "") {
-        return {"xml": new XMLSerializer().serializeToString(xml),
-                "error": null};
+        return {"xml": xmlToString(xml), "error": null};
     }
-    this.reverse = new ReverseAST(python_source.split("\n"));
+    this.source = python_source.split("\n");
     var filename = 'user_code.py';
     // Attempt parsing - might fail!
     var parse, ast, symbol_table, error;
@@ -740,17 +21,1367 @@ PythonToBlocks.prototype.convert = function(python_source) {
         symbol_table = Sk.symboltable(ast, filename, python_source, filename, parse.flags);
     } catch (e) {
         error = e;
-        xml.appendChild(this.raw_block(python_source))
-        return {"xml": new XMLSerializer().serializeToString(xml),
-                "error": error};
+        xml.appendChild(raw_block(python_source))
+        return {"xml": xmlToString(xml), "error": error};
     }
-
-    this.sourceCodeLines = python_source.split("\n");
-    this.reverse.measureNode(ast);   
-    var converted = this.reverse.convert(ast);
+    this.measureNode(ast);   
+    var converted = this.convert(ast);
     if (converted !== null) {
         xml.appendChild(converted);
     }
-    return {"xml": new XMLSerializer().serializeToString(xml),
-            "error": null};
+    return {"xml": xmlToString(xml), "error": null};
 }
+
+PythonToBlocks.prototype.identifier = function(node) {
+    return Sk.ffi.remapToJs(node);
+}
+
+PythonToBlocks.prototype.recursiveMeasure = function(node, nextBlockLine) {
+    if (node === undefined)  {
+        return;
+    }
+    var myNext = nextBlockLine;
+    if ("orelse" in node && node.orelse.length > 0) {
+        if (node.orelse.length == 1 && node.orelse[0].constructor.name == "If_") {
+            myNext = node.orelse[0].lineno-1;
+        } else {
+            myNext = node.orelse[0].lineno-1-1;
+        }
+    }
+    this.heights.push(nextBlockLine);
+    if ("body" in node) {
+        for (var i = 0; i < node.body.length; i++) {
+            var next;
+            if (i+1 == node.body.length) {
+                next = myNext;
+            } else {
+                next = node.body[i+1].lineno-1;
+            }
+            this.recursiveMeasure(node.body[i], next);
+        }
+    }
+    if ("orelse" in node) {
+        for (var i = 0; i < node.orelse.length; i++) {
+            var next;
+            if (i == node.orelse.length) {
+                next = nextBlockLine;
+            } else {
+                next = 1+(node.orelse[i].lineno-1);
+            }
+            this.recursiveMeasure(node.orelse[i], next);
+        }
+    }
+}
+
+PythonToBlocks.prototype.measureNode = function(node) {
+    this.heights = [];
+    this.recursiveMeasure(node, this.source.length-1);
+    this.heights.shift();
+}
+
+PythonToBlocks.prototype.getSourceCode = function(from, to) {
+    var lines = this.source.slice(from-1, to);
+    // Strip out any starting indentation.
+    if (lines.length > 0) {
+        var indentation = lines[0].search(/\S/);
+        for (var i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].substring(indentation);
+        }
+    }
+    return lines.join("\n");
+}
+
+PythonToBlocks.prototype.convertBody = function(node)
+{
+    // Empty body. Boring!
+    if (node.length == 0) {
+        return null;
+    }
+    
+    // This is tricked by semicolons. Hard to get around that...
+    // TODO: Force semicolon breaks in a preprocessor, and extract comments too
+    
+    // Build the actual blocks
+    var from = node[0].lineno;
+    var to = this.heights.shift();
+    var firstChild = this.convertStatement(node[0], this.getSourceCode(from, to)); // XML Block
+    var currentChild = firstChild;
+    for (var i = 1; i < node.length; i++) {
+        from = node[i].lineno;
+        to = this.heights.shift();
+        var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
+        if (newChild !== null) {
+            var nextElement = document.createElement("next");
+            nextElement.appendChild(newChild);
+            if (currentChild !== null) {
+                if (firstChild === null) {
+                    firstChild = currentChild;
+                }
+                currentChild.appendChild(nextElement);
+            } else if (firstChild === null) {
+                firstChild = newChild;
+            }
+            currentChild = newChild;
+        }
+    }
+    return firstChild;
+}
+
+function block(type, fields, values, settings, mutations, statements) {
+    var newBlock = document.createElement("block");
+    // Settings
+    newBlock.setAttribute("type", type);
+    for (var setting in settings) {
+        var settingValue = settings[setting];
+        newBlock.setAttribute(setting, settingValue);
+    }
+    // Mutations
+    if (mutations !== undefined && Object.keys(mutations).length > 0) {
+        var newMutation = document.createElement("mutation");
+        for (var mutation in mutations) {
+            var mutationValue = mutations[mutation];
+            if (mutation.charAt(0) == '@') {
+                newMutation.setAttribute(mutation.substr(1), mutationValue);
+            } else if (mutationValue.constructor === Array) {
+                for (var i = 0; i < mutationValue.length; i++) {
+                    var mutationNode = document.createElement(mutation);
+                    mutationNode.setAttribute("name", mutationValue[i]);
+                    newMutation.appendChild(mutationNode);
+                }
+            } else {
+                var mutationNode = document.createElement("arg");
+                mutationNode.setAttribute("name", mutation);
+                mutationNode.appendChild(mutationValue);
+                newMutation.appendChild(mutationNode);
+            }
+        }
+        newBlock.appendChild(newMutation);
+    }
+    // Fields
+    for (var field in fields) {
+        var fieldValue = fields[field];
+        var newField = document.createElement("field");
+        newField.setAttribute("name", field);
+        newField.appendChild(document.createTextNode(fieldValue));
+        newBlock.appendChild(newField);
+    }
+    // Values
+    for (var value in values) {
+        var valueValue = values[value];
+        var newValue = document.createElement("value");
+        newValue.setAttribute("name", value);
+        newValue.appendChild(valueValue);
+        newBlock.appendChild(newValue);
+    }
+    // Statements
+    if (statements !== undefined && Object.keys(statements).length > 0) {
+        for (var statement in statements) {
+            var statementValue = statements[statement];
+            var newStatement = document.createElement("statement");
+            newStatement.setAttribute("name", statement);
+            newStatement.appendChild(statementValue);
+            newBlock.appendChild(newStatement);
+        }
+    }
+    return newBlock;
+}
+
+raw_block = function(text) {
+    return block("raw_block", { "TEXT": text });
+}
+
+PythonToBlocks.prototype.convert = function(node) {
+    return this[node.constructor.name](node);
+}
+
+PythonToBlocks.prototype.convertStatement = function(node, full_source) {
+    try {
+        return this.convert(node);
+    } catch (e) {
+        console.error(e);
+        return raw_block(full_source);
+    }
+}
+
+/* ----- Nodes ---- */
+/*
+ * NO LINE OR COLUMN NUMBERS
+ * Module
+ * body: asdl_seq
+ */
+PythonToBlocks.prototype.Module = function(node)
+{
+    return this.convertBody(node.body);
+}
+
+/*
+ * NO LINE OR COLUMN NUMBERS
+ * Interactive
+ * body: asdl_seq
+ */
+PythonToBlocks.prototype.Interactive = function(body)
+{
+    return this.convertBody(node.body);
+}
+
+/*
+ * NO LINE OR COLUMN NUMBERS
+ * TODO
+ * body: expr_ty
+ */
+PythonToBlocks.prototype.Expression = function(body)
+{
+    this.body = body;
+}
+
+/*
+ * NO LINE OR COLUMN NUMBERS
+ *
+ * body: asdl_seq
+ */
+PythonToBlocks.prototype.Suite = function(body)
+{
+    this.asdl_seq(node.body);
+}
+
+/*
+ *
+ * name: identifier
+ * args: arguments__ty
+ * body: asdl_seq
+ * decorator_list: asdl_seq
+ */
+PythonToBlocks.prototype.FunctionDef = function(node)
+{
+    var name = node.name;
+    var args = node.args;
+    var body = node.body;
+    var decorator_list = node.decorator_list;
+    if (decorator_list.length > 0) {
+        throw new Error("Decorators are not implemented.");
+    }
+    return block("procedures_defnoreturn", {
+        "NAME": this.identifier(name)
+    }, {
+    }, {
+        "inline": "false"
+    }, {
+        "args": this.arguments_(args)
+    }, {
+        "STACK": this.convertBody(body)
+    });
+}
+
+/*
+ * name: identifier
+ * args: arguments__ty
+ * bases: asdl_seq
+ * body: asdl_seq
+ * decorator_list: asdl_seq
+ */
+PythonToBlocks.prototype.ClassDef = function(node)
+{
+    this.name = name;
+    this.bases = bases;
+    this.body = body;
+    this.decorator_list = decorator_list;
+    throw new Error("Not implemented");
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Return_ = function(node)
+{
+    var value = node.value;
+    // No field, one title, one setting
+    return block("procedures_return", {}, {
+        "VALUE": this.convert(value)
+    }, {
+        "inline": "false"
+    });
+}
+
+/*
+ * targets: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.Delete_ = function(/* {asdl_seq *} */ targets)
+{
+    this.targets = targets;
+    // TODO
+    throw new Error("Delete is not implemented");
+}
+
+/*
+ * targets: asdl_seq
+ * value: expr_ty
+ */
+PythonToBlocks.prototype.Assign = function(node)
+{
+    var targets = node.targets;
+    var value = node.value;
+    if (targets.length == 0) {
+        throw new Error("Nothing to assign to!");
+    } else if (targets.length == 1) {
+        return block("variables_set", {
+            "VAR": this.Name_str(targets[0]) //targets
+        }, {
+            "VALUE": this.convert(value)
+        });
+    } else {
+        //TODO
+        throw new Error("Multiple Assigment Targets Not implemented");
+    }
+}
+
+/*
+ * target: expr_ty
+ * op: operator_ty
+ * value: expr_ty
+ */
+PythonToBlocks.prototype.AugAssign = function(node)
+{
+    var target = node.target;
+    var op = node.op;
+    var value = node.value;
+    if (op.name != "Add") {
+        //TODO
+        throw new Error("Only addition is currently supported for augmented assignment!");
+    } else {
+        return block("math_change", {
+            "VAR": this.Name_str(target)
+        }, {
+            "DELTA": this.convert(value)
+        });
+    }
+}
+
+/*
+ * dest: expr_ty
+ * values: asdl_seq
+ * nl: bool
+ *
+ */
+PythonToBlocks.prototype.Print = function(node)
+{
+    var dest = node.dest;
+    var values = node.values;
+    var nl = node.nl;
+    
+    if (values.length == 1) {
+        return block("text_print", {}, {
+            "TEXT": this.convert(values[0])
+        });
+    } else {
+        return block("text_print_multiple", {}, 
+            this.convertElements("PRINT", values), 
+        {
+            "inline": "true"
+        }, {
+            "@items": values.length
+        });
+    }
+}
+
+/*
+ * target: expr_ty
+ * iter: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.For_ = function(node) {
+    var target = node.target;
+    var iter = node.iter;
+    var body = node.body;
+    var orelse = node.orelse;
+    
+    if (orelse.length > 0) {
+        // TODO
+        throw new Error("Or-else block of For is not implemented.");
+    }
+    
+    return block("controls_forEach", {
+        "VAR": this.Name_str(target)
+    }, {
+        "LIST": this.convert(iter)
+    }, {
+        "inline": "false"
+    }, {}, {
+        "DO": this.convertBody(body)
+    });
+}
+
+/*
+ * test: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
+ */
+PythonToBlocks.prototype.While_ = function(node) {
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    if (orelse.length > 0) {
+        // TODO
+        throw new Error("Or-else block of While is not implemented.");
+    }
+    return block("controls_while", {}, {
+        "BOOL": this.convert(test)
+    }, {}, {}, {
+        "DO": this.convertBody(body)
+    });
+}
+
+/*
+ * test: expr_ty
+ * body: asdl_seq
+ * orelse: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.If_ = function(node)
+{
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    
+    var IF_values = {"IF0": this.convert(test)};
+    var DO_values = {"DO0": this.convertBody(body)};
+    
+    var elseifCount = 0;
+    var elseCount = 0;
+    var potentialElseBody = null;
+    
+    // Handle weird orelse stuff
+    if (orelse !== undefined) {
+        if (orelse.length == 1 && orelse[0].constructor.name == "If_") {
+            // This is an 'ELIF'
+            while (orelse.length == 1  && orelse[0].constructor.name == "If_") {
+                this.heights.shift();
+                elseifCount += 1;
+                body = orelse[0].body;
+                test = orelse[0].test;
+                orelse = orelse[0].orelse;
+                DO_values["DO"+elseifCount] = this.convertBody(body);
+                if (test !== undefined) {
+                    IF_values["IF"+elseifCount] = this.convert(test);
+                }
+            }
+        }
+        if (orelse !== undefined && orelse.length > 0) {
+            // Or just the body of an Else statement
+            elseCount += 1;
+            DO_values["ELSE"] = this.convertBody(orelse);
+        }
+    }
+    
+    return block("controls_if", {
+    }, IF_values, {
+        "inline": "false"
+    }, {
+        "@elseif": elseifCount,
+        "@else": elseCount
+    }, DO_values);
+}
+
+/*
+ * context_expr: expr_ty
+ * optional_vars: expr_ty
+ * body: asdl_seq
+ */
+PythonToBlocks.prototype.With_ = function(node)
+{
+    var context_expr = node.context_expr;
+    var optional_vars = node.optional_vars;
+    var body = node.body;
+    throw new Error("With_ not implemented");
+}
+
+/*
+ * type: expr_ty
+ * inst: expr_ty
+ * tback: expr_ty
+ */
+PythonToBlocks.prototype.Raise = function(node)
+{
+    var type = node.type;
+    var inst = node.inst;
+    var tback = node.tback;
+    throw new Error("Raise not implemented");
+}
+
+/*
+ * body: asdl_seq
+ * handlers: asdl_seq
+ * orelse: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.TryExcept = function(node)
+{
+    var body = node.body;
+    var handlers = node.handlers;
+    var orelse = node.orelse;
+    throw new Error("TryExcept not implemented");
+}
+
+/*
+ * body: asdl_seq
+ * finalbody: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.TryFinally = function(node)
+{
+    var body = node.body;
+    var finalbody = node.finalbody;
+    throw new Error("TryExcept not implemented");
+}
+
+/*
+ * test: expr_ty
+ * msg: expr_ty
+ */
+PythonToBlocks.prototype.Assert = function(node)
+{
+    var test = node.test;
+    var msg = node.msg;
+    throw new Error("Assert not implemented");
+}
+
+/*
+ * names: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.Import_ = function(node)
+{
+    var names = node.names;
+    // The import statement isn't used in blockly because it happens implicitly
+    return null;
+}
+
+/*
+ * module: identifier
+ * names: asdl_seq
+ * level: int
+ *
+ */
+PythonToBlocks.prototype.ImportFrom = function(node)
+{
+    var module = node.module;
+    var names = node.names;
+    var level = node.level;
+    // The import statement isn't used in blockly because it happens implicitly
+    return null;
+}
+
+/*
+ * body: expr_ty
+ * globals: expr_ty
+ * locals: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Exec = function(node) {
+    var body = node.body;
+    var globals = node.globals;
+    var locals = node.locals;
+    throw new Error("Exec not implemented");
+}
+
+/*
+ * names: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.Global = function(node)
+{
+    var names = node.names;
+    throw new Error("Globals not implemented");
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Expr = function(node) {
+    var value = node.value;
+    
+    var converted = this.convert(value);
+    if (converted.constructor == Array) {
+        return converted[0];
+    } else {
+        return block("raw_empty", {}, {
+            "VALUE": this.convert(value)
+        });
+    }
+}
+
+/*
+ *
+ *
+ */
+PythonToBlocks.prototype.Pass = function() {
+    return block("controls_pass");
+}
+
+/*
+ *
+ *
+ */
+PythonToBlocks.prototype.Break_ = function() {
+    return block("controls_flow_statements", {
+        "FLOW": "BREAK"
+    });
+}
+
+/*
+ *
+ *
+ */
+PythonToBlocks.prototype.Continue_ = function() {
+    return block("controls_flow_statements", {
+        "FLOW": "CONTINUE"
+    });
+}
+
+/*
+ * TODO: what does this do?
+ *
+ */
+PythonToBlocks.prototype.Debugger_ = function() {
+    return null;
+}
+
+PythonToBlocks.prototype.booleanOperator = function(op) {
+    switch (op.name) {
+        case "And": return "AND";
+        case "Or": return "OR";
+        default: throw new Error("Operator not supported:"+op.name);
+    }
+}
+
+/*
+ * op: boolop_ty
+ * values: asdl_seq
+ */
+PythonToBlocks.prototype.BoolOp = function(node) {
+    var op = node.op;
+    var values = node.values;
+    // TODO: is there ever a case where it's != 2 values?
+    return block("logic_operation", {
+        "OP": this.booleanOperator(op)
+    }, {
+        "A": this.convert(values[0]),
+        "B": this.convert(values[1])
+    }, {
+        "inline": "true"
+    });
+}
+
+PythonToBlocks.prototype.binaryOperator = function(op) {
+    switch (op.name) {
+        case "Add": return "ADD";
+        case "Sub": return "MINUS";
+        case "Div": case "FloorDiv": return "DIVIDE";
+        case "Mult": return "MULTIPLY";
+        case "Pow": return "POWER";
+        case "Mod": return "MODULO";
+        default: throw new Error("Operator not supported:"+op.name);
+    }
+}
+
+/*
+ * left: expr_ty
+ * op: operator_ty
+ * right: expr_ty
+ */
+PythonToBlocks.prototype.BinOp = function(node)
+{
+    var left = node.left;
+    var op = node.op;
+    var right = node.right;
+    return block("math_arithmetic", {
+        "OP": this.binaryOperator(op) // TODO
+    }, {
+        "A": this.convert(left),
+        "B": this.convert(right)
+    }, {
+        "inline": true
+    });
+}
+
+/*
+ * op: unaryop_ty
+ * operand: expr_ty
+ */
+PythonToBlocks.prototype.UnaryOp = function(node)
+{
+    var op = node.op;
+    var operand = node.operand;
+    if (op.name == "Not") {
+        return block("logic_negate", {}, {
+            "BOOL": this.convert(operand) 
+        }, {
+            "inline": "false"
+        });
+    } else {
+        throw new Error("Other unary operators are not implemented yet.");
+    }
+}
+
+/*
+ * args: arguments__ty
+ * body: expr_ty
+ */
+PythonToBlocks.prototype.Lambda = function(node) {
+    var args = node.args;
+    var body = node.body;
+    throw new Error("Lambda functions are not implemented yet.");
+}
+
+/*
+ * test: expr_ty
+ * body: expr_ty
+ * orelse: expr_ty
+ */
+PythonToBlocks.prototype.IfExp = function(node)
+{
+    var test = node.test;
+    var body = node.body;
+    var orelse = node.orelse;
+    throw new Error("Inline IF expressions are not implemented yet.");
+}
+
+/*
+ * keys: asdl_seq
+ * values: asdl_seq
+ */
+PythonToBlocks.prototype.Dict = function(node) {
+    var keys = node.keys;
+    var values = node.values;
+    
+    var keyList = [];
+    var valueList = [];
+    for (var i = 0; i < keys.length; i+= 1) {
+        if (keys[i].constructor.name != "Str") {
+            throw new Error("Dictionary Keys should be Strings.");
+        }
+        keyList["KEY"+i] = this.Str_value(keys[i]);
+        valueList["VALUE"+i] = this.convert(values[i]);
+    }
+    
+    return block("dicts_create_with", keyList, valueList, {
+        "inline": "false"
+    }, {
+        "@items": keys.length
+    });
+}
+
+/*
+ * elts: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.Set = function(node)
+{
+    var elts = node.elts;
+    throw new Error("Sets are not implemented");
+}
+
+/*
+ * elt: expr_ty
+ * generators: asdl_seq
+ */
+PythonToBlocks.prototype.ListComp = function(node)
+{
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("List Comprehensions are not implemented"); 
+}
+
+/*
+ * elt: expr_ty
+ * generators: asdl_seq
+ */
+PythonToBlocks.prototype.SetComp = function(node)
+{
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("Set Comprehensions are not implemented"); 
+}
+
+/*
+ * key: expr_ty
+ * value: expr_ty
+ * generators: asdl_seq
+ */
+PythonToBlocks.prototype.DictComp = function(node)
+{
+    var key = node.key;
+    var value = node.value;
+    var generators = node.generators;
+    throw new Error("Dictionary Comprehensions are not implemented"); 
+}
+
+/*
+ * elt: expr_ty
+ * generators: asdl_seq
+ */
+PythonToBlocks.prototype.GeneratorExp = function(node) {
+    var elt = node.elt;
+    var generators = node.generators;
+    throw new Error("Generator Expresions are not implemented"); 
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Yield = function(node)
+{
+    var value = value;
+    throw new Error("Yield expression is not implemented");
+}
+
+
+PythonToBlocks.prototype.compareOperator = function(op) {
+    switch (op.name) {
+        case "Eq": return "EQ";
+        case "NotEq": return "NEQ";
+        case "Lt": return "LT";
+        case "Gt": return "GT";
+        case "LtE": return "LTE";
+        case "GtE": return "GTE";
+        case "In": return "IN";
+        case "NotIn": return "NOTIN";
+        // Is, IsNot, In, NotIn
+        default: throw new Error("Operator not supported:"+op.name);
+    }
+}
+
+/*
+ * left: expr_ty
+ * ops: asdl_int_seq
+ * asdl_seq: comparators
+ */
+PythonToBlocks.prototype.Compare = function(node)
+{
+    var left = node.left;
+    var ops = node.ops;
+    var comparators = node.comparators;
+    
+    if (ops.length != 1) {
+        throw new Error("Only one comparison operator is supported");
+    } else if (ops[0].name == "In" || ops[0].name == "NotIn") {
+        return block("logic_isIn", {
+            "OP": this.compareOperator(ops[0])
+        }, {
+            "ITEM": this.convert(left),
+            "LIST": this.convert(comparators[0])
+        }, {
+            "inline": "true"
+        });
+    } else {
+        return block("logic_compare", {
+            "OP": this.compareOperator(ops[0])
+        }, {
+            "A": this.convert(left),
+            "B": this.convert(comparators[0])
+        }, {
+            "inline": "true"
+        });
+    }
+    
+}
+
+convertStockSymbols = function(symbol) {
+    switch (symbol) {
+        case 'FB': case "Facebook":
+            return "Facebook";
+        case "AAPL": case "Apple":
+            return "Apple";
+        case "MSFT": case "Microsoft":
+            return "Microsoft";
+        case "GOOG": case "Google":
+            return "Google";
+        default:
+            throw new Error("Unknown Stock Symbol.");
+    }
+}
+
+toTitleCase = function(str) {
+    return str.replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+            
+PythonToBlocks.prototype.KNOWN_MODULES = {
+    "weather": {
+        "get_temperature": ["weather_temperature", "CITY"],
+        "get_report": ["weather_report", "CITY"],
+        "get_forecasts": ["weather_forecasts", "CITY"],
+        "get_highs_lows": ["weather_highs_lows", "CITY"],
+        "get_all_forecasted_temperatures": ["weather_all_forecasts"],
+        "get_forecasted_reports": ["weather_report_forecasts", "CITY"]
+    }, 
+    "earthquakes": {
+        "get": ["earthquake_get", "PROPERTY"],
+        "get_both": ["earthquake_both"],
+        "get_all": ["earthquake_all"]
+    },
+    "stocks": {
+        "get_current": ["stocks_current", ["TICKER", convertStockSymbols]],
+        "get_past": ["stocks_past", ["TICKER", convertStockSymbols]]
+    },
+    "crime": {
+        // STATE = toTitleCase
+        "get_property_crimes": ["crime_state", ["STATE", toTitleCase],
+                                              ["TYPE", "property"]],
+        "get_violent_crimes": ["crime_state",  ["STATE", toTitleCase],
+                                              ["TYPE", "violent"]],
+        "get_by_year": ["crime_year", "YEAR"],
+        "get_all": ["crime_all"]
+    },
+    "books": {
+        "get_all": ["books_get"]
+    },
+    "plt": {
+        "title": ["*plot_title", "TEXT"],
+        "show": ["*plot_show"]
+    }
+};
+PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
+PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
+    var name = this.identifier(func.attr);
+    if (func.value.constructor.name == "Name") {
+        var module = this.identifier(func.value.id);
+        if (module == "plt" && name == "plot") {
+            if (args.length == 1) {
+                return [block("plot_line", {}, {
+                    "y_values": this.convert(args[0])
+                }, {"inline": "false"})];
+            } else if (args.length == 2) {
+                return [block("plot_lineXY", {}, {
+                    "x_values": this.convert(args[0]),
+                    "y_values": this.convert(args[1])
+                }, {"inline": "false"})];
+            } else {
+                throw new Error("Incorrect number of arguments to plt.plot");
+            }
+        } else if (module in this.KNOWN_MODULES && name in this.KNOWN_MODULES[module]) {
+            var definition = this.KNOWN_MODULES[module][name];
+            var blockName = definition[0];
+            var isExpression = true;
+            if (blockName.charAt(0) == "*") {
+                blockName = blockName.slice(1);
+                isExpression = false;
+            }
+            var fields = {};
+            for (var i = 0; i < args.length; i++) {
+                var argument = definition[1+i];
+                if (typeof argument ==  "string") {
+                    fields[argument] = this.Str_value(args[i]);
+                } else {
+                    var argumentName = argument[0];
+                    var argumentMapper = argument[1];
+                    fields[argumentName] = argumentMapper(this.Str_value(args[i]));
+                }
+            }
+            for (var i = 1+args.length; i < definition.length; i++) {
+                var first = definition[i][0];
+                var second = definition[i][1];
+                fields[first] = second;
+            }
+            if (isExpression) {
+                return block(blockName, fields);
+            } else {
+                return [block(blockName, fields)];
+            }
+        }
+    } 
+    if (this.KNOWN_FUNCTIONS.indexOf(name) > -1) {
+        switch (name) {
+            case "append":
+                if (args.length !== 1) {
+                    throw new Error("Incorrect number of arguments to .append");
+                }
+                // Return as statement
+                return [block("lists_append", {}, {
+                    "ITEM": this.convert(args[0]),
+                    "LIST": this.convert(func.value)
+                }, {
+                    "inline": "true"
+                })];
+            case "strip":
+                return block("text_trim", { "MODE": "BOTH" }, 
+                    { "TEXT": this.convert(func.value) });
+            case "lstrip":
+                return block("text_trim", { "MODE": "LEFT" }, 
+                    { "TEXT": this.convert(func.value) });
+            case "rstrip":
+                return block("text_trim", { "MODE": "RIGHT" }, 
+                    { "TEXT": this.convert(func.value) });
+            default: throw new Error("Unknown function call!");
+        }
+    } else {
+        console.log(func, args, keywords, starargs, kwargs);
+        throw new Error("Unknown function call or not implemented");
+    }
+}
+
+/*
+ * func: expr_ty
+ * args: asdl_seq
+ * keywords: asdl_seq
+ * starargs: expr_ty
+ * kwargs: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Call = function(node) {
+    var func = node.func;
+    var args = node.args;
+    var keywords = node.keywords;
+    var starargs = node.starargs;
+    var kwargs = node.kwargs;
+    
+    switch (func.constructor.name) {
+        case "Name":
+            if (starargs !== null && starargs.length > 0) {
+                throw new Error("*args (variable arguments) are not implemented yet.");
+            } else if (kwargs !== null && kwargs.length > 0) {
+                throw new Error("**args (keyword arguments) are not implemented yet.");
+            }
+            var arguments = {};
+            var argumentsMutation = {"@name": this.identifier(func.id)};
+            for (var i = 0; i < args.length; i+= 1) {
+                arguments["ARG"+i] = this.convert(args[i]);
+                argumentsMutation[i] = this.convert(args[i]);
+            }
+            if (this.identifier(func.id) == "print") {
+                if (args.length == 1) {
+                    return [block("text_print", {}, {
+                        "TEXT": this.convert(args[0])
+                    })];
+                } else {
+                    return [block("text_print_multiple", {}, 
+                        this.convertElements("PRINT", args), 
+                    {
+                        "inline": "true"
+                    }, {
+                        "@items": args.length
+                    })];
+                }
+            } else {
+                return block("procedures_callreturn", {}, arguments, {
+                    "inline": "false"
+                }, argumentsMutation);
+            }
+        // Direct function call
+        case "Attribute":
+        // Module function call
+            return this.CallAttribute(func, args, keywords, starargs, kwargs);
+    }
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Repr = function(node)
+{
+    var value = node.value;
+    throw new Error("Repr is not yet implemented");
+}
+
+/*
+ * n: object
+ *
+ */
+PythonToBlocks.prototype.Num = function(node)
+{
+    var n = node.n;
+    return block("math_number", {"NUM": Sk.ffi.remapToJs(n)});
+}
+
+/*
+ * s: string
+ *
+ */
+PythonToBlocks.prototype.Str = function(node)
+{
+    var s = node.s;
+    return block("text", {"TEXT": Sk.ffi.remapToJs(s)});
+}
+
+PythonToBlocks.prototype.Str_value = function(node) {
+    var s = node.s;
+    return Sk.ffi.remapToJs(s);
+}
+
+/*
+ * value: expr_ty
+ * attr: identifier
+ * ctx: expr_context_ty
+ *
+ */
+PythonToBlocks.prototype.Attribute = function(node)
+{
+    var value = node.value;
+    var attr = node.attr;
+    var ctx = node.ctx;
+    
+    throw new Error("Attribute access not implemented");
+}
+
+/*
+ * value: expr_ty
+ * slice: slice_ty
+ * ctx: expr_context_ty
+ *
+ */
+PythonToBlocks.prototype.Subscript = function(node)
+{
+    var value = node.value;
+    var slice = node.slice;
+    var ctx = node.ctx;
+    
+    if (slice.value.constructor.name !== "Str") {
+        throw new Error("Currently, dictionary access only works for strings!");
+    }
+    
+    return block("dict_get_literal", {
+        "ITEM": this.Str_value(slice.value)
+    }, {
+        "DICT": this.convert(value)
+    });
+}
+
+/*
+ * id: identifier
+ * ctx: expr_context_ty
+ */
+PythonToBlocks.prototype.Name = function(node)
+{
+    var id = node.id;
+    var ctx = node.ctx;
+    switch (this.Name_str(node)) {
+        case "True":
+            return block("logic_boolean", {"BOOL": "TRUE"});
+        case "False":
+            return block("logic_boolean", {"BOOL": "FALSE"});
+        default:
+            return block('variables_get', {
+                "VAR": this.identifier(id)
+            });
+    }
+}
+
+/*
+ * id: identifier
+ * ctx: expr_context_ty
+ */
+PythonToBlocks.prototype.Name_str = function(node)
+{
+    var id = node.id;
+    var ctx = node.ctx;
+    return this.identifier(id);
+}
+
+PythonToBlocks.prototype.convertElements = function(key, values) {
+    var output = {};
+    for (var i = 0; i < values.length; i++) {
+        output[key+i] = this.convert(values[i]);
+    }
+    return output;
+}
+
+/*
+ * elts: asdl_seq
+ * ctx: expr_context_ty
+ *
+ */
+PythonToBlocks.prototype.List = function(node) {
+    var elts = node.elts;
+    var ctx = node.ctx;
+    
+    return block("lists_create_with", {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": "false"
+    }, {
+        "@items": elts.length
+    });
+}
+
+/*
+ * elts: asdl_seq
+ * ctx: expr_context_ty
+ */
+PythonToBlocks.prototype.Tuple = function(node)
+{
+    var elts = node.elts;
+    var ctx = node.ctx;
+    
+    throw new Error("Tuples not implemented");
+}
+
+/*
+ *
+ *
+ */
+PythonToBlocks.prototype.Ellipsis = function() {
+    throw new Error("Ellipsis not implemented");
+}
+
+/*
+ * lower: expr_ty
+ * upper: expr_ty
+ * step: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Slice = function(node)
+{
+    var lower = node.lower;
+    var upper = node.upper;
+    var step = node.step;
+    
+    throw new Error("Slices not implemented");
+}
+
+/*
+ * dims: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.ExtSlice = function(node)
+{
+    var dims = node.dims;
+    
+    throw new Error("ExtSlice is not implemented.");
+}
+
+/*
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.Index = function(value)
+{
+    var value = node.value;
+    
+    throw new Error("Index is not implemented");
+}
+
+/*
+ * target: expr_ty
+ * iter: expr_ty
+ * ifs: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.comprehension = function(node)
+{
+    var target = node.target;
+    var iter = node.iter;
+    var ifs = node.ifs;
+    
+    throw new Error("Comprehensions not implemented.");
+}
+
+/*
+ * type: expr_ty
+ * name: expr_ty
+ * body: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.ExceptHandler = function(node)
+{
+    var type = node.type;
+    var name = node.name;
+    var body = node.boy;
+    
+    throw new Error("Except handlers are not implemented");
+}
+
+PythonToBlocks.prototype.argument_ = function(node) {
+    var id = node.id;
+    return this.identifier(id);
+}
+
+/*
+ * args: asdl_seq
+ * vararg: identifier
+ * kwarg: identifier
+ * defaults: asdl_seq
+ *
+ */
+PythonToBlocks.prototype.arguments_ = function(node)
+{
+    var args = node.args;
+    var vararg = node.vararg;
+    var kwarg = node.kwarg;
+    var defaults = node.defaults;
+    
+    var allArgs = [];
+    for (var i = 0; i < args.length; i++) {
+        var arg = args[i];
+        allArgs.push(this.argument_(arg));
+    }
+    return allArgs;
+}
+
+/*
+ * arg: identifier
+ * value: expr_ty
+ *
+ */
+PythonToBlocks.prototype.keyword = function(node)
+{
+    var arg = node.arg;
+    var value = node.value;
+    
+    throw new Error("Keywords are not implemented");
+}
+
+/*
+ * name: identifier
+ * asname: identifier
+ *
+ */
+PythonToBlocks.prototype.alias = function(node)
+{
+    var name = node.name;
+    var asname = node.asname;
+    
+    throw new Error("Aliases are not implemented");
+}
+
+
+/* ----- expr_context ----- */
+/*
+Load
+Store
+Del
+AugLoad
+AugStore
+Param
+*/
+
+
+/* ----- operator ----- */
+/*
+Add
+Sub
+Mult
+Div
+Mod
+Pow
+LShift
+RShift
+BitOr
+BitXor
+BitAnd
+FloorDiv
+*/
+
+/* ----- unaryop ----- */
+/*
+Invert
+Not
+UAdd
+USub
+*/
