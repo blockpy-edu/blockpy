@@ -291,7 +291,7 @@ KennelEditor.prototype.updateBlocks = function() {
         // Try to convert it!
         var code = this.getModel(); //this.text.getValue();
         if (code.trim().charAt(0) !== '<') {
-            var result = this.converter.convert(code);
+            var result = this.converter.convertSource(code);
             code = result.xml;
             if (result.error !== null) {
                 console.error(result.error);
@@ -365,6 +365,7 @@ KennelEditor.prototype.getToolbox = function() {
                 '<category name="Python">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
+                    '<block type="function_call"></block>'+
                 '</category>'+
                 '<category name="Output">'+
                     '<block type="text_print"></block>'+

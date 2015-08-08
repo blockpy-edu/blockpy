@@ -343,7 +343,7 @@ Blockly.Blocks['function_call'] = {
         // Reconnect any child blocks.
         for (var i = 0; i < this.itemCount_; i++) {
             if (connections[i]) {
-                this.getInput('PRINT' + i).connection.connect(connections[i]);
+                this.getInput('ARGUMENT' + i).connection.connect(connections[i]);
             }
         }
     },
