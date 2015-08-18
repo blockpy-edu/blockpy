@@ -7,10 +7,7 @@ Speed grader
 backport blockpy
     Server storage
     Update problems
-    Handle parsons
-Reverse AST
-    Remove "Do nothing block"
-    At top level, don't generate empty expression-statement blocks
+    Rendering blockly in grader
 
 Stretch:
 --------

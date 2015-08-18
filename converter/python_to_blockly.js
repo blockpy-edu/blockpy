@@ -27,7 +27,9 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
     this.measureNode(ast);   
     var converted = this.convert(ast);
     if (converted !== null) {
-        xml.appendChild(converted);
+        for (var block = 0; block < converted.length; block+= 1) {
+            xml.appendChild(converted[block]);
+        }
     }
     return {"xml": xmlToString(xml), "error": null};
 }
@@ -91,8 +93,7 @@ PythonToBlocks.prototype.getSourceCode = function(from, to) {
     return lines.join("\n");
 }
 
-PythonToBlocks.prototype.convertBody = function(node)
-{
+PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     // Empty body. Boring!
     if (node.length == 0) {
         return null;
@@ -104,27 +105,44 @@ PythonToBlocks.prototype.convertBody = function(node)
     // Build the actual blocks
     var from = node[0].lineno;
     var to = this.heights.shift();
-    var firstChild = this.convertStatement(node[0], this.getSourceCode(from, to)); // XML Block
-    var currentChild = firstChild;
-    for (var i = 1; i < node.length; i++) {
+    
+    // Walk through and convert the blocks to statements
+    var children = [];
+    var currentChild = null,
+        firstChild = null;
+    for (var i = 0; i < node.length; i++) {
         from = node[i].lineno;
         to = this.heights.shift();
-        var newChild = this.convertStatement(node[i], this.getSourceCode(from, to));
+        var newChild = this.convertStatement(node[i], this.getSourceCode(from, to), is_top_level);
+        
+        // Skip null blocks (e.g., imports)
         if (newChild !== null) {
-            var nextElement = document.createElement("next");
-            nextElement.appendChild(newChild);
-            if (currentChild !== null) {
-                if (firstChild === null) {
-                    firstChild = currentChild;
+            if (is_top_level && newChild.constructor == Array) {
+                // Add non-statement expressions to the end
+                children.push(newChild[0]);
+            } else if (is_top_level && children.length > 0) {
+                children.push(newChild);
+            } else {
+                if (newChild.constructor == Array) {
+                    newChild = newChild[0];
                 }
-                currentChild.appendChild(nextElement);
-            } else if (firstChild === null) {
-                firstChild = newChild;
+                if (firstChild == null) {
+                    firstChild = newChild;
+                    currentChild = newChild;
+                } else {
+                    var nextElement = document.createElement("next");
+                    nextElement.appendChild(newChild);
+                    currentChild.appendChild(nextElement);
+                    currentChild = newChild;
+                }
             }
-            currentChild = newChild;
         }
     }
-    return firstChild;
+    // Actually add that first child to the start
+    if (firstChild !== null) {
+        children.unshift(firstChild);
+    }
+    return children;
 }
 
 function block(type, fields, values, settings, mutations, statements) {
@@ -169,18 +187,29 @@ function block(type, fields, values, settings, mutations, statements) {
     for (var value in values) {
         var valueValue = values[value];
         var newValue = document.createElement("value");
-        newValue.setAttribute("name", value);
-        newValue.appendChild(valueValue);
-        newBlock.appendChild(newValue);
+        if (valueValue !== null) {
+            newValue.setAttribute("name", value);
+            newValue.appendChild(valueValue);
+            newBlock.appendChild(newValue);
+        }
     }
     // Statements
     if (statements !== undefined && Object.keys(statements).length > 0) {
         for (var statement in statements) {
             var statementValue = statements[statement];
-            var newStatement = document.createElement("statement");
-            newStatement.setAttribute("name", statement);
-            newStatement.appendChild(statementValue);
-            newBlock.appendChild(newStatement);
+            if (statementValue == null) {
+                continue;
+            } else {
+                for (var i = 0; i < statementValue.length; i += 1) {
+                    // In most cases, you really shouldn't ever have more than
+                    //  one statement in this list. I'm not sure Blockly likes
+                    //  that.
+                    var newStatement = document.createElement("statement");
+                    newStatement.setAttribute("name", statement);
+                    newStatement.appendChild(statementValue[i]);
+                    newBlock.appendChild(newStatement);
+                }
+            }
         }
     }
     return newBlock;
@@ -190,13 +219,13 @@ raw_block = function(text) {
     return block("raw_block", { "TEXT": text });
 }
 
-PythonToBlocks.prototype.convert = function(node) {
-    return this[node.constructor.name](node);
+PythonToBlocks.prototype.convert = function(node, is_top_level) {
+    return this[node.constructor.name](node, is_top_level);
 }
 
-PythonToBlocks.prototype.convertStatement = function(node, full_source) {
+PythonToBlocks.prototype.convertStatement = function(node, full_source, is_top_level) {
     try {
-        return this.convert(node);
+        return this.convert(node, is_top_level);
     } catch (e) {
         console.error(e);
         return raw_block(full_source);
@@ -211,7 +240,7 @@ PythonToBlocks.prototype.convertStatement = function(node, full_source) {
  */
 PythonToBlocks.prototype.Module = function(node)
 {
-    return this.convertBody(node.body);
+    return this.convertBody(node.body, true);
 }
 
 /*
@@ -463,7 +492,7 @@ PythonToBlocks.prototype.If_ = function(node)
                 body = orelse[0].body;
                 test = orelse[0].test;
                 orelse = orelse[0].orelse;
-                DO_values["DO"+elseifCount] = this.convertBody(body);
+                DO_values["DO"+elseifCount] = this.convertBody(body, false);
                 if (test !== undefined) {
                     IF_values["IF"+elseifCount] = this.convert(test);
                 }
@@ -601,12 +630,14 @@ PythonToBlocks.prototype.Global = function(node)
  * value: expr_ty
  *
  */
-PythonToBlocks.prototype.Expr = function(node) {
+PythonToBlocks.prototype.Expr = function(node, is_top_level) {
     var value = node.value;
     
     var converted = this.convert(value);
     if (converted.constructor == Array) {
         return converted[0];
+    } else if (is_top_level === true) {
+        return [this.convert(value)];
     } else {
         return block("raw_empty", {}, {
             "VALUE": this.convert(value)
@@ -619,7 +650,7 @@ PythonToBlocks.prototype.Expr = function(node) {
  *
  */
 PythonToBlocks.prototype.Pass = function() {
-    return block("controls_pass");
+    return null; //block("controls_pass");
 }
 
 /*
@@ -1022,7 +1053,14 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
         }
     } else {
         console.log(func, args, keywords, starargs, kwargs);
-        throw new Error("Unknown function call or not implemented");
+        
+        /*
+        var arguments = {};
+        for (var i = 0; i < args.length; i++) {
+            arguments["ARGUMENT"+i] = this.convert(args[i]);
+        }
+        return block("function_call", {"NAME": name}, arguments);*/
+        //throw new Error("Unknown function call or not implemented");
     }
 }
 
@@ -1166,6 +1204,8 @@ PythonToBlocks.prototype.Name = function(node)
             return block("logic_boolean", {"BOOL": "TRUE"});
         case "False":
             return block("logic_boolean", {"BOOL": "FALSE"});
+        case "___":
+            return null;
         default:
             return block('variables_get', {
                 "VAR": this.identifier(id)

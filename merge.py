@@ -1,5 +1,5 @@
 
-js_in = ['analyzer/analyzer.js', 'analyzer/python_errors.js', 'converter/reverse_ast.js', 'converter/python_to_blockly.js', 'kennel/kennel.js']
+js_in = ['analyzer/analyzer.js', 'analyzer/python_errors.js',  'converter/python_to_blockly.js', 'kennel/kennel.js']
 css_in = ['libs/font-awesome.min.css', 'kennel/kennel.css']
 
 #js_out = 'kennel_dist/blockpy.js'
