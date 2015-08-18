@@ -39,7 +39,7 @@ Blockly.Python['plot_line'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
     var code = 'plt.plot(';
     var argument1 = Blockly.Python.valueToCode(block, 'y_values',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
     code += argument1 +')\n';
     return code;
 };
@@ -48,9 +48,9 @@ Blockly.Python['plot_lineXY'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
     var code = 'plt.line(';
     var argument0 = Blockly.Python.valueToCode(block, 'x_values',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
     var argument1 = Blockly.Python.valueToCode(block, 'y_values',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
     code += argument0 + ','+ argument1 + ')\n';
     return code;
 };
@@ -59,9 +59,9 @@ Blockly.Python['plot_scatter'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
     var code = 'plt.scatter(';
     var argument0 = Blockly.Python.valueToCode(block, 'x_values',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
     var argument1 = Blockly.Python.valueToCode(block, 'y_values',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
     code += argument0 + ','+ argument1 + ')\n';
     return code;
 };

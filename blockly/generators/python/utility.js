@@ -51,7 +51,7 @@ Blockly.Python['raw_table'] = function(block) {
 
 Blockly.Python['type_check'] = function(block) {
   var value = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_MEMBER) || '0';
+      Blockly.Python.ORDER_MEMBER) || '___';
   var code = 'type('+value + ')';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
@@ -62,7 +62,7 @@ Blockly.Python['function_call'] = function(block) {
   var args = new Array(block.itemCount_);
   for (var n = 0; n < block.itemCount_; n++) {
     args[n] = Blockly.Python.valueToCode(block, 'ARGUMENT' + n,
-        Blockly.Python.ORDER_NONE) || 'None';
+        Blockly.Python.ORDER_NONE) || '___';
   }
   var code = name+ '(' + args.join(', ') + ')';
   if (hasReturn) {

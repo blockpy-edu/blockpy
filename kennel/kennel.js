@@ -18,11 +18,145 @@
  * limitations under the License.
  */
  
+function randomInteger(min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+ 
  /**
  * @fileoverview Main organization file for Kennel
  * @author acbart@vt.edu (Austin Cory Bart)
  */
 'use strict';
+
+function KennelServer(model, kennel, alertBox) {
+    this.model = model;
+    this.kennel = kennel;
+    this.alertBox = alertBox;
+    
+    this.eventQueue = [];
+    this.eventTimer = null;
+    
+}
+
+KennelServer.prototype.MAX_LOG_SIZE = 20;
+KennelServer.prototype.LOG_DELAY = 8000;
+
+KennelServer.prototype.logEvent = function(event, action) {
+    var CURRENT_TIME = new Date();
+    var record = {'event': event, 
+                  'action': action,
+                  'timestamp': CURRENT_TIME.getTime()/1000 -
+                               CURRENT_TIME.getTimezoneOffset()*60};
+    var server = this;
+    this.eventQueue.push(record);
+    if (this.eventQueue.length >= this.MAX_LOG_SIZE) {
+        this.uploadEvents();
+    } else {
+        clearTimeout(this.eventTimer);
+        this.eventTimer = setTimeout(function() {
+            server.uploadEvents();
+        }, this.LOG_DELAY);
+    }
+}
+
+KennelServer.prototype.uploadEvents = function() {
+    this.eventQueue = [];
+    var data = {
+        'question_id': this.model.question.question_id,
+        'student_id': this.model.question.student_id,
+        'context_id': this.model.question.context_id,
+        'events': JSON.stringify(this.queue)
+    };
+    $.post(this.model.urls.log_event, data, function() {
+        this.eventQueue = [];
+    });
+}
+
+KennelServer.prototype.markSuccess = function() {
+    var data = {
+        'code': this.model.programs.__main__,
+        'type': 'blockly',
+        'question_id': this.model.question.question_id,
+        'student_id': this.model.question.student_id,
+        'context_id': this.model.question.context_id
+    };
+    var alertBox = this.alertBox;
+    $.post(this.model.urls.save_success, data, function(response) {
+        if (response.success) {
+            alertBox("Success reported").delay(200).fadeOut("slow");
+        } else {
+            alertBox("Success report failed");
+            console.error(response.message);
+        }
+    }).fail(function() {
+        alertBox("Success report failed");
+    });
+};
+
+KennelServer.prototype.save = function() {
+    var data = {
+        'code': this.model.programs.__main__,
+        'type': 'blockly',
+        'question_id': this.model.question.question_id,
+        'student_id': this.model.question.student_id,
+        'context_id': this.model.question.context_id
+    };
+    var alertBox = this.alertBox;
+    storage.set(data.question_id, data.code);
+    $.post(this.model.urls.save_code, data, function(response) {
+        if (response.success) {
+            alertBox("Saved").delay(200).fadeOut("slow");
+            storage.remove(data.question_id);
+        } else {
+            alertBox("Saving failed");
+            console.error(response.message);
+        }
+    }).fail(function() {
+        alertBox("Saving failed");
+    });
+};
+
+KennelServer.prototype.load = function() {
+    var data = {
+        'question_id': this.model.question.question_id,
+        'student_id': this.model.question.student_id,
+        'context_id': this.model.question.context_id
+    };
+    var alertBox = this.alertBox;
+    var server = this, kennel = this.kennel;
+    $.post(this.model.urls.load_code, data, function(response) {
+        if (response.success) {
+            if (storage.has(data.question_id)) {
+                if (storage.is_new(data.question_id, response.timestamp)) {
+                    var xml = storage.get(data.question_id);
+                    server.model.load(xml);
+                    server.save();
+                } else {
+                    storage.remove(data.question_id);
+                    if (response.code !== null) {
+                        server.model.load(response.code);
+                    }
+                }
+            } else {
+                if (response.code !== null) {
+                    server.model.load(response.code);
+                }
+            }
+            if (response.completed) {
+                kennel.feedback.success('');
+            }
+            alertBox("Loaded").delay(200).fadeOut("slow");
+        } else {
+            console.error(response.message);
+            alertBox("Loading failed");
+        }
+    }).fail(function() {
+        alert("Loading failed");
+    }).always(function() {
+        server.model.loaded = true;
+    });
+};
 
 function KennelPresentation(set, get, tag) {
     this.tag = $(tag);
@@ -141,16 +275,13 @@ PropertyExplorer.prototype.reload = function(traceTable) {
     this.tags.message.hide();
 }
 
-function KennelEditor(printError, setModel, getModel, setSettings, getSettings, blockTag, textTag, blocklyPath) {
+function KennelEditor(printError, model, blockTag, textTag, blocklyPath) {
     this.printError = printError;
-    this.setModel = setModel;
-    this.getModel = getModel;
-    this.setSettings = setSettings;
-    this.getSettings = getSettings;
+    this.model = model;
     this.converter = new PythonToBlocks();
     this.loadBlockly(blockTag, blocklyPath);
     this.loadText(textTag);
-    this.setMode(getSettings());
+    this.setMode(this.model.settings.editor);
 }
 
 KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
@@ -166,7 +297,9 @@ KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
     // Register model changer
     this.blockly.enableUndo();
     this.blockly.addChangeListener(function() {
-        editor.setModel(editor.getPythonFromBlocks());
+        if (editor.model.loaded) {
+            editor.model.set(editor.getPythonFromBlocks());
+        }
     });
     // Register window size changes for Blockly
     /*window.addEventListener('resize', function() {
@@ -204,14 +337,16 @@ KennelEditor.prototype.loadText = function(tag) {
                                       });
     var editor = this;
     this.text.on("change", function(cm, change) {
-        editor.setModel(editor.getPythonFromText());
+        if (editor.model.loaded) {
+            editor.model.set(editor.getPythonFromText());
+        }
     });
     // Ensure that it fills the editor area
     this.text.setSize(null, "100%");
 };
 
 KennelEditor.prototype.changeMode = function() {
-    if (this.getSettings() == "blocks") {
+    if (this.model.settings.editor == "blocks") {
         this.setMode("text");
     } else {
         this.setMode("blocks");
@@ -221,9 +356,9 @@ KennelEditor.prototype.changeMode = function() {
 KennelEditor.prototype.setMode = function(mode) {
     // Either update the model, or go with the model's
     if (mode === undefined) {
-        mode = this.getSettings();
+        mode = this.model.settings.editor;
     } else {
-        this.setSettings(mode);
+        this.model.settings.editor = mode;
     }
     // Hide and show elements based on model
     if (mode == 'text') {
@@ -264,19 +399,19 @@ KennelEditor.prototype.setPython = function(text) {
     if (text.trim().charAt(0) == "<") {
         var xml = Blockly.Xml.textToDom(text);
         this.setBlocksFromXml(xml);
-        if (this.getSettings() == 'text') {
+        if (this.model.settings.editor == 'text') {
             this.updateText();
         }
     } else {
         this.text.setValue(text);
-        if (this.getSettings() == 'blocks') {
+        if (this.model.settings.editor == 'blocks') {
             this.updateBlocks();
         }
     }
 }
 
 KennelEditor.prototype.updateText = function() {
-    var code = this.getModel();//this.getPythonFromBlocks();
+    var code = this.model.get();//this.getPythonFromBlocks();
     if (code == "") {
         this.text.setValue("\n");
     } else {
@@ -289,7 +424,7 @@ KennelEditor.prototype.updateBlocks = function() {
     var backupXml = this.getBlocksFromXml();
     try {
         // Try to convert it!
-        var code = this.getModel(); //this.text.getValue();
+        var code = this.model.get(); //this.text.getValue();
         if (code.trim().charAt(0) !== '<') {
             var result = this.converter.convertSource(code);
             code = result.xml;
@@ -299,7 +434,11 @@ KennelEditor.prototype.updateBlocks = function() {
         }
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
-        this.blockly.align();
+        if (this.model.settings.parsons) {
+            this.shuffle();
+        } else {
+            this.blockly.align();
+        }
     } catch (e) {
         this.printError(e);
         console.error(e);
@@ -520,14 +659,24 @@ KennelToolbar.prototype.hidePrograms = function() {
  * @constructor 
  */
 function Kennel(attachmentPoint, mode, presentation, current_code,
-                on_run, on_change, starting_code, instructor, view, blocklyPath) {
+                on_run, on_change, starting_code, instructor, view, blocklyPath,
+                parsons,
+                urls, questionProperties) {
     // User programs
     this.model = {
+        'loaded': false,
         "settings": {
             'editor': view,
             'instructor': instructor,
+            'parsons': parsons,
             'program': "__main__"
         },
+        "question": {
+            'question_id': questionProperties.question_id,
+            'student_id': questionProperties.student_id,
+            'context_id': questionProperties.book_id
+        },
+        'urls': urls,
         "programs": {
             "__main__": current_code,
             "on_run": on_run, 
@@ -537,6 +686,23 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
         "presentation": presentation,
     };
     
+    // Initialize the editor.
+    var model = this.model;
+    this.model.get = function() {
+        return kennel.model.programs[kennel.model.settings.program];
+    }
+    this.model.set = function(content) {
+        kennel.model.programs[kennel.model.settings.program] = content;
+        addDelay(model.question.question_id, function() {kennel.server.save()});
+    }
+    
+    this.model.load = function(content) {
+        kennel.model.programs['__main__'] = content;
+        if (kennel.editor !== undefined) {
+            kennel.editor.setPython(content);
+        }
+    }
+    
     // Default mode when you open the screen is instructor
     this.mode = mode;
     
@@ -545,6 +711,14 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
     
     this.loadMain();
     var kennel = this;
+    
+    // Add the Server connection
+    this.server = new KennelServer(this.model,
+                                   this,
+                                   function(message) {
+                                        return kennel.alert(message);
+                                    });
+    this.server.load();
     
     // Add the Feedback block (unused)
     this.feedback = new KennelFeedback(this.mainDiv.find('.kennel-feedback'));
@@ -568,20 +742,9 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
         kennel.mainDiv.find('.kennel-explorer')
     );
     
-    // Initialize the editor.
-    this.model.get = function() {
-        return kennel.model.programs[kennel.model.settings.program];
-    }
-    this.model.set = function(content) {
-        localStorage.setItem('__main__', content);
-        kennel.model.programs[kennel.model.settings.program] = content;
-    }
     this.editor = new KennelEditor(
         function(e) {kennel.printError(e); },
-        function(content) {  kennel.model.set(content); },
-        function() { return kennel.model.get(); },
-        function(new_editor) { kennel.model.settings.editor = new_editor; },
-        function() { return kennel.model.settings.editor; },
+        this.model,
         this.mainDiv.find('.kennel-blocks'),
         this.mainDiv.find('.kennel-text'),
         blocklyPath
@@ -600,24 +763,27 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
     
     // Add events to the toolbar
     this.activateToolbar();
-    
+
     this.changeProgram('__main__');
 };
 
 Kennel.prototype.activateToolbar = function() {
     var elements = this.toolbar.elements;
-    var kennel = this;
+    var kennel = this, server = this.server;
     // Editor mode
     elements.editor_mode.click(function() {
         if (kennel.model.settings.editor == "blocks") {
+            server.logEvent('editor', 'blocks');
             elements.editor_mode.html("<span class='glyphicon glyphicon-th'></span> Blocks");
         } else {
+            server.logEvent('editor', 'text');
             elements.editor_mode.html("<span class='glyphicon glyphicon-italic'></span> Text");
         }
         kennel.editor.changeMode();
     });
     // Instructor/Student/Grade mode
     elements.kennel_mode.click(function() {
+        server.logEvent('editor', 'mode');
         kennel.changeKennelMode();
     });
     if (!this.model.settings.instructor) {
@@ -625,10 +791,12 @@ Kennel.prototype.activateToolbar = function() {
     }
     // Run
     elements.run.click(function() {
+        server.logEvent('editor', 'run');
         kennel.run();
     });
     // Undo
     elements.undo.click(function() {
+        server.logEvent('editor', 'undo');
         if (kennel.model.settings.editor == 'blocks') {
             kennel.editor.blockly.undo();
         } else {
@@ -637,6 +805,7 @@ Kennel.prototype.activateToolbar = function() {
     });
     // Redo
     elements.redo.click(function() {
+        server.logEvent('editor', 'redo');
         if (kennel.model.settings.editor == 'blocks') {
             kennel.editor.blockly.redo();
         } else {
@@ -648,6 +817,7 @@ Kennel.prototype.activateToolbar = function() {
         right = kennel.mainDiv.find('.kennel-content-right');
     elements.wide.click(function() {
         if (elements.wide.attr("data-side") == "skinny") {
+            server.logEvent('editor', 'wide');
             // Make it skinny
             elements.wide.attr("data-side", "wide")
                          .html('<i class="fa fa-ellipsis-h"></i> Wide');
@@ -658,6 +828,7 @@ Kennel.prototype.activateToolbar = function() {
             right.removeClass('col-md-10 col-xs-10 col-md-offset-1 col-xs-offset-1');
             right.addClass('col-md-5 col-xs-5');
         } else {
+            server.logEvent('editor', 'skinny');
             // Make it wide
             elements.wide.attr("data-side", "skinny")
                          .html('<i class="fa fa-ellipsis-v"></i> Skinny');
@@ -675,14 +846,17 @@ Kennel.prototype.activateToolbar = function() {
     });
     // Reset code
     elements.reset.click(function() {
+        server.logEvent('editor', 'reset');
         kennel.setCode(kennel.model.programs.starting_code);
     });
     // Clear code
     elements.clear.click(function() {
+        server.logEvent('editor', 'clear');
         kennel.setCode("");
     });
     // Align blocks
     elements.align.click(function() {
+        server.logEvent('editor', 'align');
         kennel.editor.blockly.align();
     });
     // Change programs
@@ -744,13 +918,20 @@ Kennel.prototype.changeProgram = function(name) {
     this.toolbar.elements.programs.find("[data-name="+name+"]").click();
 }
 
+Kennel.prototype.alert = function(message) {
+    var box = this.mainDiv.find('.kennel-alert');
+    box.text(message).show();
+    return box;
+}
+
 Kennel.prototype.loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
         "<div class='row'>"+
             "<div class='kennel-content-left col-md-7 col-sm-7 alert alert-warning'>"+
+                '<span class="kennel-alert pull-right text-muted">Loading...</span>'+
                 "<fieldset>"+
-                    "<legend>BlockPy/Kennel/Silicon</legend>"+
+                    "<legend>BlockPy</legend>"+
                 "</fieldset>"+
                 "<div class='kennel-presentation'>"+
                     this.model.presentation+
@@ -877,7 +1058,11 @@ Kennel.prototype.printError = function(error) {
                 this.editor.highlightError(error.args.v[2]-1);
             } catch (e) {
             }
-            if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
+            if (error.constructor == Sk.builtin.NameError
+                && error.args.v.length > 0
+                && error.args.v[0].v == "name '___' is not defined") {
+                error = "<b>Error: </b> You have incomplete blocks. Make sure that you do not have any dangling blocks.<br><br><b>Extended Error Explanation:</b> If you look at the text view of your Python code, you'll see <code>___</code> in the code. The converter will create these <code>___</code> to show that you have a block that's missing a piece.";
+            } else if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
                 error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
             } else {
                 error = error.tp$str().v;
@@ -1116,7 +1301,7 @@ Kennel.prototype.getHighlightMap = function() {
  * Runs the given python code, resetting the console and Trace Table.
  */
 Kennel.prototype.run = function() {
-    this.editor.updateBlocks();
+    //this.editor.updateBlocks();
     var code = this.model.programs['__main__'];
     if (code.trim() == "") {
         this.printError("Your canvas is currently blank.");
@@ -1167,6 +1352,7 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
             function (module) {
                 var result = Sk.ffi.remapToJs(module.$d.result);
                 if (result === 1) {
+                    kennel.server.markSuccess();
                     kennel.feedback.success();
                 } else {
                     kennel.feedback.error(result);
@@ -1181,20 +1367,22 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
 }
 
 /**
- * @constructor
- * A class for managing delayed function calls so they combine
+ * Align the blocks in the workspace vertically.
  */
-function WaitQueue() {
-    this.timeout = null;
-}
-
-/**
- * Adds the function to the timeout queue. If there's already a function
- *  triggered to run, then it gets rid of it.
- */
-WaitQueue.prototype.add = function(aFunction, delay) {
-    if (this.timeout !== null) {
-        clearTimeout(this.timeout);
+KennelEditor.prototype.shuffle = function() {
+    var workspace = this.blockly;
+    var metrics = workspace.getMetrics();
+    var width = metrics.viewWidth / 2,
+        height = metrics.viewHeight;
+    var blocks = workspace.getTopBlocks(false);
+    var y = 5,
+        maximal_increase = height/blocks.length;
+    for (var i = 0; i < blocks.length; i++){
+        // Get a block
+        var block = blocks[i];
+        var properties = block.getRelativeToSurfaceXY();
+        block.moveBy(-properties.x+randomInteger(10, width), 
+                     -properties.y+y);
+        y = y + randomInteger(5, maximal_increase);
     }
-    this.timeout = window.setTimeout(aFunction, delay);
 }

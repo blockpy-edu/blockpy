@@ -1749,8 +1749,8 @@ var $builtinmodule = function(name) {
             throw new Sk.builtin.ValueError(
                 "Can not call show without any plot created.");
         }
-
-        Sk.console.printHtml(chart, 'Values');
+        var lines = plot._lines.map(function(elem) { return [elem._x, elem._y] })
+        Sk.console.printHtml(chart, lines);
         //$(Sk.matplotlibCanvas).show();
     };
     mod.show = new Sk.builtin.func(show_f);

@@ -160,6 +160,11 @@ post '/assessment', :provides => :json do
   end
 end
 
+post '/save' do
+  content_type :json
+  { :success => true, :code => "5"}.to_json
+end
+
 get '/tool_config.xml' do
   host = request.scheme + "://" + request.host_with_port
   url = (params['signature_proxy_test'] ? host + "/signature_test" : host + "/lti_tool")

@@ -50,7 +50,41 @@
     <!-- Converter -->
     <script type="text/javascript" src="converter/python_to_blockly.js"></script>
     
-    <!-- Analyzer -->
+    <!-- Useful snippets -->
+    <script>
+    var storage = {
+        set: function(directive, value) {
+            localStorage.setItem(directive+"_value", value);
+            localStorage.setItem(directive+"_timestamp", $.now());
+        },
+        remove: function(directive) {
+            localStorage.removeItem(directive+"_value");
+            localStorage.removeItem(directive+"_timestamp");
+        },
+        get: function(directive) {
+            return localStorage.getItem(directive+"_value");
+        },
+        has: function(directive) {
+            return localStorage.getItem(directive+"_value") !== null;
+        },
+        // Tests whether the server has the newer version
+        is_new: function(directive, server_time) {
+            var stored_time = localStorage.getItem(directive+"_timestamp");
+            return (server_time >= stored_time+5000);
+        },
+    };
+
+    var timers = {};
+    function addDelay(directive, action, delay) {
+        if (delay === undefined) {
+            delay = 400;
+        }
+        clearTimeout(timers[directive]);
+        timers[directive] = setTimeout(action, delay);
+    }
+    </script>
+    
+    <!-- Kennel -->
     <script type="text/javascript" src="kennel/kennel.js"></script>
     
     <!-- Renderer -->
@@ -89,6 +123,7 @@ function getQueryParams(){
 }
 $(document).ready(function() {
     var params = getQueryParams();
+    var body;
     if (localStorage.getItem('__main__') === null) {
         body = $("#default-body").text();
     } else {
@@ -114,6 +149,12 @@ $(document).ready(function() {
             mode = "instructor";
         }
     } 
+    var parsons = false;
+    if ("parsons" in params) {
+        if (params["parsons"] == "true") {
+            parsons = true;
+        }
+    }
     kennel = new Kennel(document.getElementById('kennel-div'),
                         mode, // Instructor mode
                         $("#problem-presentation").text(), // problem
@@ -123,8 +164,16 @@ $(document).ready(function() {
                         "alpha = 0", // Starting code
                         mode == "instructor",
                         view,
-                        'blockly/'
-                        );
+                        'blockly/',
+                        parsons,
+                        { 'save_code': 'save',
+                          'load_code': '',
+                          'save_success': '',
+                          'load_success': '',
+                          'log_event': ''},
+                        { 'question_id': 'cw-1-blockly',
+                          'student_id': 1,
+                          'book_id': 'compthink'});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
     }

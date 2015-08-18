@@ -43,7 +43,7 @@ Blockly.Python['controls_repeat'] = function(block) {
 Blockly.Python['controls_repeat_ext'] = function(block) {
   // Repeat n times (external number).
   var repeats = Blockly.Python.valueToCode(block, 'TIMES',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   if (Blockly.isNumber(repeats)) {
     repeats = parseInt(repeats, 10);
   } else {
@@ -63,7 +63,7 @@ Blockly.Python['controls_whileUntil'] = function(block) {
   var until = block.getFieldValue('MODE') == 'UNTIL';
   var argument0 = Blockly.Python.valueToCode(block, 'BOOL',
       until ? Blockly.Python.ORDER_LOGICAL_NOT :
-      Blockly.Python.ORDER_NONE) || 'False';
+      Blockly.Python.ORDER_NONE) || '___';
   var branch = Blockly.Python.statementToCode(block, 'DO');
   branch = Blockly.Python.addLoopTrap(branch, block.id) ||
       Blockly.Python.PASS;
@@ -76,7 +76,7 @@ Blockly.Python['controls_whileUntil'] = function(block) {
 Blockly.Python['controls_while'] = function(block) {
   // Do while/until loop.
   var argument0 = Blockly.Python.valueToCode(block, 'BOOL',
-      Blockly.Python.ORDER_NONE) || 'False';
+      Blockly.Python.ORDER_NONE) || '___';
   var branch = Blockly.Python.statementToCode(block, 'DO');
   branch = Blockly.Python.addLoopTrap(branch, block.id) ||
       Blockly.Python.PASS;
@@ -88,11 +88,11 @@ Blockly.Python['controls_for'] = function(block) {
   var variable0 = Blockly.Python.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   var argument0 = Blockly.Python.valueToCode(block, 'FROM',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var argument1 = Blockly.Python.valueToCode(block, 'TO',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var increment = Blockly.Python.valueToCode(block, 'BY',
-      Blockly.Python.ORDER_NONE) || '1';
+      Blockly.Python.ORDER_NONE) || '___';
   var branch = Blockly.Python.statementToCode(block, 'DO');
   branch = Blockly.Python.addLoopTrap(branch, block.id) ||
       Blockly.Python.PASS;
@@ -204,7 +204,7 @@ Blockly.Python['controls_forEach'] = function(block) {
   var variable0 = Blockly.Python.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   var argument0 = Blockly.Python.valueToCode(block, 'LIST',
-      Blockly.Python.ORDER_RELATIONAL) || '[]';
+      Blockly.Python.ORDER_RELATIONAL) || '___';
   var branch = Blockly.Python.statementToCode(block, 'DO');
   branch = Blockly.Python.addLoopTrap(branch, block.id) ||
       Blockly.Python.PASS;

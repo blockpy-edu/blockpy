@@ -33,13 +33,13 @@ Blockly.Python['controls_if'] = function(block) {
   // If/elseif/else condition.
   var n = 0;
   var argument = Blockly.Python.valueToCode(block, 'IF' + n,
-      Blockly.Python.ORDER_NONE) || 'False';
+      Blockly.Python.ORDER_NONE) || '___';
   var branch = Blockly.Python.statementToCode(block, 'DO' + n) ||
       Blockly.Python.PASS;
   var code = 'if ' + argument + ':\n' + branch;
   for (n = 1; n <= block.elseifCount_; n++) {
     argument = Blockly.Python.valueToCode(block, 'IF' + n,
-        Blockly.Python.ORDER_NONE) || 'False';
+        Blockly.Python.ORDER_NONE) || '___';
     branch = Blockly.Python.statementToCode(block, 'DO' + n) ||
         Blockly.Python.PASS;
     code += 'elif ' + argument + ':\n' + branch;
@@ -64,8 +64,8 @@ Blockly.Python['logic_compare'] = function(block) {
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = Blockly.Python.ORDER_RELATIONAL;
-  var argument0 = Blockly.Python.valueToCode(block, 'A', order) || '0';
-  var argument1 = Blockly.Python.valueToCode(block, 'B', order) || '0';
+  var argument0 = Blockly.Python.valueToCode(block, 'A', order) || '___';
+  var argument1 = Blockly.Python.valueToCode(block, 'B', order) || '___';
   var code = argument0 + ' ' + operator + ' ' + argument1;
   return [code, order];
 };
@@ -79,11 +79,11 @@ Blockly.Python['logic_operation'] = function(block) {
   var argument1 = Blockly.Python.valueToCode(block, 'B', order);
   if (!argument0 && !argument1) {
     // If there are no arguments, then the return value is false.
-    argument0 = 'False';
-    argument1 = 'False';
+    argument0 = '___';
+    argument1 = '___';
   } else {
     // Single missing arguments have no effect on the return value.
-    var defaultArgument = (operator == 'and') ? 'True' : 'False';
+    var defaultArgument = (operator == 'and') ? '___' : '___';
     if (!argument0) {
       argument0 = defaultArgument;
     }
@@ -98,7 +98,7 @@ Blockly.Python['logic_operation'] = function(block) {
 Blockly.Python['logic_negate'] = function(block) {
   // Negation.
   var argument0 = Blockly.Python.valueToCode(block, 'BOOL',
-      Blockly.Python.ORDER_LOGICAL_NOT) || 'True';
+      Blockly.Python.ORDER_LOGICAL_NOT) || '___';
   var code = 'not ' + argument0;
   return [code, Blockly.Python.ORDER_LOGICAL_NOT];
 };
@@ -117,11 +117,11 @@ Blockly.Python['logic_null'] = function(block) {
 Blockly.Python['logic_ternary'] = function(block) {
   // Ternary operator.
   var value_if = Blockly.Python.valueToCode(block, 'IF',
-      Blockly.Python.ORDER_CONDITIONAL) || 'False';
+      Blockly.Python.ORDER_CONDITIONAL) || '___';
   var value_then = Blockly.Python.valueToCode(block, 'THEN',
-      Blockly.Python.ORDER_CONDITIONAL) || 'None';
+      Blockly.Python.ORDER_CONDITIONAL) || '___';
   var value_else = Blockly.Python.valueToCode(block, 'ELSE',
-      Blockly.Python.ORDER_CONDITIONAL) || 'None';
+      Blockly.Python.ORDER_CONDITIONAL) || '___';
   var code = value_then + ' if ' + value_if + ' else ' + value_else;
   return [code, Blockly.Python.ORDER_CONDITIONAL];
 };
@@ -130,8 +130,8 @@ Blockly.Python['logic_isIn'] = function(block) {
   // Operations 'in', 'not in'.
   var operator = (block.getFieldValue('OP') == 'IN') ? 'in' : 'not in';
   var order = Blockly.Python.ORDER_RELATIONAL;
-  var argument0 = Blockly.Python.valueToCode(block, 'ITEM', order) || 'None';
-  var argument1 = Blockly.Python.valueToCode(block, 'LIST', order) || '[]';
+  var argument0 = Blockly.Python.valueToCode(block, 'ITEM', order) || '___';
+  var argument1 = Blockly.Python.valueToCode(block, 'LIST', order) || '___';
   var code = argument0 + ' ' + operator + ' ' + argument1;
   return [code, order];
 };

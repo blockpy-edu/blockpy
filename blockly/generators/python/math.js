@@ -52,8 +52,8 @@ Blockly.Python['math_arithmetic'] = function(block) {
   var tuple = OPERATORS[block.getFieldValue('OP')];
   var operator = tuple[0];
   var order = tuple[1];
-  var argument0 = Blockly.Python.valueToCode(block, 'A', order) || '0';
-  var argument1 = Blockly.Python.valueToCode(block, 'B', order) || '0';
+  var argument0 = Blockly.Python.valueToCode(block, 'A', order) || '___';
+  var argument1 = Blockly.Python.valueToCode(block, 'B', order) || '___';
   var code = argument0 + operator + argument1;
   return [code, order];
   // In case of 'DIVIDE', division between integers returns different results
@@ -71,16 +71,16 @@ Blockly.Python['math_single'] = function(block) {
   if (operator == 'NEG') {
     // Negation is a special case given its different operator precedence.
     var code = Blockly.Python.valueToCode(block, 'NUM',
-        Blockly.Python.ORDER_UNARY_SIGN) || '0';
+        Blockly.Python.ORDER_UNARY_SIGN) || '___';
     return ['-' + code, Blockly.Python.ORDER_UNARY_SIGN];
   }
   Blockly.Python.definitions_['import_math'] = 'import math';
   if (operator == 'SIN' || operator == 'COS' || operator == 'TAN') {
     arg = Blockly.Python.valueToCode(block, 'NUM',
-        Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
+        Blockly.Python.ORDER_MULTIPLICATIVE) || '___';
   } else {
     arg = Blockly.Python.valueToCode(block, 'NUM',
-        Blockly.Python.ORDER_NONE) || '0';
+        Blockly.Python.ORDER_NONE) || '___';
   }
   // First, handle cases which generate values that don't need parentheses
   // wrapping the code.
@@ -165,7 +165,7 @@ Blockly.Python['math_number_property'] = function(block) {
   // Check if a number is even, odd, prime, whole, positive, or negative
   // or if it is divisible by certain number. Returns true or false.
   var number_to_check = Blockly.Python.valueToCode(block, 'NUMBER_TO_CHECK',
-      Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
+      Blockly.Python.ORDER_MULTIPLICATIVE) || '___';
   var dropdown_property = block.getFieldValue('PROPERTY');
   var code;
   if (dropdown_property == 'PRIME') {
@@ -226,7 +226,7 @@ Blockly.Python['math_number_property'] = function(block) {
 Blockly.Python['math_change'] = function(block) {
   // Add to a variable in place.
   var argument0 = Blockly.Python.valueToCode(block, 'DELTA',
-      Blockly.Python.ORDER_ADDITIVE) || '0';
+      Blockly.Python.ORDER_ADDITIVE) || '___';
   var varName = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
       Blockly.Variables.NAME_TYPE);
   return varName + ' = (' + varName + ' if type(' + varName +
@@ -242,7 +242,7 @@ Blockly.Python['math_on_list'] = function(block) {
   // Math functions for lists.
   var func = block.getFieldValue('OP');
   var list = Blockly.Python.valueToCode(block, 'LIST',
-      Blockly.Python.ORDER_NONE) || '[]';
+      Blockly.Python.ORDER_NONE) || '___';
   var code;
   switch (func) {
     case 'SUM':
@@ -334,9 +334,9 @@ Blockly.Python['math_on_list'] = function(block) {
 Blockly.Python['math_modulo'] = function(block) {
   // Remainder computation.
   var argument0 = Blockly.Python.valueToCode(block, 'DIVIDEND',
-      Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
+      Blockly.Python.ORDER_MULTIPLICATIVE) || '___';
   var argument1 = Blockly.Python.valueToCode(block, 'DIVISOR',
-      Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
+      Blockly.Python.ORDER_MULTIPLICATIVE) || '___';
   var code = argument0 + ' % ' + argument1;
   return [code, Blockly.Python.ORDER_MULTIPLICATIVE];
 };
@@ -344,11 +344,11 @@ Blockly.Python['math_modulo'] = function(block) {
 Blockly.Python['math_constrain'] = function(block) {
   // Constrain a number between two limits.
   var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var argument1 = Blockly.Python.valueToCode(block, 'LOW',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var argument2 = Blockly.Python.valueToCode(block, 'HIGH',
-      Blockly.Python.ORDER_NONE) || 'float(\'inf\')';
+      Blockly.Python.ORDER_NONE) || '___';
   var code = 'min(max(' + argument0 + ', ' + argument1 + '), ' +
       argument2 + ')';
   return [code, Blockly.Python.ORDER_FUNCTION_CALL];
@@ -358,9 +358,9 @@ Blockly.Python['math_random_int'] = function(block) {
   // Random integer between [X] and [Y].
   Blockly.Python.definitions_['import_random'] = 'import random';
   var argument0 = Blockly.Python.valueToCode(block, 'FROM',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var argument1 = Blockly.Python.valueToCode(block, 'TO',
-      Blockly.Python.ORDER_NONE) || '0';
+      Blockly.Python.ORDER_NONE) || '___';
   var code = 'random.randint(' + argument0 + ', ' + argument1 + ')';
   return [code, Blockly.Python.ORDER_FUNCTION_CALL];
 };

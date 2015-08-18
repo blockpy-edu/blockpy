@@ -43,21 +43,21 @@ Blockly.Python['text_join'] = function(block) {
     return ['\'\'', Blockly.Python.ORDER_ATOMIC];
   } else if (block.itemCount_ == 1) {
     var argument0 = Blockly.Python.valueToCode(block, 'ADD0',
-        Blockly.Python.ORDER_NONE) || '\'\'';
+        Blockly.Python.ORDER_NONE) || '___';
     code = 'str(' + argument0 + ')';
     return [code, Blockly.Python.ORDER_FUNCTION_CALL];
   } else if (block.itemCount_ == 2) {
     var argument0 = Blockly.Python.valueToCode(block, 'ADD0',
-        Blockly.Python.ORDER_NONE) || '\'\'';
+        Blockly.Python.ORDER_NONE) || '___';
     var argument1 = Blockly.Python.valueToCode(block, 'ADD1',
-        Blockly.Python.ORDER_NONE) || '\'\'';
+        Blockly.Python.ORDER_NONE) || '___';
     var code = 'str(' + argument0 + ') + str(' + argument1 + ')';
     return [code, Blockly.Python.ORDER_UNARY_SIGN];
   } else {
     var code = [];
     for (var n = 0; n < block.itemCount_; n++) {
       code[n] = Blockly.Python.valueToCode(block, 'ADD' + n,
-          Blockly.Python.ORDER_NONE) || '\'\'';
+          Blockly.Python.ORDER_NONE) || '___';
     }
     var tempVar = Blockly.Python.variableDB_.getDistinctName('temp_value',
         Blockly.Variables.NAME_TYPE);
@@ -72,21 +72,21 @@ Blockly.Python['text_append'] = function(block) {
   var varName = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
       Blockly.Variables.NAME_TYPE);
   var argument0 = Blockly.Python.valueToCode(block, 'TEXT',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   return varName + ' = str(' + varName + ') + str(' + argument0 + ')\n';
 };
 
 Blockly.Python['text_length'] = function(block) {
   // String length.
   var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   return ['len(' + argument0 + ')', Blockly.Python.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Python['text_isEmpty'] = function(block) {
   // Is the string null?
   var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   var code = 'not len(' + argument0 + ')';
   return [code, Blockly.Python.ORDER_LOGICAL_NOT];
 };
@@ -96,9 +96,9 @@ Blockly.Python['text_indexOf'] = function(block) {
   // Should we allow for non-case sensitive???
   var operator = block.getFieldValue('END') == 'FIRST' ? 'find' : 'rfind';
   var argument0 = Blockly.Python.valueToCode(block, 'FIND',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   var argument1 = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_MEMBER) || '\'\'';
+      Blockly.Python.ORDER_MEMBER) || '___';
   var code = argument1 + '.' + operator + '(' + argument0 + ') + 1';
   return [code, Blockly.Python.ORDER_MEMBER];
 };
@@ -110,7 +110,7 @@ Blockly.Python['text_charAt'] = function(block) {
   var at = Blockly.Python.valueToCode(block, 'AT',
       Blockly.Python.ORDER_UNARY_SIGN) || '1';
   var text = Blockly.Python.valueToCode(block, 'VALUE',
-      Blockly.Python.ORDER_MEMBER) || '\'\'';
+      Blockly.Python.ORDER_MEMBER) || '___';
   switch (where) {
     case 'FIRST':
       var code = text + '[0]';
@@ -148,7 +148,7 @@ Blockly.Python['text_charAt'] = function(block) {
 Blockly.Python['text_getSubstring'] = function(block) {
   // Get substring.
   var text = Blockly.Python.valueToCode(block, 'STRING',
-      Blockly.Python.ORDER_MEMBER) || '\'\'';
+      Blockly.Python.ORDER_MEMBER) || '___';
   var where1 = block.getFieldValue('WHERE1');
   var where2 = block.getFieldValue('WHERE2');
   var at1 = Blockly.Python.valueToCode(block, 'AT1',
@@ -208,7 +208,7 @@ Blockly.Python['text_changeCase'] = function(block) {
   };
   var operator = OPERATORS[block.getFieldValue('CASE')];
   var argument0 = Blockly.Python.valueToCode(block, 'TEXT',
-      Blockly.Python.ORDER_MEMBER) || '\'\'';
+      Blockly.Python.ORDER_MEMBER) || '___';
   var code = argument0 + operator;
   return [code, Blockly.Python.ORDER_MEMBER];
 };
@@ -222,7 +222,7 @@ Blockly.Python['text_trim'] = function(block) {
   };
   var operator = OPERATORS[block.getFieldValue('MODE')];
   var argument0 = Blockly.Python.valueToCode(block, 'TEXT',
-      Blockly.Python.ORDER_MEMBER) || '\'\'';
+      Blockly.Python.ORDER_MEMBER) || '___';
   var code = argument0 + operator;
   return [code, Blockly.Python.ORDER_MEMBER];
 };
@@ -230,7 +230,7 @@ Blockly.Python['text_trim'] = function(block) {
 Blockly.Python['text_print'] = function(block) {
   // Print statement.
   var argument0 = Blockly.Python.valueToCode(block, 'TEXT',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   return 'print(' + argument0 + ')\n';
 };
 
@@ -262,7 +262,7 @@ Blockly.Python['text_prompt_ext'] = function(block) {
        '  except NameError:',
        '    return input(msg)']);
   var msg = Blockly.Python.valueToCode(block, 'TEXT',
-      Blockly.Python.ORDER_NONE) || '\'\'';
+      Blockly.Python.ORDER_NONE) || '___';
   var code = functionName + '(' + msg + ')';
   var toNumber = block.getFieldValue('TYPE') == 'NUMBER';
   if (toNumber) {
@@ -276,13 +276,13 @@ Blockly.Python['text_print_multiple'] = function(block) {
   var inner_prints = new Array(block.itemCount_);
   for (var n = 0; n < block.itemCount_; n++) {
     inner_prints[n] = Blockly.Python.valueToCode(block, 'PRINT' + n,
-        Blockly.Python.ORDER_NONE) || 'None';
+        Blockly.Python.ORDER_NONE) || '___';
   }
   var code;
   if (block.itemCount_ == 1) {
       code = 'print(' + inner_prints.join(', ') + ')\n';
   } else {
-      code = 'print ' + inner_prints.join(', ') + ' \n';
+      code = 'print(' + inner_prints.join(', ') + ')\n';
   }
   return code;
 };
