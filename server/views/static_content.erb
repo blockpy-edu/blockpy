@@ -92,18 +92,6 @@
     
 </head>
 
-<body>
-<div id="kennel-div" style='height:100%'></div>
-
-<div class='row'>
-    <div class='col-md-3 col-sm-3 col-xs-3'>
-        <img src='images/blockly-corgi-logo.png'  class='img-responsive' />
-    </div>
-    <div class='col-md-9 col-sm-9 col-xs-9'>
-        The tool above is from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>. Help us think of a name for it! 
-    </div>
-</div>
-
 <script>
 function getQueryParams(){
     try{
@@ -167,7 +155,7 @@ $(document).ready(function() {
                         'blockly/',
                         parsons,
                         { 'save_code': 'save',
-                          'load_code': '',
+                          'load_code': 'load',
                           'save_success': '',
                           'load_success': '',
                           'log_event': ''},
@@ -176,9 +164,21 @@ $(document).ready(function() {
                           'book_id': 'compthink'});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
-    }
+    }    
   });
 </script>
+
+<body>
+<div id="kennel-div" style='height:100%'></div>
+
+<div class='row'>
+    <div class='col-md-3 col-sm-3 col-xs-3'>
+        <img src='images/blockly-corgi-logo.png'  class='img-responsive' />
+    </div>
+    <div class='col-md-9 col-sm-9 col-xs-9'>
+        BlockPy from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>.
+    </div>
+</div>
 <pre id='problem-presentation' style='display:none'>
 <%= @problem_presentation %>
 </pre>

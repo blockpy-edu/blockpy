@@ -152,6 +152,12 @@ Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
 
   // Cached width is obsolete.  Clear it.
   this.size_.width = 0;
+  
+  var that = this;
+  this.fixAfterLoad = setTimeout(function() {
+    that.render_();
+    that.sourceBlock_.render();
+  }, 0);
 };
 
 /**

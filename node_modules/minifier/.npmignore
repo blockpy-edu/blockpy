@@ -1,6 +1,0 @@
-node_modules
-*min.js
-*min.css
-test
-prepareManualTests.js
-runAllTests.js

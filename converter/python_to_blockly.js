@@ -24,7 +24,7 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
         xml.appendChild(raw_block(python_source))
         return {"xml": xmlToString(xml), "error": error};
     }
-    this.measureNode(ast);   
+    this.measureNode(ast);
     var converted = this.convert(ast);
     if (converted !== null) {
         for (var block = 0; block < converted.length; block+= 1) {
@@ -223,13 +223,47 @@ PythonToBlocks.prototype.convert = function(node, is_top_level) {
     return this[node.constructor.name](node, is_top_level);
 }
 
+function arrayMax(array) {
+  return array.reduce(function(a, b) {
+    return Math.max(a, b);
+  });
+}
+
+function arrayMin(array) {
+  return array.reduce(function(a, b) {
+    return Math.min(a, b);
+  });
+}
+
 PythonToBlocks.prototype.convertStatement = function(node, full_source, is_top_level) {
     try {
         return this.convert(node, is_top_level);
     } catch (e) {
         console.error(e);
-        return raw_block(full_source);
+        heights = this.getChunkHeights(node);
+        extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
+        return raw_block(extractedSource);
     }
+}
+
+PythonToBlocks.prototype.getChunkHeights = function(node) {
+    var lineNumbers = [];
+    if (node.hasOwnProperty("lineno")) {
+        lineNumbers.push(node.lineno);
+    }
+    if (node.hasOwnProperty("body")) {
+        for (var i = 0; i < node.body.length; i += 1) {
+            var subnode = node.body[i];
+            lineNumbers = lineNumbers.concat(this.getChunkHeights(subnode));
+        }
+    }
+    if (node.hasOwnProperty("orelse")) {
+        for (var i = 0; i < node.orelse.length; i += 1) {
+            var subnode = node.orelse[i];
+            lineNumbers = lineNumbers.concat(this.getChunkHeights(subnode));
+        }
+    }
+    return lineNumbers;
 }
 
 /* ----- Nodes ---- */

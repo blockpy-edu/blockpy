@@ -80,6 +80,7 @@ def html(filename)
   end
 end
 
+# <a href="/tool_config.xml?signature_proxy_test=1">Signature Test Config</a>
 post '/signature_test' do
   erb :proxy_setup
 end
@@ -161,6 +162,11 @@ post '/assessment', :provides => :json do
 end
 
 post '/save' do
+  content_type :json
+  { :success => true, :code => "5"}.to_json
+end
+
+post '/load' do
   content_type :json
   { :success => true, :code => "5"}.to_json
 end
