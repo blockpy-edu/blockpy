@@ -52,4 +52,3 @@ Overview
             init
             rebuild blockly|skulpt|all
         
-Silicon.inject(
