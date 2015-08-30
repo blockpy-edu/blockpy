@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Add Problem</title>
+</head>
+<body>
+
+<form action="{{ url_for('grade') }}" method="post" name="login">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.p1(readonly=true) }} +
+        {{ form.p2(readonly=true) }} =
+        {{ form.result(readonly=true) }}
+    </p>
+    Is correct? {{ form.correct(readonly=true) }}
+    <a href="{{ url_for('add_form') }}">New Problem</a>
+</form>
+
+</body>
+</html>
