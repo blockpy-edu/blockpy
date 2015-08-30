@@ -1,0 +1,27 @@
+{
+  "name": "MIT Flask LTI Provider",
+  "description": "This is a sample LTI provider for the Flask framework. It is a minimal implementation that provides a starting point.",
+  "keywords": [
+    "flask",
+    "LTI",
+    "Learning Tools Interoperability",
+    "Open edX"
+  ],
+  "website": "http://mit-lti-flask-example.readthedocs.org/en/latest/",
+  "repository": "https://github.com/mitodl/mit_lti_flask_sample",
+  "success_url": "/is_up",
+  "env": {
+    "FLASK_SECRET_KEY": {
+      "description": "The standard flask secret key for session storage security",
+      "generator": "secret"
+    },
+    "CONSUMER_KEY_SECRET": {
+      "description": "OAuth1 Secret for LTI authentication to match `__consumer_key__` consumer name",
+      "generator": "secret"
+    },
+    "CONSUMER_KEY_PEM_FILE": {
+      "description": "If you need to do SSL authentication on top of regular OAUTH, paste in your plain text base64 encoded SSL certificate and private key",
+      "required": false
+    }
+  }
+}
