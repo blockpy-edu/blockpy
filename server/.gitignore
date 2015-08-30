@@ -1,4 +1,6 @@
 certs/
+secrets.json
+consumer_key.pem
 
 *.class
 

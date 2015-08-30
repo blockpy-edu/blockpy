@@ -1,48 +1,48 @@
 """
-Configuration file for flask application
+Flask Configuration File
+
+Checks for a "secrets.json" file and uses that to add in private settings such as Secret Key.
 """
 import os
+import json
 
+try:
+    with open('secrets.json', 'r') as secret_file:
+        secrets = json.load(secret_file)
+except IOError:
+    print("No secrets file found. Using insecure defaults.")
+    secrets = {}
 
-# enable CSRF
-WTF_CSRF_ENABLED = True
-
-# secret key for authentication
-SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "you-will-never-guess")
-
-# Sample client certificate example for 12 factor app
-# You would want to store your entire pem in an environment variable
-# with something like:
-# ```
-# export CONSUMER_KEY_CERT=$(cat <<EOF
-# < paste cert here>
-# EOF
-# )
-# ```
-
-
-
-CONSUMER_KEY_PEM_FILE = os.path.abspath('consumer_key.pem')
-with open(CONSUMER_KEY_PEM_FILE, 'w') as wfile:
-    wfile.write(os.environ.get('CONSUMER_KEY_CERT', ''))
-
-PYLTI_CONFIG = {
-    "consumers": {
-        "__consumer_key__": {
-            "secret": os.environ.get("CONSUMER_KEY_SECRET", "__lti_secret__"),
-            "cert": CONSUMER_KEY_PEM_FILE
+class Config(object):
+    DEBUG = False
+    TESTING = False
+    CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = True
+    SITE_NAME = 'BlockPy'
+    SYS_ADMINS = ['acbart@vt.edu']
+    
+    # secret key for flask authentication
+    SECRET_KEY = secrets.get('FLASK_SECRET_KEY', 'flask-secret-key')
+    
+    PYLTI_CONFIG = {
+        "consumers": {
+            secrets.get("CONSUMER_KEY", "__consumer_key__"): {
+                "secret": secrets.get("CONSUMER_KEY_SECRET", "__lti_secret__"),
+                "cert": secrets.get("CONSUMER_KEY_PEM_FILE", "consumer_key.pem")
+            }
         }
     }
-}
 
-# Remap URL to fix edX's misrepresentation of https protocol.
-# You can add another dict entry if you have trouble with the
-# PyLti URL.
-PYLTI_URL_FIX = {
-    "https://localhost:8000/": {
-        "https://localhost:8000/": "http://localhost:8000/"
-    },
-    "https://localhost/": {
-        "https://localhost/": "http://192.168.33.10/"
-    }
-}
+    
+class ProductionConfig(Config):
+    DEBUG = False
+    PORT = 5000
+    #SITE_ROOT_URL = 'think.cs.vt.edu/blockpy'
+    SQLALCHEMY_DATABASE_URI = 'mysql://compthink:runestone@127.0.0.1/blockpy'
+    
+class TestingConfig(Config):
+    TESTING = True
+    PORT = 5001
+    HOST = 'localhost'
+    SITE_ROOT_URL = 'localhost:5001'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
