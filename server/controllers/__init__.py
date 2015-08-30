@@ -20,11 +20,12 @@ def shutdown():
 
 @app.before_request
 def load_user():
-    if current_user.is_authenticated():
-        g.user = current_user
-        #log_page_access()
-    else:
-        g.user = None
+    pass #g.user = current_user
+    #if current_user.is_authenticated():
+    #    g.user = current_user
+    #    #log_page_access()
+    #else:
+    #    g.user = None
 
 from teachers import teachers
 app.register_blueprint(teachers)
