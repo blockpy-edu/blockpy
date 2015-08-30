@@ -17,6 +17,8 @@ Pull changes from upstream repos:
     > git subtree pull --prefix=skulpt --squash skulpt_upstream master
     > git subtree pull --prefix=blockly --squash blockly_upstream master
     > git subtree pull --prefix=server --squash server master
+    
+Note: if you get an error about a "fatal entry", make sure you don't have a trailing slash on the prefix!
 
 
 Blockly
