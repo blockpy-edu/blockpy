@@ -599,12 +599,12 @@ function KennelToolbar(tag) {
         'undo': $("<button></button>")
                             .addClass('btn btn-default kennel-toolbar-undo')
                             .attr("role", "group")
-                            .html('<i class="fa fa-undo"></i> Undo')
+                            .html('<i class="fa fa-undo"></i>')
                             .appendTo(doGroup),
         'redo': $("<button></button>")
                             .addClass('btn btn-default kennel-toolbar-redo')
                             .attr("role", "group")
-                            .html('<i class="fa fa-repeat"></i> Redo')
+                            .html('<i class="fa fa-repeat"></i>')
                             .appendTo(doGroup),
         'align': $("<button></button>")
                             .addClass('btn btn-default kennel-toolbar-align')

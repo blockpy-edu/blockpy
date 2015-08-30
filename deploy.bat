@@ -1,4 +1,4 @@
-set outputdir=C:\Users\acbart\Projects\blockpy\server\public
+set outputdir=C:\Users\acbart\Projects\blockpy\server\static
 
 mkdir %outputdir%\analyzer\
 copy analyzer\* %outputdir%\analyzer\
