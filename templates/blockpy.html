@@ -2,53 +2,16 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Blockpy/Kennel/Silicon</title>
+    <title>BlockPy</title>
     
     <!-- Style sheets -->
-    <link rel="stylesheet" href="libs/bootstrap.min.css">
-    <link rel="stylesheet" href="libs/codemirror/codemirror.css">
-    <link rel="stylesheet" href="libs/font-awesome.min.css">
-    <link rel="stylesheet" href="libs/summernote/summernote.css">
-    <link rel="stylesheet" href="kennel/kennel.css">
-    
-    <!-- JQuery, D3, Math.js, Bootstrap -->
-    <script type="text/javascript" src="libs/jquery.js"></script>
-    <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
-    <script type="text/javascript" src="libs/d3.min.js"></script>
-    <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
-    <script type="text/javascript" src="libs/bootstrap.min.js"></script>
-    <script type="text/javascript" src="libs/bootstrap-wysiwyg.js"></script>
-    <script type="text/javascript" src="libs/mindmup-editabletable.js"></script>
-    <script type="text/javascript" src="libs/codemirror/codemirror.js"></script>
-    <script type="text/javascript" src="libs/codemirror/python.js"></script>
-    <script type="text/javascript" src="libs/codemirror/htmlmixed.js"></script>
-    <script type="text/javascript" src="libs/codemirror/xml.js"></script>
-    
-    <!-- Summernote, a rich text editor -->
-    <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
-    <script type="text/javascript" src="libs/summernote/summernote-ext-hint.js"></script>
-    <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
-    
-    <!-- Datasets -->
-    <script type="text/javascript" src="libs/crime_data.js"></script>
-    
-    <!-- Blockly -->
-    <script type="text/javascript" src="blockly/blockly_compressed.js"></script>
-    <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
-    <script type="text/javascript" src="blockly/python_compressed.js"></script>
-    <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
-    <script type="text/javascript" src="blockly/msg/js/en.js"></script>
-    
-    <!-- Skulpt -->
-    <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
-    <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
-    
-    <!-- Analyzer -->
-    <script type="text/javascript" src="analyzer/analyzer.js"></script>
-    <script type="text/javascript" src="analyzer/python_errors.js"></script>
-    
-    <!-- Converter -->
-    <script type="text/javascript" src="converter/python_to_blockly.js"></script>
+    {% for css in ['libs/bootstrap.min.css',
+                   'libs/codemirror/codemirror.css',
+                   'libs/font-awesome.min.css',
+                   'libs/summernote/summernote.css',
+                   'kennel/kennel.css'] %}
+        <link rel="stylesheet" href="{{ url_for('static', filename=css) }}">
+    {% endfor %}
     
     <!-- Useful snippets -->
     <script>
@@ -84,11 +47,37 @@
     }
     </script>
     
-    <!-- Kennel -->
-    <script type="text/javascript" src="kennel/kennel.js"></script>
-    
-    <!-- Renderer -->
-    <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
+    <!-- JQuery, D3, Math.js, Bootstrap -->
+    {% for js in ['libs/jquery.js',
+                   'libs/jquery.hotkeys.js',
+                   'libs/d3.min.js',
+                   'libs/math.0.19.0.min.js',
+                   'libs/bootstrap.min.js',
+                   'libs/bootstrap-wysiwyg.js',
+                   "libs/mindmup-editabletable.js",
+                   "libs/codemirror/codemirror.js",
+                   "libs/codemirror/python.js",
+                   "libs/codemirror/htmlmixed.js",
+                   "libs/codemirror/xml.js",
+                   "libs/summernote/summernote.min.js",
+                   "libs/summernote/summernote-ext-hint.js",
+                   "libs/summernote/summernote-ext-video.js",
+                   "libs/crime_data.js",
+                   "blockly/blockly_compressed.js",
+                   "blockly/blocks_compressed.js",
+                   "blockly/python_compressed.js",
+                   "blockly/javascript_compressed.js",
+                   "blockly/msg/js/en.js",
+                   "skulpt/dist/skulpt.min.js",
+                   "skulpt/dist/skulpt-stdlib.js",
+                   "analyzer/analyzer.js",
+                   "analyzer/python_errors.js",
+                   "converter/python_to_blockly.js",
+                   "kennel/kennel.js",
+                   "converter/renderBlocklyToPng.js"
+                   ] %}
+    <script type="text/javascript" src="{{ url_for('static', filename=js) }}"></script>
+    {% endfor %}
     
 </head>
 
@@ -152,12 +141,12 @@ $(document).ready(function() {
                         "alpha = 0", // Starting code
                         mode == "instructor",
                         view,
-                        'blockly/',
+                        "{{ url_for('static', filename='blockly/') }}",
                         parsons,
-                        { 'save_code': 'save',
-                          'load_code': 'load',
-                          'save_success': '',
-                          'load_success': '',
+                        { 'save_code': 'blockpy/save',
+                          'load_code': 'blockpy/load',
+                          'save_success': 'blockpy/save',
+                          'load_success': 'blockpy/load',
                           'log_event': ''},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
@@ -171,22 +160,14 @@ $(document).ready(function() {
 <body>
 <div id="kennel-div" style='height:100%'></div>
 
-<div class='row'>
-    <div class='col-md-3 col-sm-3 col-xs-3'>
-        <img src='images/blockly-corgi-logo.png'  class='img-responsive' />
-    </div>
-    <div class='col-md-9 col-sm-9 col-xs-9'>
-        BlockPy from Virginia Tech's Software Innovations Lab. By Austin Cory Bart, Dennis Kafura, Eli Tilevich, and Clifford A. Shaffer. Interested in this project as it develops? Get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a>.
-    </div>
-</div>
 <pre id='problem-presentation' style='display:none'>
-<%= @problem_presentation %>
+{{ program.presentation }}
 </pre>
 <pre id='default-body' style='display:none'>
-<%= @program_code %>
+{{ program.code }}
 </pre>
 <pre id='default-on-run' style='display:none'>
-<%= @program_on_run %>
+{{ program.on_run }}
 </pre>
   
 <!-- Google Analytics -->
@@ -208,7 +189,7 @@ default:
 </body>
 </html>
 
-<script>
+<!--<script>
   var TP = TP || {};
   <% if defined? @tp %>
   <% if @tp.outcome_service? %>
@@ -222,4 +203,4 @@ default:
     TP.toParams.launch_params.<%= key %> = "<%= value %>";
   <% end %>
   <% end %>
-</script>
+</script>-->

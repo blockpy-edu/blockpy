@@ -1,8 +1,9 @@
 require 'sinatra/reloader'
-require './tool_provider'
+require './main'
+require 'active_record'
 
 use Rack::Static,
-  :urls => ["/AV", "/config", "/JSAV", "/lib"],
+  :urls => ["/analyzer", "/blockly", "/converter", "/fonts", "/images", "/kennel", "/libs", "/skulpt"],
   :root => "public"
 
 run Sinatra::Application

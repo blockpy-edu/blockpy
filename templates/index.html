@@ -8,7 +8,7 @@
     <title>Bootstrap 101 Template</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
 </head>
 <body>
 
@@ -18,11 +18,11 @@
                 <div class='col-md-6'>
                     <h1>BlockPy</h1>
                     <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.</p>
-                    <p><a class="btn btn-primary btn-lg" href="/lti_tool" role="button">Try BlockPy Now &raquo;</a></p>
+                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy') }}" role="button">Try BlockPy Now &raquo;</a></p>
                 </div>
                 
                 <div class='col-md-6'>
-                    <img src='images/blockly-corgi-logo-large.png' />
+                    <img src='{{ url_for("static", filename="images/blockly-corgi-logo-large.png") }}' />
                 </div>
             </div>
         </div>
@@ -33,14 +33,14 @@
             <div class='col-md-4'>
                 <h2>For Instructors</h2>
                 <p>Interested in making BlockPy problems for your class?</p>
-                <p><a href='/lti_tool?mode=instructor'>Try it now!</a></p>
+                <p><a href="{{ url_for('blockpy', mode='instructor') }}">Try it now!</a></p>
                 <!--<p>Embed BlockPy (<a href="/tool_config.xml">LTI Configuration</a>)</p>-->
             </div>
             
             <div class='col-md-4'>
                 <h2>For Users</h2>
                 <p>Try out the BlockPy sandbox!</p>
-                <p><a href='/lti_tool'>Learn more!</a></p>
+                <p><a href="{{ url_for('blockpy') }}">Learn more!</a></p>
             </div>
             
             <div class='col-md-4'>

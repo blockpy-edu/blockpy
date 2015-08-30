@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Add Problem</title>
+</head>
+<body>
+
+<form action="{{ url_for('grade') }}" method="post" name="add_form">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.p1(readonly=true) }} +
+        {{ form.p2(readonly=true) }} =
+        {{ form.result }}
+    </p>
+
+    <p><input type="submit" value="Check"></p>
+</form>
+
+</body>
+</html>

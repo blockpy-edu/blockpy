@@ -1,3 +1,0 @@
-  line1 <strong> from a URL</strong>
-  line2
-    line 3

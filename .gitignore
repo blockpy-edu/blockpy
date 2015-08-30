@@ -1,3 +1,7 @@
+certs/
+secrets.json
+consumer_key.pem
+
 *.class
 
 # Mobile Tools for Java (J2ME)
