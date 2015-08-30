@@ -18,19 +18,22 @@ def shutdown():
     shutdown_server()
     return 'Server shutting down...'
 
-#@app.before_request
-#def load_user():
-#    if current_user.is_authenticated():
-#        g.user = current_user
-#        log_page_access()
-#    else:
-#        g.user = None
+@app.before_request
+def load_user():
+    if current_user.is_authenticated():
+        g.user = current_user
+        #log_page_access()
+    else:
+        g.user = None
 
 from teachers import teachers
 app.register_blueprint(teachers)
 
 from services import services
 app.register_blueprint(services)
+
+from blockpy import blockpy
+app.register_blueprint(blockpy)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

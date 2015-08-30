@@ -96,6 +96,7 @@ class Problem(Base):
     on_run = Column(Text())
     on_step = Column(Text())
     on_start = Column(Text())
+    answer = Column(Text())
     type = Column(String(10))
     visibility = Column(String(10))
     disabled = Column(String(10))

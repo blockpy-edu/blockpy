@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Blockpy/Kennel/Silicon</title>
+    <title>BlockPy</title>
     
     <!-- Style sheets -->
     {% for css in ['libs/bootstrap.min.css',
@@ -143,10 +143,10 @@ $(document).ready(function() {
                         view,
                         "{{ url_for('static', filename='blockly/') }}",
                         parsons,
-                        { 'save_code': 'save',
-                          'load_code': 'load',
-                          'save_success': '',
-                          'load_success': '',
+                        { 'save_code': 'blockpy/save',
+                          'load_code': 'blockpy/load',
+                          'save_success': 'blockpy/save',
+                          'load_success': 'blockpy/load',
                           'log_event': ''},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
@@ -189,7 +189,7 @@ default:
 </body>
 </html>
 
-<script>
+<!--<script>
   var TP = TP || {};
   <% if defined? @tp %>
   <% if @tp.outcome_service? %>
@@ -203,4 +203,4 @@ default:
     TP.toParams.launch_params.<%= key %> = "<%= value %>";
   <% end %>
   <% end %>
-</script>
+</script>-->
