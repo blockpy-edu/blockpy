@@ -35,4 +35,4 @@ def save():
 @blockpy.route('/load/', methods=['GET', 'POST'])
 @blockpy.route('/load', methods=['GET', 'POST'])
 def load():
-    return jsonify(success=True, data={'code': '', 'completed': '', 'timestamp': ''})
+    return jsonify(success=True, data={'code': 'a=0', 'completed': 'false', 'timestamp': ''})
