@@ -695,7 +695,7 @@ def docbi(options,dest="doc/dstatic"):
         if options.verbose:
             print ". Wrote {fileName}".format(fileName=builtinfn)
 
-def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='true'):
+def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
     if not os.path.exists(fn):
         print "%s doesn't exist" % fn
         raise SystemExit()
