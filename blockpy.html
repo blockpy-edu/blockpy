@@ -47,20 +47,34 @@
     <script type="text/javascript" src="analyzer/analyzer.js"></script>
     <script type="text/javascript" src="analyzer/python_errors.js"></script>
     
-    <!-- Converter -->
-    <script type="text/javascript" src="converter/reverse_ast.js"></script>
+    <!-- Renderer -->
     <script type="text/javascript" src="converter/python_to_blockly.js"></script>
+    <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
     
     <!-- Analyzer -->
     <script type="text/javascript" src="kennel/kennel.js"></script>
-    
-    <!-- Renderer -->
-    <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
   
 </head>
 <body>
 <div id="kennel-div" style='height:100%'></div>
 <script>
+
+function getQueryParams(){
+    try{
+        url = window.location.href;
+        query_str = url.substr(url.indexOf('?')+1, url.length-1);
+        r_params = query_str.split('&');
+        params = {}
+        for( i in r_params){
+            param = r_params[i].split('=');
+            params[ param[0] ] = param[1];
+        }
+        return params;
+    }
+    catch(e){
+       return {};
+    }
+}
     Blockly.Blocks['assess_suggest'] = {
         init: function() {
             this.jsonInit({
@@ -120,24 +134,63 @@
           
           
           $(document).ready(function() {
-            if (localStorage.getItem('__main__') === null) {
-                body = $("#default-body").text();
-            } else {
-                body = localStorage.getItem('__main__');
-            }
-            body = $("#default-body").text();
-            //console.log(new PythonToBlocks().convert('a = 0\nb=7\nif b:\n    c = a'))
-            kennel = new Kennel(document.getElementById('kennel-div'),
-                                document.getElementById('toolbox'),
-                                'instructor', // Instructor mode
-                                "Print the name of the state that had the highest violent crime rate in 1995.", // problem
-                                body, // Current code
-                                $('#default-on-run').html(), // On run code
-                                "def on_step(code, output, properties):\n    pass", // On step code
-                                "alpha = 0", // Starting code,
-                                true
-                                );
-          });
+    var params = getQueryParams();
+    var body;
+    if (localStorage.getItem('__main__') === null) {
+        body = $("#default-body").text();
+    } else {
+        body = localStorage.getItem('__main__');
+    }
+    body = $("#default-body").text();
+    var view = "blocks";
+    if ("view" in params) {
+        if (params["view"] == "text") {
+            view = "text";
+        } else if (params["view"] == "blocks") {
+            view = "blocks";
+        } else {
+            console.log("Unknown view:", params["view"]);
+            view = "blocks";
+        }
+    }
+    var mode = "student";
+    if ("mode" in params) {
+        if (params["mode"] == "student") {
+            mode = "student";
+        } else if (params["mode"] == "instructor") {
+            mode = "instructor";
+        }
+    } 
+    var parsons = false;
+    if ("parsons" in params) {
+        if (params["parsons"] == "true") {
+            parsons = true;
+        }
+    }
+    kennel = new Kennel(document.getElementById('kennel-div'),
+                        mode, // Instructor mode
+                        $("#problem-presentation").text(), // problem
+                        body, // Current code
+                        $('#default-on-run').html(), // On run code
+                        "def on_step(code, output, properties):\n    pass", // On step code
+                        "alpha = 0", // Starting code
+                        mode == "instructor",
+                        view,
+                        "blockly/",
+                        parsons,
+                        { 'save_code': 'blockpy/save',
+                          'load_code': 'blockpy/load',
+                          'save_success': 'blockpy/save',
+                          'load_success': 'blockpy/load',
+                          'log_event': '',
+                          'server': false},
+                        { 'question_id': 'cw-1-blockly',
+                          'student_id': 1,
+                          'book_id': 'compthink'});
+    if ("url" in params) {
+        $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
+    }    
+  });
         </script>
 <pre id='default-body' style='display:none'>
 import books

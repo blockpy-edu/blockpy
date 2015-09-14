@@ -14,6 +14,29 @@ from main import app
 
 teachers = Blueprint('teachers', __name__, url_prefix='/teachers')
 
+assignments = Blueprint('assignments', __name__, url_prefix='/assignments')
+
+'''
+Add an assignment
+Delete an assignment
+Fork an assignment
+
+Assignment
+
+Question
+    Presentation
+    Starting code
+    On_run code
+
+'''
+
+@assignments.route('/add', methods=['GET', 'POST'])
+def add_assignment(presentation, starting_code, on_run):
+    """ Create a new assignment with the given information
+    """
+    return render_template('blockpy.html', lti=lti,
+                           program={})
+
 class AddForm(Form):
     """ Add data from Form
 
