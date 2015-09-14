@@ -90,6 +90,11 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
         // it wants to append a semicolon, or something.
         line = this.scrubNakedValue(line);
       }
+      // If this block isn't at the top, then we can store its position.
+      if (x != 0) {
+          var location = block.getRelativeToSurfaceXY();
+          //code.push("#location:"+location.x+","+location.y);
+      }
       code.push(line);
     }
   }
