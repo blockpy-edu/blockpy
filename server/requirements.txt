@@ -1,0 +1,8 @@
+flask
+Flask-SQLAlchemy
+flask-admin
+flask-security
+flask-script
+sqlalchemy
+pylti
+pyOpenSSL
