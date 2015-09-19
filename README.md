@@ -10,7 +10,8 @@ First, clone it locally. This could take a little while.
 
     > git clone https://github.com/RealTimeWeb/blockpy.git
     
-You'll need to build Skulpt and Blockly. Both of these depend on the Closure Compiler, so you'll need to put that in the empty `closure-library` folder. You can follow the `Blockly instructions here <https://developers.google.com/blockly/hacking/closure>`_ , but the command line will be something like:
+
+You'll need to build Skulpt and Blockly. Both of these depend on the Closure Compiler, so you'll need to put that in the empty `closure-library` folder. You can follow the [Blockly instructions here] (https://developers.google.com/blockly/hacking/closure) , but the gist will be:
 
     > wget https://github.com/google/closure-library/zipball/master -O closure.zip
     > unzip closure.zip
