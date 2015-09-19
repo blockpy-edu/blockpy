@@ -135,7 +135,7 @@ $(document).ready(function() {
     kennel = new Kennel(document.getElementById('kennel-div'),
                         mode, // Instructor mode
                         $("#problem-presentation").text(), // problem
-                        body, // Current code
+                        $("#default-body").text(), // Current code
                         $('#default-on-run').html(), // On run code
                         "def on_step(code, output, properties):\n    pass", // On step code
                         "alpha = 0", // Starting code
@@ -143,10 +143,10 @@ $(document).ready(function() {
                         view,
                         "{{ url_for('static', filename='blockly/') }}",
                         parsons,
-                        { 'save_code': 'blockpy/save',
-                          'load_code': 'blockpy/load',
-                          'save_success': 'blockpy/save',
-                          'load_success': 'blockpy/load',
+                        { 'save_code': '{{ url_for("blockpy.save")}}',
+                          'load_code': '{{ url_for("blockpy.load")}}',
+                          'save_success': '{{ url_for("blockpy.save")}}',
+                          'load_success': '{{ url_for("blockpy.load")}}',
                           'log_event': ''},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,

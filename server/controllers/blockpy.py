@@ -1,3 +1,5 @@
+import os
+
 from flask.ext.wtf import Form
 from wtforms import IntegerField, BooleanField
 
@@ -11,6 +13,25 @@ from sqlalchemy import Date, cast, func, desc, or_
 from main import app
 
 blockpy = Blueprint('blockpy', __name__, url_prefix='/blockpy')
+
+@blockpy.route('/', methods=['GET', 'POST'])
+def blockpy_canvas():
+    presentation, code, on_run = '', '', ''
+    if 'static' in request.args:
+        filename = request.args['static']
+        print filename
+        path = os.path.join(app.config['STATIC_DIRECTORY'], 'programs')
+        if filename in os.listdir(path):
+            path = os.path.join(path, filename)
+            with open(path) as complete:
+                presentation, code, on_run = complete.read().split('#####')
+    
+    return render_template('blockpy.html',
+                           program=dict(
+                            presentation=presentation,
+                            code=code,
+                            on_run=on_run
+                            ))
 
 @blockpy.route('/save/', methods=['GET', 'POST'])
 @blockpy.route('/save', methods=['GET', 'POST'])
@@ -36,3 +57,4 @@ def save():
 @blockpy.route('/load', methods=['GET', 'POST'])
 def load():
     return jsonify(success=True, code='a=0', completed=False, timestamp='')
+    

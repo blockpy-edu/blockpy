@@ -20,6 +20,8 @@ class Config(object):
     WTF_CSRF_ENABLED = True
     SITE_NAME = 'BlockPy'
     SYS_ADMINS = ['acbart@vt.edu']
+    ROOT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+    STATIC_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'static')
     
     # secret key for flask authentication
     SECRET_KEY = secrets.get('FLASK_SECRET_KEY', 'flask-secret-key')
@@ -41,7 +43,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://compthink:runestone@127.0.0.1/blockpy'
     
 class TestingConfig(Config):
-    TESTING = True
+    DEBUG = True
     PORT = 5001
     HOST = 'localhost'
     SITE_ROOT_URL = 'localhost:5001'
