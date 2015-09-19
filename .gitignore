@@ -18,7 +18,6 @@ develop-eggs/
 dist/
 !server/static/skulpt/dist
 eggs/
-lib/
 lib64/
 parts/
 sdist/
