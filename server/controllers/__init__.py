@@ -7,15 +7,22 @@ from flask import session, g, send_from_directory, request, jsonify, render_temp
 from flask import redirect, url_for
 from flask_security.core import current_user
 
-def shutdown_server():
+from controllers.helpers import admin_required
+
+@app.before_request
+def load_user():
+    if current_user.is_authenticated():
+        g.user = current_user
+    else:
+        g.user = None
+    
+@app.route('/shutdown', methods=['GET', 'POST'])
+@admin_required
+def shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
-    
-@app.route('/shutdown', methods=['GET', 'POST'])
-def shutdown():
-    shutdown_server()
     return 'Server shutting down...'
 
 @app.before_request
@@ -26,6 +33,9 @@ def load_user():
     #    #log_page_access()
     #else:
     #    g.user = None
+
+from users import users
+app.register_blueprint(users)
 
 from teachers import teachers
 app.register_blueprint(teachers)
@@ -45,17 +55,6 @@ def index():
     :return: index page for lti provider
     """
     return render_template('index.html')
-    
-@app.route('/blockpy', methods=['GET', 'POST'])
-def blockpy():
-    """ initial access page to the lti provider.  This page provides
-    authorization for the user.
-
-    :param lti: the `lti` object from `pylti`
-    :return: index page for lti provider
-    """
-    return render_template('blockpy.html',
-                           program={})
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
 def favicon():

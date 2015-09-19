@@ -28,7 +28,7 @@ class Base(Model):
     def __repr__(self):
         return str(self)
 
-    id =  Column(Integer, primary_key=True)
+    id =  Column(Integer(), primary_key=True)
     date_created  = Column(DateTime, default=func.current_timestamp())
     date_modified = Column(DateTime, default=func.current_timestamp(),
                                      onupdate=func.current_timestamp())
@@ -41,26 +41,35 @@ class User(Base, UserMixin):
     last_name = Column(String(255))
     email = Column(String(255), unique=True)
     gender = Column(String(255), default='Unspecified')
-    picture = Column(String(255)) # A url
+    picture = Column(String(255), default='') # A url
     
     # Foreign key relationships
-    settings = relationship("Settings", backref=backref('user', lazy='dynamic'))
-    roles = relationship("Role", backref=backref('user', lazy='dynamic'))
-    submissions = relationship("Submission", backref=backref('user', lazy='dynamic'))
-    authentications = relationship("Authentication", 
-                                   backref=backref('user', lazy='dynamic'))
-    problems = relationship("Problem", 
-                            backref=backref('user', lazy='dynamic'))
+    settings = relationship("Settings", backref='user', lazy='dynamic')
+    roles = relationship("Role", backref='user', lazy='dynamic')
+    authentications = relationship("Authentication", backref='user', lazy='dynamic')
+    problems = relationship("Problem",  backref='user', lazy='dynamic')
     def __str__(self):
         return '<{} {}>'.format(self.role.title(),
                                 self.email)
         
     def name(self):
         return ' '.join((self.first_name, self.last_name))
+        
+    def is_admin(self):
+        return 'admin' in {role.name.lower() for role in self.roles}
+        
+class Course(Base):
+    name = Column(String(255))
+    owner_id = Column(Integer(), ForeignKey('user.id'))
+    external_id = Column(String(255))
+    
+    def __str__(self):
+        return '<Course {}>'.format(self.id)
 
 class Role(Base, RoleMixin):
     name = Column(String(80))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer(), ForeignKey('user.id'))
+    course_id = Column(Integer(), ForeignKey('course.id'), default=None)
     
     def __str__(self):
         return '<{} is {}>'.format(self.name, self.user_id)
@@ -68,7 +77,7 @@ class Role(Base, RoleMixin):
 class Authentication(Base):
     type = Column(String(80))
     value = Column(String(255))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer(), ForeignKey('user.id'))
     
     def __str__(self):
         return '<{} is {}>'.format(self.name, self.user_id)
@@ -76,16 +85,17 @@ class Authentication(Base):
 class Settings(Base):
     mode = Column(String(80))
     connected = Column(String(80))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer(), ForeignKey('user.id'))
     
     def __str__(self):
         return '<{} settings ({})>'.format(self.user_id, self.id)
         
 class Submission(Base):
     code = Column(Text())
+    status = Column(Integer())
     correct = Column(Boolean())
-    problem_id = Column(Integer, ForeignKey('problem.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    problem_id = Column(Integer(), ForeignKey('problem.id'))
+    user_id = Column(Integer(), ForeignKey('user.id'))
     
     def __str__(self):
         return '<Submission {} for {}>'.format(self.id, self.user_id)
@@ -97,14 +107,13 @@ class Problem(Base):
     on_step = Column(Text())
     on_start = Column(Text())
     answer = Column(Text())
+    due = Column(DateTime())
     type = Column(String(10))
     visibility = Column(String(10))
     disabled = Column(String(10))
     mode = Column(String(10))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    
-    submissions = relationship("Submission", 
-                               backref=backref('problem', lazy='dynamic'))
+    owner_id = Column(Integer(), ForeignKey('user.id'))
+    course_id = Column(Integer(), ForeignKey('course.id'))
     
     def __str__(self):
         return '<Problem {} for {}>'.format(self.id, self.user_id)

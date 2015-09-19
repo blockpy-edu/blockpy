@@ -17,7 +17,22 @@ class PopulateDB(Command):
     
     """Fills in predefined data into DB"""
     def run(self, user_data_file, **kwargs):
-        pass            
+        from models.models import Role, User
+        
+        admin = User(first_name='Cory', last_name='Bart', 
+                     email='acbart@vt.edu', gender='Male')
+        db.session.add(admin)
+        db.session.flush()
+        db.session.add(Role(name='teacher', user_id=admin.id))
+        db.session.add(Role(name='admin', user_id=admin.id))
+        
+        for student in ('Dan Tilden', 'Anamary Leal', 'Ellie Cayford'):
+            first, last = student.split()
+            email = '{}{}@vt.edu'.format(first[0].lower(), last.lower())
+            db.session.add(User(first_name=first, last_name=last, email=email))
+        
+        db.session.commit()
+        
 
 class DisplayDB(Command):
     def run(self, **kwargs):

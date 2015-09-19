@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 # Debugging
 root = logging.getLogger()
-root.setLevel(logging.DEBUG)
+root.setLevel(logging.INFO)
 ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(name)s - %(message)s')
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)s[%(levelname)s] - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
