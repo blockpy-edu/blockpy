@@ -1,0 +1,3 @@
+var $builtinmodule = function() {
+  return {};
+};
