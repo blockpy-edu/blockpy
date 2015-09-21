@@ -82,7 +82,7 @@ Blockly.Blocks['text_join'] = {
   },
   /**
    * Create XML to represent number of text inputs.
-   * @return {Element} XML storage element.
+   * @return {!Element} XML storage element.
    * @this Blockly.Block
    */
   mutationToDom: function() {
@@ -127,14 +127,12 @@ Blockly.Blocks['text_join'] = {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     // Count number of inputs.
     var connections = [];
-    var i = 0;
     while (itemBlock) {
-      connections[i] = itemBlock.valueConnection_;
+      connections.push(itemBlock.valueConnection_);
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
-      i++;
     }
-    this.itemCount_ = i;
+    this.itemCount_ = connections.length;
     this.updateShape_();
     // Reconnect any child blocks.
     for (var i = 0; i < this.itemCount_; i++) {
@@ -364,7 +362,7 @@ Blockly.Blocks['text_charAt'] = {
   },
   /**
    * Create XML to represent whether there is an 'AT' input.
-   * @return {Element} XML storage element.
+   * @return {!Element} XML storage element.
    * @this Blockly.Block
    */
   mutationToDom: function() {
@@ -458,7 +456,7 @@ Blockly.Blocks['text_getSubstring'] = {
   },
   /**
    * Create XML to represent whether there are 'AT' inputs.
-   * @return {Element} XML storage element.
+   * @return {!Element} XML storage element.
    * @this Blockly.Block
    */
   mutationToDom: function() {
@@ -593,9 +591,68 @@ Blockly.Blocks['text_print'] = {
   }
 };
 
+Blockly.Blocks['text_prompt_ext'] = {
+  /**
+   * Block for prompt function (external message).
+   * @this Blockly.Block
+   */
+  init: function() {
+    var TYPES =
+        [[Blockly.Msg.TEXT_PROMPT_TYPE_TEXT, 'TEXT'],
+         [Blockly.Msg.TEXT_PROMPT_TYPE_NUMBER, 'NUMBER']];
+    this.setHelpUrl(Blockly.Msg.TEXT_PROMPT_HELPURL);
+    this.setColour(Blockly.Blocks.texts.HUE);
+    // Assign 'this' to a variable for use in the closures below.
+    var thisBlock = this;
+    var dropdown = new Blockly.FieldDropdown(TYPES, function(newOp) {
+      thisBlock.updateType_(newOp);
+    });
+    this.appendValueInput('TEXT')
+        .appendField(dropdown, 'TYPE');
+    this.setOutput(true, 'String');
+    this.setTooltip(function() {
+      return (thisBlock.getFieldValue('TYPE') == 'TEXT') ?
+          Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT :
+          Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER;
+    });
+  },
+  /**
+   * Modify this block to have the correct output type.
+   * @param {string} newOp Either 'TEXT' or 'NUMBER'.
+   * @private
+   * @this Blockly.Block
+   */
+  updateType_: function(newOp) {
+    if (newOp == 'NUMBER') {
+      this.outputConnection.setCheck('Number');
+    } else {
+      this.outputConnection.setCheck('String');
+    }
+  },
+  /**
+   * Create XML to represent the output type.
+   * @return {!Element} XML storage element.
+   * @this Blockly.Block
+   */
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('type', this.getFieldValue('TYPE'));
+    return container;
+  },
+  /**
+   * Parse XML to restore the output type.
+   * @param {!Element} xmlElement XML storage element.
+   * @this Blockly.Block
+   */
+  domToMutation: function(xmlElement) {
+    this.updateType_(xmlElement.getAttribute('type'));
+  }
+};
+
 Blockly.Blocks['text_prompt'] = {
   /**
    * Block for prompt function (internal message).
+   * The 'text_prompt_ext' block is preferred as it is more flexible.
    * @this Blockly.Block
    */
   init: function() {
@@ -607,11 +664,7 @@ Blockly.Blocks['text_prompt'] = {
     this.setHelpUrl(Blockly.Msg.TEXT_PROMPT_HELPURL);
     this.setColour(Blockly.Blocks.texts.HUE);
     var dropdown = new Blockly.FieldDropdown(TYPES, function(newOp) {
-      if (newOp == 'NUMBER') {
-        thisBlock.changeOutput('Number');
-      } else {
-        thisBlock.changeOutput('String');
-      }
+      thisBlock.updateType_(newOp);
     });
     this.appendDummyInput()
         .appendField(dropdown, 'TYPE')
@@ -627,38 +680,8 @@ Blockly.Blocks['text_prompt'] = {
           Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER;
     });
   },
-  newQuote_: Blockly.Blocks['text'].newQuote_
-};
-
-Blockly.Blocks['text_prompt_ext'] = {
-  /**
-   * Block for prompt function (external message).
-   * @this Blockly.Block
-   */
-  init: function() {
-    var TYPES =
-        [[Blockly.Msg.TEXT_PROMPT_TYPE_TEXT, 'TEXT'],
-         [Blockly.Msg.TEXT_PROMPT_TYPE_NUMBER, 'NUMBER']];
-    // Assign 'this' to a variable for use in the closure below.
-    var thisBlock = this;
-    this.setHelpUrl(Blockly.Msg.TEXT_PROMPT_HELPURL);
-    this.setColour(Blockly.Blocks.texts.HUE);
-    var dropdown = new Blockly.FieldDropdown(TYPES, function(newOp) {
-      if (newOp == 'NUMBER') {
-        thisBlock.changeOutput('Number');
-      } else {
-        thisBlock.changeOutput('String');
-      }
-    });
-    this.appendValueInput('TEXT')
-        .appendField(dropdown, 'TYPE');
-    this.setOutput(true, 'String');
-    // Assign 'this' to a variable for use in the tooltip closure below.
-    var thisBlock = this;
-    this.setTooltip(function() {
-      return (thisBlock.getFieldValue('TYPE') == 'TEXT') ?
-          Blockly.Msg.TEXT_PROMPT_TOOLTIP_TEXT :
-          Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER;
-    });
-  }
+  newQuote_: Blockly.Blocks['text'].newQuote_,
+  updateType_: Blockly.Blocks['text_prompt_ext'].updateType_,
+  mutationToDom: Blockly.Blocks['text_prompt_ext'].mutationToDom,
+  domToMutation: Blockly.Blocks['text_prompt_ext'].domToMutation
 };

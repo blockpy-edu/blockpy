@@ -32,7 +32,7 @@ goog.require('Blockly.Field');
 /**
  * Class for a checkbox field.
  * @param {string} state The initial state of the field ('TRUE' or 'FALSE').
- * @param {Function} opt_changeHandler A function that is executed when a new
+ * @param {Function=} opt_changeHandler A function that is executed when a new
  *     option is selected.  Its sole argument is the new checkbox state.  If
  *     it returns a value, this becomes the new checkbox state, unless the
  *     value is null, in which case the change is aborted.
@@ -47,15 +47,6 @@ Blockly.FieldCheckbox = function(state, opt_changeHandler) {
   this.setValue(state);
 };
 goog.inherits(Blockly.FieldCheckbox, Blockly.Field);
-
-/**
- * Clone this FieldCheckbox.
- * @return {!Blockly.FieldCheckbox} The result of calling the constructor again
- *   with the current values of the arguments used during construction.
- */
-Blockly.FieldCheckbox.prototype.clone = function() {
-  return new Blockly.FieldCheckbox(this.getValue(), this.changeHandler_);
-};
 
 /**
  * Mouse cursor style when over the hotspot that initiates editability.
@@ -75,7 +66,7 @@ Blockly.FieldCheckbox.prototype.init = function(block) {
   // The checkbox doesn't use the inherited text element.
   // Instead it uses a custom checkmark element that is either visible or not.
   this.checkElement_ = Blockly.createSvgElement('text',
-      {'class': 'blocklyText', 'x': -3}, this.fieldGroup_);
+      {'class': 'blocklyText', 'x': -3, 'y': 14}, this.fieldGroup_);
   var textNode = document.createTextNode('\u2713');
   this.checkElement_.appendChild(textNode);
   this.checkElement_.style.display = this.state_ ? 'block' : 'none';

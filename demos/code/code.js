@@ -82,7 +82,7 @@ Code.LANGUAGE_RTL = ['ar', 'fa', 'he'];
 
 /**
  * Blockly's main workspace.
- * @type Blockly.WorkspaceSvg
+ * @type {Blockly.WorkspaceSvg}
  */
 Code.workspace = null;
 
@@ -235,7 +235,7 @@ Code.getBBox_ = function(element) {
 
 /**
  * User's language (e.g. "en").
- * @type string
+ * @type {string}
  */
 Code.LANG = Code.getLang();
 
@@ -365,12 +365,13 @@ Code.init = function() {
       el.style.width = (2 * bBox.width - el.offsetWidth) + 'px';
     }
     // Make the 'Blocks' tab line up with the toolbox.
-    if (Code.workspace.toolbox_.width) {
+    if (Code.workspace && Code.workspace.toolbox_.width) {
       document.getElementById('tab_blocks').style.minWidth =
           (Code.workspace.toolbox_.width - 38) + 'px';
           // Account for the 19 pixel margin and on each side.
     }
   };
+  onresize();
   window.addEventListener('resize', onresize, false);
 
   var toolbox = document.getElementById('toolbox');
@@ -382,7 +383,9 @@ Code.init = function() {
            snap: true},
        media: '../../media/',
        rtl: rtl,
-       toolbox: toolbox});
+       toolbox: toolbox,
+       zoom: {enabled: true}
+      });
 
   // Add to reserved word list: Local variables in execution evironment (runJS)
   // and the infinite loop detection function.
@@ -396,7 +399,6 @@ Code.init = function() {
   }
 
   Code.tabClick(Code.selected);
-  Blockly.fireUiEvent(window, 'resize');
 
   Code.bindClick('trashButton',
       function() {Code.discard(); Code.renderContent();});
@@ -420,7 +422,6 @@ Code.init = function() {
         function(name_) {return function() {Code.tabClick(name_);};}(name));
   }
 
-  onresize();
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
 };

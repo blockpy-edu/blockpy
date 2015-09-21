@@ -37,16 +37,48 @@ goog.require('goog.dom');
  * @constructor
  */
 Blockly.Connection = function(source, type) {
+  /** @type {!Blockly.Block} */
   this.sourceBlock_ = source;
-  this.targetConnection = null;
+  /** @type {number} */
   this.type = type;
-  this.x_ = 0;
-  this.y_ = 0;
   // Shortcut for the databases for this connection's workspace.
   this.dbList_ = source.workspace.connectionDBList;
   this.hidden_ = !this.dbList_;
-  this.inDB_ = false;
 };
+
+/**
+ * Connection this connection connects to.  Null if not connected.
+ * @type {Blockly.Connection}
+ */
+Blockly.Connection.prototype.targetConnection = null;
+
+/**
+ * List of compatible value types.  Null if all types are compatible.
+ * @type {Array}
+ * @private
+ */
+Blockly.Connection.prototype.check_ = null;
+
+/**
+ * Horizontal location of this connection.
+ * @type {number}
+ * @private
+ */
+Blockly.Connection.prototype.x_ = 0;
+
+/**
+ * Vertical location of this connection.
+ * @type {number}
+ * @private
+ */
+Blockly.Connection.prototype.y_ = 0;
+
+/**
+ * Has this connection been added to the connection database?
+ * @type {boolean}
+ * @private
+ */
+Blockly.Connection.prototype.inDB_ = false;
 
 /**
  * Sever all links to this connection (not including from the source object).
@@ -361,7 +393,7 @@ Blockly.Connection.prototype.highlight = function() {
   Blockly.Connection.highlightedPath_ = Blockly.createSvgElement('path',
       {'class': 'blocklyHighlightedConnectionPath',
        'd': steps,
-       transform: 'translate(' + x + ', ' + y + ')'},
+       transform: 'translate(' + x + ',' + y + ')'},
       this.sourceBlock_.getSvgRoot());
 };
 
@@ -388,7 +420,7 @@ Blockly.Connection.prototype.tighten_ = function() {
     }
     var xy = Blockly.getRelativeXY_(svgRoot);
     block.getSvgRoot().setAttribute('transform',
-        'translate(' + (xy.x - dx) + ', ' + (xy.y - dy) + ')');
+        'translate(' + (xy.x - dx) + ',' + (xy.y - dy) + ')');
     block.moveConnections_(-dx, -dy);
   }
 };

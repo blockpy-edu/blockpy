@@ -41,21 +41,21 @@ Blockly.Css.Cursor = {
 
 /**
  * Current cursor (cached value).
- * @type string
+ * @type {string}
  * @private
  */
 Blockly.Css.currentCursor_ = '';
 
 /**
  * Large stylesheet added by Blockly.Css.inject.
- * @type Element
+ * @type {Element}
  * @private
  */
 Blockly.Css.styleSheet_ = null;
 
 /**
  * Path to media directory, with any trailing slash removed.
- * @type string
+ * @type {string}
  * @private
  */
 Blockly.Css.mediaPath_ = '';
@@ -92,7 +92,7 @@ Blockly.Css.inject = function(hasCss, pathToMedia) {
 
 /**
  * Set the cursor to be displayed when over something draggable.
- * @param {Blockly.Cursor} cursor Enum.
+ * @param {Blockly.Css.Cursor} cursor Enum.
  */
 Blockly.Css.setCursor = function(cursor) {
   if (Blockly.Css.currentCursor_ == cursor) {
@@ -118,10 +118,10 @@ Blockly.Css.setCursor = function(cursor) {
   // There is probably only one toolbox, so just change its style property.
   var toolboxen = document.getElementsByClassName('blocklyToolboxDiv');
   for (var i = 0, toolbox; toolbox = toolboxen[i]; i++) {
-    if (cursor == Blockly.Css.Cursor.OPEN) {
-      toolbox.style.cursor = '';
-    } else {
+    if (cursor == Blockly.Css.Cursor.DELETE) {
       toolbox.style.cursor = url;
+    } else {
+      toolbox.style.cursor = '';
     }
   }
   // Set cursor on the whole document, so that rapid movements
@@ -294,9 +294,12 @@ Blockly.Css.CONTENT = [
 
   '.blocklyHtmlInput {',
   '  border: none;',
+  '  border-radius: 4px;',
   '  font-family: sans-serif;',
-  '  font-size: 11pt;',
+  '  height: 100%;',
+  '  margin: 0;',
   '  outline: none;',
+  '  padding: 0 1px;',
   '  width: 100%',
   '}',
 
@@ -316,14 +319,8 @@ Blockly.Css.CONTENT = [
   '  fill-opacity: .8;',
   '}',
 
-  '.blocklyColourBackground {',
-  '  fill: #666;',
-  '}',
-
   '.blocklyScrollbarBackground {',
-  '  fill: #fff;',
-  '  stroke: #e4e4e4;',
-  '  stroke-width: 1;',
+  '  opacity: 0;',
   '}',
 
   '.blocklyScrollbarKnob {',
@@ -333,6 +330,29 @@ Blockly.Css.CONTENT = [
   '.blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
   '.blocklyScrollbarKnob:hover {',
   '  fill: #bbb;',
+  '}',
+
+  '.blocklyZoom>image {',
+  '  opacity: .4;',
+  '}',
+
+  '.blocklyZoom>image:hover {',
+  '  opacity: .6;',
+  '}',
+
+  '.blocklyZoom>image:active {',
+  '  opacity: .8;',
+  '}',
+
+  /* Darken flyout scrollbars due to being on a grey background. */
+  /* By contrast, workspace scrollbars are on a white background. */
+  '.blocklyFlyout .blocklyScrollbarKnob {',
+  '  fill: #bbb;',
+  '}',
+
+  '.blocklyFlyout .blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
+  '.blocklyFlyout .blocklyScrollbarKnob:hover {',
+  '  fill: #aaa;',
   '}',
 
   '.blocklyInvalidInput {',
@@ -542,6 +562,9 @@ Blockly.Css.CONTENT = [
   '  outline: none;',
   '  padding: 4px 0;',
   '  position: absolute;',
+  '  overflow-y: auto;',
+  '  overflow-x: hidden;',
+  '  max-height: 100%;',
   '  z-index: 20000;',  /* Arbitrary, but some apps depend on it... */
   '}',
 

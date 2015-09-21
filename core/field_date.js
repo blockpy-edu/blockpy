@@ -39,7 +39,7 @@ goog.require('goog.ui.DatePicker');
 /**
  * Class for a date input field.
  * @param {string} date The initial date.
- * @param {Function} opt_changeHandler A function that is executed when a new
+ * @param {Function=} opt_changeHandler A function that is executed when a new
  *     date is selected.  Its sole argument is the new date value.  Its
  *     return value becomes the selected date, unless it is undefined, in
  *     which case the new date stands, or it is null, in which case the change
@@ -56,15 +56,6 @@ Blockly.FieldDate = function(date, opt_changeHandler) {
   this.setChangeHandler(opt_changeHandler);
 };
 goog.inherits(Blockly.FieldDate, Blockly.Field);
-
-/**
- * Clone this FieldDate.
- * @return {!Blockly.FieldDate} The result of calling the constructor again
- *   with the current values of the arguments used during construction.
- */
-Blockly.FieldDate.prototype.clone = function() {
-  return new Blockly.FieldDate(this.getValue(), this.changeHandler_);
-};
 
 /**
  * Mouse cursor style when over the hotspot that initiates the editor.
@@ -122,7 +113,7 @@ Blockly.FieldDate.prototype.showEditor_ = function() {
   var windowSize = goog.dom.getViewportSize();
   var scrollOffset = goog.style.getViewportPageOffset(document);
   var xy = this.getAbsoluteXY_();
-  var borderBBox = this.borderRect_.getBBox();
+  var borderBBox = this.getScaledBBox_();
   var div = Blockly.WidgetDiv.DIV;
   picker.render(div);
   picker.setDate(goog.date.fromIsoString(this.getValue()));

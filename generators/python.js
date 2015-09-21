@@ -31,7 +31,7 @@ goog.require('Blockly.Generator');
 
 /**
  * Python code generator.
- * @type !Blockly.Generator
+ * @type {!Blockly.Generator}
  */
 Blockly.Python = new Blockly.Generator('Python');
 
@@ -104,8 +104,8 @@ Blockly.Python.init = function(workspace) {
 
   var defvars = [];
   var variables = Blockly.Variables.allVariables(workspace);
-  for (var x = 0; x < variables.length; x++) {
-    defvars[x] = Blockly.Python.variableDB_.getName(variables[x],
+  for (var i = 0; i < variables.length; i++) {
+    defvars[i] = Blockly.Python.variableDB_.getName(variables[i],
         Blockly.Variables.NAME_TYPE) + ' = None';
   }
   Blockly.Python.definitions_['variables'] = defvars.join('\n');
@@ -128,6 +128,10 @@ Blockly.Python.finish = function(code) {
       definitions.push(def);
     }
   }
+  // Clean up temporary data.
+  delete Blockly.Python.definitions_;
+  delete Blockly.Python.functionNames_;
+  Blockly.Python.variableDB_.reset();
   var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n\n');
   return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + code;
 };

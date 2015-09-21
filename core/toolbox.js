@@ -115,7 +115,8 @@ Blockly.Toolbox.prototype.init = function() {
       });
   var workspaceOptions = {
     parentWorkspace: workspace,
-    RTL: workspace.RTL
+    RTL: workspace.RTL,
+    svg: workspace.options.svg
   };
   /**
    * @type {!Blockly.Flyout}
@@ -146,6 +147,7 @@ Blockly.Toolbox.prototype.dispose = function() {
   this.flyout_.dispose();
   this.tree_.dispose();
   goog.dom.removeNode(this.HtmlDiv);
+  this.workspace_ = null;
 };
 
 /**
@@ -161,7 +163,8 @@ Blockly.Toolbox.prototype.position = function() {
   var svgPosition = goog.style.getPageOffset(svg);
   var svgSize = Blockly.svgSize(svg);
   if (this.workspace_.RTL) {
-    treeDiv.style.left = (svgPosition.x + svgSize.width - treeDiv.offsetWidth) + 'px';
+    treeDiv.style.left =
+        (svgPosition.x + svgSize.width - treeDiv.offsetWidth) + 'px';
   } else {
     treeDiv.style.left = svgPosition.x + 'px';
   }
@@ -177,6 +180,7 @@ Blockly.Toolbox.prototype.position = function() {
 
 /**
  * Fill the toolbox with categories and blocks.
+ * @param {Node} newTree DOM tree of blocks, or null.
  * @private
  */
 Blockly.Toolbox.prototype.populate_ = function(newTree) {
@@ -193,9 +197,6 @@ Blockly.Toolbox.prototype.populate_ = function(newTree) {
         case 'CATEGORY':
           var childOut = rootOut.createNode(childIn.getAttribute('name'));
           childOut.blocks = [];
-          if (childIn.getAttribute('expanded') == 'true') {
-            childOut.setExpanded(true);
-          }
           treeOut.add(childOut);
           var custom = childIn.getAttribute('custom');
           if (custom) {
@@ -203,6 +204,12 @@ Blockly.Toolbox.prototype.populate_ = function(newTree) {
             childOut.blocks = custom;
           } else {
             syncTrees(childIn, childOut);
+          }
+          if (childIn.getAttribute('expanded') == 'true') {
+            if (childOut.blocks.length) {
+              rootOut.setSelectedItem(childOut);
+            }
+            childOut.setExpanded(true);
           }
           break;
         case 'SEP':
@@ -401,7 +408,7 @@ Blockly.Toolbox.TreeNode.prototype.onDoubleClick_ = function(e) {
 /**
  * A blank separator node in the tree.
  * @constructor
- * @extends {Blockly.Toolbox.prototype.TreeNode}
+ * @extends {Blockly.Toolbox.TreeNode}
  */
 Blockly.Toolbox.TreeSeparator = function() {
   Blockly.Toolbox.TreeNode.call(this, null, '',
