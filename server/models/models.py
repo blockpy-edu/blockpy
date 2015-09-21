@@ -71,6 +71,8 @@ class Role(Base, RoleMixin):
     user_id = Column(Integer(), ForeignKey('user.id'))
     course_id = Column(Integer(), ForeignKey('course.id'), default=None)
     
+    NAMES = ['teacher', 'admin', 'student']
+    
     def __str__(self):
         return '<{} is {}>'.format(self.name, self.user_id)
         
@@ -78,6 +80,8 @@ class Authentication(Base):
     type = Column(String(80))
     value = Column(String(255))
     user_id = Column(Integer(), ForeignKey('user.id'))
+    
+    TYPES = ['local', 'canvas']
     
     def __str__(self):
         return '<{} is {}>'.format(self.name, self.user_id)
