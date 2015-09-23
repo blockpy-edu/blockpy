@@ -68,9 +68,11 @@ KennelServer.prototype.uploadEvents = function() {
         'context_id': this.model.question.context_id,
         'events': JSON.stringify(this.queue)
     };
-    $.post(this.model.urls.log_event, data, function() {
-        this.eventQueue = [];
-    });
+    if (this.model.urls.server !== false) {
+        $.post(this.model.urls.log_event, data, function() {
+            this.eventQueue = [];
+        });
+    }
 }
 
 KennelServer.prototype.markSuccess = function() {
@@ -82,16 +84,18 @@ KennelServer.prototype.markSuccess = function() {
         'context_id': this.model.question.context_id
     };
     var alertBox = this.alertBox;
-    $.post(this.model.urls.save_success, data, function(response) {
-        if (response.success) {
-            alertBox("Success reported").delay(200).fadeOut("slow");
-        } else {
+    if (this.model.urls.server !== false) {
+        $.post(this.model.urls.save_success, data, function(response) {
+            if (response.success) {
+                alertBox("Success reported").delay(200).fadeOut("slow");
+            } else {
+                alertBox("Success report failed");
+                console.error(response.message);
+            }
+        }).fail(function() {
             alertBox("Success report failed");
-            console.error(response.message);
-        }
-    }).fail(function() {
-        alertBox("Success report failed");
-    });
+        });
+    }
 };
 
 KennelServer.prototype.save = function() {
@@ -103,18 +107,20 @@ KennelServer.prototype.save = function() {
         'context_id': this.model.question.context_id
     };
     var alertBox = this.alertBox;
-    storage.set(data.question_id, data.code);
-    $.post(this.model.urls.save_code, data, function(response) {
-        if (response.success) {
-            alertBox("Saved").delay(200).fadeOut("slow");
-            storage.remove(data.question_id);
-        } else {
+    if (this.model.urls.server !== false) {
+        storage.set(data.question_id, data.code);
+        $.post(this.model.urls.save_code, data, function(response) {
+            if (response.success) {
+                alertBox("Saved").delay(200).fadeOut("slow");
+                storage.remove(data.question_id);
+            } else {
+                alertBox("Saving failed");
+                console.error(response.message);
+            }
+        }).fail(function() {
             alertBox("Saving failed");
-            console.error(response.message);
-        }
-    }).fail(function() {
-        alertBox("Saving failed");
-    });
+        });
+    }
 };
 
 KennelServer.prototype.load = function() {
@@ -125,37 +131,39 @@ KennelServer.prototype.load = function() {
     };
     var alertBox = this.alertBox;
     var server = this, kennel = this.kennel;
-    $.post(this.model.urls.load_code, data, function(response) {
-        if (response.success) {
-            if (storage.has(data.question_id)) {
-                if (storage.is_new(data.question_id, response.timestamp)) {
-                    var xml = storage.get(data.question_id);
-                    server.model.load(xml);
-                    server.save();
+    if (this.model.urls.server !== false) {
+        $.post(this.model.urls.load_code, data, function(response) {
+            if (response.success) {
+                if (storage.has(data.question_id)) {
+                    if (storage.is_new(data.question_id, response.timestamp)) {
+                        var xml = storage.get(data.question_id);
+                        server.model.load(xml);
+                        server.save();
+                    } else {
+                        storage.remove(data.question_id);
+                        if (response.code !== null) {
+                            server.model.load(response.code);
+                        }
+                    }
                 } else {
-                    storage.remove(data.question_id);
                     if (response.code !== null) {
                         server.model.load(response.code);
                     }
                 }
-            } else {
-                if (response.code !== null) {
-                    server.model.load(response.code);
+                if (response.completed) {
+                    kennel.feedback.success('');
                 }
+                alertBox("Loaded").delay(200).fadeOut("slow");
+            } else {
+                console.error(response.message);
+                alertBox("Loading failed");
             }
-            if (response.completed) {
-                kennel.feedback.success('');
-            }
-            alertBox("Loaded").delay(200).fadeOut("slow");
-        } else {
-            console.error(response.message);
-            alertBox("Loading failed");
-        }
-    }).fail(function() {
-        alert("Loading failed");
-    }).always(function() {
-        server.model.loaded = true;
-    });
+        }).fail(function() {
+            alert("Loading failed");
+        }).always(function() {
+            server.model.loaded = true;
+        });
+    }
 };
 
 function KennelPresentation(set, get, tag) {
@@ -504,7 +512,7 @@ KennelEditor.prototype.getToolbox = function() {
                 '<category name="Python">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
-                    '<block type="function_call"></block>'+
+                    //'<block type="function_call"></block>'+
                 '</category>'+
                 '<category name="Output">'+
                     '<block type="text_print"></block>'+
@@ -521,15 +529,15 @@ KennelEditor.prototype.getToolbox = function() {
                     '<block type="logic_boolean"></block>'+
                 '</category>'+
                 '<category name="Lists">'+
-                    '<block type="lists_create_with"></block>'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
                     '<block type="lists_length"></block>'+
+                    '<block type="lists_create_with"></block>'+
                 '</category>'+
                 '<category name="Dictionaries">'+
-                    '<block type="dicts_create_with"></block>'+
                     '<block type="dict_get_literal"></block>'+
                     '<block type="dict_keys"></block>'+
+                    '<block type="dicts_create_with"></block>'+
                 '</category>'+
                 '<sep></sep>'+
                 '<category name="Data - Weather">'+
@@ -1304,7 +1312,8 @@ Kennel.prototype.run = function() {
     //this.editor.updateBlocks();
     var code = this.model.programs['__main__'];
     if (code.trim() == "") {
-        this.printError("Your canvas is currently blank.");
+        this.printError("You haven't written any code yet!");
+        return;
     }
     this.resetConsole();
     // Actually run the python code
@@ -1344,7 +1353,6 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
                   JSON.stringify(output)+", "+
                   JSON.stringify(traceTable)+", "+
                   ")";
-        console.log(on_run);
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
