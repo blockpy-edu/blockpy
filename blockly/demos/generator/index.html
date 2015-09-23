@@ -32,6 +32,7 @@
   </p>
 
   <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <div id="blocklyDiv2" style="height: 480px; width: 600px;"></div>
 
   <xml id="toolbox" style="display: none">
     <category name="Logic">
@@ -114,6 +115,9 @@
 
   <script>
     var workspace = Blockly.inject('blocklyDiv',
+        {media: '../../media/',
+         toolbox: document.getElementById('toolbox')});
+    var workspace2 = Blockly.inject('blocklyDiv2',
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
     Blockly.Xml.domToWorkspace(workspace,

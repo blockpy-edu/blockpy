@@ -62,11 +62,14 @@ Blockly.Xml.workspaceToDom = function(workspace) {
 Blockly.Xml.blockToDom_ = function(block) {
   var element = goog.dom.createDom('block');
   element.setAttribute('type', block.type);
-  element.setAttribute('id', block.id);
+  if (Blockly.Realtime.isEnabled()) {
+    // Only used by realtime.
+    element.setAttribute('id', block.id);
+  }
   if (block.mutationToDom) {
     // Custom data for an advanced block.
     var mutation = block.mutationToDom();
-    if (mutation) {
+    if (mutation && (mutation.hasChildNodes() || mutation.hasAttributes())) {
       element.appendChild(mutation);
     }
   }
@@ -224,6 +227,7 @@ Blockly.Xml.domToWorkspace = function(workspace, xml) {
   if (workspace.RTL) {
     width = workspace.getWidth();
   }
+  Blockly.Field.startCache();
   // Safari 7.1.3 is known to provide node lists with extra references to
   // children beyond the lists' length.  Trust the length, do not use the
   // looping pattern of checking the index for an object.
@@ -239,6 +243,7 @@ Blockly.Xml.domToWorkspace = function(workspace, xml) {
       }
     }
   }
+  Blockly.Field.stopCache();
 };
 
 /**
@@ -297,6 +302,7 @@ Blockly.Xml.domToBlockHeadless_ =
   }
   var id = xmlBlock.getAttribute('id');
   if (opt_reuseBlock && id) {
+    // Only used by realtime.
     block = Blockly.Block.getById(id, workspace);
     // TODO: The following is for debugging.  It should never actually happen.
     if (!block) {
@@ -371,13 +377,21 @@ Blockly.Xml.domToBlockHeadless_ =
         // Titles were renamed to field in December 2013.
         // Fall through.
       case 'field':
-        block.setFieldValue(xmlChild.textContent, name);
+        var field = block.getField(name);
+        if (!field) {
+          console.warn('Ignoring non-existent field ' + name + ' in block ' +
+                       prototypeName);
+          break;
+        }
+        field.setValue(xmlChild.textContent);
         break;
       case 'value':
       case 'statement':
         input = block.getInput(name);
         if (!input) {
-          throw 'Input ' + name + ' does not exist in block ' + prototypeName;
+          console.warn('Ignoring non-existent input ' + name + ' in block ' +
+                       prototypeName);
+          break;
         }
         if (firstRealGrandchild &&
             firstRealGrandchild.nodeName.toLowerCase() == 'block') {
@@ -411,7 +425,7 @@ Blockly.Xml.domToBlockHeadless_ =
         break;
       default:
         // Unknown tag; ignore.  Same principle as HTML parsers.
-        console.log('Ignoring unknown tag: ' + xmlChild.nodeName);
+        console.warn('Ignoring unknown tag: ' + xmlChild.nodeName);
     }
   }
 
@@ -438,6 +452,10 @@ Blockly.Xml.domToBlockHeadless_ =
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');
+  }
+  // Give the block a chance to clean up any initial inputs.
+  if (block.validate) {
+    block.validate();
   }
   return block;
 };

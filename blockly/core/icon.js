@@ -39,15 +39,20 @@ Blockly.Icon = function(block) {
 };
 
 /**
- * Icon in base64 format.
- * @private
+ * Does this icon get hidden when the block is collapsed.
  */
-Blockly.Icon.prototype.png_ = '';
+Blockly.Icon.prototype.collapseHidden = true;
 
 /**
  * Height and width of icons.
  */
 Blockly.Icon.prototype.SIZE = 17;
+
+/**
+ * Icon in base64 format.
+ * @private
+ */
+Blockly.Icon.prototype.png_ = '';
 
 /**
  * Bubble UI (if visible).
@@ -133,6 +138,10 @@ Blockly.Icon.prototype.isVisible = function() {
  * @private
  */
 Blockly.Icon.prototype.iconClick_ = function(e) {
+  if (Blockly.dragMode_ == 2) {
+    // Drag operation is concluding.  Don't open the editor.
+    return;
+  }
   if (!this.block_.isInFlyout && !Blockly.isRightButton(e)) {
     this.setVisible(!this.isVisible());
   }
@@ -154,7 +163,7 @@ Blockly.Icon.prototype.updateColour = function() {
  * @return {number} Horizontal offset for next item to draw.
  */
 Blockly.Icon.prototype.renderIcon = function(cursorX) {
-  if (this.block_.isCollapsed()) {
+  if (this.collapseHidden && this.block_.isCollapsed()) {
     this.iconGroup_.setAttribute('display', 'none');
     return cursorX;
   }
@@ -166,7 +175,7 @@ Blockly.Icon.prototype.renderIcon = function(cursorX) {
     cursorX -= width;
   }
   this.iconGroup_.setAttribute('transform',
-      'translate(' + cursorX + ', ' + TOP_MARGIN + ')');
+      'translate(' + cursorX + ',' + TOP_MARGIN + ')');
   this.computeIconLocation();
   if (this.block_.RTL) {
     cursorX -= Blockly.BlockSvg.SEP_SPACE_X;

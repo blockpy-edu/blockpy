@@ -512,7 +512,7 @@ KennelEditor.prototype.getToolbox = function() {
                 '<category name="Python">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
-                    '<block type="function_call"></block>'+
+                    //'<block type="function_call"></block>'+
                 '</category>'+
                 '<category name="Output">'+
                     '<block type="text_print"></block>'+
@@ -529,15 +529,15 @@ KennelEditor.prototype.getToolbox = function() {
                     '<block type="logic_boolean"></block>'+
                 '</category>'+
                 '<category name="Lists">'+
-                    '<block type="lists_create_with"></block>'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
                     '<block type="lists_length"></block>'+
+                    '<block type="lists_create_with"></block>'+
                 '</category>'+
                 '<category name="Dictionaries">'+
-                    '<block type="dicts_create_with"></block>'+
                     '<block type="dict_get_literal"></block>'+
                     '<block type="dict_keys"></block>'+
+                    '<block type="dicts_create_with"></block>'+
                 '</category>'+
                 '<sep></sep>'+
                 '<category name="Data - Weather">'+
@@ -1312,7 +1312,8 @@ Kennel.prototype.run = function() {
     //this.editor.updateBlocks();
     var code = this.model.programs['__main__'];
     if (code.trim() == "") {
-        this.printError("Your canvas is currently blank.");
+        this.printError("You haven't written any code yet!");
+        return;
     }
     this.resetConsole();
     // Actually run the python code
@@ -1352,7 +1353,6 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
                   JSON.stringify(output)+", "+
                   JSON.stringify(traceTable)+", "+
                   ")";
-        console.log(on_run);
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
