@@ -388,6 +388,7 @@ Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
   if (this.isInFlyout) {
     return;
   }
+  this.workspace.markFocused();
   // Update Blockly's knowledge of its own location.
   Blockly.svgResize(this.workspace);
   Blockly.terminateDrag_();
@@ -706,9 +707,7 @@ Blockly.BlockSvg.prototype.onMouseMove_ = function(e) {
         if (this_.parentBlock_) {
           // Push this block to the very top of the stack.
           this_.setParent(null);
-          if (workspace_.scale >= 1) {
-            this_.disconnectUiEffect();
-          }
+          this_.disconnectUiEffect();
         }
         this_.setDragging_(true);
         workspace_.recordDeleteAreas();
@@ -1097,7 +1096,9 @@ Blockly.BlockSvg.disposeUiStep_ = function(clone, rtl, start, workspaceScale) {
  */
 Blockly.BlockSvg.prototype.connectionUiEffect = function() {
   this.workspace.playAudio('click');
-
+  if (this.workspace.scale < 1) {
+    return;  // Too small to care about visual effects.
+  }
   // Determine the absolute coordinates of the inferior block.
   var xy = Blockly.getSvgXY_(/** @type {!Element} */ (this.svgGroup_),
                              this.workspace);
@@ -1144,12 +1145,15 @@ Blockly.BlockSvg.connectionUiStep_ = function(ripple, start, workspaceScale) {
  */
 Blockly.BlockSvg.prototype.disconnectUiEffect = function() {
   this.workspace.playAudio('disconnect');
+  if (this.workspace.scale < 1) {
+    return;  // Too small to care about visual effects.
+  }
   // Horizontal distance for bottom of block to wiggle.
   var DISPLACEMENT = 10;
   // Scale magnitude of skew to height of block.
   var height = this.getHeightWidth().height;
   var magnitude = Math.atan(DISPLACEMENT / height) / Math.PI * 180;
-  if (this.RTL) {
+  if (!this.RTL) {
     magnitude *= -1;
   }
   // Start the animation.

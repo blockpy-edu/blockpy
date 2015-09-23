@@ -832,7 +832,7 @@ Blockly.WorkspaceSvg.prototype.updateToolbox = function(tree) {
  */
 Blockly.WorkspaceSvg.prototype.addChangeListener = function(func) {
   var wrapper = Blockly.bindEvent_(this.getCanvas(),
-                            'blocklyWorkspaceChange', null, func);
+      'blocklyWorkspaceChange', null, func);
   Array.prototype.push.apply(this.eventWrappers_, wrapper);
   return wrapper;
 };
@@ -853,7 +853,11 @@ Blockly.WorkspaceSvg.prototype.removeChangeListener = function(bindData) {
  * Mark this workspace as the currently focused main workspace.
  */
 Blockly.WorkspaceSvg.prototype.markFocused = function() {
-  Blockly.mainWorkspace = this;
+  if (this.options.parentWorkspace) {
+    this.options.parentWorkspace.markFocused();
+  } else {
+    Blockly.mainWorkspace = this;
+  }
 };
 
 /**
@@ -913,18 +917,26 @@ Blockly.WorkspaceSvg.prototype.zoomCenter = function(type) {
 
 /**
  * Reset zooming and dragging.
+ * @param {!Event} e Mouse down event.
  */
-Blockly.WorkspaceSvg.prototype.zoomReset = function() {
+Blockly.WorkspaceSvg.prototype.zoomReset = function(e) {
   this.scale = 1;
   this.updateGridPattern_();
-  var metrics = this.getMetrics();
-  this.scrollbar.set((metrics.contentWidth - metrics.viewWidth) / 2,
-                     (metrics.contentHeight - metrics.viewHeight) / 2);
   Blockly.hideChaff(false);
   if (this.flyout_) {
     // No toolbox, resize flyout.
     this.flyout_.reflow();
   }
+  // Zoom level has changed, update the scrollbars.
+  if (this.scrollbar) {
+    this.scrollbar.resize();
+  }
+  // Center the workspace.
+  var metrics = this.getMetrics();
+  this.scrollbar.set((metrics.contentWidth - metrics.viewWidth) / 2,
+      (metrics.contentHeight - metrics.viewHeight) / 2);
+  // This event has been handled.  Don't start a workspace drag.
+  e.stopPropagation();
 };
 
 /**
