@@ -61,7 +61,6 @@ KennelServer.prototype.logEvent = function(event, action) {
 }
 
 KennelServer.prototype.uploadEvents = function() {
-    this.eventQueue = [];
     var data = {
         'question_id': this.model.question.question_id,
         'student_id': this.model.question.student_id,
@@ -90,7 +89,7 @@ KennelServer.prototype.markSuccess = function() {
                 alertBox("Success reported").delay(200).fadeOut("slow");
             } else {
                 alertBox("Success report failed");
-                console.error(response.message);
+                console.error("Server Success Report Error", response.message);
             }
         }).fail(function() {
             alertBox("Success report failed");
@@ -115,7 +114,7 @@ KennelServer.prototype.save = function() {
                 storage.remove(data.question_id);
             } else {
                 alertBox("Saving failed");
-                console.error(response.message);
+                console.error("Server Saving Error", response.message);
             }
         }).fail(function() {
             alertBox("Saving failed");
@@ -155,7 +154,7 @@ KennelServer.prototype.load = function() {
                 }
                 alertBox("Loaded").delay(200).fadeOut("slow");
             } else {
-                console.error(response.message);
+                console.error("Server Load Error", response.message);
                 alertBox("Loading failed");
             }
         }).fail(function() {
@@ -163,6 +162,8 @@ KennelServer.prototype.load = function() {
         }).always(function() {
             server.model.loaded = true;
         });
+    } else {
+        server.model.loaded = true;
     }
 };
 
@@ -437,7 +438,7 @@ KennelEditor.prototype.updateBlocks = function() {
             var result = this.converter.convertSource(code);
             code = result.xml;
             if (result.error !== null) {
-                console.error(result.error);
+                console.error("Partial Conversion Error", result.error);
             }
         }
         var blocklyXml = Blockly.Xml.textToDom(code);
@@ -449,7 +450,7 @@ KennelEditor.prototype.updateBlocks = function() {
         }
     } catch (e) {
         this.printError(e);
-        console.error(e);
+        console.error("Total Conversion Error", e);
         this.setBlocksFromXml(backupXml);
     }
 }
@@ -1056,7 +1057,7 @@ Kennel.prototype.stepConsole = function(step, page) {
  * Print an error to the consoles -- the on screen one and the browser one
  */
 Kennel.prototype.printError = function(error) {
-    console.log(error);
+    console.log("Printing Error", error);
     this.explorer.tags.errors.show();
     // Is it a string?
     if (typeof error !== "string") {
@@ -1078,7 +1079,7 @@ Kennel.prototype.printError = function(error) {
         } else {
             // An error?
             error = ""+error.name + ": " + error.message;
-            console.log(error.stack);
+            console.log("Unknown Error"+error.stack);
         }
     }
     // Perform any necessary cleaning
@@ -1336,7 +1337,6 @@ Kennel.prototype.run = function() {
             kennel.toolbar.elements.run.prop('disabled', false);
         },
         function(error) {
-            console.log(error.stack);
             kennel.printError(error);
             kennel.toolbar.elements.run.prop('disabled', false);
         }
@@ -1369,7 +1369,7 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
             }, function (error) {
                 Sk.afterSingleExecution = backupExecution;
                 kennel.feedback.error("Error in instructor's feedback. "+error);
-                console.error(error);
+                console.error("Instructor Feedback Error:", error);
             });
     }
 }

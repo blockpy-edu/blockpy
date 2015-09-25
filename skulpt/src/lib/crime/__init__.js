@@ -16,6 +16,9 @@ var $builtinmodule = function(name)
         Sk.builtin.pyCheckArgs("get_property_crimes", arguments, 1, 1);
         Sk.builtin.pyCheckType("state", "string", Sk.builtin.checkString(state));
         state = state.v.toLowerCase();
+        if (! (state in _CRIME_DATA)) {
+            throw new Sk.builtin.Exception("State name not found: "+state);
+        }
         return Sk.ffi.remapToPy(_CRIME_DATA[state]['data'].map(function(elem) {
             return elem['rates']['property']['all'];
         }));
@@ -25,6 +28,9 @@ var $builtinmodule = function(name)
         Sk.builtin.pyCheckArgs("get_violent_crimes", arguments, 1, 1);
         Sk.builtin.pyCheckType("state", "string", Sk.builtin.checkString(state));
         state = state.v.toLowerCase();
+        if (! (state in _CRIME_DATA)) {
+            throw new Sk.builtin.Exception("State name not found: "+state);
+        }
         return Sk.ffi.remapToPy(_CRIME_DATA[state]['data'].map(function(elem) {
             return elem['rates']['violent']['all'];
         }));
@@ -45,6 +51,9 @@ var $builtinmodule = function(name)
                                     'population': _CRIME_DATA[state]['data'][i]['population']});
                 }
             }
+        }
+        if (year_data.length == 0) {
+            throw new Sk.builtin.Exception("Year not valid: "+year);
         }
         return Sk.ffi.remapToPy(year_data);
     });

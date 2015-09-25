@@ -45,7 +45,7 @@ PythonToBlocks.prototype.recursiveMeasure = function(node, nextBlockLine) {
     }
     var myNext = nextBlockLine;
     if ("orelse" in node && node.orelse.length > 0) {
-        if (node.orelse.length == 1 && node.orelse[0].constructor.name == "If_") {
+        if (node.orelse.length == 1 && node.orelse[0]._astname == "If_") {
             myNext = node.orelse[0].lineno-1;
         } else {
             myNext = node.orelse[0].lineno-1-1;
@@ -221,7 +221,7 @@ raw_block = function(text) {
 }
 
 PythonToBlocks.prototype.convert = function(node, is_top_level) {
-    return this[node.constructor.name](node, is_top_level);
+    return this[node._astname](node, is_top_level);
 }
 
 function arrayMax(array) {
@@ -240,7 +240,6 @@ PythonToBlocks.prototype.convertStatement = function(node, full_source, is_top_l
     try {
         return this.convert(node, is_top_level);
     } catch (e) {
-        console.error(e);
         heights = this.getChunkHeights(node);
         extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
         return raw_block(extractedSource);
@@ -330,7 +329,7 @@ PythonToBlocks.prototype.FunctionDef = function(node)
     }, {
         "inline": "false"
     }, {
-        "args": this.arguments_(args)
+        "arg": this.arguments_(args)
     }, {
         "STACK": this.convertBody(body)
     });
@@ -519,9 +518,9 @@ PythonToBlocks.prototype.If_ = function(node)
     
     // Handle weird orelse stuff
     if (orelse !== undefined) {
-        if (orelse.length == 1 && orelse[0].constructor.name == "If_") {
+        if (orelse.length == 1 && orelse[0]._astname == "If_") {
             // This is an 'ELIF'
-            while (orelse.length == 1  && orelse[0].constructor.name == "If_") {
+            while (orelse.length == 1  && orelse[0]._astname == "If_") {
                 this.heights.shift();
                 elseifCount += 1;
                 body = orelse[0].body;
@@ -827,7 +826,7 @@ PythonToBlocks.prototype.Dict = function(node) {
     var keyList = [];
     var valueList = [];
     for (var i = 0; i < keys.length; i+= 1) {
-        if (keys[i].constructor.name != "Str") {
+        if (keys[i]._astname != "Str") {
             throw new Error("Dictionary Keys should be Strings.");
         }
         keyList["KEY"+i] = this.Str_value(keys[i]);
@@ -1016,7 +1015,7 @@ PythonToBlocks.prototype.KNOWN_MODULES = {
 PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
 PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
     var name = this.identifier(func.attr);
-    if (func.value.constructor.name == "Name") {
+    if (func.value._astname == "Name") {
         var module = this.identifier(func.value.id);
         if (module == "plt" && name == "plot") {
             if (args.length == 1) {
@@ -1114,7 +1113,7 @@ PythonToBlocks.prototype.Call = function(node) {
     var starargs = node.starargs;
     var kwargs = node.kwargs;
     
-    switch (func.constructor.name) {
+    switch (func._astname) {
         case "Name":
             if (starargs !== null && starargs.length > 0) {
                 throw new Error("*args (variable arguments) are not implemented yet.");
@@ -1215,7 +1214,7 @@ PythonToBlocks.prototype.Subscript = function(node)
     var slice = node.slice;
     var ctx = node.ctx;
     
-    if (slice.value.constructor.name !== "Str") {
+    if (slice.value._astname !== "Str") {
         throw new Error("Currently, dictionary access only works for strings!");
     }
     

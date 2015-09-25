@@ -90,7 +90,7 @@ KennelServer.prototype.markSuccess = function() {
                 alertBox("Success reported").delay(200).fadeOut("slow");
             } else {
                 alertBox("Success report failed");
-                console.error(response.message);
+                console.error("Server Success Report Error", response.message);
             }
         }).fail(function() {
             alertBox("Success report failed");
@@ -115,7 +115,7 @@ KennelServer.prototype.save = function() {
                 storage.remove(data.question_id);
             } else {
                 alertBox("Saving failed");
-                console.error(response.message);
+                console.error("Server Saving Error", response.message);
             }
         }).fail(function() {
             alertBox("Saving failed");
@@ -155,7 +155,7 @@ KennelServer.prototype.load = function() {
                 }
                 alertBox("Loaded").delay(200).fadeOut("slow");
             } else {
-                console.error(response.message);
+                console.error("Server Load Error", response.message);
                 alertBox("Loading failed");
             }
         }).fail(function() {
@@ -163,6 +163,8 @@ KennelServer.prototype.load = function() {
         }).always(function() {
             server.model.loaded = true;
         });
+    } else {
+        server.model.loaded = true;
     }
 };
 
@@ -430,6 +432,7 @@ KennelEditor.prototype.updateText = function() {
 KennelEditor.prototype.updateBlocks = function() {
     // Make a backup of the current state
     var backupXml = this.getBlocksFromXml();
+    var blocklyXml = Blockly.Xml.textToDom('<xml xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml"><block type="text"><field name="TEXT">f</field></block></xml>');
     try {
         // Try to convert it!
         var code = this.model.get(); //this.text.getValue();
@@ -437,9 +440,10 @@ KennelEditor.prototype.updateBlocks = function() {
             var result = this.converter.convertSource(code);
             code = result.xml;
             if (result.error !== null) {
-                console.error(result.error);
+                console.error("Partial Conversion Error", result.error);
             }
         }
+        console.log(code);
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         if (this.model.settings.parsons) {
@@ -449,7 +453,7 @@ KennelEditor.prototype.updateBlocks = function() {
         }
     } catch (e) {
         this.printError(e);
-        console.error(e);
+        console.error("Total Conversion Error", e);
         this.setBlocksFromXml(backupXml);
     }
 }
@@ -1056,7 +1060,7 @@ Kennel.prototype.stepConsole = function(step, page) {
  * Print an error to the consoles -- the on screen one and the browser one
  */
 Kennel.prototype.printError = function(error) {
-    console.log(error);
+    console.log("Printing Error", error);
     this.explorer.tags.errors.show();
     // Is it a string?
     if (typeof error !== "string") {
@@ -1078,7 +1082,7 @@ Kennel.prototype.printError = function(error) {
         } else {
             // An error?
             error = ""+error.name + ": " + error.message;
-            console.log(error.stack);
+            console.log("Unknown Error"+error.stack);
         }
     }
     // Perform any necessary cleaning
@@ -1336,7 +1340,6 @@ Kennel.prototype.run = function() {
             kennel.toolbar.elements.run.prop('disabled', false);
         },
         function(error) {
-            console.log(error.stack);
             kennel.printError(error);
             kennel.toolbar.elements.run.prop('disabled', false);
         }
@@ -1369,7 +1372,7 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
             }, function (error) {
                 Sk.afterSingleExecution = backupExecution;
                 kennel.feedback.error("Error in instructor's feedback. "+error);
-                console.error(error);
+                console.error("Instructor Feedback Error:", error);
             });
     }
 }

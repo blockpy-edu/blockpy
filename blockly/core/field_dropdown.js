@@ -169,7 +169,7 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   // Record menuSize after adding menu.
   var menuSize = goog.style.getSize(menuDom);
   // Recalculate height for the total content, not only box height.
-  menuSize.height = menuDom.scrollHeight;
+  //menuSize.height = menuDom.scrollHeight;
 
   // Position the menu.
   // Flip menu vertically if off the bottom.
@@ -193,7 +193,7 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
       xy.x = windowSize.width + scrollOffset.x - menuSize.width;
     }
   }
-  Blockly.WidgetDiv.position(xy.x, xy.y windowSize, scrollOffset,
+  Blockly.WidgetDiv.position(xy.x, xy.y, windowSize, scrollOffset,
                              this.sourceBlock_.RTL);
   menu.setAllowAutoFocus(true);
   menuDom.focus();

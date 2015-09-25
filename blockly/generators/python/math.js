@@ -229,8 +229,7 @@ Blockly.Python['math_change'] = function(block) {
       Blockly.Python.ORDER_ADDITIVE) || '___';
   var varName = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
       Blockly.Variables.NAME_TYPE);
-  return varName + ' = (' + varName + ' if type(' + varName +
-      ') in (int, float, long) else 0) + ' + argument0 + '\n';
+  return varName + ' += ' + argument0 + '\n';
 };
 
 // Rounding functions have a single operand.

@@ -52,6 +52,11 @@ Blockly.FieldTextArea = function(text, opt_changeHandler) {
 goog.inherits(Blockly.FieldTextArea, Blockly.Field);
 
 /**
+ * Point size of text.  Should match blocklyText's font-size in CSS.
+ */
+Blockly.FieldTextArea.FONTSIZE = 11;
+
+/**
  * Clone this FieldTextArea.
  * @return {!Blockly.FieldTextArea} The result of calling the constructor again
  *   with the current values of the arguments used during construction.
@@ -69,7 +74,7 @@ Blockly.FieldTextArea.prototype.CURSOR = 'text';
  * Allow browser to spellcheck this field.
  * @private
  */
-Blockly.FieldTextInput.prototype.spellcheck_ = true;
+Blockly.FieldTextArea.prototype.spellcheck_ = true;
 
 /**
  * Close the input widget if this input is being deleted.
@@ -139,7 +144,7 @@ Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
     text = Blockly.Field.NBSP;
   }
   //text = text.replace(/\s/g, Blockly.Field.NBSP);
-  var y=2;
+  var y=12.5 + 2; // Hack to fix placement
   var that=this;
   //var textNode = document.createTextNode(text);
   text.split(/\n/).map(function(textline){
@@ -156,7 +161,9 @@ Blockly.FieldTextArea.prototype.updateTextNode_ = function() {
   var that = this;
   this.fixAfterLoad = setTimeout(function() {
     that.render_();
-    that.sourceBlock_.render();
+    if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+        that.sourceBlock_.render();
+    }
   }, 0);
 };
 
@@ -209,6 +216,10 @@ Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
   var div = Blockly.WidgetDiv.DIV;
   // Create the input.
   var htmlInput = goog.dom.createDom('textarea', 'blocklyHtmlInput');
+  var fontSize = (Blockly.FieldTextArea.FONTSIZE *this.sourceBlock_.workspace.scale) + 'pt';
+  div.style.fontSize = fontSize;
+  htmlInput.style.fontSize = fontSize;
+  htmlInput.style.fontFamily = 'monospace';
   htmlInput.setAttribute('spellcheck', this.spellcheck_);
   Blockly.FieldTextArea.htmlInput_ = htmlInput;
   htmlInput.style.resize = 'none';
@@ -313,22 +324,28 @@ Blockly.FieldTextArea.prototype.resizeEditor_ = function() {
   var htmlInput = Blockly.FieldTextArea.htmlInput_;
   //div.style.width = bBox.width + 'px';
   if (htmlInput.clientHeight < htmlInput.scrollHeight) {
-    div.style.width = (bBox.width) + 'px';
+    div.style.width = (bBox.width * this.sourceBlock_.workspace.scale) + 'px';
   } else {
-    div.style.width = bBox.width + 'px';
+    div.style.width = bBox.width * this.sourceBlock_.workspace.scale + 'px';
   }
-  div.style.height = bBox.height + 'px';
+  div.style.height = bBox.height * this.sourceBlock_.workspace.scale + 'px';
   // Position the editor
   var xy = this.getAbsoluteXY_();
   // In RTL mode block fields and LTR input fields the left edge moves,
   // whereas the right edge is fixed.  Reposition the editor.
   if (this.sourceBlock_.RTL) {
-    var borderBBox = this.borderRect_.getBBox();
+    var borderBBox = this.getScaledBBox_();
     xy.x += borderBBox.width;
     xy.x -= div.offsetWidth;
   }
   // Shift by a few pixels to line up exactly.
   xy.y += 1;
+  if (goog.userAgent.GECKO && Blockly.WidgetDiv.DIV.style.top) {
+    // Firefox mis-reports the location of the border by a pixel
+    // once the WidgetDiv is moved into position.
+    xy.x -= 1;
+    xy.y -= 1;
+  }
   if (goog.userAgent.WEBKIT) {
     xy.y -= 3;
   }
@@ -362,6 +379,9 @@ Blockly.FieldTextArea.prototype.widgetDispose_ = function() {
     Blockly.unbindEvent_(htmlInput.onWorkspaceChangeWrapper_);
     Blockly.FieldTextArea.htmlInput_ = null;
     // Delete the width property.
-    Blockly.WidgetDiv.DIV.style.width = 'auto';
+    var style = Blockly.WidgetDiv.DIV.style;
+    style.width = 'auto';
+    style.height = 'auto';
+    style.fontSize = '';
   };
 };
