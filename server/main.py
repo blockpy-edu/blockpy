@@ -18,4 +18,8 @@ root.addHandler(ch)
 
 app.config.from_object('config.TestingConfig')
 
+# Email
+from flask.ext.mail import Mail
+mail = Mail(app)
+
 import controllers

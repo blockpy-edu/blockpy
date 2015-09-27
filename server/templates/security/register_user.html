@@ -1,0 +1,55 @@
+
+{% extends 'layout.html' %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block body %}
+
+<h1>Register</h1>
+
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% include "security/_messages.html" %}
+
+<p>
+	Hello! Welcome to BlockPy. If you are an instructor, you will need to register below.
+</p>
+<div class='container'>
+<div class="row">
+<div class="col-md-12 ">
+    <form role="form" class='form-inline' action="{{ url_for_security('register') }}" method="POST" name="register" id='register-form'>
+        {{ register_user_form.hidden_tag() }}
+        <div class="form-group">
+            {{ render_field_with_errors(register_user_form.email, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(register_user_form.password, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(register_user_form.first_name, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(register_user_form.last_name, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(register_user_form.proof, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ register_user_form.submit(class_='btn btn-default') }} or <a href='{{ url_for_security("login") }}'>login</a>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+
+
+{% endblock %}
