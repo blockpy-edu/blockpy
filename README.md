@@ -1,7 +1,13 @@
 corgis-blockly
 ==============
 
-Synthesizing Blockly, Python Tutor, and Google Drive
+![CORGIS BlockPy](/images/blockly-corgi-logo.png?raw=true "CORGIS BlockPy")
+
+BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.
+
+The goal of BlockPy is to give you a gentle introduction to Python but eventually mature you into a more serious programming environment (such as Spyder or PyCharm). Long-term, we may support some game/animation design stuff that Scratch/Snap does, but that's not the real goal.
+
+The BlockPy project is aimed at solving some hard technical problems: having a block-based environment for a dynamic language can be tricky - are a given pair of square brackets representing list indexing or dictionary indexing? Our goal is to use advanced program analysis techniques to provide excellent support to learners.
 
 Installation
 ------------
