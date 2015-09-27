@@ -34,6 +34,22 @@ class Config(object):
             }
         }
     }
+    
+    #configured for GMAIL
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = 'vt.blockpy@gmail.com'
+    MAIL_PASSWORD = secrets.get("EMAIL_PASSWORD")
+    DEFAULT_MAIL_SENDER = 'BlockPy Admin'
+    
+    SECURITY_CONFIRMABLE = True
+    SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_PASSWORD_HASH='bcrypt'
+    SECURITY_PASSWORD_SALT=secrets.get('SECURITY_PASSWORD_SALT')
+    SECURITY_DEFAULT_REMEMBER_ME = True
 
     
 class ProductionConfig(Config):

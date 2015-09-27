@@ -57,17 +57,38 @@
 </head>
 <body>
 <div id="kennel-div" style='height:100%'></div>
+<div id="kennel-div2" style='height:100%'></div>
 <script>
 
-
+var storage = {
+    set: function(directive, value) {
+        localStorage.setItem(directive+"_value", value);
+        localStorage.setItem(directive+"_timestamp", $.now());
+    },
+    remove: function(directive) {
+        localStorage.removeItem(directive+"_value");
+        localStorage.removeItem(directive+"_timestamp");
+    },
+    get: function(directive) {
+        return localStorage.getItem(directive+"_value");
+    },
+    has: function(directive) {
+        return localStorage.getItem(directive+"_value") !== null;
+    },
+    // Tests whether the server has the newer version
+    is_new: function(directive, server_time) {
+        var stored_time = localStorage.getItem(directive+"_timestamp");
+        return (server_time >= stored_time+5000);
+    },
+};
 var timers = {};
-    function addDelay(directive, action, delay) {
-        if (delay === undefined) {
-            delay = 400;
-        }
-        clearTimeout(timers[directive]);
-        timers[directive] = setTimeout(action, delay);
+function addDelay(directive, action, delay) {
+    if (delay === undefined) {
+        delay = 400;
     }
+    clearTimeout(timers[directive]);
+    timers[directive] = setTimeout(action, delay);
+}
 
 function getQueryParams(){
     try{
@@ -195,7 +216,27 @@ function getQueryParams(){
                           'save_success': 'blockpy/save',
                           'load_success': 'blockpy/load',
                           'log_event': '',
-                          'server': false},
+                          'server': true},
+                        { 'question_id': 'cw-1-blockly',
+                          'student_id': 1,
+                          'book_id': 'compthink'});
+    kennel = new Kennel(document.getElementById('kennel-div2'),
+                        mode, // Instructor mode
+                        $("#problem-presentation").text(), // problem
+                        body, // Current code
+                        $('#default-on-run').html(), // On run code
+                        "def on_step(code, output, properties):\n    pass", // On step code
+                        "alpha = 0", // Starting code
+                        mode == "instructor",
+                        view,
+                        "blockly/",
+                        parsons,
+                        { 'save_code': 'blockpy/save',
+                          'load_code': 'blockpy/load',
+                          'save_success': 'blockpy/save',
+                          'load_success': 'blockpy/load',
+                          'log_event': '',
+                          'server': true},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
                           'book_id': 'compthink'});

@@ -8,8 +8,7 @@ from main import app
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-                               UserMixin, RoleMixin, login_required
+from flask.ext.security import UserMixin, RoleMixin, login_required
 from sqlalchemy import event, Integer, Date, ForeignKey, Column, Table,\
                        String, Boolean, DateTime, Text, ForeignKeyConstraint,\
                        cast, func
@@ -42,12 +41,16 @@ class User(Base, UserMixin):
     email = Column(String(255), unique=True)
     gender = Column(String(255), default='Unspecified')
     picture = Column(String(255), default='') # A url
+    proof = Column(String(255))
+    password = Column(String(255))
+    active = Column(Boolean())
+    confirmed_at = Column(DateTime())
     
     # Foreign key relationships
     settings = relationship("Settings", backref='user', lazy='dynamic')
     roles = relationship("Role", backref='user', lazy='dynamic')
     authentications = relationship("Authentication", backref='user', lazy='dynamic')
-    problems = relationship("Problem",  backref='user', lazy='dynamic')
+    assignments = relationship("Assignment",  backref='user', lazy='dynamic')
     def __str__(self):
         return '<{} {}>'.format(self.role.title(),
                                 self.email)
@@ -57,6 +60,9 @@ class User(Base, UserMixin):
         
     def is_admin(self):
         return 'admin' in {role.name.lower() for role in self.roles}
+    
+    def is_instructor(self):
+        return 'instructor' in {role.name.lower() for role in self.roles}
         
 class Course(Base):
     name = Column(String(255))
@@ -98,13 +104,13 @@ class Submission(Base):
     code = Column(Text())
     status = Column(Integer())
     correct = Column(Boolean())
-    problem_id = Column(Integer(), ForeignKey('problem.id'))
+    assignment_id = Column(Integer(), ForeignKey('assignment.id'))
     user_id = Column(Integer(), ForeignKey('user.id'))
     
     def __str__(self):
         return '<Submission {} for {}>'.format(self.id, self.user_id)
     
-class Problem(Base):
+class Assignment(Base):
     url = Column(String(255))
     body = Column(Text())
     on_run = Column(Text())
@@ -120,7 +126,4 @@ class Problem(Base):
     course_id = Column(Integer(), ForeignKey('course.id'))
     
     def __str__(self):
-        return '<Problem {} for {}>'.format(self.id, self.user_id)
-    
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+        return '<Assignment {} for {}>'.format(self.id, self.user_id)

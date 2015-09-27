@@ -2,7 +2,7 @@ import os
 
 from main import app
 
-from models.models import User
+from models.models import db, User, Role
 from flask import session, g, send_from_directory, request, jsonify, render_template
 from flask import redirect, url_for
 from flask_security.core import current_user
@@ -15,30 +15,19 @@ def load_user():
         g.user = current_user
     else:
         g.user = None
-    
-@app.route('/shutdown', methods=['GET', 'POST'])
-@admin_required
-def shutdown():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-    return 'Server shutting down...'
 
-@app.before_request
-def load_user():
-    pass #g.user = current_user
-    #if current_user.is_authenticated():
-    #    g.user = current_user
-    #    #log_page_access()
-    #else:
-    #    g.user = None
+from admin import admin
+
+import security 
 
 from users import users
 app.register_blueprint(users)
 
-from teachers import teachers
-app.register_blueprint(teachers)
+from courses import courses
+app.register_blueprint(courses)
+
+from lti import lti_assignments
+app.register_blueprint(lti_assignments)
 
 from services import services
 app.register_blueprint(services)

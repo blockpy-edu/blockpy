@@ -99,7 +99,7 @@ Blockly.Tooltip.RADIUS_OK = 10;
 /**
  * Delay before tooltip appears.
  */
-Blockly.Tooltip.HOVER_MS = 1000;
+Blockly.Tooltip.HOVER_MS = 700;
 
 /**
  * Horizontal padding between tooltip and screen edge.

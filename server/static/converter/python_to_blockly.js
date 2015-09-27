@@ -8,7 +8,6 @@ function xmlToString(xml) {
 
 PythonToBlocks.prototype.convertSource = function(python_source) {
     var xml = document.createElement("xml");
-    xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     if (python_source.trim() === "") {
         return {"xml": xmlToString(xml), "error": null};
     }

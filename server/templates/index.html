@@ -1,28 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>BlockPy</title>
-    <meta property="og:title" content="Welcome to BlockPy" />
-    <meta property="og:site_name" content="BlockPy"/>
-    <meta property="og:url" content="http://think.cs.vt.edu/blockpy/" />
-    <meta property="og:description" content="BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems." />
+{% extends 'layout.html' %}
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
-</head>
-<body>
+{% block title %}
+BlockPy
+{% endblock %}
 
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<script type='text/javascript'>
+</script>
+{% endblock %}
+
+{% block body %}
     <div class="jumbotron" style='padding-top: 20px; padding-bottom: 20px'>
         <div class="container">
             <div class='row'>
                 <div class='col-md-6'>
                     <h1>BlockPy</h1>
                     <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.</p>
-                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy') }}" role="button">Try BlockPy Now &raquo;</a></p>
+                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy.blockpy_canvas') }}" role="button">Try BlockPy Now &raquo;</a></p>
                 </div>
                 
                 <div class='col-md-6'>
@@ -37,14 +34,14 @@
             <div class='col-md-4'>
                 <h2>For Instructors</h2>
                 <p>Interested in making BlockPy problems for your class?</p>
-                <p><a href="{{ url_for('blockpy', mode='instructor') }}">Try it now!</a></p>
+                <p><a href="{{ url_for('blockpy.blockpy_canvas', mode='instructor') }}">Try it now!</a></p>
                 <!--<p>Embed BlockPy (<a href="/tool_config.xml">LTI Configuration</a>)</p>-->
             </div>
             
             <div class='col-md-4'>
                 <h2>For Users</h2>
                 <p>Try out the BlockPy sandbox!</p>
-                <p><a href="{{ url_for('blockpy') }}">Learn more!</a></p>
+                <p><a href="{{ url_for('blockpy.blockpy_canvas') }}">Learn more!</a></p>
             </div>
             
             <div class='col-md-4'>
@@ -61,13 +58,4 @@
             
         </div>
     </div>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
-</body>
-</html>
-
-</body>
-</html>
+{% endblock %}

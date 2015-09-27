@@ -40,7 +40,7 @@ function KennelServer(model, kennel, alertBox) {
 }
 
 KennelServer.prototype.MAX_LOG_SIZE = 20;
-KennelServer.prototype.LOG_DELAY = 8000;
+KennelServer.prototype.LOG_DELAY = 4000;
 
 KennelServer.prototype.logEvent = function(event, action) {
     var CURRENT_TIME = new Date();
@@ -65,7 +65,7 @@ KennelServer.prototype.uploadEvents = function() {
         'question_id': this.model.question.question_id,
         'student_id': this.model.question.student_id,
         'context_id': this.model.question.context_id,
-        'events': JSON.stringify(this.queue)
+        'events': JSON.stringify(this.eventQueue)
     };
     if (this.model.urls.server !== false) {
         $.post(this.model.urls.log_event, data, function() {
@@ -158,7 +158,7 @@ KennelServer.prototype.load = function() {
                 alertBox("Loading failed");
             }
         }).fail(function() {
-            alert("Loading failed");
+            alertBox("Loading failed");
         }).always(function() {
             server.model.loaded = true;
         });

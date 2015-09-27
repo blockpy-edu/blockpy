@@ -50,6 +50,11 @@ Blockly.WorkspaceSvg = function(options) {
   Blockly.WorkspaceSvg.superClass_.constructor.call(this, options);
   this.getMetrics = options.getMetrics;
   this.setMetrics = options.setMetrics;
+  
+  this.undo_stack = [];
+  this.redo_stack = [];
+  this.last_change_by_undo = false;
+  this.save_undo_flag = true;
 
   Blockly.ConnectionDB.init(this);
 
@@ -346,10 +351,6 @@ Blockly.WorkspaceSvg.prototype.align = function() {
     }
 }
 
-Blockly.WorkspaceSvg.prototype.undo_stack = [];
-Blockly.WorkspaceSvg.prototype.redo_stack = [];
-Blockly.WorkspaceSvg.prototype.last_change_by_undo = false;
-Blockly.WorkspaceSvg.prototype.save_undo_flag = true;
 Blockly.WorkspaceSvg.prototype.maximum_undos = 20;
 
 Blockly.WorkspaceSvg.prototype.enableUndo = function() {
@@ -397,10 +398,11 @@ Blockly.WorkspaceSvg.prototype.redo = function() {
         if (this.redo_stack.length == 1) {
             state = this.redo_stack.pop();
             this.undo_stack.push(state);
+        } else {
+            this.clear();
+            var xml = Blockly.Xml.textToDom(state);
+            Blockly.Xml.domToWorkspace(this, xml);
         }
-        this.clear();
-        var xml = Blockly.Xml.textToDom(state);
-        Blockly.Xml.domToWorkspace(this, xml);
     }
     if (this.redo_stack.length == 0) {
         this.last_change_by_undo = false;

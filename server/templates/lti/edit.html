@@ -1,0 +1,87 @@
+{% extends 'reduced_layout.html' %}
+
+{% block title %}
+Edit Assignment
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<!-- Style sheets -->
+{% for css in ['libs/codemirror/codemirror.css',
+               'libs/font-awesome.min.css',
+               'libs/summernote/summernote.css',
+               'kennel/kennel.css'] %}
+    <link rel="stylesheet" href="{{ url_for('static', filename=css) }}">
+{% endfor %}
+
+<!-- JQuery, D3, Math.js, Bootstrap -->
+{% for js in ['libs/jquery.hotkeys.js',
+               'libs/d3.min.js',
+               'libs/math.0.19.0.min.js',
+               'libs/bootstrap-wysiwyg.js',
+               "libs/mindmup-editabletable.js",
+               "libs/codemirror/codemirror.js",
+               "libs/codemirror/python.js",
+               "libs/codemirror/htmlmixed.js",
+               "libs/codemirror/xml.js",
+               "libs/summernote/summernote.min.js",
+               "libs/summernote/summernote-ext-hint.js",
+               "libs/summernote/summernote-ext-video.js",
+               "libs/crime_data.js",
+               "blockly/blockly_compressed.js",
+               "blockly/blocks_compressed.js",
+               "blockly/python_compressed.js",
+               "blockly/javascript_compressed.js",
+               "blockly/msg/js/en.js",
+               "skulpt/dist/skulpt.min.js",
+               "skulpt/dist/skulpt-stdlib.js",
+               "analyzer/analyzer.js",
+               "analyzer/python_errors.js",
+               "converter/python_to_blockly.js",
+               "kennel/kennel.js",
+               "converter/renderBlocklyToPng.js"
+               ] %}
+<script type="text/javascript" src="{{ url_for('static', filename=js) }}"></script>
+{% endfor %}
+
+{% endblock %}
+
+{% block body %}
+
+<div id="kennel-div" style='height:100%'></div>
+
+<pre id='problem-presentation' style='display:none'>
+
+</pre>
+<pre id='default-body' style='display:none'>
+
+</pre>
+<pre id='default-on-run' style='display:none'>
+
+</pre>
+
+<script>
+kennel = new Kennel(document.getElementById('kennel-div'),
+                        'instructor', // Instructor mode
+                        $("#problem-presentation").text(), // problem
+                        $("#default-body").text(), // Current code
+                        $('#default-on-run').html(), // On run code
+                        "def on_step(code, output, properties):\n    pass", // On step code
+                        "alpha = 0", // Starting code
+                        true,
+                        'blocks',
+                        "{{ url_for('static', filename='blockly/') }}",
+                        false,
+                        { 'save_code': '{{ url_for("blockpy.save")}}',
+                          'load_code': '{{ url_for("blockpy.load")}}',
+                          'save_success': '{{ url_for("blockpy.save")}}',
+                          'load_success': '{{ url_for("blockpy.load")}}',
+                          'log_event': ''},
+                        { 'question_id': 'cw-1-blockly',
+                          'student_id': 1,
+                          'book_id': 'compthink'});
+</script>
+
+{% endblock %}

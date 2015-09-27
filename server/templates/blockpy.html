@@ -188,19 +188,3 @@ default:
 
 </body>
 </html>
-
-<!--<script>
-  var TP = TP || {};
-  <% if defined? @tp %>
-  <% if @tp.outcome_service? %>
-	  TP.outcomeService = true;
-  <% else %>
-  	TP.outcomeService = false;
-  <% end %>
-  TP.toParams = {};
-  TP.toParams.launch_params = {};
-  <% @tp.to_params.each do |key, value| %>
-    TP.toParams.launch_params.<%= key %> = "<%= value %>";
-  <% end %>
-  <% end %>
-</script>-->

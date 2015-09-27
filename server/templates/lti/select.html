@@ -1,0 +1,63 @@
+{% extends 'reduced_layout.html' %}
+
+{% block title %}
+Courses: Index
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<script type='text/javascript'>
+$(document).ready(function() {
+    // Poll every N seconds to see if the list has changed
+});
+</script>
+<style>
+.btn-group {
+  display: flex;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<h3>Choose an Assignment</h3>
+
+<span id='test-span'>0</span>
+
+<table class="table table-condensed table-hover">
+    {% for course in courses %}
+    <tr>
+        <td>
+            <strong>Fake Assignment</strong>
+        </td>
+        <td>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce cursus, ex eget ultrices tristique, orci quam hendrerit urna, ut sagittis eros justo eleifend justo. Donec euismod purus tellus, sit amet facilisis libero aliquam sit amet. Donec ut risus ornar...
+        </td>
+        <td>
+            <div class="btn-group">
+                <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment=1, _external=True) | urlencode}}&return_type=lti_launch_url&title=Fake%20Assignment&text=Hello%20World" class="btn btn-primary">Select</a>
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a target="_blank" href="{{ url_for('lti_assignments.edit' ) }}">Edit</a></li>
+                    <li><a href="#">Duplicate</a></li>
+                    <li><a href="#">Delete</a></li>
+                    <!--<li role="separator" class="divider"></li>-->
+                </ul>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan='3'>
+            <a target="_blank" href="{{ url_for('lti_assignments.edit')}}" class="btn btn-default">Create new Assignment</a>
+        </td>
+    </tr>
+</table>
+
+
+{% endblock %}

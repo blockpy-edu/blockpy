@@ -40,7 +40,7 @@ function KennelServer(model, kennel, alertBox) {
 }
 
 KennelServer.prototype.MAX_LOG_SIZE = 20;
-KennelServer.prototype.LOG_DELAY = 8000;
+KennelServer.prototype.LOG_DELAY = 4000;
 
 KennelServer.prototype.logEvent = function(event, action) {
     var CURRENT_TIME = new Date();
@@ -61,12 +61,11 @@ KennelServer.prototype.logEvent = function(event, action) {
 }
 
 KennelServer.prototype.uploadEvents = function() {
-    this.eventQueue = [];
     var data = {
         'question_id': this.model.question.question_id,
         'student_id': this.model.question.student_id,
         'context_id': this.model.question.context_id,
-        'events': JSON.stringify(this.queue)
+        'events': JSON.stringify(this.eventQueue)
     };
     if (this.model.urls.server !== false) {
         $.post(this.model.urls.log_event, data, function() {
@@ -159,7 +158,7 @@ KennelServer.prototype.load = function() {
                 alertBox("Loading failed");
             }
         }).fail(function() {
-            alert("Loading failed");
+            alertBox("Loading failed");
         }).always(function() {
             server.model.loaded = true;
         });
@@ -432,7 +431,6 @@ KennelEditor.prototype.updateText = function() {
 KennelEditor.prototype.updateBlocks = function() {
     // Make a backup of the current state
     var backupXml = this.getBlocksFromXml();
-    var blocklyXml = Blockly.Xml.textToDom('<xml xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml"><block type="text"><field name="TEXT">f</field></block></xml>');
     try {
         // Try to convert it!
         var code = this.model.get(); //this.text.getValue();
@@ -443,7 +441,6 @@ KennelEditor.prototype.updateBlocks = function() {
                 console.error("Partial Conversion Error", result.error);
             }
         }
-        console.log(code);
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         if (this.model.settings.parsons) {
