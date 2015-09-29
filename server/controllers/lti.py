@@ -107,7 +107,13 @@ def index(lti=lti, assignment=None):
         print "No assignment, how boring"
     else:
         print "An assignment! Great!", assignment
-    return render_template('blockpy.html', lti=lti,
+    if request.method == 'POST':
+        params = request.form.to_dict()
+    else:
+        params = request.args.to_dict()
+    session['final_user_id'] = params['user_id']
+    pprint(session.items())
+    return render_template('lti/edit.html', lti=lti,
                            program={})
     
 @lti_assignments.route('/select/', methods=['GET', 'POST'])
@@ -123,8 +129,10 @@ def select(lti=lti):
         params = request.form.to_dict()
     else:
         params = request.args.to_dict()
-    pprint(params.items())
     user_id = params['user_id']
+    session['user_id'] = params['user_id']
+    print("HOPES AND DREAMS")
+    pprint(session.items())
     user_name = params['lis_person_name_full']
     #user_nickname = lti.nickname
     user_roles = params['roles']
@@ -137,6 +145,8 @@ def select(lti=lti):
     return_url = params['launch_presentation_return_url']
     message_type = params['lti_message_type']
     return_type = params['ext_content_return_types']
+    
+    # STore current user_id and context_id
     
     courses=range(10)
     
@@ -152,6 +162,9 @@ def edit(assignment=None):
     """
     pprint(vars(session))
     pprint(session.items())
+    
+    # Get the ID of the assignment
+    # Ensure that it is changeable by the current user_id and context_id
     
     courses=range(100)
     
@@ -188,8 +201,7 @@ def grade(lti=lti):
     :param lti: the `lti` object from `pylti`
     :return: grade rendered by grade.html template
     """
-    form = AddForm()
-    correct = ((form.p1.data + form.p2.data) == form.result.data)
-    form.correct.data = correct
-    pylti.post_grade(1 if correct else 0)
-    return render_template('grade.html', form=form)
+    pprint(session.items())
+    pprint(vars(session))
+    lti.post_grade2(1, user=session['final_user_id'])
+    return "Successful!"

@@ -50,6 +50,10 @@ Edit Assignment
 
 {% block body %}
 
+<form method="post" action="{{ url_for('lti_assignments.grade')}}">
+  <button type="submit" name="your_name" value="your_value">Grade Me</button>
+</form>
+
 <div id="kennel-div" style='height:100%'></div>
 
 <pre id='problem-presentation' style='display:none'>
