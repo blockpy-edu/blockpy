@@ -44,7 +44,7 @@ PythonToBlocks.prototype.recursiveMeasure = function(node, nextBlockLine) {
     }
     var myNext = nextBlockLine;
     if ("orelse" in node && node.orelse.length > 0) {
-        if (node.orelse.length == 1 && node.orelse[0]._astname == "If_") {
+        if (node.orelse.length == 1 && node.orelse[0]._astname == "If") {
             myNext = node.orelse[0].lineno-1;
         } else {
             myNext = node.orelse[0].lineno-1-1;
@@ -517,9 +517,9 @@ PythonToBlocks.prototype.If = function(node)
     
     // Handle weird orelse stuff
     if (orelse !== undefined) {
-        if (orelse.length == 1 && orelse[0]._astname == "If_") {
+        if (orelse.length == 1 && orelse[0]._astname == "If") {
             // This is an 'ELIF'
-            while (orelse.length == 1  && orelse[0]._astname == "If_") {
+            while (orelse.length == 1  && orelse[0]._astname == "If") {
                 this.heights.shift();
                 elseifCount += 1;
                 body = orelse[0].body;
