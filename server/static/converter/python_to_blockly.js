@@ -44,7 +44,7 @@ PythonToBlocks.prototype.recursiveMeasure = function(node, nextBlockLine) {
     }
     var myNext = nextBlockLine;
     if ("orelse" in node && node.orelse.length > 0) {
-        if (node.orelse.length == 1 && node.orelse[0]._astname == "If_") {
+        if (node.orelse.length == 1 && node.orelse[0]._astname == "If") {
             myNext = node.orelse[0].lineno-1;
         } else {
             myNext = node.orelse[0].lineno-1-1;
@@ -354,7 +354,7 @@ PythonToBlocks.prototype.ClassDef = function(node)
  * value: expr_ty
  *
  */
-PythonToBlocks.prototype.Return_ = function(node)
+PythonToBlocks.prototype.Return = function(node)
 {
     var value = node.value;
     // No field, one title, one setting
@@ -369,7 +369,7 @@ PythonToBlocks.prototype.Return_ = function(node)
  * targets: asdl_seq
  *
  */
-PythonToBlocks.prototype.Delete_ = function(/* {asdl_seq *} */ targets)
+PythonToBlocks.prototype.Delete = function(/* {asdl_seq *} */ targets)
 {
     this.targets = targets;
     // TODO
@@ -454,7 +454,7 @@ PythonToBlocks.prototype.Print = function(node)
  * orelse: asdl_seq
  *
  */
-PythonToBlocks.prototype.For_ = function(node) {
+PythonToBlocks.prototype.For = function(node) {
     var target = node.target;
     var iter = node.iter;
     var body = node.body;
@@ -481,7 +481,7 @@ PythonToBlocks.prototype.For_ = function(node) {
  * body: asdl_seq
  * orelse: asdl_seq
  */
-PythonToBlocks.prototype.While_ = function(node) {
+PythonToBlocks.prototype.While = function(node) {
     var test = node.test;
     var body = node.body;
     var orelse = node.orelse;
@@ -502,7 +502,7 @@ PythonToBlocks.prototype.While_ = function(node) {
  * orelse: asdl_seq
  *
  */
-PythonToBlocks.prototype.If_ = function(node)
+PythonToBlocks.prototype.If = function(node)
 {
     var test = node.test;
     var body = node.body;
@@ -517,9 +517,9 @@ PythonToBlocks.prototype.If_ = function(node)
     
     // Handle weird orelse stuff
     if (orelse !== undefined) {
-        if (orelse.length == 1 && orelse[0]._astname == "If_") {
+        if (orelse.length == 1 && orelse[0]._astname == "If") {
             // This is an 'ELIF'
-            while (orelse.length == 1  && orelse[0]._astname == "If_") {
+            while (orelse.length == 1  && orelse[0]._astname == "If") {
                 this.heights.shift();
                 elseifCount += 1;
                 body = orelse[0].body;
@@ -552,7 +552,7 @@ PythonToBlocks.prototype.If_ = function(node)
  * optional_vars: expr_ty
  * body: asdl_seq
  */
-PythonToBlocks.prototype.With_ = function(node)
+PythonToBlocks.prototype.With = function(node)
 {
     var context_expr = node.context_expr;
     var optional_vars = node.optional_vars;
@@ -614,7 +614,7 @@ PythonToBlocks.prototype.Assert = function(node)
  * names: asdl_seq
  *
  */
-PythonToBlocks.prototype.Import_ = function(node)
+PythonToBlocks.prototype.Import = function(node)
 {
     var names = node.names;
     // The import statement isn't used in blockly because it happens implicitly
@@ -690,7 +690,7 @@ PythonToBlocks.prototype.Pass = function() {
  *
  *
  */
-PythonToBlocks.prototype.Break_ = function() {
+PythonToBlocks.prototype.Break = function() {
     return block("controls_flow_statements", {
         "FLOW": "BREAK"
     });
@@ -700,7 +700,7 @@ PythonToBlocks.prototype.Break_ = function() {
  *
  *
  */
-PythonToBlocks.prototype.Continue_ = function() {
+PythonToBlocks.prototype.Continue = function() {
     return block("controls_flow_statements", {
         "FLOW": "CONTINUE"
     });
@@ -710,7 +710,7 @@ PythonToBlocks.prototype.Continue_ = function() {
  * TODO: what does this do?
  *
  */
-PythonToBlocks.prototype.Debugger_ = function() {
+PythonToBlocks.prototype.Debugger = function() {
     return null;
 }
 
