@@ -382,8 +382,6 @@ KennelEditor.prototype.setMode = function(mode) {
         // Refresh the CodeMirror instance to prevent graphical glitches
         this.text.refresh();
     } else if (mode == 'blocks') {
-        // Update the blocks model from the text
-        this.updateBlocks();
         // Hide the text menu
         this.textTag.css('height', '0%');
         $(this.text.getWrapperElement()).hide();
@@ -391,6 +389,8 @@ KennelEditor.prototype.setMode = function(mode) {
         this.blockTag.css('height', '100%');
         this.resizeBlockly();
         this.blockly.setVisible(true);
+        // Update the blocks model from the text
+        this.updateBlocks();
     } else {
         console.error("Invalid mode:", mode);
     }
@@ -431,7 +431,7 @@ KennelEditor.prototype.updateText = function() {
 KennelEditor.prototype.updateBlocks = function() {
     // Make a backup of the current state
     var backupXml = this.getBlocksFromXml();
-    try {
+    //try {
         // Try to convert it!
         var code = this.model.get(); //this.text.getValue();
         if (code.trim().charAt(0) !== '<') {
@@ -441,6 +441,7 @@ KennelEditor.prototype.updateBlocks = function() {
                 console.error("Partial Conversion Error", result.error);
             }
         }
+        console.log(code);
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         if (this.model.settings.parsons) {
@@ -448,11 +449,11 @@ KennelEditor.prototype.updateBlocks = function() {
         } else {
             this.blockly.align();
         }
-    } catch (e) {
-        this.printError(e);
-        console.error("Total Conversion Error", e);
-        this.setBlocksFromXml(backupXml);
-    }
+    //} catch (e) {
+      //  this.printError(e);
+//        console.error("Total Conversion Error", e);
+        //this.setBlocksFromXml(backupXml);
+    //}
 }
 
 KennelEditor.prototype.getBlocksFromXml = function() {
