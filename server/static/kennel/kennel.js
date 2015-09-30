@@ -382,8 +382,6 @@ KennelEditor.prototype.setMode = function(mode) {
         // Refresh the CodeMirror instance to prevent graphical glitches
         this.text.refresh();
     } else if (mode == 'blocks') {
-        // Update the blocks model from the text
-        this.updateBlocks();
         // Hide the text menu
         this.textTag.css('height', '0%');
         $(this.text.getWrapperElement()).hide();
@@ -391,6 +389,8 @@ KennelEditor.prototype.setMode = function(mode) {
         this.blockTag.css('height', '100%');
         this.resizeBlockly();
         this.blockly.setVisible(true);
+        // Update the blocks model from the text
+        this.updateBlocks();
     } else {
         console.error("Invalid mode:", mode);
     }
@@ -431,7 +431,7 @@ KennelEditor.prototype.updateText = function() {
 KennelEditor.prototype.updateBlocks = function() {
     // Make a backup of the current state
     var backupXml = this.getBlocksFromXml();
-    try {
+    //try {
         // Try to convert it!
         var code = this.model.get(); //this.text.getValue();
         if (code.trim().charAt(0) !== '<') {
@@ -441,6 +441,7 @@ KennelEditor.prototype.updateBlocks = function() {
                 console.error("Partial Conversion Error", result.error);
             }
         }
+        console.log(code);
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         if (this.model.settings.parsons) {
@@ -448,11 +449,11 @@ KennelEditor.prototype.updateBlocks = function() {
         } else {
             this.blockly.align();
         }
-    } catch (e) {
-        this.printError(e);
-        console.error("Total Conversion Error", e);
-        this.setBlocksFromXml(backupXml);
-    }
+    //} catch (e) {
+      //  this.printError(e);
+//        console.error("Total Conversion Error", e);
+        //this.setBlocksFromXml(backupXml);
+    //}
 }
 
 KennelEditor.prototype.getBlocksFromXml = function() {
@@ -636,6 +637,9 @@ function KennelToolbar(tag) {
                             .attr("role", "group")
                             .html('<i class="fa fa-trash-o"></i> Clear')
                             .appendTo(doGroup),
+        'to_rst': $("<button>RST</button>")
+                            .addClass('btn btn-info kennel-to-rst')
+                            .appendTo(doGroup),
         'wrench': '',
         'copy': '',
         'paste': '',
@@ -776,6 +780,28 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
     this.changeProgram('__main__');
 };
 
+/**
+ * Indents the given string
+ * @param {string} str  The string to be indented.
+ * @param {number} numOfIndents  The amount of indentations to place at the
+ *     beginning of each line of the string.
+ * @param {number=} opt_spacesPerIndent  Optional.  If specified, this should be
+ *     the number of spaces to be used for each tab that would ordinarily be
+ *     used to indent the text.  These amount of spaces will also be used to
+ *     replace any tab characters that already exist within the string.
+ * @return {string}  The new string with each line beginning with the desired
+ *     amount of indentation.
+ */
+function indent(str, numOfIndents, opt_spacesPerIndent) {
+  str = str.replace(/^(?=.)/gm, new Array(numOfIndents + 1).join('\t'));
+  numOfIndents = new Array(opt_spacesPerIndent + 1 || 0).join(' '); // re-use
+  return opt_spacesPerIndent
+    ? str.replace(/^\t+/g, function(tabs) {
+        return tabs.replace(/./g, numOfIndents);
+    })
+    : str;
+}
+
 Kennel.prototype.activateToolbar = function() {
     var elements = this.toolbar.elements;
     var kennel = this, server = this.server;
@@ -795,8 +821,25 @@ Kennel.prototype.activateToolbar = function() {
         server.logEvent('editor', 'mode');
         kennel.changeKennelMode();
     });
+    elements.to_rst.click(function(ev) {
+        ev.preventDefault();
+        var presentation = kennel.model.presentation.replace(/(\r\n|\n|\r)/gm,"");
+        var starting = indent(kennel.model.programs.starting_code, 1, 4);
+        var testing = indent(kennel.model.programs.on_run, 1, 4);
+        var text = ".. blockly:: ___\n"+
+                   "    :comment: " + presentation + "\n"+
+                   "\n"+
+                   "    preload::\n"+ starting + "\n"+
+                   "    test::\n"+ testing + "\n";
+        var popup = kennel.mainDiv.find('.kennel-popup');
+        popup.find('.modal-title').html("RST");
+        popup.find('.modal-body').text(text);
+        popup.modal('show');
+        
+    });
     if (!this.model.settings.instructor) {
         elements.kennel_mode.hide();
+        elements.to_rst.hide();
     }
     // Run
     elements.run.click(function() {
@@ -936,6 +979,21 @@ Kennel.prototype.alert = function(message) {
 Kennel.prototype.loadMain = function() {
     var mainTabs = ""+
     "<div class='kennel-content container-fluid'>"+
+        "<div class='kennel-popup modal fade' style='display:none'>"+
+            "<div class='modal-dialog' style='width:750px'>"+
+                "<div class='modal-content' id='modal-message' >"+
+                    "<div class='modal-header'>"+
+                        "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>"+
+                        "<h4 class='modal-title'>Dynamic Content</h4>"+
+                    "</div>"+
+                    "<textarea class='modal-body' style='width:100%; height:400px'>"+
+                    "</textarea>"+
+                    "<div class='modal-footer'>"+
+                        "<button type='button' class='btn btn-white' data-dismiss='modal'>Close</button>"+
+                    "</div>"+    
+                "</div>"+
+            "</div>"+
+        "</div>"+
         "<div class='row'>"+
             "<div class='kennel-content-left col-md-7 col-sm-7 alert alert-warning'>"+
                 '<span class="kennel-alert pull-right text-muted">Loading...</span>'+
@@ -1383,13 +1441,18 @@ KennelEditor.prototype.shuffle = function() {
     var width = metrics.viewWidth / 2,
         height = metrics.viewHeight;
     var blocks = workspace.getTopBlocks(false);
-    var y = 5,
+    var y = 5, x = 0,
         maximal_increase = height/blocks.length;
     for (var i = 0; i < blocks.length; i++){
         // Get a block
         var block = blocks[i];
         var properties = block.getRelativeToSurfaceXY();
-        block.moveBy(-properties.x+randomInteger(10, width), 
+        if (i == 0) {
+            x = 5;
+        } else {
+            x = -properties.x+randomInteger(10, width);
+        }
+        block.moveBy(x, 
                      -properties.y+y);
         y = y + randomInteger(5, maximal_increase);
     }
