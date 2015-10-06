@@ -247,8 +247,13 @@ function getQueryParams(){
   
         </script>
 <pre id='default-body' style='display:none'>
-if a:
-if b:
+import matplotlib.pyplot as plt
+import weather
+
+
+plt.plot(weather.get_forecasts("Blacksburg, VA"))
+plt.show()
+
 </pre>
 <pre id='default-on-run' style='display:none'>
 def on_run(code, output, properties):

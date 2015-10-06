@@ -291,6 +291,11 @@ function KennelEditor(printError, model, blockTag, textTag, blocklyPath) {
     this.loadBlockly(blockTag, blocklyPath);
     this.loadText(textTag);
     this.setMode(this.model.settings.editor);
+    if (kennel.model.settings.editor == "blocks") {
+        elements.editor_mode.html("<span class='glyphicon glyphicon-th'></span> Blocks");
+    } else {
+        elements.editor_mode.html("<span class='glyphicon glyphicon-italic'></span> Text");
+    }
 }
 
 KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
@@ -441,7 +446,6 @@ KennelEditor.prototype.updateBlocks = function() {
                 console.error("Partial Conversion Error", result.error);
             }
         }
-        console.log(code);
         var blocklyXml = Blockly.Xml.textToDom(code);
         this.setBlocksFromXml(blocklyXml);
         if (this.model.settings.parsons) {
@@ -1384,6 +1388,7 @@ Kennel.prototype.run = function() {
     this.toolbar.elements.run.prop('disabled', true);
     
     var kennel = this;
+    var server = this.server;
     executionPromise.then(
         function (module) {
             // Run the afterSingleExecution one extra time for final state
@@ -1395,6 +1400,7 @@ Kennel.prototype.run = function() {
             kennel.toolbar.elements.run.prop('disabled', false);
         },
         function(error) {
+            server.logEvent('blockly_error', error);
             kennel.printError(error);
             kennel.toolbar.elements.run.prop('disabled', false);
         }
@@ -1403,9 +1409,11 @@ Kennel.prototype.run = function() {
 
 Kennel.prototype.check = function(student_code, traceTable, output) {
     var kennel = this;
+    var server = this.server;
     var on_run = this.model.programs['on_run'];
     if (on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
+        console.log(output);
         Sk.afterSingleExecution = undefined;
         on_run += "\nresult = on_run('''"+student_code+"''', "+
                   JSON.stringify(output)+", "+
@@ -1428,6 +1436,7 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
                 Sk.afterSingleExecution = backupExecution;
                 kennel.feedback.error("Error in instructor's feedback. "+error);
                 console.error("Instructor Feedback Error:", error);
+                server.logEvent('blockly_instructor_error', error);
             });
     }
 }
