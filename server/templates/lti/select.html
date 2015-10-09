@@ -9,9 +9,38 @@ Courses: Index
 
 {% block extrahead %}
 <script type='text/javascript'>
-$(document).ready(function() {
-    // Poll every N seconds to see if the list has changed
-});
+/*
+original_assignments = [{{ assignments|map(attribute='id')|join(',') }}];
+(function poll() {
+    setTimeout(function() {
+        $.ajax({
+            url: "{{ url_for('lti_assignments.check_assignments') }}",
+            type: "GET",
+            success: function(data) {
+                if (data.success) {
+                    var assignments = data.assignments;
+                    for (var i = 0; i < assignments.length; i+= 1) {
+                        var assignment = assignments[i];
+                        if (original_assignments.indexOf(assignment.id) == -1) {
+                            var new_row = $("<tr></tr>").append(
+                                $("<td></td>").text(assignment.title)
+                            ).append(
+                                $("<td></td>").text(assignment.body)
+                            ).append(
+                                $("<td>Testing</td>")
+                            );
+                            $('#new-row').before(new_row);
+                            original_assignments.push(assignment.id);
+                        }
+                    }
+                }
+            },
+            dataType: "json",
+            complete: poll,
+            timeout: 2000
+        })
+    }, 5000);
+})();*/
 </script>
 <style>
 .btn-group {
@@ -24,26 +53,26 @@ $(document).ready(function() {
 
 <h3>Choose an Assignment</h3>
 
-<span id='test-span'>0</span>
-
-<table class="table table-condensed table-hover">
-    {% for course in courses %}
-    <tr>
-        <td>
-            <strong>Fake Assignment</strong>
+<table class="table table-condensed table-hover" id='assignment-list'>
+    {% for assignment in assignments %}
+    <tr id='assignment-row-{{assignment.id}}'>
+        <td class='col-md-3 col-sm-3 col-xs-3'>
+            <strong>{{assignment.title()}}</strong><br>
+            Last modified at
+            {{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(' 0', ' ') }}
         </td>
-        <td>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce cursus, ex eget ultrices tristique, orci quam hendrerit urna, ut sagittis eros justo eleifend justo. Donec euismod purus tellus, sit amet facilisis libero aliquam sit amet. Donec ut risus ornar...
+        <td class='col-md-6 col-sm-6 col-xs-6'>
+            {{ assignment.body|striptags|truncate(255) }}
         </td>
-        <td>
+        <td class='col-md-2 col-sm-2 col-xs-2'>
             <div class="btn-group">
-                <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment=1, _external=True) | urlencode}}&return_type=lti_launch_url&title=Fake%20Assignment&text=Hello%20World" class="btn btn-primary">Select</a>
+                <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=Hello%20World" class="btn btn-primary">Select</a>
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a target="_blank" href="{{ url_for('lti_assignments.edit' ) }}">Edit</a></li>
+                    <li><a target="_blank" href="{{ url_for('lti_assignments.edit_assignment', assignment_id=assignment.id ) }}">Edit</a></li>
                     <li><a href="#">Duplicate</a></li>
                     <li><a href="#">Delete</a></li>
                     <!--<li role="separator" class="divider"></li>-->
@@ -52,9 +81,9 @@ $(document).ready(function() {
         </td>
     </tr>
     {% endfor %}
-    <tr>
+    <tr id='new-row'>
         <td colspan='3'>
-            <a target="_blank" href="{{ url_for('lti_assignments.edit')}}" class="btn btn-default">Create new Assignment</a>
+            <a target="_blank" href="{{ url_for('lti_assignments.new_assignment')}}" class="btn btn-default">Create new Assignment</a>
         </td>
     </tr>
 </table>

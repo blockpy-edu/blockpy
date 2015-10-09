@@ -16,6 +16,12 @@ Edit Assignment
     <link rel="stylesheet" href="{{ url_for('static', filename=css) }}">
 {% endfor %}
 
+<style>
+.embedded-data {
+    display: none;
+}
+</style>
+
 <!-- JQuery, D3, Math.js, Bootstrap -->
 {% for js in ['libs/jquery.hotkeys.js',
                'libs/d3.min.js',
@@ -51,29 +57,27 @@ Edit Assignment
 {% block body %}
 
 <form method="post" action="{{ url_for('lti_assignments.grade')}}">
-  <button type="submit" name="your_name" value="your_value">Grade Me</button>
+    <button type="submit" name="your_name" value="your_value">Grade Me</button>
 </form>
 
-<div id="kennel-div" style='height:100%'></div>
+<!-- Main BlockPy canvas -->
+<div id="blockpy-div" style='height:100%'></div>
 
-<pre id='problem-presentation' style='display:none'>
-
-</pre>
-<pre id='default-body' style='display:none'>
-
-</pre>
-<pre id='default-on-run' style='display:none'>
-
-</pre>
+<pre id='problem-presentation' class='embedded-data'>{{ assignment.presentation }}</pre>
+<pre id='default-body'         class='embedded-data'>{{ submission.code }}</pre>
+<pre id='default-on-run'       class='embedded-data'>{{ assignment.on_run }}</pre>
+<pre id='default-on-step'      class='embedded-data'>{{ assignment.on_step }}</pre>
+<pre id='default-on-start'     class='embedded-data'>{{ assignment.on_start }}</pre>
 
 <script>
-kennel = new Kennel(document.getElementById('kennel-div'),
+$(document).ready(function() {
+    blockpy = new Kennel(document.getElementById('blockpy-div'),
                         'instructor', // Instructor mode
                         $("#problem-presentation").text(), // problem
                         $("#default-body").text(), // Current code
-                        $('#default-on-run').html(), // On run code
-                        "def on_step(code, output, properties):\n    pass", // On step code
-                        "alpha = 0", // Starting code
+                        $('#default-on-run').text(), // On run code
+                        $('#default-on-step').text(), // On step code
+                        $('#default-on-start').text(), // Starting code
                         true,
                         'blocks',
                         "{{ url_for('static', filename='blockly/') }}",
@@ -86,6 +90,8 @@ kennel = new Kennel(document.getElementById('kennel-div'),
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
                           'book_id': 'compthink'});
+    $(".embedded-data").remove();
+});
 </script>
 
 {% endblock %}
