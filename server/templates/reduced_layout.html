@@ -18,22 +18,24 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
     
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
-    <style>
-    {% block extracss %}
-    {% endblock %}
-    </style>
+    <script src="{{ url_for('static', filename='libs/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='libs/bootstrap.min.js')}}"></script>
 
     <script type="text/javascript">
     {% block extrajs %}
     {% endblock %}
     
+    {% if not navbar_invisible %}
     $(document).ready(function () {
         $("#{{request.endpoint}}").parent().addClass("active"); 
     })
+    {% endif %}
     </script>
+    
+    <style>
+    {% block extracss %}
+    {% endblock %}
+    </style>
     
     {% block extrahead %}
     {% endblock %}
@@ -41,6 +43,7 @@
   </head>
 <body>
 
+{% if not navbar_invisible %}
 <nav class="navbar navbar-inverse navbar-static-top">
   <div class="container">
     <div class="navbar-header">
@@ -53,6 +56,7 @@
     </div><!--/.nav-collapse -->
   </div>
 </nav>
+{% endif %}
 
 <div class="container-fluid">
 {% block body %}

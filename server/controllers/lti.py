@@ -1,6 +1,11 @@
 from pprint import pprint
 from lxml import etree
 
+# Pygments, for reporting nicely formatted Python snippets
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+
 from flask.ext.wtf import Form
 from wtforms import IntegerField, BooleanField
 
@@ -18,7 +23,7 @@ from sqlalchemy import Date, cast, func, desc, or_
 from controllers.helpers import instructor_required
 
 from main import app
-from models.models import (User, Course, Assignment)
+from models.models import (User, Course, Assignment, Submission)
 
 lti_assignments = Blueprint('lti_assignments', __name__, url_prefix='/lti_assignments')
 
@@ -82,6 +87,11 @@ def error(exception=None):
     :return: the error.html template rendered
     """
     print exception
+    if request.method == 'POST':
+        params = request.form.to_dict()
+    else:
+        params = request.args.to_dict()
+    print(params)
     return render_template('error.html')
 
 
@@ -97,13 +107,14 @@ def config():
 @lti_assignments.route('/index', methods=['GET'])
 @lti_assignments.route('/lti', methods=['GET', 'POST'])
 @lti(request='initial', error=error, app=app)
-def index(lti=lti, assignment_id=None):
+def index(lti=lti):
     """ initial access page to the lti provider.  This page provides
     authorization for the user.
 
     :param lti: the `lti` object from `pylti`
     :return: index page for lti provider
     """
+    assignment_id = request.args.get('assignment_id', None)
     if assignment_id is None:
         return "No assignment, how boring"
     else:
@@ -112,8 +123,8 @@ def index(lti=lti, assignment_id=None):
     assignment = Assignment.by_id(assignment_id)
     submission = assignment.get_submission(user.id)
     pprint(session.items())
-    return render_template('lti/edit.html', lti=lti,
-                           program={}, assignment=assignment)
+    return render_template('lti/index.html', lti=lti,
+                           program={}, assignment=assignment, submission=submission)
                            
                            
 def ensure_canvas_arguments():
@@ -121,6 +132,8 @@ def ensure_canvas_arguments():
         params = request.form.to_dict()
     else:
         params = request.args.to_dict()
+    if 'launch_presentation_return_url' in params:
+        session['launch_presentation_return_url'] = params['launch_presentation_return_url']
     if "stored_context_id" not in session:
         session["stored_context_id"] = params['context_id']
     if "stored_context_title" not in session:
@@ -142,7 +155,7 @@ def ensure_canvas_arguments():
     
 @lti_assignments.route('/select/', methods=['GET', 'POST'])
 @lti_assignments.route('/select', methods=['GET', 'POST'])
-@lti(request='session', error=error, role='staff', app=app)
+@lti(request='initial', error=error, role='staff', app=app)
 def select(lti=lti):
     """ render the contents of the staff.html template
 
@@ -151,6 +164,7 @@ def select(lti=lti):
     """
     # Store current user_id and context_id
     user, roles, course = ensure_canvas_arguments()
+    print roles
     assignments = Assignment.by_course(course.id)
     return_url = session['launch_presentation_return_url']
     
@@ -169,12 +183,59 @@ def check_assignments():
     assignments = Assignment.by_course(course.id)
     return jsonify(success=True, assignments=[a.to_dict() for a in assignments])
     
-def save_blockpy():
-    # Given a problem ID
-    # Ensure that the session has the necessary components
-    #   Student ID, context ID
-    #   and that these match things on record for the problem_id
-    return "True"
+@lti_assignments.route('/save_code/', methods=['GET', 'POST'])
+@lti_assignments.route('/save_code', methods=['GET', 'POST'])
+def save_code():
+    assignment_id = request.form.get('question_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No Assignment ID given!")
+    code = request.form.get('code', '')
+    filename = request.form.get('filename', '__main__')
+    NEEDED_KEYS = ["stored_user_id", "stored_user_email"]
+    if not bool(key for key in NEEDED_KEYS if key in session):
+        return jsonify(success=False, message="LTI Authentication error!")
+    user = User.from_lti("canvas", session["stored_user_id"], 
+                         session["stored_user_email"])
+    if filename == "__main__":
+        Submission.save_code(user.id, assignment_id, code)
+    elif User.is_lti_instructor(session["stored_user_role"]):
+        if filename == "on_run":
+            Assignment.edit(assignment_id=assignment_id, on_run=code)
+        elif filename == "on_change":
+            Assignment.edit(assignment_id=assignment_id, on_step=code)
+        elif filename == "starting_code":
+            Assignment.edit(assignment_id=assignment_id, on_start=code)
+    return jsonify(success=True)
+    
+@lti_assignments.route('/save_correct/', methods=['GET', 'POST'])
+@lti_assignments.route('/save_correct', methods=['GET', 'POST'])
+def save_correct():
+    assignment_id = request.form.get('question_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No Assignment ID given!")
+    NEEDED_KEYS = ["stored_user_id", "stored_user_email"]
+    if not bool(key for key in NEEDED_KEYS if key in session):
+        return jsonify(success=False, message="LTI Authentication error!")
+    user = User.from_lti("canvas", session["stored_user_id"], 
+                         session["stored_user_email"])
+    submission = Submission.save_correct(user.id, assignment_id)
+    return jsonify(success=True)
+    
+@lti_assignments.route('/save_presentation/', methods=['GET', 'POST'])
+@lti_assignments.route('/save_presentation', methods=['GET', 'POST'])
+def save_presentation():
+    assignment_id = request.form.get('question_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No Assignment ID given!")
+    presentation = request.form.get('presentation', "")
+    NEEDED_KEYS = ["stored_user_id", "stored_user_email"]
+    if not bool(key for key in NEEDED_KEYS if key in session):
+        return jsonify(success=False, message="LTI Authentication error!")
+    if User.is_lti_instructor(session["stored_user_role"]):
+        Assignment.edit(assignment_id=assignment_id, presentation=presentation)
+        return jsonify(success=True)
+    else:
+        return jsonify(success=False, message="You are not an instructor!")
     
 @lti_assignments.route('/new_assignment/', methods=['GET', 'POST'])
 @lti_assignments.route('/new_assignment', methods=['GET', 'POST'])
@@ -199,7 +260,11 @@ def edit_assignment(assignment_id):
         return "This assignment does not belong to this course."
     submission = assignment.get_submission(user.id)
     
-    return render_template('lti/edit.html', assignment=assignment, submission=submission)
+    return render_template('lti/edit.html', 
+                           assignment=assignment, 
+                           submission=submission, 
+                           user_id=user.id,
+                           context_id=course.id)
     
 @lti_assignments.route('/dashboard/', methods=['GET', 'POST'])
 @lti_assignments.route('/dashboard', methods=['GET', 'POST'])
@@ -234,6 +299,15 @@ def grade(lti=lti):
     """
     pprint(session.items())
     pprint(vars(session))
+    assignment_id = request.form.get('question_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No Assignment ID given!")
+    NEEDED_KEYS = ["stored_user_id", "stored_user_email"]
+    if not bool(key for key in NEEDED_KEYS if key in session):
+        return jsonify(success=False, message="LTI Authentication error!")
+    user = User.from_lti("canvas", session["stored_user_id"], 
+                         session["stored_user_email"])
+    submission = Submission.save_correct(user.id, assignment_id)
     session[''] = session['lis_outcome_service_url']
-    lti.post_grade(1, "<div>Testing</div><pre>Hello world</pre><br><strong>BE STRONG</strong><em>Hello emphasis</em><iframe src='http://www.google.com'></iframe><img src='http://think.cs.vt.edu/blockpy/static/images/blockly-corgi-logo-large.png' /><span style='color:red'>RED TEXT</span>")
+    lti.post_grade(1, "<h1>Success</h1>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
     return "Successful!"

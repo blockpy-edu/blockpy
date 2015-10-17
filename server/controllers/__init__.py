@@ -51,14 +51,20 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 @app.route("/site-map", methods=['GET', 'POST'])
 def site_map():
-    links = []
+    import urllib
+    output = []
     for rule in app.url_map.iter_rules():
-        # Filter out rules we can't navigate to in a browser
-        # and rules that require parameters
+
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "[{0}]".format(arg)
+
+        methods = ','.join(rule.methods)
         try:
-            url = url_for(rule.endpoint)
+            url = url_for(rule.endpoint, **options)
         except:
-            url = "Unknown"
-        links.append((url, rule.endpoint))
-    # links is now a list of url, endpoint tuples
-    return "<br>\n".join(["{} => {}".format(u, e) for u, e in links])
+            url = "Unknown error"
+        line = urllib.unquote("<td>{:50s}</td><td>{:20s}</td><td>{}</td>".format(rule.endpoint, methods, url))
+        output.append(line)
+    return "<table><tr>{}</tr></table>".format("</tr><tr>".join(sorted(output)))
+        

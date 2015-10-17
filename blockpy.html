@@ -60,36 +60,6 @@
 <div id="kennel-div2" style='height:100%'></div>
 <script>
 
-var storage = {
-    set: function(directive, value) {
-        localStorage.setItem(directive+"_value", value);
-        localStorage.setItem(directive+"_timestamp", $.now());
-    },
-    remove: function(directive) {
-        localStorage.removeItem(directive+"_value");
-        localStorage.removeItem(directive+"_timestamp");
-    },
-    get: function(directive) {
-        return localStorage.getItem(directive+"_value");
-    },
-    has: function(directive) {
-        return localStorage.getItem(directive+"_value") !== null;
-    },
-    // Tests whether the server has the newer version
-    is_new: function(directive, server_time) {
-        var stored_time = localStorage.getItem(directive+"_timestamp");
-        return (server_time >= stored_time+5000);
-    },
-};
-var timers = {};
-function addDelay(directive, action, delay) {
-    if (delay === undefined) {
-        delay = 400;
-    }
-    clearTimeout(timers[directive]);
-    timers[directive] = setTimeout(action, delay);
-}
-
 function getQueryParams(){
     try{
         url = window.location.href;
