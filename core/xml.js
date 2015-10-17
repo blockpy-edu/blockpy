@@ -60,7 +60,7 @@ Blockly.Xml.workspaceToDom = function(workspace) {
  * @private
  */
 Blockly.Xml.blockToDom_ = function(block) {
-  var element = goog.dom.createDom('block');
+  var element = goog.dom.createDom(block.isShadow() ? 'shadow' : 'block');
   element.setAttribute('type', block.type);
   if (Blockly.Realtime.isEnabled()) {
     // Only used by realtime.
@@ -117,6 +117,10 @@ Blockly.Xml.blockToDom_ = function(block) {
       } else if (input.type == Blockly.NEXT_STATEMENT) {
         container = goog.dom.createDom('statement');
       }
+      var shadow = input.connection.getShadowDom();
+      if (shadow && (!childBlock || !childBlock.isShadow())) {
+        container.appendChild(Blockly.Xml.cloneShadow_(shadow));
+      }
       if (childBlock) {
         container.appendChild(Blockly.Xml.blockToDom_(childBlock));
         empty = false;
@@ -139,7 +143,7 @@ Blockly.Xml.blockToDom_ = function(block) {
   if (!block.isDeletable()) {
     element.setAttribute('deletable', false);
   }
-  if (!block.isMovable()) {
+  if (!block.isMovable() && !block.isShadow()) {
     element.setAttribute('movable', false);
   }
   if (!block.isEditable()) {
@@ -152,8 +156,49 @@ Blockly.Xml.blockToDom_ = function(block) {
         Blockly.Xml.blockToDom_(nextBlock));
     element.appendChild(container);
   }
+  var shadow = block.nextConnection && block.nextConnection.getShadowDom();
+  if (shadow && (!nextBlock || !nextBlock.isShadow())) {
+    container.appendChild(Blockly.Xml.cloneShadow_(shadow));
+  }
 
   return element;
+};
+
+/**
+ * Deeply clone the shadow's DOM so that changes don't back-wash to the block.
+ * @param {!Element} shadow A tree of XML elements.
+ * @return {!Element} A tree of XML elements.
+ * @private
+ */
+Blockly.Xml.cloneShadow_ = function(shadow) {
+  shadow = shadow.cloneNode(true);
+  // Walk the tree looking for whitespace.  Don't prune whitespace in a tag.
+  var node = shadow;
+  var textNode;
+  while (node) {
+    if (node.firstChild) {
+      node = node.firstChild;
+    } else {
+      while (node && !node.nextSibling) {
+        textNode = node;
+        node = node.parentNode;
+        if (textNode.nodeType == 3 && textNode.data.trim() == '' &&
+            node.firstChild != textNode) {
+          // Prune whitespace after a tag.
+          goog.dom.removeNode(textNode);
+        }
+      }
+      if (node) {
+        textNode = node;
+        node = node.nextSibling;
+        if (textNode.nodeType == 3 && textNode.data.trim() == '') {
+          // Prune whitespace before a tag.
+          goog.dom.removeNode(textNode);
+        }
+      }
+    }
+  }
+  return shadow;
 };
 
 /**
@@ -274,7 +319,9 @@ Blockly.Xml.domToBlock = function(workspace, xmlBlock, opt_reuseBlock) {
     // Populating the connection database may be defered until after the blocks
     // have renderend.
     setTimeout(function() {
-      topBlock.setConnectionsHidden(false);
+      if (topBlock.workspace) {  // Check that the block hasn't been deleted.
+        topBlock.setConnectionsHidden(false);
+      }
     }, 1);
     topBlock.updateDisabled();
     // Fire an event to allow scrollbars to resize.
@@ -322,19 +369,30 @@ Blockly.Xml.domToBlockHeadless_ =
 
   var blockChild = null;
   for (var i = 0, xmlChild; xmlChild = xmlBlock.childNodes[i]; i++) {
-    if (xmlChild.nodeType == 3 && xmlChild.data.match(/^\s*$/)) {
-      // Extra whitespace between tags does not concern us.
+    if (xmlChild.nodeType == 3) {
+      // Ignore any text at the <block> level.  It's all whitespace anyway.
       continue;
     }
     var input;
 
-    // Find the first 'real' grandchild node (that isn't whitespace).
-    var firstRealGrandchild = null;
+    // Find any enclosed blocks or shadows in this tag.
+    var childBlockNode = null;
+    var childShadowNode = null;
+    var shadowActive = false;
     for (var j = 0, grandchildNode; grandchildNode = xmlChild.childNodes[j];
          j++) {
-      if (grandchildNode.nodeType != 3 || !grandchildNode.data.match(/^\s*$/)) {
-        firstRealGrandchild = grandchildNode;
+      if (grandchildNode.nodeType == 1) {
+        if (grandchildNode.nodeName.toLowerCase() == 'block') {
+          childBlockNode = grandchildNode;
+        } else if (grandchildNode.nodeName.toLowerCase() == 'shadow') {
+          childShadowNode = grandchildNode;
+        }
       }
+    }
+    // Use the shadow block if there is no child block.
+    if (!childBlockNode && childShadowNode) {
+      childBlockNode = childShadowNode;
+      shadowActive = true;
     }
 
     var name = xmlChild.getAttribute('name');
@@ -393,10 +451,12 @@ Blockly.Xml.domToBlockHeadless_ =
                        prototypeName);
           break;
         }
-        if (firstRealGrandchild &&
-            firstRealGrandchild.nodeName.toLowerCase() == 'block') {
+        if (childShadowNode) {
+          input.connection.setShadowDom(childShadowNode);
+        }
+        if (childBlockNode) {
           blockChild = Blockly.Xml.domToBlockHeadless_(workspace,
-              firstRealGrandchild, opt_reuseBlock);
+              childBlockNode, opt_reuseBlock);
           if (blockChild.outputConnection) {
             input.connection.connect(blockChild.outputConnection);
           } else if (blockChild.previousConnection) {
@@ -407,8 +467,10 @@ Blockly.Xml.domToBlockHeadless_ =
         }
         break;
       case 'next':
-        if (firstRealGrandchild &&
-            firstRealGrandchild.nodeName.toLowerCase() == 'block') {
+        if (childShadowNode && block.nextConnection) {
+          block.nextConnection.setShadowDom(childShadowNode);
+        }
+        if (childBlockNode) {
           if (!block.nextConnection) {
             throw 'Next statement does not exist.';
           } else if (block.nextConnection.targetConnection) {
@@ -416,7 +478,7 @@ Blockly.Xml.domToBlockHeadless_ =
             throw 'Next statement is already connected.';
           }
           blockChild = Blockly.Xml.domToBlockHeadless_(workspace,
-              firstRealGrandchild, opt_reuseBlock);
+              childBlockNode, opt_reuseBlock);
           if (!blockChild.previousConnection) {
             throw 'Next block does not have previous statement.';
           }
@@ -452,6 +514,9 @@ Blockly.Xml.domToBlockHeadless_ =
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');
+  }
+  if (xmlBlock.nodeName.toLowerCase() == 'shadow') {
+    block.setShadow(true);
   }
   // Give the block a chance to clean up any initial inputs.
   if (block.validate) {
