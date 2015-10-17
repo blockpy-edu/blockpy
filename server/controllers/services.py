@@ -14,12 +14,13 @@ services = Blueprint('services', __name__, url_prefix='/services')
 
 from service_libraries import weather as weather_service
 
-@services.route('/weather/<function>/<arguments>', methods=['GET'])
-@services.route('/weather/<function>/<arguments>/', methods=['GET'])
-def weather(function, arguments):
+@services.route('/weather/', methods=['GET', "POST"])
+@services.route('/weather', methods=['GET', 'POST'])
+def weather():
+    function = request.args.get("function", "get_temperature")
+    city = request.args.get("city", "Blacksburg, VA")
     weather_function = getattr(weather_service, function)
-    weather_arguments = arguments.split("|||")
-    return jsonify(data=weather_function(*weather_arguments))
+    return jsonify(data=weather_function(city))
 
 @services.route('/sheets', methods=['GET'])
 def sheets(sheet_url):

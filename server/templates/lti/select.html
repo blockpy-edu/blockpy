@@ -66,7 +66,7 @@ original_assignments = [{{ assignments|map(attribute='id')|join(',') }}];
         </td>
         <td class='col-md-2 col-sm-2 col-xs-2'>
             <div class="btn-group">
-                <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=Hello%20World" class="btn btn-primary">Select</a>
+                <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise" class="btn btn-primary">Select</a>
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>

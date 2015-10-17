@@ -161,13 +161,52 @@ class Submission(Base):
     
     def __str__(self):
         return '<Submission {} for {}>'.format(self.id, self.user_id)
+        
+    @staticmethod
+    def load(user_id, assignment_id):
+        submission = Submission.query.filter_by(assignment_id=assignment_id, 
+                                                user_id=user_id).first()
+        if not submission:
+            submission = Submission(assignment_id=assignment_id, user_id=user_id)
+            db.session.add(submission)
+            db.session.commit()
+        return submission
+        
+    @staticmethod
+    def save_code(user_id, assignment_id, code):
+        submission = Submission.query.filter_by(user_id=user_id, 
+                                                assignment_id=assignment_id).first()
+        if not submission:
+            submission = Submission(assignment_id=assignment_id, 
+                                    user_id=user_id,
+                                    code=code)
+            db.session.add(submission)
+        else:
+            submission.code = code
+        db.session.commit()
+        return submission
+        
+    @staticmethod
+    def save_correct(user_id, assignment_id):
+        submission = Submission.query.filter_by(user_id=user_id, 
+                                                assignment_id=assignment_id).first()
+        if not submission:
+            submission = Submission(assignment_id=self.id, 
+                                    user_id=user_id,
+                                    correct=True)
+            db.session.add(submission)
+        else:
+            submission.correct = True
+        db.session.commit()
+        return submission
+        
     
 class Assignment(Base):
     url = Column(String(255), default="")
     name = Column(String(255), default="Untitled")
     body = Column(Text(), default="")
-    on_run = Column(Text(), default="def on_run(code, output, properties):\n    pass")
-    on_step = Column(Text(), default="def on_step(code, output, properties):\n    pass")
+    on_run = Column(Text(), default="def on_run(code, output, properties):\n    return True")
+    on_step = Column(Text(), default="def on_step(code, output, properties):\n    return True")
     on_start = Column(Text(), default="")
     answer = Column(Text(), default="")
     due = Column(DateTime(), default=None)
@@ -177,6 +216,20 @@ class Assignment(Base):
     mode = Column(String(10), default="blocks")
     owner_id = Column(Integer(), ForeignKey('user.id'))
     course_id = Column(Integer(), ForeignKey('course.id'))
+    
+    @staticmethod
+    def edit(assignment_id, presentation=None, on_run=None, on_step=None, on_start=None):
+        assignment = Assignment.by_id(assignment_id)
+        if presentation is not None:
+            assignment.body = presentation
+        if on_run is not None:
+            assignment.on_run = on_run
+        if on_step is not None:
+            assignment.on_step = on_step
+        if on_start is not None:
+            assignment.on_start = on_start
+        db.session.commit()
+        return assignment
     
     def to_dict(self):
         return {
@@ -224,7 +277,4 @@ class Assignment(Base):
         return False
     
     def get_submission(self, user_id):
-        submission = Submission.query.filter_by(assignment_id=self.id, user_id=user_id).first()
-        if not submission:
-            submission = Submission(assignment_id=self.id, user_id=user_id)
-        return submission
+        return Submission.load(user_id, self.id)

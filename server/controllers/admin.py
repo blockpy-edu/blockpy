@@ -59,10 +59,10 @@ class FeedbackView(RegularView):
                           'last_editor': _id(User)}
                           '''
 admin.add_view(UserView(User, db.session, category='Tables'))
-admin.add_view(RegularView(Course, db.session, category='Tables'))
-admin.add_view(RegularView(Submission, db.session, category='Tables'))
+admin.add_view(ModelIdView(Course, db.session, category='Tables'))
+admin.add_view(ModelIdView(Submission, db.session, category='Tables'))
 admin.add_view(ModelIdView(Assignment, db.session, category='Tables'))
-admin.add_view(RegularView(Settings, db.session, category='Tables'))
+admin.add_view(ModelIdView(Settings, db.session, category='Tables'))
 admin.add_view(ModelIdView(Authentication, db.session, category='Tables'))
 
 @app.route('/admin/shutdown', methods=['GET', 'POST'])

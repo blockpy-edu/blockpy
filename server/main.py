@@ -19,6 +19,9 @@ root.addHandler(ch)
 
 app.config.from_object('config.TestingConfig')
 
+# Assets
+from controllers.assets import assets
+
 # Email
 from flask.ext.mail import Mail
 mail = Mail(app)

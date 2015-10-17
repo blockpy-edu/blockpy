@@ -2,7 +2,37 @@ var $builtinmodule = function(name)
 {
     var mod = {};
     
-    var CONNECTED = false;
+    var CONNECTED = 'weather' in Sk.connectedServices;
+    var CONNECTED_URL = Sk.connectedServices['weather']
+    
+    var CACHE = function() {
+        var name = "WEATHER_BLOCKPY_";
+        this.set =  function(key, value) {
+            localStorage.setItem(name+key+"_value", value);
+            localStorage.setItem(name+key+"_timestamp", (new Date).getTime());
+        };
+        this.remove = function(key) {
+            localStorage.removeItem(name+key+"_value");
+            localStorage.removeItem(name+key+"_timestamp");
+        };
+        this.get = function(key) {
+            return localStorage.getItem(name+key+"_value");
+        };
+        this.has = function(key) {
+            if (this.is_old(key, 10)) {
+                this.remove(key);
+                return false;
+            } else {
+                return localStorage.getItem(name+key+"_value") !== null;
+            }
+        };
+        // Tests whether the server has the newer version
+        this.is_old = function(key, minutes) {
+            var stored_time = localStorage.getItem(name+key+"_timestamp");
+            current_time = (new Date).getTime();
+            return (current_time >= stored_time+(minutes*60000));
+        };
+    };
     
     var WEATHER_REPORTS = {
     'BLACKSBURG':[{'temperature': 78, 'humidity':  20, 'wind':  7}, {'temperature': 61, 'humidity': 50, 'wind': 10},
@@ -51,14 +81,35 @@ var $builtinmodule = function(name)
             default: return null;
         }
     }
-
-    mod.get_temperature = new Sk.builtin.func(function(city) {
-        Sk.builtin.pyCheckArgs("get_temperature", arguments, 1, 1);
+    
+    var sanitizeInput = function(functionName, city) {
+        Sk.builtin.pyCheckArgs(functionName, arguments, 1, 1);
         Sk.builtin.pyCheckType("city", "string", Sk.builtin.checkString(city));
         city = normalize_city(city.v);
         if (city === null) {
             throw new Sk.builtin.ValueError("Weather data is only available for the following cities: Blacksburg, Miami, San Jose, New York, Seattle.");
         }
+    };
+    
+    var getData = function(city) {
+        if (CONNECTED) {
+            if (CACHE.has(city)) {
+                return CACHE.get(city);
+            } else {
+                $.post(CONNECTED_URL, {'city': city}, function(data) {
+                    // Oh. This is actually going to be a thing.
+                    // Have to crack how Skulpt does it and replicate that.
+                    // Or figure 
+                })
+            }
+        } else {
+            return WEATHER_REPORTS;
+        }
+    }
+
+    mod.get_temperature = new Sk.builtin.func(function(city) {
+        sanitizeInput("get_temperature", city);
+        
         return Sk.ffi.remapToPy(WEATHER_REPORTS[city][0]['temperature']);
     });
     
