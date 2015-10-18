@@ -1114,35 +1114,44 @@ PythonToBlocks.prototype.Call = function(node) {
     
     switch (func._astname) {
         case "Name":
-            if (starargs !== null && starargs.length > 0) {
-                throw new Error("*args (variable arguments) are not implemented yet.");
-            } else if (kwargs !== null && kwargs.length > 0) {
-                throw new Error("**args (keyword arguments) are not implemented yet.");
-            }
-            var arguments = {};
-            var argumentsMutation = {"@name": this.identifier(func.id)};
-            for (var i = 0; i < args.length; i+= 1) {
-                arguments["ARG"+i] = this.convert(args[i]);
-                argumentsMutation[i] = this.convert(args[i]);
-            }
-            if (this.identifier(func.id) == "print") {
-                if (args.length == 1) {
-                    return [block("text_print", {}, {
-                        "TEXT": this.convert(args[0])
-                    })];
-                } else {
-                    return [block("text_print_multiple", {}, 
-                        this.convertElements("PRINT", args), 
-                    {
-                        "inline": "true"
-                    }, {
-                        "@items": args.length
-                    })];
-                }
-            } else {
-                return block("procedures_callreturn", {}, arguments, {
-                    "inline": "false"
-                }, argumentsMutation);
+            switch (this.identifier(func.id)) {
+                case "print":
+                    if (args.length == 1) {
+                        return [block("text_print", {}, {
+                            "TEXT": this.convert(args[0])})];
+                    } else {
+                        return [block("text_print_multiple", {}, 
+                            this.convertElements("PRINT", args), 
+                            {"inline": "true"
+                            }, { "@items": args.length})];
+                    }
+                case "abs":
+                    return block("math_single", {"OP": "ABS"}, {"NUM": this.convert(args[0])})
+                case "round":
+                    return block("math_round", {"OP": "ROUND"}, {"NUM": this.convert(args[0])})
+                case "sum":
+                    return block("math_on_list", {"OP": "SUM"}, {"LIST": this.convert(args[0])})
+                case "min":
+                    return block("math_on_list", {"OP": "MIN"}, {"LIST": this.convert(args[0])})
+                case "max":
+                    return block("math_on_list", {"OP": "MAX"}, {"LIST": this.convert(args[0])})
+                case "len":
+                    return block("lists_length", {}, {"VALUE": this.convert(args[0])})
+                default:
+                    if (starargs !== null && starargs.length > 0) {
+                        throw new Error("*args (variable arguments) are not implemented yet.");
+                    } else if (kwargs !== null && kwargs.length > 0) {
+                        throw new Error("**args (keyword arguments) are not implemented yet.");
+                    }
+                    var arguments = {};
+                    var argumentsMutation = {"@name": this.identifier(func.id)};
+                    for (var i = 0; i < args.length; i+= 1) {
+                        arguments["ARG"+i] = this.convert(args[i]);
+                        argumentsMutation[i] = this.convert(args[i]);
+                    }
+                    return block("procedures_callreturn", {}, arguments, {
+                        "inline": "false"
+                    }, argumentsMutation);
             }
         // Direct function call
         case "Attribute":
@@ -1213,15 +1222,20 @@ PythonToBlocks.prototype.Subscript = function(node)
     var slice = node.slice;
     var ctx = node.ctx;
     
-    if (slice.value._astname !== "Str") {
-        throw new Error("Currently, dictionary access only works for strings!");
+    if (slice.value._astname == "Str") {
+        return block("dict_get_literal", {
+            "ITEM": this.Str_value(slice.value)
+        }, {
+            "DICT": this.convert(value)
+        });
+    } else if (slice.value._astname == "Num") {
+        return block("lists_index", {}, {
+            "ITEM": this.convert(slice.value),
+            "LIST": this.convert(value),
+        });
     }
     
-    return block("dict_get_literal", {
-        "ITEM": this.Str_value(slice.value)
-    }, {
-        "DICT": this.convert(value)
-    });
+    throw new Error("This kind of subscript is not supported.");
 }
 
 /*

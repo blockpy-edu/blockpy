@@ -48,7 +48,7 @@ $(document).ready(function() {
                         false,
                         'blocks',
                         "{{ url_for('static', filename='blockly/') }}",
-                        false,
+                        {'parsons': false, 'read_only': false},
                         { 'save_code': '{{ url_for("lti_assignments.save_code")}}',
                           'load_code': false,
                           'save_success': '{{ url_for("lti_assignments.save_correct")}}',
