@@ -75,7 +75,9 @@ Blockly.Python['math_single'] = function(block) {
         Blockly.Python.ORDER_UNARY_SIGN) || '___';
     return ['-' + code, Blockly.Python.ORDER_UNARY_SIGN];
   }
-  Blockly.Python.definitions_['import_math'] = 'import math';
+  if (operator != 'ABS' && operator != 'POW' && operator != 'ROUND') {
+    Blockly.Python.definitions_['import_math'] = 'import math';
+  }
   if (operator == 'SIN' || operator == 'COS' || operator == 'TAN') {
     arg = Blockly.Python.valueToCode(block, 'NUM',
         Blockly.Python.ORDER_MULTIPLICATIVE) || '___';
@@ -87,7 +89,7 @@ Blockly.Python['math_single'] = function(block) {
   // wrapping the code.
   switch (operator) {
     case 'ABS':
-      code = 'math.fabs(' + arg + ')';
+      code = 'abs(' + arg + ')';
       break;
     case 'ROOT':
       code = 'math.sqrt(' + arg + ')';
@@ -102,7 +104,7 @@ Blockly.Python['math_single'] = function(block) {
       code = 'math.exp(' + arg + ')';
       break;
     case 'POW10':
-      code = 'math.pow(10,' + arg + ')';
+      code = 'pow(10,' + arg + ')';
       break;
     case 'ROUND':
       code = 'round(' + arg + ')';

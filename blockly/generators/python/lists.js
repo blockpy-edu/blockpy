@@ -56,14 +56,14 @@ Blockly.Python['lists_repeat'] = function(block) {
 };
 
 Blockly.Python['lists_length'] = function(block) {
-  // List length.
+  // String or array length.
   var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
       Blockly.Python.ORDER_NONE) || '___';
   return ['len(' + argument0 + ')', Blockly.Python.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Python['lists_isEmpty'] = function(block) {
-  // Is the list empty?
+  // Is the string null or array empty?
   var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
       Blockly.Python.ORDER_NONE) || '___';
   var code = 'not len(' + argument0 + ')';
@@ -97,6 +97,15 @@ Blockly.Python['lists_indexOf'] = function(block) {
     return [code, Blockly.Python.ORDER_FUNCTION_CALL];
   }
 };
+
+Blockly.Python['lists_index'] = function(block) {
+    var at = Blockly.Python.valueToCode(block, 'ITEM',
+      Blockly.Python.ORDER_UNARY_SIGN) || '___';
+    var list = Blockly.Python.valueToCode(block, 'LIST',
+      Blockly.Python.ORDER_MEMBER) || '___';
+    var code = list + '[' + at + ']';
+    return [code, Blockly.Python.ORDER_MEMBER];
+}
 
 Blockly.Python['lists_getIndex'] = function(block) {
   // Get element at index.

@@ -36,6 +36,10 @@ Blockly.Blocks.lists.HUE = 100;
 Blockly.Blocks['lists_create_empty'] = {
   /**
    * Block for creating an empty list.
+   * The 'list_create_with' block is preferred as it is more flexible.
+   * <block type="lists_create_with">
+   *   <mutation items="0"></mutation>
+   * </block>
    * @this Blockly.Block
    */
   init: function() {
@@ -296,6 +300,28 @@ Blockly.Blocks['lists_indexOf'] = {
     this.setTooltip(Blockly.Msg.LISTS_INDEX_OF_TOOLTIP);
   }
 };
+
+Blockly.Blocks['lists_index'] = {
+    /**
+     * Block for getting element at index.
+     * @this Blockly.Block
+     */
+    init: function() {
+        this.setHelpUrl(Blockly.Msg.LISTS_GET_INDEX_HELPURL);
+        this.setColour(Blockly.Blocks.lists.HUE);
+        this.appendValueInput('ITEM')
+            .setCheck('Number')
+            .appendField("get");
+        this.appendValueInput('LIST')
+            .setCheck('Array')
+            .appendField("th item of");
+        this.setInputsInline(true);
+        this.setOutput(true);
+        // Assign 'this' to a variable for use in the tooltip closure below.
+        var thisBlock = this;
+        this.setTooltip("Get's the ith item from the list");
+    }
+}
 
 Blockly.Blocks['lists_getIndex'] = {
   /**

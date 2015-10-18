@@ -29,9 +29,9 @@ goog.provide('Blockly.Blocks.corgis');
 goog.require('Blockly.Blocks');
 
 var WEATHER_HUE = 70,
-    QUAKES_HUE = 65,
-    STOCKS_HUE = 60,
-    CRIME_HUE = 60,
+    QUAKES_HUE = 60,
+    STOCKS_HUE = 65,
+    CRIME_HUE = 55,
     BOOKS_HUE = 50;
     
 /*

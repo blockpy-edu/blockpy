@@ -343,7 +343,7 @@ PropertyExplorer.prototype.move = function(step) {
         this.tags.table.append(
             $("<tr/>").append($("<td/>").text(value.name))
                       .append($("<td/>").text(value.type))
-                      .append('<td><samp>'+value.value+'</samp></td>'));
+                      .append('<td><samp>'+encodeHTML(value.value)+'</samp></td>'));
     }
 };
 
@@ -375,6 +375,8 @@ KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
     this.blockly = Blockly.inject(this.blocklyDiv[0],
                                    {path: blocklyPath, 
                                     scrollbars: true, 
+                                    readOnly: this.model.settings.read_only,
+                                    zoom: {enabled: false},
                                     toolbox: this.getToolbox()});
     // Activate tracing in blockly
     this.blockly.traceOn(true);
@@ -571,20 +573,20 @@ KennelEditor.prototype.unhighlightLines = function() {
 
 KennelEditor.prototype.getToolbox = function() {
     return '<xml id="toolbox" style="display: none">'+
-                '<category name="Properties" custom="VARIABLE">'+
+                '<category name="Properties" custom="VARIABLE" colour="240">'+
                 '</category>'+
-                '<category name="Decisions">'+
+                '<category name="Decisions" colour="330">'+
                     '<block type="controls_if"></block>'+
                     '<block type="logic_compare"></block>'+
                     '<block type="logic_operation"></block>'+
                     '<block type="logic_negate"></block>'+
                 '</category>'+
-                '<category name="Iteration">'+
+                '<category name="Iteration" colour="300">'+
                     '<block type="controls_forEach"></block>'+
                 '</category>'+
-                '<category name="Functions" custom="PROCEDURE">'+
+                '<category name="Functions" custom="PROCEDURE" colour="210">'+
                 '</category>'+
-                '<category name="Calculation">'+
+                '<category name="Calculation" colour="270">'+
                     //'<block type="raw_table"></block>'+
                     '<block type="math_arithmetic"></block>'+
                     //'<block type="type_check"></block>'+
@@ -594,12 +596,12 @@ KennelEditor.prototype.getToolbox = function() {
                     '<block type="math_round"></block>'+
                     //'<block type="text_join"></block>'+
                 '</category>'+
-                '<category name="Python">'+
+                '<category name="Python" colour="180">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
                     //'<block type="function_call"></block>'+
                 '</category>'+
-                '<category name="Output">'+
+                '<category name="Output" colour="160">'+
                     '<block type="text_print"></block>'+
                     //'<block type="text_print_multiple"></block>'+
                     '<block type="plot_line"></block>'+
@@ -608,24 +610,31 @@ KennelEditor.prototype.getToolbox = function() {
                     '<block type="plot_title"></block>'+
                 '</category>'+
                 '<sep></sep>'+
-                '<category name="Values">'+
+                '<category name="Values" colour="100">'+
                     '<block type="text"></block>'+
                     '<block type="math_number"></block>'+
                     '<block type="logic_boolean"></block>'+
                 '</category>'+
-                '<category name="Lists">'+
+                '<category name="Lists" colour="30">'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
                     '<block type="lists_length"></block>'+
                     '<block type="lists_create_with"></block>'+
+                    '<block type="lists_index">'+
+                        '<value name="ITEM">'+
+                          '<shadow type="math_number">'+
+                            '<field name="NUM">0</field>'+
+                          '</shadow>'+
+                        '</value>'+
+                    '</block>'+
                 '</category>'+
-                '<category name="Dictionaries">'+
+                '<category name="Dictionaries" colour="0">'+
                     '<block type="dict_get_literal"></block>'+
                     '<block type="dict_keys"></block>'+
                     '<block type="dicts_create_with"></block>'+
                 '</category>'+
                 '<sep></sep>'+
-                '<category name="Data - Weather">'+
+                '<category name="Data - Weather" colour="70">'+
                     '<block type="weather_temperature"></block>'+
                     '<block type="weather_report"></block>'+
                     '<block type="weather_forecasts"></block>'+
@@ -633,21 +642,21 @@ KennelEditor.prototype.getToolbox = function() {
                     '<block type="weather_all_forecasts"></block>'+
                     '<block type="weather_highs_lows"></block>'+
                 '</category>'+
-                '<category name="Data - Stock">'+
+                '<category name="Data - Stock" colour="65">'+
                     '<block type="stocks_current"></block>'+
                     '<block type="stocks_past"></block>'+
                 '</category>'+
-                '<category name="Data - Earthquakes">'+
+                '<category name="Data - Earthquakes" colour="60">'+
                     '<block type="earthquake_get"></block>'+
                     '<block type="earthquake_both"></block>'+
                     '<block type="earthquake_all"></block>'+
                 '</category>'+
-                '<category name="Data - Crime">'+
+                '<category name="Data - Crime" colour="55">'+
                     '<block type="crime_state"></block>'+
                     '<block type="crime_year"></block>'+
                     '<block type="crime_all"></block>'+
                 '</category>'+
-                '<category name="Data - Books">'+
+                '<category name="Data - Books" colour="50">'+
                     '<block type="books_get"></block>'+
                 '</category>'+
             '</xml>';
@@ -756,7 +765,7 @@ KennelToolbar.prototype.hidePrograms = function() {
  */
 function Kennel(attachmentPoint, mode, presentation, current_code,
                 on_run, on_change, starting_code, instructor, view, blocklyPath,
-                parsons,
+                settings,
                 urls, questionProperties) {
     // User programs
     this.model = {
@@ -764,7 +773,8 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
         "settings": {
             'editor': view,
             'instructor': instructor,
-            'parsons': parsons,
+            'parsons': settings.parsons,
+            'read_only': settings.read_only,
             'program': "__main__"
         },
         "question": {
@@ -1287,6 +1297,8 @@ Kennel.prototype.resetConsole = function() {
     this.stepLineMap = [];
     var kennel = this;
     // Skulpt settings
+    // No connected services
+    Sk.connectedServices = {}
     // Limit execution to 5 seconds
     Sk.execLimit = 5000;
     // Ensure version 3, so we get proper print handling

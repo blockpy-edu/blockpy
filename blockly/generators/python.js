@@ -158,8 +158,7 @@ Blockly.Python.scrubNakedValue = function(line) {
 Blockly.Python.quote_ = function(string) {
   // TODO: This is a quick hack.  Replace with goog.string.quote
   string = string.replace(/\\/g, '\\\\')
-                 .replace(/\n/g, '\\\n')
-                 .replace(/\%/g, '\\%');
+                 .replace(/\n/g, '\\\n');
   if (string.indexOf('"') > -1 && string.indexOf('"') == -1) {
       return '\'' + string + '\'';
   } else if (string.indexOf('"') == -1 && string.indexOf('"') > -1) {

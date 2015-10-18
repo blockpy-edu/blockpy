@@ -83,7 +83,6 @@ var $builtinmodule = function(name)
     }
     
     var sanitizeInput = function(functionName, city) {
-        Sk.builtin.pyCheckArgs(functionName, arguments, 1, 1);
         Sk.builtin.pyCheckType("city", "string", Sk.builtin.checkString(city));
         city = normalize_city(city.v);
         if (city === null) {
@@ -108,6 +107,7 @@ var $builtinmodule = function(name)
     }
 
     mod.get_temperature = new Sk.builtin.func(function(city) {
+        Sk.builtin.pyCheckArgs("get_temperature", arguments, 1, 1);
         sanitizeInput("get_temperature", city);
         
         return Sk.ffi.remapToPy(WEATHER_REPORTS[city][0]['temperature']);

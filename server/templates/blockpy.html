@@ -77,7 +77,7 @@ $(document).ready(function() {
                         mode == "instructor",
                         view,
                         "{{ url_for('static', filename='blockly/') }}",
-                        parsons,
+                        {'parsons': false, 'read_only': false},
                         { 'save_code': '{{ url_for("blockpy.save")}}',
                           'load_code': '{{ url_for("blockpy.load")}}',
                           'save_success': '{{ url_for("blockpy.save")}}',
