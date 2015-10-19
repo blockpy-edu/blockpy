@@ -23,7 +23,7 @@ def blockpy_canvas():
     if assignment_id is not None:
         assignment = Assignment.by_id(assignment_id)
         if g.user is not None:
-            submission = assignment.get_submission(user.id)
+            submission = assignment.get_submission(g.user.id)
         else:
             submission = {}
     else:
