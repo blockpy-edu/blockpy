@@ -53,18 +53,18 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">BlockPy</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">BlockPy</a>
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <li><a id='index' href="{{ url_for('index') }}">Home</a></li>
         {% if g.user %}
         <li><a href="{{ url_for('lti_assignments.config') }}">LTI</a></li>
-        <li><a href="{{ url_for('courses.index') }}">Courses</a></li>
+        <!--<li><a href="{{ url_for('courses.index') }}">Courses</a></li>-->
         {% else %}
         {% endif %}
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="https://groups.google.com/forum/#!forum/blockpy">Contact</a></li>
       </ul>
       {% if g.user %}
       <p class="navbar-text navbar-right">Signed in as {{ g.user.name() }} <a href="{{ url_for('security.logout') }}" class="navbar-link">(log out)</a></p>
