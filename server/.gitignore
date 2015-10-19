@@ -1,6 +1,8 @@
 static/.webassets-cache/
 static/gen/
 
+logs/
+
 certs/
 secrets.json
 consumer_key.pem

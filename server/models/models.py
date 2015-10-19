@@ -278,3 +278,13 @@ class Assignment(Base):
     
     def get_submission(self, user_id):
         return Submission.load(user_id, self.id)
+
+class Log(Base):
+    event = Column(String(255), default="")
+    action = Column(String(255), default="")
+    assignment_id = Column(Integer(), ForeignKey('assignment.id'))
+    user_id = Column(Integer(), ForeignKey('user.id'))
+    
+    def __str__(self):
+        return '<Log {} for {}>'.format(self.event, self.action)
+        

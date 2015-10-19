@@ -15,6 +15,12 @@ BlockPy
     {% assets "blockpy_css" %}
         <link rel="stylesheet" href="{{ ASSET_URL }}" />
     {% endassets %}
+    
+<style>
+.embedded-data {
+    display: none;
+}
+</style>
 
 <script>
 function getQueryParams(){
@@ -72,20 +78,21 @@ $(document).ready(function() {
                         $("#problem-presentation").text(), // problem
                         $("#default-body").text(), // Current code
                         $('#default-on-run').text(), // On run code
-                        "def on_step(code, output, properties):\n    pass", // On step code
-                        "alpha = 0", // Starting code
+                        $('#default-on-step').text(), // On step code
+                        $('#default-on-start').text(), // Starting code
                         mode == "instructor",
                         view,
                         "{{ url_for('static', filename='blockly/') }}",
                         {'parsons': false, 'read_only': false},
                         { 'save_code': '{{ url_for("blockpy.save")}}',
-                          'load_code': '{{ url_for("blockpy.load")}}',
+                          'load_code': false,
                           'save_success': '{{ url_for("blockpy.save")}}',
                           'load_success': '{{ url_for("blockpy.load")}}',
+                          'load_success': {{ "true" if submission.correct else "false" }},
                           'log_event': ''},
-                        { 'question_id': 'cw-1-blockly',
-                          'student_id': 1,
-                          'book_id': 'compthink'});
+                        { 'question_id': {{ assignment.id }},
+                          'student_id': {{ user.id }},
+                          'book_id': {{ course.id }}});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
     }    
@@ -97,43 +104,10 @@ $(document).ready(function() {
 {% block body %}
 <div id="kennel-div" style='height:100%'></div>
 
-<pre id='problem-presentation' style='display:none'>
-{{ program.presentation }}
-The two common ways of representing temperatures are Fahrenheit and Celsius. We want to answer the question: "What are the forecasted temperatures of Blacksburg in Celsius?" Using iteration, print out each of the forecasted temperatures (which are given to you in Fahrenheit) of Blacksburg in Celsius. The formula for conversion is<br>&nbsp;<samp>C= (F-32)/1.8</samp>
-</pre>
-<pre id='default-body' style='display:none'>
-{{ program.code }}
-</pre>
-<pre id='default-on-run' style='display:none'>
-{{ program.on_run }}
-import weather
-    
-def on_run(code, output, trace):
-    def in_output(text):
-        return (str(text)+"\n" in output)
-
-    temps = weather.get_forecasts("Blacksburg, VA")
-
-    printedtemp = 0
-    for f in temps:
-        c = (f-32)/1.8
-        if in_output(c):
-            printedtemp = printedtemp + 1
-
-    if not output:
-        return "You should be printing the forecast for Blacksburg in Celsius."
-    if not ('weather.get_forecasts' in code):
-        return "You should be using the 'get forecasted temperatures' block!"
-    if not ('weather.get_forecasts("Blacksburg, VA")' in code):
-        return "Are you checking the forecast for some other town?"
-    if printedtemp &lt; 10:
-        return "You should have printed a total of 10 temperatues in celsius."
-    if printedtemp==10:
-        return True
-    if printedtemp &gt; 10:
-        return "Woah... Too many lines printed."
-    else:
-        return "Keep working on it."
-</pre>
+<pre id='problem-presentation' class='embedded-data'>{{ assignment.body }}</pre>
+<pre id='default-body'         class='embedded-data'>{{ submission.code }}</pre>
+<pre id='default-on-run'       class='embedded-data'>{{ assignment.on_run }}</pre>
+<pre id='default-on-step'      class='embedded-data'>{{ assignment.on_step }}</pre>
+<pre id='default-on-start'     class='embedded-data'>{{ assignment.on_start }}</pre>
   
 {% endblock %}

@@ -1096,6 +1096,7 @@ Kennel.prototype.loadMain = function() {
         "<div class='row'>"+
             "<div class='kennel-content-left col-md-7 col-sm-7 alert alert-warning'>"+
                 '<span class="kennel-alert pull-right text-muted">Loading...</span>'+
+                "<div><strong>BlockPy</strong></div>"+
                 "<div class='kennel-presentation'>"+
                     this.model.presentation+
                 "</div>"+
