@@ -18,11 +18,12 @@ BlockPy
             <div class='row'>
                 <div class='col-md-6'>
                     <h1>BlockPy</h1>
-                    <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.</p>
+                    <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science, equipped with powerful tools like the State Explorer, and scaffolding beginners with Guided Feedback, the goal of BlockPy is to let you authentically solve real-world problems.</p>
                     <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy.blockpy_canvas') }}" role="button">Try BlockPy Now &raquo;</a></p>
                 </div>
                 
                 <div class='col-md-6'>
+                <br></br>
                     <img src='{{ url_for("static", filename="images/blockly-corgi-logo-large.png") }}' />
                 </div>
             </div>
@@ -34,14 +35,21 @@ BlockPy
             <div class='col-md-4'>
                 <h2>For Instructors</h2>
                 <p>Interested in making BlockPy problems for your class?</p>
-                <p><a href="{{ url_for('blockpy.blockpy_canvas', mode='instructor') }}">Try it now!</a></p>
+                <p><a href="{{ url_for('blockpy.blockpy_canvas', mode='instructor') }}">Try building problems now!</a></p>
+                <p><a href="{{ url_for('courses.index') }}">See some sample problems!</a></p>
+                <p>Interested in using BlockPy in your course? Check out our <a href='https://groups.google.com/forum/#!forum/blockpy'>Community</a>
+                or get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a></p>
                 <!--<p>Embed BlockPy (<a href="/tool_config.xml">LTI Configuration</a>)</p>-->
             </div>
             
             <div class='col-md-4'>
-                <h2>For Users</h2>
-                <p>Try out the BlockPy sandbox!</p>
-                <p><a href="{{ url_for('blockpy.blockpy_canvas') }}">Learn more!</a></p>
+                <h2>For Developers</h2>
+                <p>BlockPy is 100% open-source!</p>
+                <p><a href="https://github.com/RealTimeWeb/blockpy">Check out our source code!</a></p>
+                <p><a href="https://github.com/RealTimeWeb/blockpy/issues">Report an issue!</a></p>
+                <p><a href="https://github.com/RealTimeWeb/blockpy/pulls">Submit a Pull Request!</a></p>
+                <p>Have some ideas for the future of BlockPy? Check out our <a href='https://groups.google.com/forum/#!forum/blockpy'>Community</a>
+                or get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a></p>
             </div>
             
             <div class='col-md-4'>

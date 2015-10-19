@@ -44,6 +44,17 @@ def index():
     :return: index page for lti provider
     """
     return render_template('index.html')
+    
+@app.route('/about/', methods=['GET', 'POST'])
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+    """ initial access page to the lti provider.  This page provides
+    authorization for the user.
+
+    :param lti: the `lti` object from `pylti`
+    :return: index page for lti provider
+    """
+    return render_template('about.html')
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
 def favicon():
