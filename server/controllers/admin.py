@@ -15,7 +15,7 @@ from jinja2 import Markup
 from main import app
 from controllers.helpers import admin_required
 from models.models import (User, db, Course, Submission, Assignment, Settings,
-                           Authentication)
+                           Authentication, Log)
 
 admin = Admin(app)
 
@@ -64,6 +64,7 @@ admin.add_view(ModelIdView(Submission, db.session, category='Tables'))
 admin.add_view(ModelIdView(Assignment, db.session, category='Tables'))
 admin.add_view(ModelIdView(Settings, db.session, category='Tables'))
 admin.add_view(ModelIdView(Authentication, db.session, category='Tables'))
+admin.add_view(ModelIdView(Log, db.session, category='Tables'))
 
 @app.route('/admin/shutdown', methods=['GET', 'POST'])
 @admin_required

@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 
 from flask.ext.wtf import Form
 from wtforms import IntegerField, BooleanField
@@ -12,33 +13,35 @@ from sqlalchemy import Date, cast, func, desc, or_
 
 from main import app
 
+from models.models import db, Assignment
+
 blockpy = Blueprint('blockpy', __name__, url_prefix='/blockpy')
 
 @blockpy.route('/', methods=['GET', 'POST'])
 def blockpy_canvas():
-    presentation, code, on_run = '', '', ''
-    if 'static' in request.args:
-        filename = request.args['static']
-        print filename
-        path = os.path.join(app.config['STATIC_DIRECTORY'], 'programs')
-        if filename in os.listdir(path):
-            path = os.path.join(path, filename)
-            with open(path) as complete:
-                presentation, code, on_run = complete.read().split('#####')
-    
+    assignment_id = request.args.get('assignment_id', None)
+    if assignment_id is not None:
+        assignment = Assignment.by_id(assignment_id)
+        if g.user is not None:
+            submission = assignment.get_submission(user.id)
+        else:
+            submission = {}
+    else:
+        assignment = {'presentation': '', 'id': 1}
+        submission = {}
+    user = {'id': 1}
+    course = {'id': 1}
+        
     return render_template('blockpy.html',
-                           program=dict(
-                            presentation=presentation,
-                            code=code,
-                            on_run=on_run
-                            ))
+                           assignment=assignment, submission=submission,
+                           user=user, course=course)
 
 @blockpy.route('/save/', methods=['GET', 'POST'])
 @blockpy.route('/save', methods=['GET', 'POST'])
 def save():
     # problem_id
-    if 'problem_id' in request.args:
-        problem_id = request.args['problem_id']
+    if 'question_id' in request.values:
+        question_id = request.values['question_id']
     else:
         return jsonify(success=False, message="No problem ID given.")
     # user_id
@@ -47,8 +50,12 @@ def save():
     else:
         return jsonify(success=False, message="You are not logged in.")
     # values
-    code = request.args.get('code', '')
-    correct = request.args.get('correct', 'false') == "true"
+    code = request.values.get('code', '')
+    
+    assignment = Assignment.by_id(question_id)
+    submission = assignment.get_submission(g.user.id)
+    submission.code = code
+    db.session.commit()
     
     # Do saving
     return jsonify(success=True)

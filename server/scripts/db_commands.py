@@ -18,7 +18,7 @@ class PopulateDB(Command):
     
     """Fills in predefined data into DB"""
     def run(self, user_data_file, **kwargs):
-        from models.models import Role, User
+        from models.models import Role, User, Course, Assignment
         
         print("Adding Admin")
         admin = User(first_name='Cory', last_name='Bart', 
@@ -36,6 +36,16 @@ class PopulateDB(Command):
             first, last = student.split()
             email = '{}{}@vt.edu'.format(first[0].lower(), last.lower())
             db.session.add(User(first_name=first, last_name=last, email=email))
+            
+        print("Adding default course")
+        default_course = Course(name="Default Course", owner_id=admin.id, service="blockpy")
+        db.session.add(default_course)
+        db.session.flush()
+        
+        print("Adding some assignments")
+        assignment1 = Assignment(name="Example #1", body="a=b+c", 
+                                 course_id=default_course.id, owner_id=admin.id)
+        db.session.add(assignment1)
         
         db.session.commit()
         print("Complete")
