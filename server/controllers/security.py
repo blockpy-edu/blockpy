@@ -9,7 +9,7 @@ from wtforms import BooleanField, TextField, validators
 class ExtendedConfirmRegisterForm(ConfirmRegisterForm):
     first_name = TextField('First Name', [validators.Required()])
     last_name = TextField('Last Name', [validators.Required()])
-    proof = TextField('Instructor Proof (e.g., your university website)', [validators.Required()])
+    proof = TextField('Instructor Proof (e.g., your university website)')
     
 # User registration, etc.
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

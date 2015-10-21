@@ -18,14 +18,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
     
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='libs/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='libs/bootstrap.min.js')}}"></script>
     
     <style>
     {% block extracss %}
     {% endblock %}
     </style>
-
+    
+    {% block extrahead %}
+    {% endblock %}
+    
     <script type="text/javascript">
     {% block extrajs %}
     {% endblock %}
@@ -34,9 +37,6 @@
         $("#{{request.endpoint}}").parent().addClass("active"); 
     })
     </script>
-    
-    {% block extrahead %}
-    {% endblock %}
     
   </head>
 <body>
