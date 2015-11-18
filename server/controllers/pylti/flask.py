@@ -62,8 +62,8 @@ class LTI(object):
             return session['lis_person_sourcedid']
         elif 'lis_person_contact_email_primary' in session:
             return session['lis_person_contact_email_primary']
-        elif 'user_id' in session:
-            return session['user_id']
+        elif 'pylti_user_id' in session:
+            return session['pylti_user_id']
         else:
             return ''
 
@@ -74,7 +74,7 @@ class LTI(object):
 
         :return: user_id
         """
-        return session['user_id']
+        return session['pylti_user_id']
 
     def verify(self):
         """
@@ -222,7 +222,8 @@ class LTI(object):
 
     def verify_request(self):
         """
-        Verify LTI request
+        Verify LTI request. This is called when an initial
+        session is launched.
 
         :raises: LTIException is request validation failed
         """
@@ -243,9 +244,14 @@ class LTI(object):
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
+                    print "FOUND", prop
                     log.debug("params %s=%s", prop, params.get(prop, None))
                     session[prop] = params[prop]
-
+                else:
+                    print "MISSING", prop
+            if params.get('user_id', None):
+                session['pylti_user_id'] = params['user_id']
+            
             # Set logged in session key
             session[LTI_SESSION_KEY] = True
             return True
@@ -254,7 +260,9 @@ class LTI(object):
             for prop in LTI_PROPERTY_LIST:
                 if session.get(prop, None):
                     del session[prop]
-
+            if session.get('user_id', None):
+                del session['pylti_user_id']
+            
             session[LTI_SESSION_KEY] = False
             raise
 

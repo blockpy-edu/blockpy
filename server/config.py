@@ -22,6 +22,7 @@ class Config(object):
     SYS_ADMINS = ['acbart@vt.edu']
     ROOT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
     STATIC_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'static')
+    BLOCKLY_LOG_DIR = os.path.join(ROOT_DIRECTORY, 'logs')
     
     # secret key for flask authentication
     SECRET_KEY = secrets.get('FLASK_SECRET_KEY', 'flask-secret-key')

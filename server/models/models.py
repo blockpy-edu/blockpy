@@ -176,6 +176,7 @@ class Submission(Base):
     def save_code(user_id, assignment_id, code):
         submission = Submission.query.filter_by(user_id=user_id, 
                                                 assignment_id=assignment_id).first()
+        Submission.log_code(user_id, assignment_id, code)
         if not submission:
             submission = Submission(assignment_id=assignment_id, 
                                     user_id=user_id,
@@ -200,6 +201,25 @@ class Submission(Base):
         db.session.commit()
         return submission
         
+    @staticmethod
+    def log_code(user_id, assignment_id, code, extension='.py'):
+        '''
+        Store the code on disk, mapped to the Assignment ID and the Student ID
+        '''
+        directory = os.path.join(app.config['BLOCKLY_LOG_DIR'],
+                                 assignment_id, user_id)
+
+        try:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+        except OSError, e:
+            app.logger.warning(e.args)
+            
+        name = time.strftime("%Y%m%d-%H%M%S")
+        file_name = os.path.join(directory, name + extension)
+        with open(file_name, 'wb') as blockly_logfile:
+            blockly_logfile.write(code)
+
     
 class Assignment(Base):
     url = Column(String(255), default="")
@@ -287,4 +307,5 @@ class Log(Base):
     
     def __str__(self):
         return '<Log {} for {}>'.format(self.event, self.action)
+        
         

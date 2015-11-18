@@ -59,6 +59,16 @@
 {% endif %}
 
 <div class="container-fluid">
+
+<table>
+{% for k, v in session.items() %}
+<tr>
+<td>{{ k }}</td>
+<td>{{ v }}</td>
+</tr>
+{% endfor %}
+</table>
+
 {% block body %}
 {% endblock %}
 </div>
@@ -83,6 +93,12 @@
 
       ga('create', 'UA-68145230-1', 'auto');
       ga('send', 'pageview');
+    </script>
+    
+    <script type="text/javascript">
+      $(function(){
+        parent.postMessage(JSON.stringify({subject: 'lti.frameResize', height: $(document).height()+"px"}), '*');
+      });
     </script>
     
 </body>
