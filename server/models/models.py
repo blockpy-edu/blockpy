@@ -207,7 +207,7 @@ class Submission(Base):
         Store the code on disk, mapped to the Assignment ID and the Student ID
         '''
         directory = os.path.join(app.config['BLOCKLY_LOG_DIR'],
-                                 assignment_id, user_id)
+                                 str(assignment_id), str(user_id))
 
         try:
             if not os.path.exists(directory):
