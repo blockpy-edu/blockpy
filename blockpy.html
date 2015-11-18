@@ -30,12 +30,14 @@
     <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
   
     <!-- Datasets -->
+    <script type="text/javascript" src="libs/sql.js"></script>
     <script type="text/javascript" src="libs/crime_data.js"></script>
     
     <!-- Blockly -->
     <script type="text/javascript" src="blockly/blockly_compressed.js"></script>
     <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
     <script type="text/javascript" src="blockly/python_compressed.js"></script>
+    <script type="text/javascript" src="blockly/pseudo_compressed.js"></script>
     <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
     <script type="text/javascript" src="blockly/msg/js/en.js"></script>
     
@@ -181,32 +183,12 @@ function getQueryParams(){
                         view,
                         "blockly/",
                         parsons,
-                        { 'save_code': 'blockpy/save',
-                          'load_code': 'blockpy/load',
-                          'save_success': 'blockpy/save',
-                          'load_success': 'blockpy/load',
+                        { 'save_code': false,
+                          'load_code': false,
+                          'save_success': false,
+                          'load_success': false,
                           'log_event': '',
-                          'server': true},
-                        { 'question_id': 'cw-1-blockly',
-                          'student_id': 1,
-                          'book_id': 'compthink'});
-    kennel = new Kennel(document.getElementById('kennel-div2'),
-                        mode, // Instructor mode
-                        $("#problem-presentation").text(), // problem
-                        body, // Current code
-                        $('#default-on-run').html(), // On run code
-                        "def on_step(code, output, properties):\n    pass", // On step code
-                        "alpha = 0", // Starting code
-                        mode == "instructor",
-                        view,
-                        "blockly/",
-                        parsons,
-                        { 'save_code': 'blockpy/save',
-                          'load_code': 'blockpy/load',
-                          'save_success': 'blockpy/save',
-                          'load_success': 'blockpy/load',
-                          'log_event': '',
-                          'server': true},
+                          'server': false},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
                           'book_id': 'compthink'});
@@ -217,12 +199,7 @@ function getQueryParams(){
   
         </script>
 <pre id='default-body' style='display:none'>
-import matplotlib.pyplot as plt
-import weather
-
-
-plt.plot(weather.get_forecasts("Blacksburg, VA"))
-plt.show()
+import sqlite3
 
 </pre>
 <pre id='default-on-run' style='display:none'>

@@ -52,7 +52,7 @@ $(document).ready(function() {
                           'load_code': false,
                           'save_success': '{{ url_for("lti_assignments.save_correct")}}',
                           'load_success': {{ "true" if submission.correct else "false" }},
-                          'log_event': '',
+                          'log_event': '{{ url_for("lti_assignments.save_events") }}',
                           'save_presentation': "{{ url_for("lti_assignments.save_presentation")}}"},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
