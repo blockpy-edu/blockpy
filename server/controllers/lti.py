@@ -37,9 +37,6 @@ def error(exception=None):
         params = request.form.to_dict()
     else:
         params = request.args.to_dict()
-    print exception
-    print(params)
-    pprint(session.items())
     return render_template('error.html')
 
 
@@ -234,6 +231,6 @@ def grade(lti=lti):
     user = User.from_lti("canvas", session["pylti_user_id"], 
                          session.get("user_email", ""))
     submission = Submission.save_correct(user.id, assignment_id)
-    session[''] = session['lis_outcome_service_url']
+    #session[''] = session['lis_outcome_service_url']
     lti.post_grade(1, "<h1>Success</h1>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
     return "Successful!"
