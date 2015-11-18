@@ -244,11 +244,9 @@ class LTI(object):
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
-                    print "FOUND", prop
                     log.debug("params %s=%s", prop, params.get(prop, None))
                     session[prop] = params[prop]
                 else:
-                    print "MISSING", prop
             if params.get('user_id', None):
                 session['pylti_user_id'] = params['user_id']
             
