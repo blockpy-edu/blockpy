@@ -246,7 +246,6 @@ class LTI(object):
                 if params.get(prop, None):
                     log.debug("params %s=%s", prop, params.get(prop, None))
                     session[prop] = params[prop]
-                else:
             if params.get('user_id', None):
                 session['pylti_user_id'] = params['user_id']
             
