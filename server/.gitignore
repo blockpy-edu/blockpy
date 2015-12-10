@@ -1,6 +1,8 @@
 static/.webassets-cache/
 static/gen/
 
+test.db
+
 logs/
 
 certs/
