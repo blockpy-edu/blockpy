@@ -20,6 +20,7 @@ bundles = {
         "blockly/blockly_compressed.js",
         "blockly/blocks_compressed.js",
         "blockly/python_compressed.js",
+        "blockly/pseudo_compressed.js",
         "blockly/javascript_compressed.js",
         "blockly/msg/js/en.js",
         "skulpt/dist/skulpt.min.js",

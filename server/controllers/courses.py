@@ -29,7 +29,6 @@ def add():
     return render_template('courses/add.html')
 
 @courses.route('/', methods=['GET', 'POST'])
-@instructor_required
 def index():
     """ Create a new assignment with the given information
     """

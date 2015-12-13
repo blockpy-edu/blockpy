@@ -387,6 +387,7 @@ KennelEditor.prototype.loadBlockly = function(tag, blocklyPath) {
         if (editor.model.loaded) {
             editor.model.set(editor.getPythonFromBlocks());
         }
+        //$(".kennel-explorer").css("white-space", "pre-wrap").html(Blockly.Pseudo.workspaceToCode(this.blockly));
     });
     // Register window size changes for Blockly
     /*window.addEventListener('resize', function() {
@@ -732,6 +733,9 @@ function KennelToolbar(tag) {
         'to_rst': $("<button>RST</button>")
                             .addClass('btn btn-info kennel-to-rst')
                             .appendTo(doGroup),
+        'to_pseudo': $("<button>Pseudo</button>")
+                            .addClass('btn btn-default kennel-toolbar-pseudo')
+                            .appendTo(doGroup),
         'wrench': '',
         'copy': '',
         'paste': '',
@@ -936,6 +940,15 @@ Kennel.prototype.activateToolbar = function() {
         popup.modal('show');
         
     });
+    
+    elements.to_pseudo.click(function(ev) {
+        ev.preventDefault();
+        var popup = kennel.mainDiv.find('.kennel-popup');
+        popup.find('.modal-title').html("Pseudo-code Explanation");
+        popup.find('.modal-body').html(Blockly.Pseudo.workspaceToCode(kennel.editor.blockly));
+        popup.modal('show');
+        
+    });
     if (!this.model.settings.instructor) {
         elements.kennel_mode.hide();
         elements.to_rst.hide();
@@ -1085,8 +1098,8 @@ Kennel.prototype.loadMain = function() {
                         "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>"+
                         "<h4 class='modal-title'>Dynamic Content</h4>"+
                     "</div>"+
-                    "<textarea class='modal-body' style='width:100%; height:400px'>"+
-                    "</textarea>"+
+                    "<div class='modal-body' style='width:100%; height:400px; white-space:pre-wrap'>"+
+                    "</div>"+
                     "<div class='modal-footer'>"+
                         "<button type='button' class='btn btn-white' data-dismiss='modal'>Close</button>"+
                     "</div>"+    
