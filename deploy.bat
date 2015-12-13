@@ -14,6 +14,7 @@ copy blockly\blockly_compressed.js %outputdir%\blockly\blockly_compressed.js
 copy blockly\blockly_uncompressed.js %outputdir%\blockly\blockly_uncompressed.js
 copy blockly\blocks_compressed.js %outputdir%\blockly\blocks_compressed.js
 copy blockly\python_compressed.js %outputdir%\blockly\python_compressed.js
+copy blockly\pseudo_compressed.js %outputdir%\blockly\pseudo_compressed.js
 copy blockly\javascript_compressed.js %outputdir%\blockly\javascript_compressed.js
 
 mkdir %outputdir%\blockly\msg\js\

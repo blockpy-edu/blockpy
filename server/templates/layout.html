@@ -35,6 +35,9 @@
     
     $(document).ready(function () {
         $("#{{request.endpoint}}").parent().addClass("active"); 
+        setTimeout(function() {
+            $("#survey-link").tooltip('show');
+        }, 5000);
     })
     </script>
     
@@ -64,6 +67,13 @@
         {% else %}
         {% endif %}
         <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a id='survey-link' 
+               target='_blank' 
+               href="https://virginiatech.qualtrics.com/SE/?SID=SV_0UMPv09Ci7gdRCB"
+               data-toggle="tooltip"
+               title="Take our survey!" 
+               data-placement="bottom"
+               ><b>Take our survey!</b></a></li>
         <li><a href="https://groups.google.com/forum/#!forum/blockpy">Contact</a></li>
       </ul>
       {% if g.user %}

@@ -308,13 +308,25 @@ PropertyExplorer.prototype.move = function(step) {
     var explorer = this;
     if (step > 0) {
         var back = Math.max(0, step-1);
-        this.tags.first.off('click').click(function() {explorer.move(0)});
-        this.tags.back.off('click').click(function() {explorer.move(back)});
+        this.tags.first.off('click').click(function() {
+            server.logEvent('explorer', 'first');
+            explorer.move(0);
+        });
+        this.tags.back.off('click').click(function() {
+            server.logEvent('explorer', 'back');
+            explorer.move(back);
+        });
     }
     if (step < last) {
         var next = Math.min(last, step+1);
-        this.tags.last.off('click').click(function() {explorer.move(last)});
-        this.tags.next.off('click').click(function() {explorer.move(next)});
+        this.tags.last.off('click').click(function() {
+            server.logEvent('explorer', 'last');
+            explorer.move(last);
+        });
+        this.tags.next.off('click').click(function() {
+            server.logEvent('explorer', 'next');
+            explorer.move(next);
+        });
     }
     // Update the header bar of the explorer
     this.tags.step.html(step+1);
@@ -943,6 +955,7 @@ Kennel.prototype.activateToolbar = function() {
     
     elements.to_pseudo.click(function(ev) {
         ev.preventDefault();
+        server.logEvent('editor', 'pseudo');
         var popup = kennel.mainDiv.find('.kennel-popup');
         popup.find('.modal-title').html("Pseudo-code Explanation");
         popup.find('.modal-body').html(Blockly.Pseudo.workspaceToCode(kennel.editor.blockly));
