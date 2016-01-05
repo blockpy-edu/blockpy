@@ -1,7 +1,7 @@
 {% extends 'reduced_layout.html' %}
 
 {% block title %}
-Edit Assignment
+Assignment
 {% endblock %}
 
 {% block statusbar %}
@@ -29,21 +29,21 @@ Edit Assignment
 <!-- Main BlockPy canvas -->
 <div id="blockpy-div" style='height:100%'></div>
 
-<pre id='problem-presentation' class='embedded-data'>{{ assignment.body }}</pre>
-<pre id='default-body'         class='embedded-data'>{{ submission.code }}</pre>
-<pre id='default-on-run'       class='embedded-data'>{{ assignment.on_run }}</pre>
-<pre id='default-on-step'      class='embedded-data'>{{ assignment.on_step }}</pre>
-<pre id='default-on-start'     class='embedded-data'>{{ assignment.on_start }}</pre>
+<pre id='problem-presentation' class='embedded-data'>{{ assignment.body.encode('base64') }}</pre>
+<pre id='default-body'         class='embedded-data'>{{ submission.code.encode('base64') }}</pre>
+<pre id='default-on-run'       class='embedded-data'>{{ assignment.on_run.encode('base64') }}</pre>
+<pre id='default-on-step'      class='embedded-data'>{{ assignment.on_step.encode('base64') }}</pre>
+<pre id='default-on-start'     class='embedded-data'>{{ assignment.on_start.encode('base64') }}</pre>
 
 <script>
 $(document).ready(function() {
     blockpy = new Kennel(document.getElementById('blockpy-div'),
                         'student', // Instructor mode
-                        $("#problem-presentation").text(), // problem
-                        $("#default-body").text(), // Current code
-                        $('#default-on-run').text(), // On run code
-                        $('#default-on-step').text(), // On step code
-                        $('#default-on-start').text(), // Starting code
+                        atob($("#problem-presentation").text()), // problem
+                        atob($("#default-body").text()), // Current code
+                        atob($('#default-on-run').text()), // On run code
+                        atob($('#default-on-step').text()), // On step code
+                        atob($('#default-on-start').text()), // Starting code
                         false,
                         'blocks',
                         "{{ url_for('static', filename='blockly/') }}",

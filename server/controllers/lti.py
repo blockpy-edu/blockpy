@@ -60,11 +60,17 @@ def index(lti=lti):
     :return: index page for lti provider
     """
     assignment_id = request.args.get('assignment_id', None)
+    assignment_type = request.args.get('assignment_type', 'blockpy')
     user, roles, course = ensure_canvas_arguments()
-    assignment = Assignment.by_id(assignment_id)
-    submission = assignment.get_submission(user.id)
-    return render_template('lti/index.html', lti=lti,
-                           program={}, assignment=assignment, submission=submission)
+    if assignment_type == 'maze':
+        return render_template('lti/maze.html', lti=lti)
+    elif assignment_type == 'blockpy':
+        assignment = Assignment.by_id(assignment_id)
+        submission = assignment.get_submission(user.id)
+        return render_template('lti/index.html', lti=lti,
+                               program={}, 
+                               assignment=assignment, 
+                               submission=submission)
                            
                            
 def ensure_canvas_arguments():

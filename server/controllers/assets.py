@@ -38,6 +38,15 @@ bundles = {
         'libs/summernote/summernote.css',
         'kennel/kennel.css',
         output='gen/blockpy.css'),
+        
+    'blockly_maze_css': Bundle(
+        'blockly-games/appengine/common/common.css',
+        'blockly-games/appengine/maze/style.css',
+        output='gen/blockly_maze.css'),
+    'blockly_maze_js': Bundle(
+        'blockly-games/appengine/common/boot.js',
+        'blockly-games/appengine/common/storage.js',
+        output='gen/blockly_maze.js'),
 }
 
 assets = Environment(app)

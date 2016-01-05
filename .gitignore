@@ -2,6 +2,7 @@ Thumbs.db
 ignore/
 kennel_dist/
 closure-compiler/
+blockly-games/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
