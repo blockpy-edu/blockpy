@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Courses: Index
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<script type='text/javascript'>
+</script>
+{% endblock %}
+
+{% block body %}
+
+
+<h3>Assignment List</h3>
+
+<ul>
+
+    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=1) }}">Assignment #1</a></li>
+    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=2) }}">Assignment #2</a></li>
+    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=3) }}">Assignment #3</a></li>
+    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=4) }}">Assignment #4</a></li>
+
+</ul>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Courses: {{ course.name }}
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<script type='text/javascript'>
+</script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Courses: {{ course.name }}</h1>
+
+<a href="{{ url_for('courses.index') }}">Back to all courses</a>
+
+<h3>Assignment List</h3>
+
+<ul>
+{% for assignment in assignments %}
+<li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=assignment.id) }}">{{ assignment.name }} </a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}
