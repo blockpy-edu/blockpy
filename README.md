@@ -70,12 +70,14 @@ Push changes to the subtrees' repos:
     > git subtree push --prefix=skulpt/ --squash skulpt master
     > git subtree push --prefix=blockly/ --squash blockly master
     > git subtree push --prefix=server/ --squash server master
+    > git subtree push --prefix=server/static/blockly-games --squash blockly-games master
     
 Pull changes from upstream repos (e.g., official Blockly and Skulpt, our production server):
 
     > git subtree pull --prefix=skulpt --squash skulpt_upstream master
     > git subtree pull --prefix=blockly --squash blockly_upstream master
     > git subtree pull --prefix=server --squash server master
+    > git subtree pull --prefix=server/static/blockly-games --squash blockly-games master
     
 Note: if you get an error about a "fatal entry", make sure you don't have a trailing slash on the prefix!
 
