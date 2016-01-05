@@ -30,7 +30,7 @@
     <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
   
     <!-- Datasets -->
-    <script type="text/javascript" src="libs/sql.js"></script>
+    <!--<script type="text/javascript" src="libs/sql.js"></script>-->
     <script type="text/javascript" src="libs/crime_data.js"></script>
     
     <!-- Blockly -->
@@ -51,6 +51,7 @@
     
     <!-- Renderer -->
     <script type="text/javascript" src="converter/python_to_blockly.js"></script>
+    <script type="text/javascript" src="converter/variable_tracker.js"></script>
     <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
     
     <!-- Analyzer -->
@@ -199,7 +200,10 @@ function getQueryParams(){
   
         </script>
 <pre id='default-body' style='display:none'>
-import sqlite3
+if a:
+    print("False")
+a = 3
+a = False
 
 </pre>
 <pre id='default-on-run' style='display:none'>
@@ -296,6 +300,23 @@ def on_run(code, output, properties):
         <block type="books_get"></block>
     </category>
 </xml>
+
+<script>
+$(document).ready(function() {
+    codes = ["#1\na=a", "#2\na=0\na", "#3\na\na=0", "#4\na\na\na=0", "#5\nfor a in [1,2]:\n  pass", "#6\nfor x in a:\n  pass","#7\na=[]", "#8\na=[]\nfor x in a:\n  pass"];
+    var t = $("<table>").addClass("table table-condensed table-striped");
+    for (var i= 0; i<codes.length; i++) {
+        var code = codes[i];
+        var results = (new AbstractInterpreter()).analyze(code);
+        var results = JSON.stringify(results, null, 2);
+        t.append($("<tr>").html(
+            "<td>"+code+"</td><td>"+results+"</td>"
+        ));
+    }
+    $("body").prepend(t)
+});
+</script>
+
   
 <!-- Google Analytics -->
 <script>

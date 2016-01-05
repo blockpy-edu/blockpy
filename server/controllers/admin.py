@@ -15,7 +15,7 @@ from jinja2 import Markup
 from main import app
 from controllers.helpers import admin_required
 from models.models import (User, db, Course, Submission, Assignment, Settings,
-                           Authentication, Log)
+                           Authentication, Log, Role)
 
 admin = Admin(app)
 
@@ -44,7 +44,24 @@ class ModelIdView(RegularView):
 def _id(table):
     def _edit_id(view, context, model, name):
         return table.query.filter(table.id == getattr(model, name)).first()
-    return _edit_idW
+    return _edit_id
+    
+class RoleView(RegularView):
+    column_list = ('id', 'date_created', 'name', 'user_id', 'course_id')
+    column_labels = {'id': 'Role ID', 'date_created': 'Created',
+                     'name': 'Name', 'user_id': "User", "course_id": "Course"}
+    column_searchable_list = ('name', 'course_id', 'user_id')
+    column_sortable_list = ('id', 'date_created', 'name', 'user_id', 'course_id')
+    column_formatters = { 'user_id': _id(User),
+                          'course_id': _id(Course)}
+    form_columns = ('name', 'user_id', 'course_id')
+class AssignmentView(RegularView):
+    column_list = ('id', 'date_modified', 
+                   'owner_id', 'course_id',
+                   'name', 'body', 
+                   'on_run', 'on_start', 'answer', 
+                   'type', 'visibility', 'disabled', 'mode',
+                   )
 '''class ScheduleView(RegularView):
     column_display_pk = False
     column_searchable_list = ('title', 'calendar')
@@ -61,9 +78,10 @@ class FeedbackView(RegularView):
 admin.add_view(UserView(User, db.session, category='Tables'))
 admin.add_view(ModelIdView(Course, db.session, category='Tables'))
 admin.add_view(ModelIdView(Submission, db.session, category='Tables'))
-admin.add_view(ModelIdView(Assignment, db.session, category='Tables'))
+admin.add_view(AssignmentView(Assignment, db.session, category='Tables'))
 admin.add_view(ModelIdView(Settings, db.session, category='Tables'))
 admin.add_view(ModelIdView(Authentication, db.session, category='Tables'))
+admin.add_view(RoleView(Role, db.session, category='Tables'))
 admin.add_view(ModelIdView(Log, db.session, category='Tables'))
 
 @app.route('/admin/shutdown', methods=['GET', 'POST'])

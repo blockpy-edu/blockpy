@@ -132,7 +132,7 @@ class Role(Base, RoleMixin):
     NAMES = ['teacher', 'admin', 'student']
     
     def __str__(self):
-        return '<{} is {}>'.format(self.name, self.user_id)
+        return '<User {} is {}>'.format(self.user_id, self.name)
         
 class Authentication(Base):
     type = Column(String(80))
