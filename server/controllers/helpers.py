@@ -25,7 +25,15 @@ def instructor_required(f):
         if g.user is None:
             return redirect(url_for('security.login', next=request.url))
         if not g.user.is_instructor():
-            flash("This portion of the site is only for administrators.")
+            flash("This portion of the site is only for instructors.")
             return redirect(url_for('users.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('security.login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function

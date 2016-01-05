@@ -1236,6 +1236,11 @@ Kennel.prototype.stepConsole = function(step, page) {
     });
 }
 
+Kennel.prototype.printAnalysis = function(result) {
+    this.explorer.tags.message.show();
+    this.explorer.tags.message.html(JSON.stringify(result.identifiers));
+}
+
 /*
  * Print an error to the consoles -- the on screen one and the browser one
  */
@@ -1511,6 +1516,10 @@ Kennel.prototype.run = function() {
     var executionPromise = Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody("<stdin>", false, code, true);
     });
+    
+    var ai = new AbstractInterpreter();
+    var results = ai.analyze(code);
+    this.printAnalysis(results);
     
     // Change "Run" to "Executing"
     this.toolbar.elements.run.prop('disabled', true);

@@ -14,16 +14,12 @@ Courses: Index
 
 {% block body %}
 
-
-<h3>Assignment List</h3>
+<h3>Courses</h3>
 
 <ul>
-
-    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=1) }}">Assignment #1</a></li>
-    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=2) }}">Assignment #2</a></li>
-    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=3) }}">Assignment #3</a></li>
-    <li><a href="{{ url_for('blockpy.blockpy_canvas', assignment_id=4) }}">Assignment #4</a></li>
-
+{% for course, role in courses %}
+<li><a href="{{ url_for('courses.course', course_id=course.id)}}"><b>{{ course.name }} ({{ course.service }})</b>: {{ role.name|title }}</a></li>
+{% endfor %}
 </ul>
 
 {% endblock %}
