@@ -18,6 +18,7 @@ Blockly Maze
 {% endassets %}
 
 <script>
+URL_ROOT = "{{ url_for('static', filename='') }}";
 LEVEL_SET = {{ level }};
 URL_MAP = { 
     'save_code': '{{ url_for("lti_assignments.save_code")}}',
