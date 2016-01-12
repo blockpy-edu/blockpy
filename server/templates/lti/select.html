@@ -9,6 +9,19 @@ Courses: Index
 
 {% block extrahead %}
 <script type='text/javascript'>
+$(document).ready(function() {
+    $(".maze-selected").click(function() {
+        var maze_id = $(this).data('maze');
+        $.get("{{ url_for('lti_assignments.select_builtin_assignment') }}", 
+            {'assignment_id': maze_id, 
+             'assignment_type': 'maze'},
+            function(data) {
+                var redirect_url = "{{ return_url }}?url="+data.url+"&return_type=lti_launch_url&title=maze"+maze_id+"&text=BlockPy%20Exercise";
+                window.location.href = redirect_url;
+            }
+        );
+    });
+});
 /*
 original_assignments = [{{ assignments|map(attribute='id')|join(',') }}];
 (function poll() {
@@ -51,19 +64,12 @@ original_assignments = [{{ assignments|map(attribute='id')|join(',') }}];
 
 {% block body %}
 
+<a href="javascript:location.reload(true)" class='pull-right'><span class='glyphicon glyphicon-refresh' aria-hidden="true"></span></a>
 <h3>Choose an Assignment</h3>
 
 <table class="table table-condensed table-hover" id='assignment-list'>
     {% for assignment in assignments %}
     <tr id='assignment-row-{{assignment.id}}'>
-        <td class='col-md-3 col-sm-3 col-xs-3'>
-            <strong>{{assignment.title()}}</strong><br>
-            Last modified at
-            {{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(' 0', ' ') }}
-        </td>
-        <td class='col-md-6 col-sm-6 col-xs-6'>
-            {{ assignment.body|striptags|truncate(255) }}
-        </td>
         <td class='col-md-2 col-sm-2 col-xs-2'>
             <div class="btn-group">
                 <a href="{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise" class="btn btn-primary">Select</a>
@@ -79,11 +85,46 @@ original_assignments = [{{ assignments|map(attribute='id')|join(',') }}];
                 </ul>
             </div>
         </td>
+        <td class='col-md-3 col-sm-3 col-xs-3'>
+            <strong>{{assignment.title()}}</strong><br>
+            Last modified at
+            {{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(' 0', ' ') }}
+        </td>
+        <td class='col-md-6 col-sm-6 col-xs-6'>
+            {{ assignment.body|striptags|truncate(255) }}
+        </td>
     </tr>
     {% endfor %}
+    <tr id='maze-row'>
+        <td class='col-md-2 col-sm-2 col-xs-2'>
+        
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+              {% for i in range(1, 11) %}
+                <li><a href="#" class="maze-selected" data-maze="{{ i }}">Maze #{{ i }}</button></li>
+              {% endfor %}
+              </ul>
+            </div>
+        </td>
+        <td class='col-md-3 col-sm-3 col-xs-3'>
+            <strong>Blockly Maze</strong><br>Built-in
+        </td>
+        <td class='col-md-6 col-sm-6 col-xs-6'>
+            An interactive maze navigation game.
+        </td>
+    </tr>
     <tr id='new-row'>
-        <td colspan='3'>
+        <td colspan='1'>
             <a target="_blank" href="{{ url_for('lti_assignments.new_assignment')}}" class="btn btn-default">Create new Assignment</a>
+        </td>
+        <td colspan='1'>
+            <a target="_blank" href="{{ url_for('lti_assignments.new_assignment')}}" class="btn btn-default">Create new Group</a>
+        </td>
+        <td colspan='1'>
+            
         </td>
     </tr>
 </table>

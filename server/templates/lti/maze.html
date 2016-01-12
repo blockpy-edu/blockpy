@@ -1,0 +1,91 @@
+{% extends 'reduced_layout.html' %}
+
+{% block title %}
+Blockly Maze
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+
+{% assets "blockly_maze_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{% assets "blockly_maze_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+<script>
+LEVEL_SET = {{ level }};
+URL_MAP = { 
+    'save_code': '{{ url_for("lti_assignments.save_code")}}',
+    'save_success': '{{ url_for("lti_assignments.save_correct")}}',
+    'load_success': {{ "true" if submission.correct else "false" }},
+    'log_event': '{{ url_for("lti_assignments.save_events") }}',
+};
+function alertBox(message) {
+    return $("#status-report").html(message);
+}
+function markSuccess() {
+    $("#success-report").addClass('label label-success').html("Success!");
+}
+function reportChange() {
+    
+}
+function reportSuccess() {
+    markSuccess();
+    var data = {'question_id': "{{ assignment.id }}"};
+    $.post(URL_MAP.save_success, data, function(response) {
+        if (response.success) {
+            alertBox("Success reported").delay(200).fadeOut("slow");
+        } else {
+            alertBox("Success report failed");
+            console.error("Server Success Report Error", response.message);
+        }
+    }).fail(function() {
+        alertBox("Success report failed");
+    });
+}
+function loadEverything() {
+$(document).ready(function() {
+    $("#runButton").parent().prev().html(
+        "<span id='success-report'></span><br><span id='status-report'></span>"
+    );
+    if (URL_MAP.load_success) {
+        markSuccess();
+    }
+    var result = atob("{{ submission.code.encode('base64').replace('\n', '\\n') }}")
+    if (result) {
+        Blockly.getMainWorkspace().clear();
+        Blockly.Xml.domToWorkspace(Blockly.getMainWorkspace(), 
+                                   Blockly.Xml.textToDom(result));
+    }
+    Blockly.addChangeListener(function() {
+        var answer = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()));
+        var data = {
+            'question_id': "{{ assignment.id }}",
+            'filename': '__main__',
+            'code': answer
+            };
+        $.post(URL_MAP.save_code, data, function(response) {
+            if (response.success) {
+                alertBox("Saved").delay(200).fadeOut("slow");
+            } else {
+                alertBox("Saving failed");
+                console.error("Server Saving Error", response.message);
+            }
+        }).fail(function() {
+            alertBox("Saving failed");
+        });
+    });
+});
+};
+</script>
+
+{% endblock %}
+
+{% block body %}
+
+{% endblock %}

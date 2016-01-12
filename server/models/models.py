@@ -19,6 +19,13 @@ Model = db.Model
 relationship = db.relationship
 backref = db.backref
 
+def ensure_dirs(path):
+    try: 
+        os.makedirs(path)
+    except OSError, e:
+        if not os.path.isdir(path):
+            app.logger.warning(e.args + (path, ) )
+
 class Base(Model):
     __abstract__  = True
     @declared_attr
@@ -72,8 +79,8 @@ class User(Base, UserMixin):
         return any(role for role in ROLES if role in given_roles)
         
     @staticmethod
-    def new_lti_user(service, lti_user_id, lti_email):
-        new_user = User(first_name=lti_user_id, last_name="Canvas User", email=lti_email, 
+    def new_lti_user(service, lti_user_id, lti_email, lti_first_name, lti_last_name):
+        new_user = User(first_name=lti_first_name, last_name=lti_last_name, email=lti_email, 
                         password="", active=False, confirmed_at=None)
         db.session.add(new_user)
         db.session.flush()
@@ -84,15 +91,28 @@ class User(Base, UserMixin):
         db.session.commit()
         return new_user
         
+    def register_authentication(self, service, lti_user_id):
+        new_authentication = Authentication(type=service, 
+                                            value=lti_user_id,
+                                            user_id=self.id)
+        db.session.add(new_authentication)
+        db.session.commit()
+        return self
+        
     @staticmethod
-    def from_lti(service, lti_user_id, lti_email):
+    def from_lti(service, lti_user_id, lti_email, lti_first_name, lti_last_name):
         """
         For a given service (e.g., "canvas"), and a user_id in the LTI system
         """
         lti = Authentication.query.filter_by(type=service, 
                                              value=lti_user_id).first()
         if lti is None:
-            return User.new_lti_user(service, lti_user_id, lti_email)
+            user = User.query.filter_by(email=lti_email).first()
+            if user:
+                user.register_authentication(service, lti_user_id)
+                return user
+            else:
+                return User.new_lti_user(service, lti_user_id, lti_email, lti_first_name, lti_last_name)
         else:
             return lti.user
         
@@ -158,6 +178,8 @@ class Submission(Base):
     correct = Column(Boolean(), default=False)
     assignment_id = Column(Integer(), ForeignKey('assignment.id'))
     user_id = Column(Integer(), ForeignKey('user.id'))
+    assignment_version = Column(Integer(), default=0)
+    version = Column(Integer(), default=0)
     
     def __str__(self):
         return '<Submission {} for {}>'.format(self.id, self.user_id)
@@ -173,19 +195,24 @@ class Submission(Base):
         return submission
         
     @staticmethod
-    def save_code(user_id, assignment_id, code):
+    def save_code(user_id, assignment_id, code, assignment_version):
         submission = Submission.query.filter_by(user_id=user_id, 
                                                 assignment_id=assignment_id).first()
-        Submission.log_code(user_id, assignment_id, code)
+        is_version_correct = True
         if not submission:
             submission = Submission(assignment_id=assignment_id, 
                                     user_id=user_id,
-                                    code=code)
+                                    code=code,
+                                    assignment_version=assignment_version)
             db.session.add(submission)
         else:
             submission.code = code
+            submission.version += 1
+            current_assignment_version = Assignment.by_id(submission.assignment_id).version
+            is_version_correct = (assignment_version == current_assignment_version)
         db.session.commit()
-        return submission
+        submission.log_code()
+        return submission, is_version_correct
         
     @staticmethod
     def save_correct(user_id, assignment_id):
@@ -201,24 +228,20 @@ class Submission(Base):
         db.session.commit()
         return submission
         
-    @staticmethod
-    def log_code(user_id, assignment_id, code, extension='.py'):
+    def log_code(self, extension='.py'):
         '''
         Store the code on disk, mapped to the Assignment ID and the Student ID
         '''
         directory = os.path.join(app.config['BLOCKLY_LOG_DIR'],
-                                 str(assignment_id), str(user_id))
+                                 str(self.assignment_id), 
+                                 str(self.user_id))
 
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except OSError, e:
-            app.logger.warning(e.args)
+        ensure_dirs(directory)
             
         name = time.strftime("%Y%m%d-%H%M%S")
         file_name = os.path.join(directory, name + extension)
         with open(file_name, 'wb') as blockly_logfile:
-            blockly_logfile.write(code)
+            blockly_logfile.write(self.code)
 
     
 class Assignment(Base):
@@ -236,18 +259,26 @@ class Assignment(Base):
     mode = Column(String(10), default="blocks")
     owner_id = Column(Integer(), ForeignKey('user.id'))
     course_id = Column(Integer(), ForeignKey('course.id'))
+    version = Column(Integer(), default=0)
     
     @staticmethod
-    def edit(assignment_id, presentation=None, on_run=None, on_step=None, on_start=None):
+    def edit(assignment_id, presentation=None, name=None, on_run=None, on_step=None, on_start=None):
         assignment = Assignment.by_id(assignment_id)
+        if name is not None:
+            assignment.name = name
+            assignment.version += 1
         if presentation is not None:
             assignment.body = presentation
+            assignment.version += 1
         if on_run is not None:
             assignment.on_run = on_run
+            assignment.version += 1
         if on_step is not None:
             assignment.on_step = on_step
+            assignment.version += 1
         if on_start is not None:
             assignment.on_start = on_start
+            assignment.version += 1
         db.session.commit()
         return assignment
     
@@ -273,13 +304,30 @@ class Assignment(Base):
         return assignment
         
     @staticmethod
-    def by_course(course_id):
-        return Assignment.query.filter_by(course_id=course_id).all()
+    def by_course(course_id, exclude_builtins=True):
+        if exclude_builtins:
+            return (Assignment.query.filter_by(course_id=course_id)
+                                    .filter(Assignment.mode != 'maze')
+                                    .all())
+        else:
+            return Assignment.query.filter_by(course_id=course_id).all()
     
     @staticmethod
     def by_id(assignment_id):
         return Assignment.query.get(assignment_id)
     
+    @staticmethod    
+    def by_builtin(type, id, owner_id, course_id):
+        assignment = Assignment.query.filter_by(course_id=course_id,
+                                                mode=type,
+                                                name=id).first()
+        if not assignment:
+            print type, id
+            assignment = Assignment.new(owner_id, course_id)
+            assignment.mode = type
+            assignment.name = id
+            db.session.commit()
+        return assignment
     @staticmethod
     def by_id_or_new(assignment_id, owner_id, course_id):
         if assignment_id is None:
@@ -298,6 +346,28 @@ class Assignment(Base):
     
     def get_submission(self, user_id):
         return Submission.load(user_id, self.id)
+        
+class AssignmentGroup(Base):
+    name = Column(String(255), default="Untitled")
+    owner_id = Column(Integer(), ForeignKey('user.id'))
+    course_id = Column(Integer(), ForeignKey('course.id'))
+    
+    @staticmethod
+    def by_id(assignment_group_id):
+        return AssignmentGroup.query.get(assignment_group_id)
+    
+    def get_assignments(self):
+        return (Assignment.query
+                          .join(AssignmentGroupMembership, 
+                                AssignmentGroupMembership.assignment_id == Assignment.id)
+                          .filter(AssignmentGroupMembership.assignment_group_id==self.id)
+                          .order_by(AssignmentGroupMembership.position)
+                          .all())
+        
+class AssignmentGroupMembership(Base):
+    assignment_group_id = Column(Integer(), ForeignKey('assignmentgroup.id'))
+    assignment_id = Column(Integer(), ForeignKey('assignment.id'))
+    position = Column(Integer())
 
 class Log(Base):
     event = Column(String(255), default="")
@@ -305,7 +375,12 @@ class Log(Base):
     assignment_id = Column(Integer(), ForeignKey('assignment.id'))
     user_id = Column(Integer(), ForeignKey('user.id'))
     
+    @staticmethod    
+    def new(event, action, assignment_id, user_id):
+        log = Log(event=event, action=action, assignment_id=assignment_id, user_id=user_id)
+        db.session.add(log)
+        db.session.commit()
+        return log
+    
     def __str__(self):
         return '<Log {} for {}>'.format(self.event, self.action)
-        
-        

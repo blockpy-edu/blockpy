@@ -1,5 +1,6 @@
 from pprint import pprint
 from lxml import etree
+from urllib import quote as url_quote
 
 # Pygments, for reporting nicely formatted Python snippets
 from pygments import highlight
@@ -23,7 +24,8 @@ from sqlalchemy import Date, cast, func, desc, or_
 from controllers.helpers import instructor_required
 
 from main import app
-from models.models import (User, Course, Assignment, Submission)
+from models.models import (User, Course, Assignment, AssignmentGroup, 
+                           Submission, Log)
 
 lti_assignments = Blueprint('lti_assignments', __name__, url_prefix='/lti_assignments')
 
@@ -60,17 +62,27 @@ def index(lti=lti):
     :return: index page for lti provider
     """
     assignment_id = request.args.get('assignment_id', None)
-    assignment_type = request.args.get('assignment_type', 'blockpy')
+    assignment_group_id = request.args.get('assignment_group_id', None)
     user, roles, course = ensure_canvas_arguments()
-    if assignment_type == 'maze':
-        return render_template('lti/maze.html', lti=lti)
-    elif assignment_type == 'blockpy':
-        assignment = Assignment.by_id(assignment_id)
-        submission = assignment.get_submission(user.id)
+    # Assignment group or individual assignment?
+    if assignment_group_id is not None:
+        group = AssignmentGroup.by_id(assignment_group_id)
+        assignments = group.get_assignments()
+        submissions = [a.get_submission(user.id) for a in assignments]
+    elif assignment_id is not None:
+        assignments = [Assignment.by_id(assignment_id)]
+        submissions = [assignments[0].get_submission(user.id)]
+    else:
+        return error()
+    # Use the proper template
+    if assignments[0].mode == 'maze':
+        return render_template('lti/maze.html', lti=lti,
+                               assignment= assignments[0], 
+                               submission= submissions[0],
+                               level=assignments[0].name)
+    else:
         return render_template('lti/index.html', lti=lti,
-                               program={}, 
-                               assignment=assignment, 
-                               submission=submission)
+                               group=zip(assignments, submissions))
                            
                            
 def ensure_canvas_arguments():
@@ -79,7 +91,9 @@ def ensure_canvas_arguments():
     '''
     user = User.from_lti("canvas", 
                          session["pylti_user_id"], 
-                         session.get("lis_person_contact_email_primary", ""))
+                         session.get("lis_person_contact_email_primary", ""),
+                         session.get("lis_person_name_given", "Canvas"),
+                         session.get("lis_person_name_family", "User"))
     roles = session["roles"]
     course = Course.from_lti("canvas", 
                              session["context_id"], 
@@ -95,7 +109,7 @@ def select(lti=lti):
     """
     # Store current user_id and context_id
     user, roles, course = ensure_canvas_arguments()
-    assignments = Assignment.by_course(course.id)
+    assignments = Assignment.by_course(course.id, exclude_builtins=True)
     return_url = session['launch_presentation_return_url']
     
     return render_template('lti/select.html', assignments=assignments, return_url=return_url)
@@ -118,14 +132,18 @@ def check_assignments(lti=lti):
 @lti(request='session', app=app)
 def save_code(lti=lti):
     assignment_id = request.form.get('question_id', None)
+    assignment_version = int(request.form.get('version', -1))
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     code = request.form.get('code', '')
     filename = request.form.get('filename', '__main__')
     user = User.from_lti("canvas", session["pylti_user_id"], 
-                         session.get("user_email", ""))
+                         session.get("user_email", ""),
+                         session.get("lis_person_name_given", ""),
+                         session.get("lis_person_name_family", ""))
+    is_version_correct = True
     if filename == "__main__":
-        Submission.save_code(user.id, assignment_id, code)
+        submission, is_version_correct = Submission.save_code(user.id, assignment_id, code, assignment_version)
     elif User.is_lti_instructor(session["roles"]):
         if filename == "on_run":
             Assignment.edit(assignment_id=assignment_id, on_run=code)
@@ -133,15 +151,22 @@ def save_code(lti=lti):
             Assignment.edit(assignment_id=assignment_id, on_step=code)
         elif filename == "starting_code":
             Assignment.edit(assignment_id=assignment_id, on_start=code)
-    return jsonify(success=True)
+    return jsonify(success=True, is_version_correct=is_version_correct)
     
 @lti_assignments.route('/save_events/', methods=['GET', 'POST'])
 @lti_assignments.route('/save_events', methods=['GET', 'POST'])
 @lti(request='session', app=app)
 def save_events(lti=lti):
-    # TODO: implement event storage
-    # This will just store button clicks (e.g., "Run", "Block View") to the
-    # Log table.
+    assignment_id = request.form.get('question_id', None)
+    event = request.form.get('event', "blank")
+    action = request.form.get('action', "missing")
+    if assignment_id is None:
+        return jsonify(success=False, message="No Assignment ID given!")
+    user = User.from_lti("canvas", session["pylti_user_id"], 
+                         session.get("user_email", ""),
+                         session.get("lis_person_name_given", ""),
+                         session.get("lis_person_name_family", ""))
+    log = Log.new(event, action, assignment_id, user.id)
     return jsonify(success=True)
     
 @lti_assignments.route('/save_correct/', methods=['GET', 'POST'])
@@ -152,8 +177,15 @@ def save_correct(lti=lti):
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     user = User.from_lti("canvas", session["pylti_user_id"], 
-                         session.get("user_email", ""))
+                         session.get("user_email", ""),
+                         session.get("lis_person_name_given", ""),
+                         session.get("lis_person_name_family", ""))
+    assignment = Assignment.by_id(assignment_id)
     submission = Submission.save_correct(user.id, assignment_id)
+    if assignment.mode == 'maze':
+        lti.post_grade(1, "<h1>Success</h1>");
+    else:
+        lti.post_grade(1, "<h1>Success</h1>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
     return jsonify(success=True)
     
 @lti_assignments.route('/save_presentation/', methods=['GET', 'POST'])
@@ -164,8 +196,9 @@ def save_presentation(lti=lti):
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     presentation = request.form.get('presentation', "")
+    name = request.form.get('name', "")
     if User.is_lti_instructor(session["roles"]):
-        Assignment.edit(assignment_id=assignment_id, presentation=presentation)
+        Assignment.edit(assignment_id=assignment_id, presentation=presentation, name=name)
         return jsonify(success=True)
     else:
         return jsonify(success=False, message="You are not an instructor!")
@@ -179,6 +212,24 @@ def new_assignment(lti=lti):
         return "You are not an instructor in this course."
     assignment = Assignment.new(owner_id=user.id, course_id=course.id)
     return redirect(url_for('lti_assignments.edit_assignment', assignment_id=assignment.id))
+    
+@lti_assignments.route('/select_builtin_assignment/', methods=['GET', 'POST'])
+@lti_assignments.route('/select_builtin_assignment', methods=['GET', 'POST'])
+@lti(request='session', app=app)
+def select_builtin_assignment(lti=lti):
+    assignment_type = request.args.get('assignment_type', None)
+    assignment_id = request.args.get('assignment_id', None)
+    user, roles, course = ensure_canvas_arguments()
+    if not User.is_lti_instructor(roles):
+        return "You are not an instructor in this course."
+    assignment = Assignment.by_builtin(assignment_type, assignment_id, 
+                                       owner_id=user.id, course_id=course.id)
+    assignment_url = url_for('lti_assignments.index', 
+                                    assignment_id=assignment.id, 
+                                    _external=True)
+    print assignment_url
+    encoded_url = url_quote(assignment_url)
+    return jsonify(url=encoded_url)
     
 @lti_assignments.route('/edit_assignment/<int:assignment_id>/', methods=['GET', 'POST'])
 @lti_assignments.route('/edit_assignment/<int:assignment_id>', methods=['GET', 'POST'])
@@ -197,6 +248,20 @@ def edit_assignment(assignment_id, lti=lti):
     return render_template('lti/edit.html', 
                            assignment=assignment, 
                            submission=submission, 
+                           user_id=user.id,
+                           context_id=course.id)
+                           
+        
+@lti_assignments.route('/batch_edit/', methods=['GET', 'POST'])
+@lti_assignments.route('/batch_edit', methods=['GET', 'POST'])
+@lti(request='session', app=app)
+def batch_edit(lti=lti):
+    user, roles, course = ensure_canvas_arguments()
+    if not User.is_lti_instructor(roles):
+        return "You are not an instructor in this course."
+    assignments = Assignment.by_course(course.id)
+    return render_template('lti/batch.html', 
+                           assignments=assignments,
                            user_id=user.id,
                            context_id=course.id)
     
@@ -220,7 +285,8 @@ def share(lti=lti):
     :param lti: the `lti` object from `pylti`
     :return: the staff.html template rendered
     """
-    return "Choose from the below:<ol><li>Test</li></ol>"
+    user, roles, course = ensure_canvas_arguments()
+    return "Sorry this feature has not been implemented yet!"
 
 
 @lti_assignments.route('/grade', methods=['POST'])
@@ -237,6 +303,8 @@ def grade(lti=lti):
     user = User.from_lti("canvas", session["pylti_user_id"], 
                          session.get("user_email", ""))
     submission = Submission.save_correct(user.id, assignment_id)
+    if 'lis_result_sourcedid' not in session:
+        return "Failure"
     #session[''] = session['lis_outcome_service_url']
     lti.post_grade(1, "<h1>Success</h1>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
     return "Successful!"

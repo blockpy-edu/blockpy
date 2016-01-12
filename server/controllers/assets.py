@@ -28,6 +28,7 @@ bundles = {
         "analyzer/analyzer.js",
         "analyzer/python_errors.js",
         "converter/python_to_blockly.js",
+        #"converter/variable_tracker.js",
         "kennel/kennel.js",
         "converter/renderBlocklyToPng.js",
         output='gen/blockpy.js'),
@@ -40,12 +41,12 @@ bundles = {
         output='gen/blockpy.css'),
         
     'blockly_maze_css': Bundle(
-        'blockly-games/appengine/common/common.css',
-        'blockly-games/appengine/maze/style.css',
+        'blockly-games/common/common.css',
+        'blockly-games/maze/style.css',
         output='gen/blockly_maze.css'),
     'blockly_maze_js': Bundle(
-        'blockly-games/appengine/common/boot.js',
-        'blockly-games/appengine/common/storage.js',
+        'blockly-games/common/boot.js',
+        'blockly-games/common/storage.js',
         output='gen/blockly_maze.js'),
 }
 
