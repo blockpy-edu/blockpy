@@ -56,7 +56,10 @@ $(document).ready(function() {
                           'save_presentation': "{{ url_for("lti_assignments.save_presentation")}}"},
                         { 'question_id': {{ assignment.id }},
                           'student_id': {{ user_id }},
-                          'book_id': {{ context_id }} });
+                          'book_id': {{ context_id }},
+                          'version': {{ assignment.version }},
+                          'name': '{{ assignment.name }}'
+                        });
     $(".embedded-data").remove();
 });
 </script>

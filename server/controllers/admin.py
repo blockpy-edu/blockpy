@@ -14,7 +14,8 @@ from jinja2 import Markup
 # Import runestone
 from main import app
 from controllers.helpers import admin_required
-from models.models import (User, db, Course, Submission, Assignment, Settings,
+from models.models import (User, db, Course, Submission, Assignment, 
+                           AssignmentGroup, AssignmentGroupMembership, Settings,
                            Authentication, Log, Role)
 
 admin = Admin(app)
@@ -41,6 +42,11 @@ class UserView(RegularView):
 class ModelIdView(RegularView):
     column_display_pk = True
     
+def _editable(table, field):
+    def _edit_field(view, context, model, name):
+        return table.query.filter(getattr(table, field) == getattr(model, name)).first()
+    return _edit_field
+    
 def _id(table):
     def _edit_id(view, context, model, name):
         return table.query.filter(table.id == getattr(model, name)).first()
@@ -61,6 +67,26 @@ class AssignmentView(RegularView):
                    'name', 'body', 
                    'on_run', 'on_start', 'answer', 
                    'type', 'visibility', 'disabled', 'mode',
+                   'version'
+                   )
+class AssignmentGroupView(RegularView):
+    column_list = ('id', 'date_modified', 
+                   'owner_id', 'course_id',
+                   'name'
+                   )
+class AssignmentGroupMembershipView(RegularView):
+    column_list = ('id', 'date_modified', 
+                   'assignment_group_id', 'assignment_id',
+                   'position'
+                   )
+    form_columns = ('assignment_group_id', 'assignment_id', 'position')
+    column_formatters = { 'user_id': _editable(User, 'id'),
+                          'course_id': _editable(Course, 'id')}
+class SubmissionView(RegularView):
+    column_list = ('id', 'date_modified', 
+                   'user_id', 'assignment_id',
+                   'code', 'status', 
+                   'correct', 'version', 'assignment_version'
                    )
 '''class ScheduleView(RegularView):
     column_display_pk = False
@@ -77,8 +103,10 @@ class FeedbackView(RegularView):
                           '''
 admin.add_view(UserView(User, db.session, category='Tables'))
 admin.add_view(ModelIdView(Course, db.session, category='Tables'))
-admin.add_view(ModelIdView(Submission, db.session, category='Tables'))
+admin.add_view(SubmissionView(Submission, db.session, category='Tables'))
 admin.add_view(AssignmentView(Assignment, db.session, category='Tables'))
+admin.add_view(AssignmentGroupView(AssignmentGroup, db.session, category='Tables'))
+admin.add_view(AssignmentGroupMembershipView(AssignmentGroupMembership, db.session, category='Tables'))
 admin.add_view(ModelIdView(Settings, db.session, category='Tables'))
 admin.add_view(ModelIdView(Authentication, db.session, category='Tables'))
 admin.add_view(RoleView(Role, db.session, category='Tables'))

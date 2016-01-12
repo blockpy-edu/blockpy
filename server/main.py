@@ -1,6 +1,7 @@
 import os, sys
 import logging
 from random import randint
+import jinja2
 
 from flask import Flask, render_template
 
@@ -16,6 +17,9 @@ ch.setLevel(LEVEL)
 formatter = logging.Formatter('%(name)s[%(levelname)s] - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
+
+# Modify Jinja2
+app.jinja_env.filters['zip'] = zip
 
 app.config.from_object('config.TestingConfig')
 

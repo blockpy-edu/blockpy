@@ -192,6 +192,8 @@ function getQueryParams(){
                           'server': false},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
+                          'name': 'Untitled',
+                          'version': 1,
                           'book_id': 'compthink'});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
@@ -302,7 +304,7 @@ def on_run(code, output, properties):
 </xml>
 
 <script>
-$(document).ready(function() {
+/*$(document).ready(function() {
     codes = ["#1\na=a", "#2\na=0\na", "#3\na\na=0", "#4\na\na\na=0", "#5\nfor a in [1,2]:\n  pass", "#6\nfor x in a:\n  pass","#7\na=[]", "#8\na=[]\nfor x in a:\n  pass"];
     var t = $("<table>").addClass("table table-condensed table-striped");
     for (var i= 0; i<codes.length; i++) {
@@ -314,7 +316,7 @@ $(document).ready(function() {
         ));
     }
     $("body").prepend(t)
-});
+});*/
 </script>
 
   

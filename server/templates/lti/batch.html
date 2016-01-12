@@ -1,0 +1,42 @@
+{% extends 'reduced_layout.html' %}
+
+{% block title %}
+Batch Edit Assignments
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+
+
+{% endblock %}
+
+{% block body %}
+
+<table class='table table-condensed table-stripe'>
+    <tr>
+        <th class="col-md-2">Name</th>
+        <th class="col-md-4">Problem</th>
+        <th class="col-md-5">Starting</th>
+        <th class="col-md-1">Tools</th>
+    </tr>
+    {% for assignment in assignments %}
+    <tr>
+        <td><input type="text" class="form-control"  value="{{ assignment.name }}"></td>
+        <td><textarea class="form-control" style='width:100%' rows='6'>{{ assignment.body }}</textarea></td>
+        <td><textarea class="form-control" style='width:100%' rows='6'>{{ assignment.on_run }}</textarea></td>
+        <td>
+            <button class="btn btn-success">Save</button>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td><button class="btn btn-success">New Assignment</button></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+{% endblock %}
