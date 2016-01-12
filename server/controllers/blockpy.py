@@ -35,6 +35,10 @@ def blockpy_canvas():
     return render_template('blockpy.html',
                            assignment=assignment, submission=submission,
                            user=user, course=course)
+                           
+@blockpy.route('/static/<path:path>', methods=['GET', 'POST'])
+def blockpy_static(path):
+    return app.send_static_file(path)
 
 @blockpy.route('/save/', methods=['GET', 'POST'])
 @blockpy.route('/save', methods=['GET', 'POST'])
