@@ -51,7 +51,7 @@ def config():
                                     version='1'), mimetype='text/xml')
 
 @lti_assignments.route('/', methods=['GET', 'POST'])
-@lti_assignments.route('/index', methods=['GET'])
+@lti_assignments.route('/index', methods=['GET', 'POST'])
 @lti_assignments.route('/lti', methods=['GET', 'POST'])
 @lti(request='initial', error=error, app=app)
 def index(lti=lti):
