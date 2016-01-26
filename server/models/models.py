@@ -3,8 +3,10 @@ import time
 import re
 import os
 from pprint import pprint
+import logging
 
 from main import app
+from interaction_logger import StructuredEvent
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -232,16 +234,21 @@ class Submission(Base):
         '''
         Store the code on disk, mapped to the Assignment ID and the Student ID
         '''
+        # Multiple-file logging
         directory = os.path.join(app.config['BLOCKLY_LOG_DIR'],
                                  str(self.assignment_id), 
                                  str(self.user_id))
 
         ensure_dirs(directory)
-            
         name = time.strftime("%Y%m%d-%H%M%S")
         file_name = os.path.join(directory, name + extension)
         with open(file_name, 'wb') as blockly_logfile:
             blockly_logfile.write(self.code)
+        # Single file logging
+        student_interactions_logger = logging.getLogger('StudentInteractions')
+        student_interactions_logger.info(
+            StructuredEvent(self.user_id, self.assignment_id, 'code', 'set', self.code)
+        )
 
     
 class Assignment(Base):
@@ -377,9 +384,15 @@ class Log(Base):
     
     @staticmethod    
     def new(event, action, assignment_id, user_id):
+        # Database logging
         log = Log(event=event, action=action, assignment_id=assignment_id, user_id=user_id)
         db.session.add(log)
         db.session.commit()
+        # Single-file logging
+        student_interactions_logger = logging.getLogger('StudentInteractions')
+        student_interactions_logger.info(
+            StructuredEvent(user_id, assignment_id, event, action, '')
+        )
         return log
     
     def __str__(self):
