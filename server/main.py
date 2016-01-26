@@ -19,9 +19,14 @@ formatter = logging.Formatter('%(name)s[%(levelname)s] - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
+# Modify Jinja2
+app.jinja_env.filters['zip'] = zip
+
+app.config.from_object('config.TestingConfig')
+
 # Logging student interactions
 from interaction_logger import StructuredEvent
-LOG_FILENAME = 'log/student_interactions/student_interactions.log'
+LOG_FILENAME = os.path.join(app.config['ROOT_DIRECTORY'], 'log/student_interactions/student_interactions.log')
 student_interactions_logger = logging.getLogger('StudentInteractions')
 student_interactions_logger.setLevel(logging.INFO)
 handler = handlers.TimedRotatingFileHandler(LOG_FILENAME, when='D')
@@ -29,11 +34,6 @@ handler.setLevel(logging.INFO)
 simple_formatter = logging.Formatter('%(message)s')
 handler.setFormatter(simple_formatter)
 student_interactions_logger.addHandler(handler)
-
-# Modify Jinja2
-app.jinja_env.filters['zip'] = zip
-
-app.config.from_object('config.TestingConfig')
 
 # Assets
 from controllers.assets import assets
