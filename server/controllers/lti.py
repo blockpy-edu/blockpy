@@ -1,6 +1,21 @@
 from pprint import pprint
 from lxml import etree
 from urllib import quote as url_quote
+from urllib import urlencode
+from HTMLParser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 # Pygments, for reporting nicely formatted Python snippets
 from pygments import highlight
@@ -24,7 +39,8 @@ from sqlalchemy import Date, cast, func, desc, or_
 from controllers.helpers import instructor_required
 
 from main import app
-from models.models import (User, Course, Assignment, AssignmentGroup, 
+from models.models import (User, Course, 
+                           Assignment, AssignmentGroup, AssignmentGroupMembership,
                            Submission, Log)
 
 lti_assignments = Blueprint('lti_assignments', __name__, url_prefix='/lti_assignments')
@@ -80,6 +96,10 @@ def index(lti=lti):
                                assignment= assignments[0], 
                                submission= submissions[0],
                                level=assignments[0].name)
+    elif assignments[0].mode == 'explain':
+        return render_template('lti/explain.html', lti=lti,
+                               assignment= assignments[0], 
+                               submission= submissions[0])
     else:
         return render_template('lti/index.html', lti=lti,
                                group=zip(assignments, submissions))
@@ -94,12 +114,15 @@ def ensure_canvas_arguments():
                          session.get("lis_person_contact_email_primary", ""),
                          session.get("lis_person_name_given", "Canvas"),
                          session.get("lis_person_name_family", "User"))
-    roles = session["roles"]
+    if "roles" in session:
+        roles = session["roles"].split(",")
+    else:
+        roles = []
     course = Course.from_lti("canvas", 
                              session["context_id"], 
                              session.get("context_title", ""), 
                              user.id)
-    return user, roles.split(","), course
+    return user, roles, course
     
 @lti_assignments.route('/select/', methods=['GET', 'POST'])
 @lti_assignments.route('/select', methods=['GET', 'POST'])
@@ -110,9 +133,12 @@ def select(lti=lti):
     # Store current user_id and context_id
     user, roles, course = ensure_canvas_arguments()
     assignments = Assignment.by_course(course.id, exclude_builtins=True)
+    groups = [(group, group.get_assignments())
+              for group in AssignmentGroup.by_course(course.id)]
+    strays = AssignmentGroup.get_ungrouped_assignments(course.id)
     return_url = session['launch_presentation_return_url']
     
-    return render_template('lti/select.html', assignments=assignments, return_url=return_url)
+    return render_template('lti/select.html', assignments=assignments, strays=strays, groups=groups, return_url=return_url)
     
 @lti_assignments.route('/check_assignments/', methods=['GET', 'POST'])
 @lti_assignments.route('/check_assignments', methods=['GET', 'POST'])
@@ -202,16 +228,71 @@ def save_presentation(lti=lti):
         return jsonify(success=True)
     else:
         return jsonify(success=False, message="You are not an instructor!")
+        
+        
+import explain
+
+
+# refreshAssignment
     
-@lti_assignments.route('/new_assignment/', methods=['GET', 'POST'])
-@lti_assignments.route('/new_assignment', methods=['GET', 'POST'])
+@lti_assignments.route('/assignment/new/', methods=['GET', 'POST'])
+@lti_assignments.route('/assignment/new', methods=['GET', 'POST'])
 @lti(request='session', app=app)
 def new_assignment(lti=lti):
     user, roles, course = ensure_canvas_arguments()
     if not User.is_lti_instructor(roles):
         return "You are not an instructor in this course."
     assignment = Assignment.new(owner_id=user.id, course_id=course.id)
-    return redirect(url_for('lti_assignments.edit_assignment', assignment_id=assignment.id))
+    return jsonify(success=True,
+                   redirect=url_for('lti_assignments.edit_assignment', assignment_id=assignment.id),
+                   id= assignment.id,
+                   name= assignment.name,
+                   body= strip_tags(assignment.body)[:255],
+                   title= assignment.title(),
+                   select = url_quote(url_for('lti_assignments.index', assignment_id=assignment.id, _external=True))+"&return_type=lti_launch_url&title="+url_quote(assignment.title())+"&text=BlockPy%20Exercise",
+                   edit= url_for('lti_assignments.edit_assignment', assignment_id=assignment.id),
+                   date_modified = assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " "))
+    
+@lti_assignments.route('/assignment/remove/', methods=['GET', 'POST'])
+@lti_assignments.route('/assignment/remove', methods=['GET', 'POST'])
+@lti(request='session', app=app)
+def remove_assignment(lti=lti):
+    assignment_id = request.values.get('assignment_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No assignment id")
+    user, roles, course = ensure_canvas_arguments()
+    if not User.is_lti_instructor(roles):
+        return jsonify(success=False, message="You are not an instructor in this course.")
+    # TODO: Security hole, evil instructors could remove assignments outside of their course
+    Assignment.remove(assignment_id)
+    return jsonify(success=True)
+    
+@lti_assignments.route('/assignment/get/', methods=['GET', 'POST'])
+@lti_assignments.route('/assignment/get', methods=['GET', 'POST'])
+@lti(request='session', app=app)
+def get_assignment(lti=lti):
+    '''
+    Returns metadata about the assignment.
+    '''
+    assignment_id = request.values.get('assignment_id', None)
+    if assignment_id is None:
+        return jsonify(success=False, message="No assignment id")
+    user, roles, course = ensure_canvas_arguments()
+    if not User.is_lti_instructor(roles):
+        return jsonify(success=False, message="You are not an instructor in this course.")
+    # TODO: Security hole, evil instructors could remove assignments outside of their course
+    assignment = Assignment.by_id(assignment_id)
+    return jsonify(success=True, url=assignment.url, name=assignment.name,
+                   body= strip_tags(assignment.body)[:255],
+                   on_run=assignment.on_run,
+                   title= assignment.title(),
+                   answer=assignment.answer, type=assignment.type,
+                   visibility=assignment.visibility, disabled=assignment.disabled,
+                   mode=assignment.mode, version=assignment.version,
+                   id=assignment.id, course_id=assignment.course_id,
+                   date_modified = assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " "))
+
+import assignment_groups
     
 @lti_assignments.route('/select_builtin_assignment/', methods=['GET', 'POST'])
 @lti_assignments.route('/select_builtin_assignment', methods=['GET', 'POST'])

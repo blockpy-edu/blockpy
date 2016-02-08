@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import time
 import re
 import os
+import json
 from pprint import pprint
 import logging
 
@@ -196,6 +197,22 @@ class Submission(Base):
             db.session.commit()
         return submission
         
+    def save_explanation_code(self, code):
+        submission_destructured = json.loads(self.code)
+        if 'code' in submission_destructured:
+            submission_destructured['code'] = code_submission
+        else:
+            submission_destructured = {
+                'code': code_submission
+            }
+        submission.code = json.dumps(submission_destructured)
+        submission.version += 1
+        db.session.commit()
+        return submission_destructured
+        
+    def load_explanation(self):
+        return json.loads(self.code)
+        
     @staticmethod
     def save_code(user_id, assignment_id, code, assignment_version):
         submission = Submission.query.filter_by(user_id=user_id, 
@@ -309,6 +326,11 @@ class Assignment(Base):
         db.session.add(assignment)
         db.session.commit()
         return assignment
+    
+    @staticmethod    
+    def remove(assignment_id):
+        Assignment.query.filter_by(id=assignment_id).delete()
+        db.session.commit()
         
     @staticmethod
     def by_course(course_id, exclude_builtins=True):
@@ -359,9 +381,44 @@ class AssignmentGroup(Base):
     owner_id = Column(Integer(), ForeignKey('user.id'))
     course_id = Column(Integer(), ForeignKey('course.id'))
     
+    @staticmethod    
+    def new(owner_id, course_id):
+        assignment_group = AssignmentGroup(owner_id=owner_id, course_id=course_id)
+        db.session.add(assignment_group)
+        db.session.commit()
+        return assignment_group
+        
+    @staticmethod    
+    def remove(assignment_group_id):
+        AssignmentGroup.query.filter_by(id=assignment_group_id).delete()
+        AssignmentGroupMembership.query.filter_by(assignment_group_id=assignment_group_id).delete()
+        db.session.commit()
+        
+    @staticmethod
+    def edit(assignment_group_id, name=None):
+        assignment_group = AssignmentGroup.by_id(assignment_group_id)
+        if name is not None:
+            assignment_group.name = name
+        db.session.commit()
+        return assignment_group
+    
     @staticmethod
     def by_id(assignment_group_id):
         return AssignmentGroup.query.get(assignment_group_id)
+        
+    @staticmethod
+    def by_course(course_id):
+        return (AssignmentGroup.query.filter_by(course_id=course_id)
+                                     .order_by(AssignmentGroup.name)
+                                     .all())
+    
+    @staticmethod
+    def get_ungrouped_assignments(course_id):
+        return (Assignment.query
+                          .filter_by(course_id=course_id)
+                          .outerjoin(AssignmentGroupMembership)
+                          .filter(AssignmentGroupMembership.assignment_id==None)
+                          .all())
     
     def get_assignments(self):
         return (Assignment.query
@@ -375,6 +432,21 @@ class AssignmentGroupMembership(Base):
     assignment_group_id = Column(Integer(), ForeignKey('assignmentgroup.id'))
     assignment_id = Column(Integer(), ForeignKey('assignment.id'))
     position = Column(Integer())
+    
+    @staticmethod
+    def move_assignment(assignment_id, new_group_id):
+        membership = (AssignmentGroupMembership.query
+                                               .filter_by(assignment_id=assignment_id)
+                                               .first())
+        if membership is None:
+            membership = AssignmentGroupMembership(assignment_group_id = new_group_id,
+                                                   assignment_id=assignment_id,
+                                                   position=0)
+            db.session.add(membership)
+        else:
+            membership.assignment_group_id = new_group_id
+        db.session.commit()
+        return membership
 
 class Log(Base):
     event = Column(String(255), default="")

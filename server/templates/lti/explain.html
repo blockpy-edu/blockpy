@@ -1,0 +1,56 @@
+{% extends 'reduced_layout.html' %}
+
+{% block title %}
+Code Explaining
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+
+{% assets "code_explaining_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{% assets "code_explaining_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+<script>
+URL_ROOT = "{{ url_for('static', filename='') }}";
+URL_MAP = { 
+    'save_code': '{{ url_for("lti_assignments.save_code")}}',
+    'save_success': '{{ url_for("lti_assignments.save_correct")}}',
+    'load_success': {{ "true" if submission.correct else "false" }},
+    'log_event': '{{ url_for("lti_assignments.save_events") }}',
+};
+</script>
+
+{% endblock %}
+
+{% block body %}
+
+
+
+    <!-- The global progress bar -->
+<h1>Explain Your Code</h1>
+<div class="row"> 
+    <div>Upload your main Python project file (.py).</div>
+    <div>Do not upload the python dataset file you were given, only the python file that YOU wrote. If your project involves more than one file, upload the one with the most code.</div>
+    
+    <span class="btn btn-success fileinput-button">
+        <i class="glyphicon glyphicon-upload"></i>
+        <span>Select file...</span>
+        <input id='fileupload' type="file" name="files">
+    </span>    
+</div>
+<div class="row">
+    <textarea>{{ submission.code }}</textarea>
+</div>
+<div class='col-md-8'>
+    
+    
+</div>
+
+{% endblock %}

@@ -1602,7 +1602,7 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
         executionPromise.then(
             function (module) {
                 var result = Sk.ffi.remapToJs(module.$d.result);
-                if (result === 1) {
+                if (result === 1 || (result.constructor === Array && result[0] === 1)) {
                     kennel.server.markSuccess();
                     kennel.feedback.success();
                 } else {
