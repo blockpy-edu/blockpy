@@ -1605,8 +1605,6 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
                 if (result === 1) {  
                     kennel.server.markSuccess();
                     kennel.feedback.success();
-                } else if (result.constructor === Array && result.length >= 1 && result[0] === 1) {
-                    kennel.feedback.error(result[1]);
                 } else {
                     kennel.feedback.error(result);
                 }
