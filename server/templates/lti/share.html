@@ -36,12 +36,11 @@ ko.bindingHandlers.editableText = {
 $(document).ready(function() {
     $(".maze-selected").click(function() {
         var maze_id = $(this).data('maze');
-        // TODO: This does not work with shared
         $.get("{{ url_for('lti_assignments.select_builtin_assignment') }}", 
             {'assignment_id': maze_id, 
              'assignment_type': 'maze'},
             function(data) {
-                var redirect_url = "{{ return_url }}?url="+data.url+"&return_type={{ 'lti_launch_url' if menu != 'share' else 'iframe' }}&title=maze"+maze_id+"&text=BlockPy%20Exercise&width=100%25&height=600";
+                var redirect_url = "{{ return_url }}?url="+data.url+"&return_type=lti_launch_url&title=maze"+maze_id+"&text=BlockPy%20Exercise";
                 window.location.href = redirect_url;
             }
         );
@@ -62,7 +61,7 @@ function MainModel() {
                 'id': {{ assignment.id }},
                 'group_id': {{ group.id }},
                 'title': ko.observable("{{assignment.title()}}"),
-                'select': "{{ return_url }}?url={{url_for('lti_assignments.index' if menu != 'share' else 'lti_assignments.shared', assignment_id=assignment.id, _external=True) | urlencode}}&return_type={{ 'lti_launch_url' if menu != 'share' else 'iframe' }}&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise&width=100%25&height=600", 
+                'select': "{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise", 
                 'edit': "{{ url_for('lti_assignments.edit_assignment', assignment_id=assignment.id ) }}",
                 'modified': ko.observable('{{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " ") }}'),
                 'body': ko.observable("{{ assignment.body|striptags|truncate(255) }}")
@@ -82,7 +81,7 @@ function MainModel() {
                 'name': ko.observable("{{ assignment.name }}"),
                 'group_id': -1,
                 'title': ko.observable("{{assignment.title()}}"),
-                'select': "{{ return_url }}?url={{url_for('lti_assignments.index' if menu != 'share' else 'lti_assignments.shared', assignment_id=assignment.id, _external=True) | urlencode}}&return_type={{ 'lti_launch_url' if menu != 'share' else 'iframe' }}&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise&width=100%25&height=600", 
+                'select': "{{ return_url }}?url={{url_for('lti_assignments.index', assignment_id=assignment.id, _external=True) | urlencode}}&return_type=lti_launch_url&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise", 
                 'edit': "{{ url_for('lti_assignments.edit_assignment', assignment_id=assignment.id ) }}",
                 'modified': ko.observable('{{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " ") }}'),
                 'body': ko.observable("{{ assignment.body|striptags|truncate(255) }}")
@@ -195,7 +194,6 @@ function MainModel() {
     
     self.addAssignment = function() {
         $.post("{{ url_for('lti_assignments.new_assignment') }}", {
-            'menu': "{{ menu }}"
         }, function(data) {
             if (data.success) {
                 self.strayGroup.assignments.push({
@@ -268,7 +266,7 @@ tr.hover-remove-rows button.remove-button {
 {% block body %}
 
 <a href="javascript:location.reload(true)" class='pull-right'><span class='glyphicon glyphicon-refresh' aria-hidden="true"></span></a>
-<h3>Choose {{'an Assignment' if menu != 'share' else 'an Ungraded Assignment'}}</h3>
+<h3>Choose an Assignment</h3>
 
 <table class="table table-condensed table-hover">
 <tbody>

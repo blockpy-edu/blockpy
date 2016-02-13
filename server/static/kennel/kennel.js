@@ -103,26 +103,29 @@ KennelServer.prototype.uploadEvents = function() {
     }
 }
 
-KennelServer.prototype.markSuccess = function() {
+KennelServer.prototype.markSuccess = function(success) {
     var data = {
         'code': this.model.programs.__main__,
         'type': 'blockly',
         'version': this.model.question.version,
         'question_id': this.model.question.question_id,
         'student_id': this.model.question.student_id,
-        'context_id': this.model.question.context_id
+        'context_id': this.model.question.context_id,
+        'status': success
     };
     var alertBox = this.alertBox;
     if (this.model.urls.server !== false) {
         $.post(this.model.urls.save_success, data, function(response) {
-            if (response.success) {
-                alertBox("Success reported").delay(200).fadeOut("slow");
-            } else {
-                alertBox("Success report failed");
-                console.error("Server Success Report Error", response.message);
+            if (success) {
+                if (response.success) {
+                    alertBox("Success reported").delay(200).fadeOut("slow");
+                } else {
+                    alertBox("Success report failed");
+                    console.error("Server Success Report Error", response.message);
+                }
             }
         }).fail(function() {
-            alertBox("Success report failed");
+            alertBox("Status report failed");
         });
     }
 };
@@ -1603,9 +1606,10 @@ Kennel.prototype.check = function(student_code, traceTable, output) {
             function (module) {
                 var result = Sk.ffi.remapToJs(module.$d.result);
                 if (result === 1) {  
-                    kennel.server.markSuccess();
+                    kennel.server.markSuccess(1.0);
                     kennel.feedback.success();
                 } else {
+                    kennel.server.markSuccess(0.0);
                     kennel.feedback.error(result);
                 }
                 Sk.afterSingleExecution = backupExecution;

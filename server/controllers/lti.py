@@ -51,6 +51,7 @@ def error(exception=None):
     :param exception: optional exception
     :return: the error.html template rendered
     """
+    print exception
     if request.method == 'POST':
         params = request.form.to_dict()
     else:
@@ -138,7 +139,7 @@ def select(lti=lti):
     strays = AssignmentGroup.get_ungrouped_assignments(course.id)
     return_url = session['launch_presentation_return_url']
     
-    return render_template('lti/select.html', assignments=assignments, strays=strays, groups=groups, return_url=return_url)
+    return render_template('lti/select.html', assignments=assignments, strays=strays, groups=groups, return_url=return_url, menu='select')
     
 @lti_assignments.route('/check_assignments/', methods=['GET', 'POST'])
 @lti_assignments.route('/check_assignments', methods=['GET', 'POST'])
@@ -200,6 +201,7 @@ def save_events(lti=lti):
 @lti(request='session', app=app)
 def save_correct(lti=lti):
     assignment_id = request.form.get('question_id', None)
+    status = float(request.form.get('status', "0.0"))
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     user = User.from_lti("canvas", session["pylti_user_id"], 
@@ -207,12 +209,34 @@ def save_correct(lti=lti):
                          session.get("lis_person_name_given", ""),
                          session.get("lis_person_name_family", ""))
     assignment = Assignment.by_id(assignment_id)
-    submission = Submission.save_correct(user.id, assignment_id)
-    if assignment.mode == 'maze':
-        lti.post_grade(1, "<h1>Success</h1>");
+    if status == 1:
+        submission = Submission.save_correct(user.id, assignment_id)
     else:
-        lti.post_grade(1, "<h1>Success</h1>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
+        submission = assignment.get_submission(user.id)
+    if submission.correct:
+        message = "Success!"
+    else:
+        message = "Incomplete"
+    url = url_for('lti_assignments.get_submission_code', submission_id=submission.id, _external=True)
+    if assignment.mode == 'maze':
+        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message));
+    else:
+        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message)+"<div>Latest work in progress: <a href='{0}' target='_blank'>View</a></div>"+"<div>Touches: {0}</div>".format(submission.version)+"Last ran code:<br>".format(url)+highlight(submission.code, PythonLexer(), HtmlFormatter()))
     return jsonify(success=True)
+    
+@lti_assignments.route('/get_submission_code/', methods=['GET', 'POST'])
+@lti_assignments.route('/get_submission_code', methods=['GET', 'POST'])
+@lti(request='session', app=app)
+def get_submission_code(lti=lti):
+    user, roles, course = ensure_canvas_arguments()
+    submission_id = request.values.get('submission_id', None)
+    if submission_id is None:
+        return "Sorry, no submission ID was given."
+    submission = Submission.query.get(submission_id)
+    if User.is_lti_instructor(session["roles"]) or submission.user_id == user.id:
+        return submission.code if submission.code else "#No code given!"
+    else:
+        return "Sorry, you do not have sufficient permissions to spy!"
     
 @lti_assignments.route('/save_presentation/', methods=['GET', 'POST'])
 @lti_assignments.route('/save_presentation', methods=['GET', 'POST'])
@@ -240,16 +264,19 @@ import explain
 @lti(request='session', app=app)
 def new_assignment(lti=lti):
     user, roles, course = ensure_canvas_arguments()
+    menu = request.values.get('menu', "select")
     if not User.is_lti_instructor(roles):
         return "You are not an instructor in this course."
     assignment = Assignment.new(owner_id=user.id, course_id=course.id)
+    launch_type = 'lti_launch_url' if menu != 'share' else 'iframe'
+    endpoint = 'lti_assignments.index' if menu != 'share' else 'lti_assignments.shared'
     return jsonify(success=True,
                    redirect=url_for('lti_assignments.edit_assignment', assignment_id=assignment.id),
                    id= assignment.id,
                    name= assignment.name,
                    body= strip_tags(assignment.body)[:255],
                    title= assignment.title(),
-                   select = url_quote(url_for('lti_assignments.index', assignment_id=assignment.id, _external=True))+"&return_type=lti_launch_url&title="+url_quote(assignment.title())+"&text=BlockPy%20Exercise",
+                   select = url_quote(url_for(endpoint, assignment_id=assignment.id, _external=True))+"&return_type="+launch_type+"&title="+url_quote(assignment.title())+"&text=BlockPy%20Exercise&width=100%25&height=600",
                    edit= url_for('lti_assignments.edit_assignment', assignment_id=assignment.id),
                    date_modified = assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " "))
     
@@ -359,7 +386,7 @@ def dashboard(lti=lti):
     
 @lti_assignments.route('/share/', methods=['GET', 'POST'])
 @lti_assignments.route('/share', methods=['GET', 'POST'])
-@lti(request='session', app=app)
+@lti(request='initial', error=error, role='staff', app=app)
 def share(lti=lti):
     """ render the contents of the staff.html template
 
@@ -367,8 +394,49 @@ def share(lti=lti):
     :return: the staff.html template rendered
     """
     user, roles, course = ensure_canvas_arguments()
-    return "Sorry this feature has not been implemented yet!"
+    assignments = Assignment.by_course(course.id, exclude_builtins=True)
+    groups = [(group, group.get_assignments())
+              for group in AssignmentGroup.by_course(course.id)]
+    strays = AssignmentGroup.get_ungrouped_assignments(course.id)
+    return_url = session['launch_presentation_return_url']
+    
+    return render_template('lti/select.html', assignments=assignments, strays=strays, groups=groups, return_url=return_url, menu='share')
 
+@lti_assignments.route('/shared/', methods=['GET', 'POST'])
+@lti_assignments.route('/shared', methods=['GET', 'POST'])
+@lti(request='session', error=error, app=app)
+def shared(lti=lti):
+    """ render the contents of the assignment template
+
+    :param lti: the `lti` object from `pylti`
+    :return: the staff.html template rendered
+    """
+    assignment_id = request.args.get('assignment_id', None)
+    assignment_group_id = request.args.get('assignment_group_id', None)
+    user, roles, course = ensure_canvas_arguments()
+    # Assignment group or individual assignment?
+    if assignment_group_id is not None:
+        group = AssignmentGroup.by_id(assignment_group_id)
+        assignments = group.get_assignments()
+        submissions = [a.get_submission(user.id) for a in assignments]
+    elif assignment_id is not None:
+        assignments = [Assignment.by_id(assignment_id)]
+        submissions = [assignments[0].get_submission(user.id)]
+    else:
+        return error()
+    # Use the proper template
+    if assignments[0].mode == 'maze':
+        return render_template('lti/maze.html', lti=lti,
+                               assignment= assignments[0], 
+                               submission= submissions[0],
+                               level=assignments[0].name)
+    elif assignments[0].mode == 'explain':
+        return render_template('lti/explain.html', lti=lti,
+                               assignment= assignments[0], 
+                               submission= submissions[0])
+    else:
+        return render_template('lti/index.html', lti=lti,
+                               group=zip(assignments, submissions))
 
 @lti_assignments.route('/grade', methods=['POST'])
 @lti(request='session', app=app)
