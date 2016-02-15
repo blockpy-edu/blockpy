@@ -193,6 +193,8 @@ class Submission(Base):
                                                 user_id=user_id).first()
         if not submission:
             submission = Submission(assignment_id=assignment_id, user_id=user_id)
+            assignment = Assignment.by_id(assignment_id)
+            submission.code = assignment.on_start
             db.session.add(submission)
             db.session.commit()
         return submission
@@ -351,7 +353,6 @@ class Assignment(Base):
                                                 mode=type,
                                                 name=id).first()
         if not assignment:
-            print type, id
             assignment = Assignment.new(owner_id, course_id)
             assignment.mode = type
             assignment.name = id
