@@ -36,12 +36,17 @@ Blockly.Pseudo['lists_create_empty'] = function(block) {
 
 Blockly.Pseudo['lists_create_with'] = function(block) {
   // Create a list with any number of elements of any type.
-  var code = new Array(block.itemCount_);
-  for (var n = 0; n < block.itemCount_; n++) {
-    code[n] = Blockly.Pseudo.valueToCode(block, 'ADD' + n,
-        Blockly.Pseudo.ORDER_NONE) || '___';
+  var code;
+  if (block.itemCount_ > 0) {
+      code = new Array(block.itemCount_);
+      for (var n = 0; n < block.itemCount_; n++) {
+        code[n] = Blockly.Pseudo.valueToCode(block, 'ADD' + n,
+            Blockly.Pseudo.ORDER_NONE) || '___';
+      }
+      code = 'a new list of these elements: ' + code.join(', ') + '';
+  } else {
+      code = 'a new empty list';
   }
-  code = 'a new list of these elements: ' + code.join(', ') + '';
   return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
@@ -59,7 +64,7 @@ Blockly.Pseudo['lists_length'] = function(block) {
   // String or array length.
   var argument0 = Blockly.Pseudo.valueToCode(block, 'VALUE',
       Blockly.Pseudo.ORDER_NONE) || '___';
-  return ['len(' + argument0 + ')', Blockly.Pseudo.ORDER_FUNCTION_CALL];
+  return ['the length of ' + argument0, Blockly.Pseudo.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Pseudo['lists_isEmpty'] = function(block) {

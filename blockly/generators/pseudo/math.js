@@ -232,7 +232,7 @@ Blockly.Pseudo['math_change'] = function(block) {
       Blockly.Pseudo.ORDER_ADDITIVE) || '___';
   var varName = Blockly.Pseudo.variableDB_.getName(block.getFieldValue('VAR'),
       Blockly.Variables.NAME_TYPE);
-  return varName + ' += ' + argument0 + '\n';
+  return 'Increase <u>' + varName + '</u> by' + argument0 + '.\n';
 };
 
 // Rounding functions have a single operand.

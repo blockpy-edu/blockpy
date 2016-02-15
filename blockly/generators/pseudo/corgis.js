@@ -37,7 +37,7 @@ Blockly.Pseudo['weather_temperature'] = function(block) {
     Blockly.Pseudo.definitions_['import_weather'] = 'Import the weather module (which provides access to US weather reports).';
     var code = 'the current temperature for ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('CITY'));
-    code += argument0 + '';
+    code += argument0;
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 Blockly.Pseudo['weather_forecasts'] = function(block) {
@@ -81,17 +81,17 @@ Blockly.Pseudo['weather_all_forecasts'] = function(block) {
  * Stocks Data
  */
 Blockly.Pseudo['stocks_current'] = function(block) {
-    Blockly.Pseudo.definitions_['import_stocks'] = 'import stocks';
-    var code = 'stocks.get_current(';
+    Blockly.Pseudo.definitions_['import_stocks'] = 'Import the stock module (which provides access to stock changes)';
+    var code = 'the current change in stock for ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('TICKER'));
-    code += argument0 + ')';
+    code += argument0;
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 Blockly.Pseudo['stocks_past'] = function(block) {
-    Blockly.Pseudo.definitions_['import_stocks'] = 'import stocks';
-    var code = 'stocks.get_past(';
+    Blockly.Pseudo.definitions_['import_stocks'] = 'Import the stock module (which provides access to stock changes)';
+    var code = 'the past change in stocks for ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('TICKER'));
-    code += argument0 + ')';
+    code += argument0;
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
@@ -99,20 +99,20 @@ Blockly.Pseudo['stocks_past'] = function(block) {
  * Earthquake Data
  */
 Blockly.Pseudo['earthquake_get'] = function(block) {
-    Blockly.Pseudo.definitions_['import_earthquakes'] = 'import earthquakes';
-    var code = 'earthquakes.get(';
+    Blockly.Pseudo.definitions_['import_earthquakes'] = 'Import the earthquake module (which provides access to recent earthquakes)';
+    var code = 'the ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('PROPERTY'));
-    code += argument0 + ')';
+    code += argument0 + ' of recent earthquakes';
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 Blockly.Pseudo['earthquake_both'] = function(block) {
-    Blockly.Pseudo.definitions_['import_earthquakes'] = 'import earthquakes';
-    var code = 'earthquakes.get_both()';
+    Blockly.Pseudo.definitions_['import_earthquakes'] = 'Import the earthquake module (which provides access to recent earthquakes)';
+    var code = 'both the magnitude and depth of recent earthquakes';
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 Blockly.Pseudo['earthquake_all'] = function(block) {
-    Blockly.Pseudo.definitions_['import_earthquakes'] = 'import earthquakes';
-    var code = 'earthquakes.get_all()';
+    Blockly.Pseudo.definitions_['import_earthquakes'] = 'Import the earthquake module (which provides access to recent earthquakes)';
+    var code = 'all of the recent earthquakes';
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
@@ -120,24 +120,24 @@ Blockly.Pseudo['earthquake_all'] = function(block) {
  * Crime Data
  */
 Blockly.Pseudo['crime_state'] = function(block) {
-    Blockly.Pseudo.definitions_['import_crime'] = 'import crime';
-    var code = 'crime.get_' + block.getFieldValue('TYPE') + '_crimes(';
+    Blockly.Pseudo.definitions_['import_crime'] = 'Import the crime module (which provides access to historical crime records in the US)';
+    var code = 'the ' + block.getFieldValue('TYPE') + ' property crimes of ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('STATE'));
-    code += argument0 + ')';
+    code += argument0;
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
 Blockly.Pseudo['crime_year'] = function(block) {
-    Blockly.Pseudo.definitions_['import_crime'] = 'import crime';
-    var code = 'crime.get_by_year(';
+    Blockly.Pseudo.definitions_['import_crime'] = 'Import the crime module (which provides access to historical crime records in the US)';
+    var code = 'the crime reports in ';
     var argument0 = Blockly.Pseudo.quote_(block.getFieldValue('YEAR'));
-    code += argument0 + ')';
+    code += argument0;
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
 Blockly.Pseudo['crime_all'] = function(block) {
-    Blockly.Pseudo.definitions_['import_crime'] = 'import crime';
-    var code = 'crime.get_all()';
+    Blockly.Pseudo.definitions_['import_crime'] = 'Import the crime module (which provides access to historical crime records in the US)';
+    var code = 'all of the crime reports';
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
@@ -145,7 +145,7 @@ Blockly.Pseudo['crime_all'] = function(block) {
  * Book Data
  */
 Blockly.Pseudo['books_get'] = function(block) {
-    Blockly.Pseudo.definitions_['import_books'] = 'import books';
-    var code = 'books.get_all()';
+    Blockly.Pseudo.definitions_['import_books'] = 'Import the books module (which provides access to a few example books)';
+    var code = 'all of the books';
     return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };

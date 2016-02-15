@@ -42,12 +42,12 @@ Blockly.Pseudo['controls_if'] = function(block) {
         Blockly.Pseudo.ORDER_NONE) || '___';
     branch = Blockly.Pseudo.statementToCode(block, 'DO' + n) ||
         Blockly.Pseudo.PASS;
-    code += 'elif ' + argument + ':\n' + branch;
+    code += 'otherwise if ' + argument + ':\n' + branch;
   }
   if (block.elseCount_) {
     branch = Blockly.Pseudo.statementToCode(block, 'ELSE') ||
         Blockly.Pseudo.PASS;
-    code += 'else:\n' + branch;
+    code += 'otherwise:\n' + branch;
   }
   return code;
 };
@@ -55,12 +55,12 @@ Blockly.Pseudo['controls_if'] = function(block) {
 Blockly.Pseudo['logic_compare'] = function(block) {
   // Comparison operator.
   var OPERATORS = {
-    'EQ': '==',
-    'NEQ': '!=',
-    'LT': '<',
-    'LTE': '<=',
-    'GT': '>',
-    'GTE': '>='
+    'EQ': ' is equal to ',
+    'NEQ': ' is not equal to ',
+    'LT': ' is less than ',
+    'LTE': ' is less than or equal to ',
+    'GT': ' is greater than ',
+    'GTE': ' is greater than or equal to '
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = Blockly.Pseudo.ORDER_RELATIONAL;

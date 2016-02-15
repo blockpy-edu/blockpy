@@ -33,7 +33,7 @@ Blockly.Pseudo['dict_get'] = function(block) {
       Blockly.Pseudo.ORDER_MEMBER) || '___';
   var value = Blockly.Pseudo.valueToCode(block, 'ITEM',
       Blockly.Pseudo.ORDER_NONE) || '___';
-  var code = dict + '[' + value + ']';
+  var code = " the value of the key " + value + " of " +dict;
   return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
 
@@ -42,10 +42,9 @@ Blockly.Pseudo['dict_get_literal'] = function(block) {
   var dict = Blockly.Pseudo.valueToCode(block, 'DICT',
       Blockly.Pseudo.ORDER_MEMBER) || '___';
   var value = Blockly.Pseudo.quote_(block.getFieldValue('ITEM'));
-  var code = dict + '[' + value + ']';
+  var code = " the value of the key " + value + " of " +dict;
   return [code, Blockly.Pseudo.ORDER_ATOMIC];
 };
-
 
 Blockly.Pseudo['dicts_create_with'] = function(block) {
     var value_keys = Blockly.Pseudo.valueToCode(block, 'keys', Blockly.   Pseudo.ORDER_ATOMIC);
