@@ -51,6 +51,24 @@ $(document).ready(function() {
 function MainModel() {
     var self = this;
     self.groups = ko.observableArray([
+    {
+        'name': 'Ungrouped Assignments',
+        'id': -1,
+        'assignments': ko.observableArray([
+        {% for assignment in strays %}
+            {
+                'id': {{ assignment.id }},
+                'name': ko.observable("{{ assignment.name }}"),
+                'group_id': -1,
+                'title': ko.observable("{{assignment.title()}}"),
+                'select': "{{ return_url }}?url={{url_for('lti_assignments.index' if menu != 'share' else 'lti_assignments.shared', assignment_id=assignment.id, _external=True) | urlencode}}&return_type={{ 'lti_launch_url' if menu != 'share' else 'iframe' }}&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise&width=100%25&height=600", 
+                'edit': "{{ url_for('lti_assignments.edit_assignment', assignment_id=assignment.id ) }}",
+                'modified': ko.observable('{{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " ") }}'),
+                'body': ko.observable("{{ assignment.body|striptags|truncate(255) }}")
+            }{{ "," if not loop.last }}
+        {% endfor %}
+        ])
+    },
     {% for group, assignments in groups %}
     {
         'name': ko.observable("{{ group.name }}"),
@@ -70,28 +88,10 @@ function MainModel() {
             {% endfor %}
             
         ])
-    },
+    }{{ ',' if not loop.last}}
     {% endfor %}
-    {
-        'name': 'Ungrouped Assignments',
-        'id': -1,
-        'assignments': ko.observableArray([
-        {% for assignment in strays %}
-            {
-                'id': {{ assignment.id }},
-                'name': ko.observable("{{ assignment.name }}"),
-                'group_id': -1,
-                'title': ko.observable("{{assignment.title()}}"),
-                'select': "{{ return_url }}?url={{url_for('lti_assignments.index' if menu != 'share' else 'lti_assignments.shared', assignment_id=assignment.id, _external=True) | urlencode}}&return_type={{ 'lti_launch_url' if menu != 'share' else 'iframe' }}&title={{ assignment.title()|urlencode }}&text=BlockPy%20Exercise&width=100%25&height=600", 
-                'edit': "{{ url_for('lti_assignments.edit_assignment', assignment_id=assignment.id ) }}",
-                'modified': ko.observable('{{ assignment.date_modified.strftime(" %I:%M%p on %a %d, %b %Y").replace(" 0", " ") }}'),
-                'body': ko.observable("{{ assignment.body|striptags|truncate(255) }}")
-            }{{ "," if not loop.last }}
-        {% endfor %}
-        ])
-    }
     ]);
-    self.strayGroup = self.groups()[self.groups().length-1];
+    self.strayGroup = self.groups()[0];
     
     self.moveGroup = function(assignment, old_group, new_group) {
         $.post("{{ url_for('lti_assignments.move_group') }}", {
@@ -150,7 +150,7 @@ function MainModel() {
         $.post("{{ url_for('lti_assignments.add_group') }}", {
         }, function(data) {
             if (data.success) {
-                self.groups.push({
+                self.groups.unshift({
                     'id': data.id,
                     'name': ko.observable(data.name),
                     'assignments': ko.observableArray()
@@ -198,7 +198,7 @@ function MainModel() {
             'menu': "{{ menu }}"
         }, function(data) {
             if (data.success) {
-                self.strayGroup.assignments.push({
+                self.strayGroup.assignments.unshift({
                     'id': data.id,
                     'group_id': -1,
                     'name': ko.observable(data.name),
