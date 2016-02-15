@@ -973,12 +973,15 @@ Kennel.prototype.activateToolbar = function() {
     
     elements.to_pseudo.click(function(ev) {
         ev.preventDefault();
+        kennel.editor.updateBlocks();
         server.logEvent('editor', 'pseudo');
         var popup = kennel.mainDiv.find('.kennel-popup');
         popup.find('.modal-title').html("Pseudo-code Explanation");
         popup.find('.modal-body').html(Blockly.Pseudo.workspaceToCode(kennel.editor.blockly));
         popup.modal('show');
-        
+    });
+    kennel.mainDiv.find('.kennel-popup').on('hidden.bs.modal', function () {
+        server.logEvent('editor', 'close_pseudo');
     });
     if (!this.model.settings.instructor) {
         elements.kennel_mode.hide();
