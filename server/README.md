@@ -23,6 +23,10 @@ Anyway, you can start the server with a local secure connection with the followi
     
 Now you can open your browser and navigate to "https://localhost:5000" and start interacting with the environment.
 
+If you don't want to deal with SSL stuff, you can also start using it without setting up a secure local connection:
+
+    python manage.py runserver
+
 Installing on a Server
 ======================
 
