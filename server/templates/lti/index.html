@@ -35,29 +35,29 @@ Assignment
 
 <pre id='problem-presentation-{{loop.index}}' 
      class='embedded-data embedded-data-{{loop.index}}'
-     >{{ assignment.body.encode('base64') }}</pre>
+     >{{ assignment.body }}</pre>
 <pre id='default-body-{{loop.index}}'         
      class='embedded-data embedded-data-{{loop.index}}'
-     >{{ submission.code.encode('base64')}}</pre>
+     >{{ submission.code}}</pre>
 <pre id='default-on-run-{{loop.index}}'       
      class='embedded-data embedded-data-{{loop.index}}'
-     >{{ assignment.on_run.encode('base64') }}</pre>
+     >{{ assignment.on_run }}</pre>
 <pre id='default-on-step-{{loop.index}}'      
      class='embedded-data embedded-data-{{loop.index}}'
-     >{{ assignment.on_step.encode('base64') }}</pre>
+     >{{ assignment.on_step }}</pre>
 <pre id='default-on-start-{{loop.index}}'     
      class='embedded-data embedded-data-{{loop.index}}'
-     >{{ assignment.on_start.encode('base64') }}</pre>
+     >{{ assignment.on_start }}</pre>
 
 <script>
 $(document).ready(function() {
     blockpy = new Kennel(document.getElementById('blockpy-div-{{loop.index}}'),
                         'student', // Instructor mode
-                        atob($("#problem-presentation-{{loop.index}}").text()), // problem
-                        atob($("#default-body-{{loop.index}}").text()), // Current code
-                        atob($('#default-on-run-{{loop.index}}').text()), // On run code
-                        atob($('#default-on-step-{{loop.index}}').text()), // On step code
-                        atob($('#default-on-start-{{loop.index}}').text()), // Starting code
+                        $("#problem-presentation-{{loop.index}}").text(), // problem
+                        $("#default-body-{{loop.index}}").text(), // Current code
+                        $('#default-on-run-{{loop.index}}').text(), // On run code
+                        $('#default-on-step-{{loop.index}}').text(), // On step code
+                        $('#default-on-start-{{loop.index}}').text(), // Starting code
                         false,
                         'blocks',
                         "{{ url_for('static', filename='blockly/') }}",
