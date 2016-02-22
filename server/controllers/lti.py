@@ -248,9 +248,10 @@ def save_presentation(lti=lti):
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     presentation = request.form.get('presentation', "")
+    parsons = request.form.get('parsons', "false") == "true"
     name = request.form.get('name', "")
     if User.is_lti_instructor(session["roles"]):
-        Assignment.edit(assignment_id=assignment_id, presentation=presentation, name=name)
+        Assignment.edit(assignment_id=assignment_id, presentation=presentation, name=name, parsons=parsons)
         return jsonify(success=True)
     else:
         return jsonify(success=False, message="You are not an instructor!")

@@ -130,9 +130,10 @@ KennelServer.prototype.markSuccess = function(success) {
     }
 };
 
-KennelServer.prototype.savePresentation = function(presentation, name) {
+KennelServer.prototype.savePresentation = function(presentation, name, parsons) {
     var data = {
         'presentation': presentation,
+        'parsons': parsons,
         'name': name,
         'question_id': this.model.question.question_id,
     };
@@ -895,7 +896,7 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
             kennel.model.presentation = content;
             kennel.editor.blockly.resize();
             var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
-            kennel.server.savePresentation(content, val);
+            kennel.server.savePresentation(content, val, kennel.model.settings.parsons);
         },
         function() { return kennel.model.presentation; },
         kennel.mainDiv.find('.kennel-presentation'),
@@ -1072,8 +1073,14 @@ Kennel.prototype.activateToolbar = function() {
     // Save name editing
     this.mainDiv.find('.kennel-presentation-name-editor').change(function() {
         var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
-        kennel.server.savePresentation(kennel.presentation.get(), val);
+        kennel.server.savePresentation(kennel.presentation.get(), val, kennel.model.settings.parsons);
     });
+    // Parsons checkbox
+    this.mainDiv.find('.kennel-presentation-parsons-check input').change(function() {
+        kennel.model.settings.parsons = this.checked;
+        var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
+        kennel.server.savePresentation(kennel.presentation.get(), val, this.checked);
+    }).prop('checked', this.model.settings.parsons);    
 }
 
 Kennel.prototype.metrics_editor_height = '100%';
@@ -1089,12 +1096,14 @@ Kennel.prototype.setCode = function(code, name) {
 Kennel.prototype.changeKennelMode = function() {
     var nameSpan = this.mainDiv.find('.kennel-presentation-name');
     var nameInput = this.mainDiv.find('.kennel-presentation-name-editor');
+    var parsonBox = this.mainDiv.find('.kennel-presentation-parsons-check');
     if (this.mode == 'instructor') {
         // Make the presentation editable
         this.presentation.startEditor();
         // Make the name editable
         nameSpan.hide();
         nameInput.val(nameSpan.html()).show();
+        parsonBox.show();
         // Display the extra programs
         this.toolbar.showPrograms();
         // Expose Teacher API
@@ -1107,6 +1116,7 @@ Kennel.prototype.changeKennelMode = function() {
         // Make the name read-only
         nameSpan.html(nameInput.val()).show();
         nameInput.hide();
+        parsonBox.hide();
         // Hide the extra programs
         this.toolbar.hidePrograms();
         this.changeProgram('__main__');
@@ -1161,7 +1171,10 @@ Kennel.prototype.loadMain = function() {
                     "<span class='kennel-presentation-name'>"+
                     this.model.question.name+
                     "</span>"+
-                    "<input type='text' class='kennel-presentation-name-editor form-control' style='display:none'>"+
+                    "<input type='text' class='kennel-presentation-name-editor form-control' style='display:none'> "+
+                    "<label style='display:none' class='kennel-presentation-parsons-check'>"+
+                    "<input type='checkbox' class='form-control'> Parsons"+
+                    "</label>"+
                     "</div>"+
                 "</div>"+
                 "<div class='kennel-presentation'>"+

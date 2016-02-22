@@ -96,7 +96,9 @@ $(document).ready(function() {
                           'book_id': {{ course.id }}});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
-    }    
+    } else if ("code" in params) {
+        kennel.setCode(decodeURIComponent(params["code"]));
+    }
   });
 </script>
 
