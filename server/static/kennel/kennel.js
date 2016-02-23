@@ -130,10 +130,11 @@ KennelServer.prototype.markSuccess = function(success) {
     }
 };
 
-KennelServer.prototype.savePresentation = function(presentation, name, parsons) {
+KennelServer.prototype.savePresentation = function(presentation, name, parsons, text_first) {
     var data = {
         'presentation': presentation,
         'parsons': parsons,
+        'text_first': text_first,
         'name': name,
         'question_id': this.model.question.question_id,
     };
@@ -804,6 +805,7 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
             'editor': view,
             'instructor': instructor,
             'parsons': settings.parsons,
+            'text_first': settings.text_first,
             'read_only': settings.read_only,
             'program': "__main__"
         },
@@ -1070,17 +1072,24 @@ Kennel.prototype.activateToolbar = function() {
             kennel.changeProgram(name);
         }
     });
+    
+    var parsonBox = kennel.mainDiv.find('.kennel-presentation-parsons-check input');
+    var textFirstBox = kennel.mainDiv.find('.kennel-presentation-text-first input');
+    var nameEditor = kennel.mainDiv.find('.kennel-presentation-name-editor');
+    var updatePresentation = function() {
+        kennel.model.settings.parsons = parsonBox.prop('checked');
+        kennel.model.settings.text_first = textFirstBox.prop('checked');
+        kennel.server.savePresentation(kennel.presentation.get(), 
+                                       nameEditor.val(), 
+                                       kennel.model.settings.parsons,
+                                       kennel.model.settings.text_first);
+    }
     // Save name editing
-    this.mainDiv.find('.kennel-presentation-name-editor').change(function() {
-        var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
-        kennel.server.savePresentation(kennel.presentation.get(), val, kennel.model.settings.parsons);
-    });
+    nameEditor.change(updatePresentation);
     // Parsons checkbox
-    this.mainDiv.find('.kennel-presentation-parsons-check input').change(function() {
-        kennel.model.settings.parsons = this.checked;
-        var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
-        kennel.server.savePresentation(kennel.presentation.get(), val, this.checked);
-    }).prop('checked', this.model.settings.parsons);    
+    parsonBox.change(updatePresentation).prop('checked', this.model.settings.parsons);
+    // Text first checkbox
+    textFirstBox.change(updatePresentation).prop('checked', this.model.settings.text_first);
 }
 
 Kennel.prototype.metrics_editor_height = '100%';
@@ -1097,6 +1106,7 @@ Kennel.prototype.changeKennelMode = function() {
     var nameSpan = this.mainDiv.find('.kennel-presentation-name');
     var nameInput = this.mainDiv.find('.kennel-presentation-name-editor');
     var parsonBox = this.mainDiv.find('.kennel-presentation-parsons-check');
+    var textFirstBox = this.mainDiv.find('.kennel-presentation-text-first');
     if (this.mode == 'instructor') {
         // Make the presentation editable
         this.presentation.startEditor();
@@ -1104,6 +1114,7 @@ Kennel.prototype.changeKennelMode = function() {
         nameSpan.hide();
         nameInput.val(nameSpan.html()).show();
         parsonBox.show();
+        textFirstBox.show();
         // Display the extra programs
         this.toolbar.showPrograms();
         // Expose Teacher API
@@ -1117,6 +1128,7 @@ Kennel.prototype.changeKennelMode = function() {
         nameSpan.html(nameInput.val()).show();
         nameInput.hide();
         parsonBox.hide();
+        textFirstBox.hide();
         // Hide the extra programs
         this.toolbar.hidePrograms();
         this.changeProgram('__main__');
@@ -1172,8 +1184,13 @@ Kennel.prototype.loadMain = function() {
                     this.model.question.name+
                     "</span>"+
                     "<input type='text' class='kennel-presentation-name-editor form-control' style='display:none'> "+
+                    // Parsons
                     "<label style='display:none' class='kennel-presentation-parsons-check'>"+
                     "<input type='checkbox' class='form-control'> Parsons"+
+                    "</label> "+
+                    // Initial mode
+                    "<label style='display:none' class='kennel-presentation-text-first'>"+
+                    "<input type='checkbox' class='form-control'> Text first"+
                     "</label>"+
                     "</div>"+
                 "</div>"+

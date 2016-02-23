@@ -59,9 +59,10 @@ $(document).ready(function() {
                         $('#default-on-step-{{loop.index}}').text(), // On step code
                         $('#default-on-start-{{loop.index}}').text(), // Starting code
                         false,
-                        'blocks',
+                        "{{ 'text' if assignment.type == 'text' else 'blocks' }}",
                         "{{ url_for('static', filename='blockly/') }}",
                         {'parsons': {{ 'true' if assignment.type == 'parsons' else 'false' }}, 
+                         'text_first': {{ 'true' if assignment.type == 'text' else 'false' }}, 
                          'read_only': false},
                         { 'save_code': '{{ url_for("lti_assignments.save_code")}}',
                           'load_code': false,
