@@ -288,7 +288,7 @@ class Assignment(Base):
     version = Column(Integer(), default=0)
     
     @staticmethod
-    def edit(assignment_id, presentation=None, name=None, on_run=None, on_step=None, on_start=None, parsons=None):
+    def edit(assignment_id, presentation=None, name=None, on_run=None, on_step=None, on_start=None, parsons=None, text_first=None):
         assignment = Assignment.by_id(assignment_id)
         if name is not None:
             assignment.name = name
@@ -305,8 +305,12 @@ class Assignment(Base):
         if on_start is not None:
             assignment.on_start = on_start
             assignment.version += 1
-        if parsons is not None:
-            assignment.type = 'parsons' if parsons else 'normal'
+        assignment.type = 'normal'
+        if parsons is True:
+            assignment.type = 'parsons'
+            assignment.version += 1
+        if text_first is True:
+            assignment.type = 'text'
             assignment.version += 1
         db.session.commit()
         return assignment
