@@ -50,6 +50,11 @@ Assignment
      >{{ assignment.on_start }}</pre>
 
 <script>
+/*
+Tracking code - safe to delete
+*/
+localStorage.setItem('user_id', "{{ user_id }}");
+
 $(document).ready(function() {
     blockpy = new Kennel(document.getElementById('blockpy-div-{{loop.index}}'),
                         'student', // Instructor mode
