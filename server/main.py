@@ -35,6 +35,17 @@ simple_formatter = logging.Formatter('%(message)s')
 handler.setFormatter(simple_formatter)
 student_interactions_logger.addHandler(handler)
 
+# Logging external events of interest
+EXTERNAL_LOG_FILENAME = os.path.join(app.config['ROOT_DIRECTORY'], 'log/external_interactions/external_interactions.log')
+external_interactions_logger = logging.getLogger('ExternalInteractions')
+external_interactions_logger.setLevel(logging.INFO)
+ei_handler = handlers.TimedRotatingFileHandler(LOG_FILENAME, when='D')
+ei_handler.setLevel(logging.INFO)
+simple_formatter = logging.Formatter('%(message)s')
+ei_handler.setFormatter(simple_formatter)
+external_interactions_logger.addHandler(ei_handler)
+
+
 # Assets
 from controllers.assets import assets
 

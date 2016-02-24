@@ -96,14 +96,17 @@ def index(lti=lti):
         return render_template('lti/maze.html', lti=lti,
                                assignment= assignments[0], 
                                submission= submissions[0],
-                               level=assignments[0].name)
+                               level=assignments[0].name,
+                               user_id=user.id)
     elif assignments[0].mode == 'explain':
         return render_template('lti/explain.html', lti=lti,
                                assignment= assignments[0], 
-                               submission= submissions[0])
+                               submission= submissions[0],
+                               user_id=user.id)
     else:
         return render_template('lti/index.html', lti=lti,
-                               group=zip(assignments, submissions))
+                               group=zip(assignments, submissions),
+                               user_id=user.id)
                            
                            
 def ensure_canvas_arguments():
@@ -433,14 +436,17 @@ def shared(lti=lti):
         return render_template('lti/maze.html', lti=lti,
                                assignment= assignments[0], 
                                submission= submissions[0],
-                               level=assignments[0].name)
+                               level=assignments[0].name,
+                               user_id=user.id)
     elif assignments[0].mode == 'explain':
         return render_template('lti/explain.html', lti=lti,
                                assignment= assignments[0], 
-                               submission= submissions[0])
+                               submission= submissions[0],
+                               user_id=user.id)
     else:
         return render_template('lti/index.html', lti=lti,
-                               group=zip(assignments, submissions))
+                               group=zip(assignments, submissions),
+                               user_id=user.id)
 
 @lti_assignments.route('/grade', methods=['POST'])
 @lti(request='session', app=app)

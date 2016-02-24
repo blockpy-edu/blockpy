@@ -2,6 +2,7 @@ Thumbs.db
 ignore/
 kennel_dist/
 closure-compiler/
+research/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
