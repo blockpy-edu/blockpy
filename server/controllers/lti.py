@@ -221,6 +221,7 @@ def save_events(lti=lti):
 def save_correct(lti=lti):
     assignment_id = request.form.get('question_id', None)
     status = float(request.form.get('status', "0.0"))
+    lis_result_sourcedid = request.form.get('lis_result_sourcedid', None)
     if assignment_id is None:
         return jsonify(success=False, message="No Assignment ID given!")
     user = User.from_lti("canvas", session["pylti_user_id"], 
@@ -237,12 +238,12 @@ def save_correct(lti=lti):
     else:
         message = "Incomplete"
     url = url_for('lti_assignments.get_submission_code', submission_id=submission.id, _external=True)
-    if 'lis_result_sourcedid' not in session:
+    if lis_result_sourcedid is None:
         return jsonify(success=False, message="Not in a grading context.")
     if assignment.mode == 'maze':
-        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message));
+        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message), endpoint=lis_result_sourcedid);
     else:
-        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message)+"<div>Latest work in progress: <a href='{0}' target='_blank'>View</a></div>".format(url)+"<div>Touches: {0}</div>".format(submission.version)+"Last ran code:<br>"+highlight(submission.code, PythonLexer(), HtmlFormatter()))
+        lti.post_grade(float(submission.correct), "<h1>{0}</h1>".format(message)+"<div>Latest work in progress: <a href='{0}' target='_blank'>View</a></div>".format(url)+"<div>Touches: {0}</div>".format(submission.version)+"Last ran code:<br>"+highlight(submission.code, PythonLexer(), HtmlFormatter()), endpoint=lis_result_sourcedid)
     return jsonify(success=True)
     
 @lti_assignments.route('/get_submission_code/', methods=['GET', 'POST'])
