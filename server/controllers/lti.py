@@ -3,6 +3,7 @@ from lxml import etree
 from urllib import quote as url_quote
 from urllib import urlencode
 from HTMLParser import HTMLParser
+import logging
 
 class MLStripper(HTMLParser):
     def __init__(self):
@@ -39,6 +40,7 @@ from sqlalchemy import Date, cast, func, desc, or_
 from controllers.helpers import instructor_required
 
 from main import app
+from interaction_logger import StructuredEvent
 from models.models import (User, Course, 
                            Assignment, AssignmentGroup, AssignmentGroupMembership,
                            Submission, Log)
@@ -66,6 +68,17 @@ def config():
     """
     return Response(render_template('lti/config.xml',
                                     version='1'), mimetype='text/xml')
+                                    
+def log_user_ip(uid):
+    user_id = str(request.remote_addr)
+    question_id = "corgis"
+    event = "corgis"
+    action = "record"
+    body = str(uid)
+    external_interactions_logger = logging.getLogger('ExternalInteractions')
+    external_interactions_logger.info(
+        StructuredEvent(user_id, question_id, event, action, body)
+    )
 
 @lti_assignments.route('/', methods=['GET', 'POST'])
 @lti_assignments.route('/index', methods=['GET', 'POST'])
@@ -91,6 +104,9 @@ def index(lti=lti):
         submissions = [assignments[0].get_submission(user.id)]
     else:
         return error()
+    if 'ip_address_found' not in session or session['ip_address_found'] != request.remote_addr:
+        session['ip_address_found'] = request.remote_addr
+        log_user_ip(user.id)
     # Use the proper template
     if assignments[0].mode == 'maze':
         return render_template('lti/maze.html', lti=lti,

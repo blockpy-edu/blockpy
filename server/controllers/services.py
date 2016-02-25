@@ -47,10 +47,8 @@ def sheets(sheet_url):
 #@crossdomain(origin='*')
 def log_event():
     user_id = request.form.get('user_id', "")
-    pprint(session.items())
     if user_id == "":
-        user_id = session["pylti_user_id"] if "pylti_user_id" in session else ""
-        user_id += ","+session["lis_person_name_full"] if "lis_person_name_full" in session else ""
+        user_id = str(request.remote_addr)
     question_id = request.form.get('question_id', "")
     event = request.form.get('event', "")
     action = request.form.get('action', "")
