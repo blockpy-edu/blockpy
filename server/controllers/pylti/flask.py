@@ -263,7 +263,7 @@ class LTI(object):
             session[LTI_SESSION_KEY] = False
             raise
 
-    def post_grade(self, grade, message=''):
+    def post_grade(self, grade, message='', endpoint=None):
         """
         Post grade to LTI consumer using XML
 
@@ -273,7 +273,10 @@ class LTI(object):
         """
         message_identifier_id = self.message_identifier_id()
         operation = 'replaceResult'
-        lis_result_sourcedid = self.lis_result_sourcedid
+        if endpoint is None:
+            lis_result_sourcedid = self.lis_result_sourcedid
+        else:
+            lis_result_sourcedid = endpoint
         # # edX devbox fix
         score = float(grade)
         if 0 <= score <= 1.0:

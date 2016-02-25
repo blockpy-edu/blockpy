@@ -109,6 +109,7 @@ KennelServer.prototype.markSuccess = function(success) {
         'type': 'blockly',
         'version': this.model.question.version,
         'question_id': this.model.question.question_id,
+        'lis_result_sourcedid': this.model.question.lis_result_sourcedid,
         'student_id': this.model.question.student_id,
         'context_id': this.model.question.context_id,
         'status': success
@@ -814,6 +815,7 @@ function Kennel(attachmentPoint, mode, presentation, current_code,
             'student_id': questionProperties.student_id,
             'context_id': questionProperties.book_id,
             'version': questionProperties.version,
+            'lis_result_sourcedid': questionProperties.lis_result_sourcedid,
             'name': questionProperties.name
         },
         'urls': urls,

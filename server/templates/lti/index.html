@@ -79,6 +79,7 @@ $(document).ready(function() {
                           'student_id': 1,
                           'book_id': 'compthink',
                           'version': {{ assignment.version }},
+                          'lis_result_sourcedid': "{{ session['lis_result_sourcedid'] if 'lis_result_sourcedid' in session else ""}}",
                           'name': '{{ assignment.name }}' });
     $(".embedded-data-{{loop.index}}").remove();
 });
