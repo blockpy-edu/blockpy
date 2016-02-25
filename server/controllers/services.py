@@ -43,7 +43,7 @@ def sheets(sheet_url):
     
 @services.route('/log/', methods=['GET', 'POST', 'OPTIONS'])
 @services.route('/log', methods=['GET', 'POST', 'OPTIONS'])
-@crossdomain(origin='*')
+#@crossdomain(origin='*')
 def log_event():
     user_id = request.form.get('user_id', "")
     question_id = request.form.get('question_id', "")
@@ -54,4 +54,6 @@ def log_event():
     external_interactions_logger.info(
         StructuredEvent(user_id, question_id, event, action, body)
     )
-    return jsonify(success=True)
+    response = make_response('success') 
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
