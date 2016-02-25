@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 
 from flask.ext.wtf import Form
 from wtforms import IntegerField, BooleanField
@@ -46,10 +47,15 @@ def sheets(sheet_url):
 #@crossdomain(origin='*')
 def log_event():
     user_id = request.form.get('user_id', "")
+    pprint(session.items())
+    if user_id == "":
+        user_id = session["pylti_user_id"] if "pylti_user_id" in session else ""
+        user_id += ","+session["lis_person_name_full"] if "lis_person_name_full" in session else ""
     question_id = request.form.get('question_id', "")
     event = request.form.get('event', "")
     action = request.form.get('action', "")
     body = request.form.get('body', "")
+    print user_id
     external_interactions_logger = logging.getLogger('ExternalInteractions')
     external_interactions_logger.info(
         StructuredEvent(user_id, question_id, event, action, body)
