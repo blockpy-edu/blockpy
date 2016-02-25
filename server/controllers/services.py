@@ -41,8 +41,9 @@ def sheets(sheet_url):
     # https://spreadsheets.google.com/feeds/list/___/od6/public/basic?alt=json
     # https://spreadsheets.google.com/feeds/list/1eLbX_5EFvZYc7JOGYF8ATdu5uQeu6OvILNnr4vH3vFI/od6/public/basic?alt=json
     
-@services.route('/log/', methods=['GET', 'POST'])
-@services.route('/log', methods=['GET', 'POST'])
+@services.route('/log/', methods=['GET', 'POST', 'OPTIONS'])
+@services.route('/log', methods=['GET', 'POST', 'OPTIONS'])
+@crossdomain(origin='*')
 def log_event():
     user_id = request.form.get('user_id', "")
     question_id = request.form.get('question_id', "")
