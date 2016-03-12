@@ -1,4 +1,5 @@
 import os
+import json
 from pprint import pprint
 
 from flask.ext.wtf import Form
@@ -69,3 +70,28 @@ def save():
 def load():
     return jsonify(success=True, code='a=0', completed=False, timestamp='')
     
+@blockpy.route('/analyze_log/', methods=['GET', 'POST'])
+@blockpy.route('/analyze_log', methods=['GET', 'POST'])
+def analyze():
+    log_folder = os.path.join(app.config['ROOT_DIRECTORY'], 'queued_logs')
+    files = [f[:-4].split("_") for f in os.listdir(log_folder)]
+    return render_template('analyzer.html', files=json.dumps(files))
+
+@blockpy.route('/load_log/', methods=['GET', 'POST'])
+@blockpy.route('/load_log', methods=['GET', 'POST'])
+def analyze_load_log():
+    assignment_id = request.args.get('assignment_id', None)
+    user_id = request.args.get('user_id', None)
+    if None in (assignment_id, user_id):
+        return jsonify(success=False, message="No user_id or assignment_id given")
+    assignment = Assignment.by_id(assignment_id)
+    log_file = str(user_id)+"_"+str(assignment_id)+".log"
+    log_file = os.path.join(app.config['ROOT_DIRECTORY'], 'queued_logs', log_file)
+    if not os.path.isfile(log_file):
+        return jsonify(success=False, message="No log found")
+    with open(log_file) as opened_file:
+        records = [json.loads(line) for line in opened_file]
+    return render_template('analyzer.html',
+                           records=json.dumps(records),
+                           assignment=assignment)
+

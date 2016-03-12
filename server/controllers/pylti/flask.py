@@ -253,7 +253,6 @@ class LTI(object):
             session[LTI_SESSION_KEY] = True
             return True
         except LTIException:
-            log.debug('verify_request failed')
             for prop in LTI_PROPERTY_LIST:
                 if session.get(prop, None):
                     del session[prop]

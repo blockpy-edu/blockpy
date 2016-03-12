@@ -81,7 +81,7 @@ KennelServer.prototype.logEvent = function(event, action) {
                 'context_id': this.model.question.context_id};    
     var alertBox = this.alertBox;
     var server = this;
-    if (this.model.urls.server !== false) {
+    if (this.model.urls.server !== false && this.model.urls.log_event !== false) {
         $.post(server.model.urls.log_event, data, function(response) {
             if (response.success) {
                 alertBox("Logged").delay(100).fadeOut("slow");
@@ -115,7 +115,7 @@ KennelServer.prototype.markSuccess = function(success) {
         'status': success
     };
     var alertBox = this.alertBox;
-    if (this.model.urls.server !== false) {
+    if (this.model.urls.server !== false && this.model.urls.save_success !== false) {
         $.post(this.model.urls.save_success, data, function(response) {
             if (success) {
                 if (response.success) {
@@ -171,7 +171,7 @@ KennelServer.prototype.save = function() {
     };
     var alertBox = this.alertBox;
     var server = this;
-    if (this.model.urls.server !== false) {
+    if (this.model.urls.server !== false && this.model.urls.save_code !== false) {
         if (this.saveTimer[filename]) {
             clearTimeout(this.saveTimer);
         }

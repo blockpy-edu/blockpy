@@ -165,7 +165,7 @@ def is64bit():
     return sys.maxsize > 2**32
 
 if sys.platform == "win32":
-    jsengine = ".\\support\\d8\\d8.exe --debugger --harmony"
+    jsengine = ".\\support\\d8\\d8.exe --harmony"
     nul = "nul"
     crlfprog = os.path.join(os.path.split(sys.executable)[0], "Tools/Scripts/crlf.py")
 elif sys.platform == "darwin":
@@ -695,6 +695,66 @@ def docbi(options,dest="doc/dstatic"):
         if options.verbose:
             print ". Wrote {fileName}".format(fileName=builtinfn)
 
+def assess(student_code, instructor_code):
+    student_code = student_code.replace("\\", "/")
+    instructor_code = instructor_code.replace("\\", "/")
+    if not os.path.exists(student_code):
+        print "%s doesn't exist" % student_code
+        raise SystemExit()
+    if not os.path.exists(instructor_code):
+        print "%s doesn't exist" % instructor_code
+        raise SystemExit()
+    if not os.path.exists("support/tmp"):
+        os.mkdir("support/tmp")
+    student_module_name = os.path.splitext(os.path.basename(student_code))[0]
+    instructor_module_name = os.path.splitext(os.path.basename(instructor_code))[0]
+    f = open("support/tmp/run.js", "w")
+    f.write("""
+var printError = function(error) {{
+    if (error.constructor == Sk.builtin.NameError
+        && error.args.v.length > 0
+        && error.args.v[0].v == "name '___' is not defined") {{
+        print("EXCEPTION: DanglingBlocksError");
+    }} else {{
+        print("EXCEPTION: "+error.tp$name);
+    }}
+}}
+var student_code = read('{student_code_filename}');
+var instructor_code = read('{instructor_code_filename}');
+var outputList = [];
+Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ if (text !== "\\n") {{ outputList.push(text); }} }} }});
+// Run students' code
+Sk.misceval.asyncToPromise(function() {{
+    return Sk.importMainWithBody("<stdin>", false, student_code, true);
+}}).then(function (data) {{
+    // Trace table
+    var traceTable = []; //JSON.stringify(data.$d);
+    // Run instructor's code
+    Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ }} }});
+    instructor_code += "\\nresult = on_run('''"+student_code+"''', "+
+                  JSON.stringify(outputList)+", "+
+                  JSON.stringify(traceTable)+")";
+    Sk.misceval.asyncToPromise(function() {{
+        return Sk.importMainWithBody("<stdin>", false, instructor_code, true);
+    }}).then(function (data) {{
+        var result = data.$d.result.v;
+        print(result);
+    }}, function(e) {{
+        printError(e);
+    }});
+}}, function(e) {{
+    printError(e);
+}});""".format(student_code_filename=student_code, 
+               instructor_code_filename=instructor_code))
+    f.close()
+    command = jsengine.split(" ")+getFileList(FILE_TYPE_TEST)+["support/tmp/run.js"]
+    try:
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+        out, err = p.communicate()
+        print(out)
+    except OSError as e:
+        print >>sys.stderr, "Execution failed:", e
+
 def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
     if not os.path.exists(fn):
         print "%s doesn't exist" % fn
@@ -713,13 +773,20 @@ def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
         debugon = 'false'
     f.write("""
 var input = read('%s');
+var outputList = [];
 print("-----");
 print(input);
 print("-----");
-Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s});
+Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s, output: function(text) {if (text !== "\\n") {outputList.push(text); }} });
 Sk.misceval.asyncToPromise(function() {
     return Sk.importMain("%s", %s, true);
-}).then(function () {
+}).then(function (data) {
+    // Printed
+    //  outputList
+    // Properties
+    //  JSON.stringify(data.$d);
+    // Source code
+    //  input
     print("-----");
 }, function(e) {
     print("UNCAUGHT EXCEPTION: " + e);
@@ -994,6 +1061,8 @@ def main():
         regensymtabtests()
     elif cmd == "run":
         run(sys.argv[2])
+    elif cmd == "assess":
+        assess(sys.argv[2], sys.argv[3])
     elif cmd == "brun":
         run_in_browser(sys.argv[2],options)
     elif cmd == 'rununits':

@@ -399,7 +399,7 @@ def batch_edit(lti=lti):
     
 @lti_assignments.route('/dashboard/', methods=['GET', 'POST'])
 @lti_assignments.route('/dashboard', methods=['GET', 'POST'])
-@lti(request='session', error=error, role='staff', app=app)
+@lti(request='initial', error=error, role='staff', app=app)
 def dashboard(lti=lti):
     """ render the contents of the staff.html template
 
@@ -435,6 +435,7 @@ def shared(lti=lti):
     :param lti: the `lti` object from `pylti`
     :return: the staff.html template rendered
     """
+    print "REACHED"
     assignment_id = request.args.get('assignment_id', None)
     assignment_group_id = request.args.get('assignment_group_id', None)
     user, roles, course = ensure_canvas_arguments()
