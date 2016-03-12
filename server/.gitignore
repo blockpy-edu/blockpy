@@ -4,6 +4,7 @@ static/gen/
 test.db
 
 logs/
+queued_logs/
 
 certs/
 secrets.json

@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+{% set skip_jquery = True %}
+
+{% block title %}
+BlockPy analyzer
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+
+    {% assets "blockpy_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% assets "blockpy_css" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}" />
+    {% endassets %}
+    
+<style>
+.embedded-data {
+    display: none;
+}
+</style>
+
+<script>
+function getQueryParams(){
+    try{
+        url = window.location.href;
+        query_str = url.substr(url.indexOf('?')+1, url.length-1);
+        r_params = query_str.split('&');
+        params = {}
+        for( i in r_params){
+            param = r_params[i].split('=');
+            params[ param[0] ] = param[1];
+        }
+        return params;
+    }
+    catch(e){
+       return {};
+    }
+}
+$(document).ready(function() {
+    kennel = new Kennel(document.getElementById('kennel-div'),
+                        'student', // Instructor mode
+                        $("#problem-presentation").text(), // problem
+                        $("#default-body").text(), // Current code
+                        $('#default-on-run').text(), // On run code
+                        $('#default-on-step').text(), // On step code
+                        $('#default-on-start').text(), // Starting code
+                        false,
+                        'text',
+                        "{{ url_for('static', filename='blockly/') }}",
+                        {'parsons': false, 'read_only': false},
+                        { 'save_code': false,
+                          'load_code': false,
+                          'save_success': false,
+                          'load_success': false,
+                          'log_event': false},
+                        { 'question_id': -1,
+                          'student_id': -1,
+                          'book_id': -1});
+    //kennel.setCode(decodeURIComponent(params["code"]));
+  });
+</script>
+
+{% endblock %}
+
+{% block body %}
+<div id="kennel-div" style='height:100%'></div>
+
+<pre id='problem-presentation' class='embedded-data'></pre>
+<pre id='default-body'         class='embedded-data'></pre>
+<pre id='default-on-run'       class='embedded-data'></pre>
+<pre id='default-on-step'      class='embedded-data'></pre>
+<pre id='default-on-start'     class='embedded-data'></pre>
+
+<pre>{{ files }}</pre>
+  
+{% endblock %}
