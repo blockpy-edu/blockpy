@@ -169,14 +169,18 @@ def submit_explain(lti=lti):
     code, elements = submission.load_explanation(5)
     if lis_result_sourcedid is None:
         return jsonify(success=False, message="Not in a grading context.")
+    hl_lines  = [e['line'][0] for e in elements]
     message = """<h1>Code Annotation</h1>
+    <div>Thank you for submitting. This activity will be graded manually, so please be patient!</div>
     <div><ul><li>{explanations}</li></ul></div>
     <div>{code}</div>
     """.format(
-        code = highlight(code, PythonLexer(), HtmlFormatter(linenos=True)),
+        code = highlight(code, PythonLexer(), HtmlFormatter(linenos=True, hl_lines=hl_lines, noclasses=True)),
         explanations = '</li><li>'.join(
-            ['<b>{line}:</b> {answer}'.format(line=e['line'][0], answer=e['answer'])
-             for e in elements])
+            ['<b>{line} ({type}):</b> {answer}'.format(line=e['line'][0], 
+                                                      answer=e['answer'], 
+                                                      type=Submission.abbreviate_element_type(e['name']))
+             for e in sorted(elements, key=lambda e: e['line'][0])])
         )
     lti.post_grade(0, message, endpoint=lis_result_sourcedid)
     return jsonify(success=True)
