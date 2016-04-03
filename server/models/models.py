@@ -258,6 +258,10 @@ class Submission(Base):
     ELEMENT_PRIORITY_LIST = ['CORGIS_USE', 'FOR_LOOP', 'DICTIONARY_ACCESS', 
                          'IMPORT_CORGIS', 'LIST_APPEND', 'IMPORT_MATPLOTLIB', 
                          'ASSIGNMENT', 'MATPLOTLIB_PLOT']
+                         
+    @staticmethod
+    def abbreviate_element_type(element_type):
+        return ''.join([l[0] for l in element_type.split("_")])
     
     def load_explanation(self, max_questions):
         submission_destructured = json.loads(self.code)
