@@ -55,6 +55,7 @@ bundles = {
         "libs/codemirror/htmlmixed.js",
         "libs/codemirror/xml.js",
         "libs/jquery.ui.widget.js",
+        "libs/knockout-3.4.0.js",
         "libs/jquery.fileupload.js",
         output='gen/code_explaining.js'),
     'code_explaining_css': Bundle(
