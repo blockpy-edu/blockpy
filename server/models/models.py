@@ -194,26 +194,92 @@ class Submission(Base):
         if not submission:
             submission = Submission(assignment_id=assignment_id, user_id=user_id)
             assignment = Assignment.by_id(assignment_id)
-            submission.code = assignment.on_start
+            if assignment.mode == 'explain':
+                submission.code = json.dumps(Submission.default_explanation(''))
+            else:
+                submission.code = assignment.on_start
             db.session.add(submission)
             db.session.commit()
         return submission
         
-    def save_explanation_code(self, code):
-        submission_destructured = json.loads(self.code)
+    @staticmethod
+    def default_explanation(code):
+        return {
+                'code': code,
+                'elements': {
+                    'CORGIS_USE': {'line': 0, 'present': False, 'answer': '', 'name': 'CORGIS_USE'},
+                    'FOR_LOOP': {'line': 0, 'present': False, 'answer': '', 'name': 'FOR_LOOP'},
+                    'DICTIONARY_ACCESS': {'line': 0, 'present': False, 'answer': '', 'name': 'DICTIONARY_ACCESS'},
+                    'IMPORT_CORGIS': {'line': 0, 'present': False, 'answer': '', 'name': 'IMPORT_CORGIS'},
+                    'LIST_APPEND': {'line': 0, 'present': False, 'answer': '', 'name': 'LIST_APPEND'},
+                    'IMPORT_MATPLOTLIB': {'line': 0, 'present': False, 'answer': '', 'name': 'IMPORT_MATPLOTLIB'},
+                    'ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'ASSIGNMENT'},
+                    'MATPLOTLIB_PLOT': {'line': 0, 'present': False, 'answer': '', 'name': 'MATPLOTLIB_PLOT'},
+                    'LIST_ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'LIST_ASSIGNMENT'}
+                }
+        }
+        
+    @staticmethod
+    def save_explanation_answer(user_id, assignment_id, name, answer):
+        submission = Submission.query.filter_by(user_id=user_id, 
+                                                assignment_id=assignment_id).first()
+        submission_destructured = json.loads(submission.code)
+        elements = submission_destructured['elements']
+        if name in elements:
+            elements[name]['answer'] = answer
+            submission.code = json.dumps(submission_destructured)
+            submission.version += 1
+            db.session.commit()
+            submission.log_code()
+            return submission_destructured
+        
+    
+    def save_explanation_code(self, code, elements):
+        try:
+            submission_destructured = json.loads(self.code)
+        except ValueError:
+            submission_destructured = {}
         if 'code' in submission_destructured:
-            submission_destructured['code'] = code_submission
+            submission_destructured['code'] = code
+            existing_elements = submission_destructured['elements']
+            for element in existing_elements:
+                existing_elements[element]['present'] = False
+            for element, value in elements.items():
+                existing_elements[element]['line'] = value
+                existing_elements[element]['present'] = True
         else:
-            submission_destructured = {
-                'code': code_submission
-            }
-        submission.code = json.dumps(submission_destructured)
-        submission.version += 1
+            submission_destructured = Submission.default_explanation(code)
+        self.code = json.dumps(submission_destructured)
+        self.version += 1
         db.session.commit()
+        self.log_code()
         return submission_destructured
         
-    def load_explanation(self):
-        return json.loads(self.code)
+    ELEMENT_PRIORITY_LIST = ['CORGIS_USE', 'FOR_LOOP', 'DICTIONARY_ACCESS', 
+                         'IMPORT_CORGIS', 'LIST_APPEND', 'IMPORT_MATPLOTLIB', 
+                         'ASSIGNMENT', 'MATPLOTLIB_PLOT']
+    
+    def load_explanation(self, max_questions):
+        submission_destructured = json.loads(self.code)
+        code = submission_destructured['code']
+        # Find the first FIVE
+        available_elements = []
+        used_lines = set()
+        e = submission_destructured['elements']
+        for element in Submission.ELEMENT_PRIORITY_LIST:
+            # Not present?
+            if not e[element]['present']:
+                continue
+            # Already used that line?
+            if e[element]['line'][0] in used_lines:
+                continue
+            # Cool, then add it
+            available_elements.append(e[element])
+            used_lines.add(e[element]['line'][0])
+            # Stop if we have enough already
+            if len(available_elements) >= max_questions:
+                break
+        return code, available_elements
         
     @staticmethod
     def save_code(user_id, assignment_id, code, assignment_version):

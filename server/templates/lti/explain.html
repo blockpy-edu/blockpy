@@ -1,3 +1,4 @@
+{% set navbar_invisible = true %}
 {% extends 'reduced_layout.html' %}
 
 {% block title %}
@@ -17,14 +18,222 @@ Code Explaining
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
 
+<style>
+.CodeMirror {
+    border: 1px solid #eee;
+    height: auto;
+    max-height:200px;
+}
+.CodeMirror-scroll {
+    height: auto;
+    max-height:200px;
+}
+
+.editor-active-line {
+    background: #C4FBC4 !important;
+    color: #8a1f11 !important;
+}
+
+.editor-error-line {
+    background: #FBC4C4 !important;
+    color: #8a1f11 !important;
+}
+</style>
+
 <script>
+
+function jumpToLine(editor, i) { 
+    var t = editor.charCoords({line: i, ch: 0}, "local").top; 
+    var middleHeight = editor.getScrollerElement().offsetHeight / 2; 
+    editor.scrollTo(null, t - middleHeight - 5); 
+} 
+
+function CodeLineWidgetViewModel(params) {
+    this.id = uniqueIndex;
+    this.answer = ko.observable(params.answer());
+    this.line = params.line();
+    this.code = params.code();
+    this.name = params.name();
+    var that = this;
+    this.target = "code_viewer_" + this.id;
+    this.buildCodeMirror = function() {
+        var exact_target = $("#"+that.target)[0];
+        that.codeMirror = CodeMirror.fromTextArea(exact_target, {
+            mode: { name: "python", 
+                    version: 3, 
+                    singleLineStringErrors: false
+            },
+            height: 'auto',
+            readOnly: true,
+            lineNumbers: true,
+            firstLineNumber: 1,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            matchBrackets: true
+        });
+        that.codeMirror.addLineClass(that.line-1, 'text', 'editor-active-line');
+        jumpToLine(that.codeMirror, that.line);
+    };
+    setTimeout(this.buildCodeMirror, 0);
+    uniqueIndex += 1;
+    
+    var requestTimer;
+    this.answerSubscription = this.answer.subscribe(function(newValue) {
+        if (requestTimer) window.clearTimeout(requestTimer);
+        requestTimer = setTimeout(function() {
+            $.post(URL_MAP.save_explain, {
+                'question_id': {{ assignment.id|tojson }},
+                'version': {{ assignment.version|tojson }},
+                'answer': newValue,
+                'name': that.name
+            }, function(data) {
+                if (data.success) {
+                    if (data.is_version_correct) {
+                        // HEY EVERYBODY THIS ASSIGNMENT IS OUT OF DATE!
+                        // See? Nobody cares.
+                    }
+                } else {
+                    console.error(data.message);
+                }
+            });
+        }, 1000);
+    });
+}
+CodeLineWidgetViewModel.prototype.dispose = function() {
+    this.answerSubscription.dispose();
+};
+
+var uniqueIndex = 0;
+ko.components.register('code-line-widget', {
+    viewModel: CodeLineWidgetViewModel,
+    template:
+        "<h3>#<span data-bind='text: ($index() + 1)'></span></h3>"+
+        "<div class='row'>"+        
+        "<div class='col-md-6 col-sm-6 col-xs-6 col-lg-6'>"+
+            "<textarea data-bind='text: code, attr: { id: target }' "+
+                  "rows='5' "+
+                  "></textarea>"+
+        "</div>"+
+        "<div class='col-md-6 col-sm-6 col-xs-6 col-lg-6'>"+
+            "<textarea class='form-control' style='width:100%; height:200px' "+
+                "data-bind='text: answer, textInput: answer'></textarea>"+
+        "</div>"+
+        "</div>"
+});
+
+mainModel = {
+    code: ko.observable({{ code|tojson }}),
+    submissionStatusColor: ko.observable('{{ "btn-success" if submission.correct else "btn-primary"}}'),
+    submissionStatusText: ko.observable('{{"Resubmit" if submission.correct else "Submit for grading"}}'),
+    submitExplanation: function() {
+        mainModel.submissionStatusColor('btn-warning');
+        mainModel.submissionStatusText('Submitting...');
+        $.ajax({
+            type: "POST",
+            url: URL_MAP.submit_explain, 
+            data: {
+                'question_id': {{ assignment.id|tojson }},
+                'lis_result_sourcedid': URL_MAP.lis_result_sourcedid
+            }, 
+            success: function(data) {
+                if (data.success) {
+                    mainModel.submissionStatusColor('btn-success');
+                    mainModel.submissionStatusText('Resubmit');
+                } else {
+                    mainModel.submissionStatusColor('btn-danger');
+                    mainModel.submissionStatusText('Submission failed; Report this!');
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.error(textStatus, errorThrown);
+                mainModel.submissionStatusColor('btn-danger');
+                mainModel.submissionStatusText('Submission failed; Report this!');
+            }
+        });
+    },
+    elements: ko.observableArray([
+    {% for element in elements %}
+        { 'name': ko.observable({{ element.name|tojson }}), 
+          'answer': ko.observable({{ element.answer|tojson }}),
+          'line': ko.observable({{ element.line[0]|tojson }}) } {{ ',' if not loop.last}} 
+    {% endfor %}
+    ])
+};
+
 URL_ROOT = "{{ url_for('static', filename='') }}";
 URL_MAP = { 
-    'save_code': '{{ url_for("lti_assignments.save_code")}}',
+    'lis_result_sourcedid': "{{ session['lis_result_sourcedid'] if 'lis_result_sourcedid' in session else 'NOT IN SESSION'}}",
+    'save_explain': '{{ url_for("lti_assignments.save_explain")}}',
+    'submit_explain': '{{ url_for("lti_assignments.submit_explain")}}',
     'save_success': '{{ url_for("lti_assignments.save_correct")}}',
     'load_success': {{ "true" if submission.correct else "false" }},
     'log_event': '{{ url_for("lti_assignments.save_events") }}',
 };
+
+function refreshAnnotationDescription() {
+    if (mainModel.code() != "") {
+        $("#annotation-description").show();
+    } else {
+        $("#annotation-description").hide();
+    }
+}
+
+$(document).ready(function() {
+    /*mainModel.code.subscribe(function(newValue) {
+        myCodeMirror.setValue(newValue);
+    });
+    mainModel.elements.subscribe(function(changes) {
+        changes.forEach(rebuildElement);
+    });*/
+    ko.applyBindings(mainModel);
+    refreshAnnotationDescription();
+    $('#fileupload').fileupload({
+        // Uncomment the following to send cross-domain cookies:
+        //xhrFields: {withCredentials: true},
+        url: '{{ url_for("lti_assignments.upload") }}',
+        dataType: 'json',
+        formData: {
+            'assignment_id': '{{ assignment.id }}'
+        }, 
+        done: function (e, data) {
+            // Update code
+            mainModel.code(data.result.code);
+            refreshAnnotationDescription();
+            
+            // Update elements
+            mainModel.elements.removeAll();
+            var elements = data.result.elements;
+            for (i = 0; i < elements.length; i++) {
+                mainModel.elements.push({
+                    'name': ko.observable(elements[i].name),
+                    'answer': ko.observable(elements[i].answer),
+                    'line': ko.observable(elements[i].line[0])
+                });
+            }
+            
+            // Reset progressbar
+            $('#progress-bar').fadeOut("slow");
+            
+            // Show submit button
+        },
+        send: function(e, data) {
+            $('#progress-bar .progress-bar').css(
+                'width',
+                '0%'
+            ).text("0%");
+            $('#progress-bar').show();
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress-bar .progress-bar').css(
+                'width',
+                progress + '%'
+            ).text(progress+"%");
+        }
+    });
+});
+ 
 </script>
 
 {% endblock %}
@@ -36,21 +245,51 @@ URL_MAP = {
     <!-- The global progress bar -->
 <h1>Explain Your Code</h1>
 <div class="row"> 
-    <div>Upload your main Python project file (.py).</div>
-    <div>Do not upload the python dataset file you were given, only the python file that YOU wrote. If your project involves more than one file, upload the one with the most code.</div>
-    
-    <span class="btn btn-success fileinput-button">
+    <div>Upload your main Python project file (.py). Do not upload the python dataset file you were given, only the python file that YOU wrote. If your project involves more than one file, upload the one with the most code.</div>
+</div>
+<div class="row"> 
+    <span class="btn btn-success fileinput-button
+                 col-xs-2 col-xs-offset-1
+                 col-sm-2 col-sm-offset-1
+                 col-md-2 col-md-offset-1
+                 col-lg-2 col-lg-offset-1">
         <i class="glyphicon glyphicon-upload"></i>
         <span>Select file...</span>
-        <input id='fileupload' type="file" name="files">
+        <input id='fileupload' type="file" name="files" accept=".py">
     </span>
+    
+    <div class="progress 
+                col-xs-6 col-xs-offset-1
+                col-sm-6 col-sm-offset-1
+                col-md-6 col-md-offset-1
+                col-lg-6 col-lg-offset-1" id='progress-bar' style='margin-top:5px; margin-bottom:5px'>
+      <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+        0%
+      </div>
+    </div>
 </div>
+<div class="row" id="annotation-description" style='display: none'>
+<hr>
+For each of the following highlighted lines of your code, please write a 1-2 sentence description of your code, as if you were explaining it to someone else. Do your best and work alone.
+<hr>
+</div>
+<!-- ko foreach: elements -->
+<div data-bind='component: { 
+    name: "code-line-widget",
+    params: {
+        "answer": answer,
+        "line": line,
+        "code": $root.code,
+        "name": name
+    }
+}'></div>
+<!-- /ko -->
+
 <div class="row">
-    <textarea>{{ submission.code }}</textarea>
+<hr>
+<div class="center-block">
+<button class="btn center-block" type="submit" data-bind="click: submitExplanation, css: submissionStatusColor, text: submissionStatusText"></button>
 </div>
-<div class='col-md-8'>
-    
-    
 </div>
 
 {% endblock %}

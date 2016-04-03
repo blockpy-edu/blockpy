@@ -375,6 +375,16 @@ PropertyExplorer.prototype.move = function(step) {
     }
 };
 
+String.prototype.trunc = String.prototype.trunc ||
+function(n) {
+    return (this.length > n) ? this.substr(0,n-1)+'&hellip;' : this;
+};
+
+PropertyExplorer.prototype.abbreviateValue = function(value) {
+    
+    return encodeHTML;
+}
+
 /*
  * Clear out any existing data
  */

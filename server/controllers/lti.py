@@ -115,9 +115,13 @@ def index(lti=lti):
                                level=assignments[0].name,
                                user_id=user.id)
     elif assignments[0].mode == 'explain':
+        MAX_QUESTIONS = 5
+        code, elements = submissions[0].load_explanation(MAX_QUESTIONS)
         return render_template('lti/explain.html', lti=lti,
                                assignment= assignments[0], 
                                submission= submissions[0],
+                               code = code,
+                               elements=elements,
                                user_id=user.id)
     else:
         return render_template('lti/index.html', lti=lti,
