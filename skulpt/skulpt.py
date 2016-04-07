@@ -725,7 +725,7 @@ var outputList = [];
 Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ if (text !== "\\n") {{ outputList.push(text); }} }} }});
 // Run students' code
 Sk.misceval.asyncToPromise(function() {{
-    return Sk.importMainWithBody("<stdin>", false, student_code, true);
+    return Sk.importMainWithBody("<student>", false, student_code, true);
 }}).then(function (data) {{
     // Trace table
     var traceTable = []; //JSON.stringify(data.$d);
@@ -735,7 +735,7 @@ Sk.misceval.asyncToPromise(function() {{
                   JSON.stringify(outputList)+", "+
                   JSON.stringify(traceTable)+")";
     Sk.misceval.asyncToPromise(function() {{
-        return Sk.importMainWithBody("<stdin>", false, instructor_code, true);
+        return Sk.importMainWithBody("<instructor>", false, instructor_code, true);
     }}).then(function (data) {{
         var result = data.$d.result.v;
         print(result);
@@ -747,7 +747,7 @@ Sk.misceval.asyncToPromise(function() {{
 }});""".format(student_code_filename=student_code, 
                instructor_code_filename=instructor_code))
     f.close()
-    command = jsengine.split(" ")+getFileList(FILE_TYPE_TEST)+["support/tmp/run.js"]
+    command = jsengine.split(" ")+getFileList(FILE_TYPE_TEST)+["../libs/math.0.19.0.min.js", "../libs/crime_data.js", "support/tmp/run.js"]
     try:
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
         out, err = p.communicate()

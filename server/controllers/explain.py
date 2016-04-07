@@ -116,7 +116,7 @@ def upload(lti=lti):
     assignment_id = request.values.get('assignment_id', None)
     max_questions = int(request.values.get('max_questions', '5'))
     if assignment_id is None:
-        return jsonify(success=False, message="No Assignment ID given!")
+        return jsonify(success=False, invalid=False, message="No Assignment ID given!")
     user = User.from_lti("canvas", session["pylti_user_id"], 
                          session.get("user_email", ""),
                          session.get("lis_person_name_given", ""),
@@ -126,14 +126,17 @@ def upload(lti=lti):
     # Get the uploaded information
     data_file = request.files.get('files')
     if not data_file:
-        return jsonify(success=False, message="No data file!")
+        return jsonify(success=False, invalid=True, message="No data file!")
     code_submission = data_file.read()
-    elements = find_elements(code_submission)
+    try:
+        elements = find_elements(code_submission)
+    except SyntaxError:
+        return jsonify(success=True, invalid=True, message="Your python file has errors in it.")
     submission_destructured = submission.save_explanation_code(code_submission, elements)
     
     code, elements = submission.load_explanation(max_questions)
     
-    return jsonify(success=True, code=code, elements=elements)
+    return jsonify(success=True, invalid=False, code=code, elements=elements)
     
 @lti_assignments.route('/explain/save/', methods=['POST'])
 @lti_assignments.route('/explain/save', methods=['POST'])
