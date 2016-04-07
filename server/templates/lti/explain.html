@@ -197,20 +197,28 @@ $(document).ready(function() {
             'assignment_id': '{{ assignment.id }}'
         }, 
         done: function (e, data) {
-            // Update code
-            mainModel.code(data.result.code);
-            refreshAnnotationDescription();
-            
-            // Update elements
-            mainModel.elements.removeAll();
-            var elements = data.result.elements;
-            for (i = 0; i < elements.length; i++) {
-                mainModel.elements.push({
-                    'name': ko.observable(elements[i].name),
-                    'answer': ko.observable(elements[i].answer),
-                    'line': ko.observable(elements[i].line[0])
-                });
-            }
+            if (data.result.invalid) {
+                console.error(data);
+                $("#invalid-code-warning").show();
+                $("#annotation-description").hide();
+                mainModel.elements.removeAll();
+            } else {
+                $("#invalid-code-warning").hide();
+                // Update code
+                mainModel.code(data.result.code);
+                refreshAnnotationDescription();
+                
+                // Update elements
+                mainModel.elements.removeAll();
+                var elements = data.result.elements;
+                for (i = 0; i < elements.length; i++) {
+                    mainModel.elements.push({
+                        'name': ko.observable(elements[i].name),
+                        'answer': ko.observable(elements[i].answer),
+                        'line': ko.observable(elements[i].line[0])
+                    });
+                }
+            }           
             
             // Reset progressbar
             $('#progress-bar').fadeOut("slow");
@@ -223,6 +231,7 @@ $(document).ready(function() {
                 '0%'
             ).text("0%");
             $('#progress-bar').show();
+            $("#invalid-code-warning").hide();
         },
         progressall: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -267,6 +276,10 @@ $(document).ready(function() {
         0%
       </div>
     </div>
+    <br>
+</div>
+<div class="row" id="invalid-code-warning" style="display: none;">
+    <span><b>Your python file had errors in it. Correct the errors and reupload the file. Talk to an instructor if you are having difficulty.</b></span>
 </div>
 <div class="row" id="annotation-description" style='display: none'>
 <hr>
