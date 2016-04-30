@@ -15,6 +15,7 @@ class Finder(ast.NodeVisitor):
         self.results = {}
         self.corgis_module = None
         self.inside_assignment = False
+        self.inside_left_assignment = False
         
     def generic_visit(self, node):
         ast.NodeVisitor.generic_visit(self, node)
@@ -31,6 +32,8 @@ class Finder(ast.NodeVisitor):
             self.results['CORGIS_USE'] = (node.lineno, node.col_offset)
         if node.id == 'append' and 'LIST_APPEND' not in self.results:
             self.results['LIST_APPEND'] = (node.lineno, node.col_offset)
+        if node.id == 'print' and 'PRINT_USE' not in self.results:
+            self.results['PRINT_USE'] = (node.lineno, node.col_offset)
             
     def visit_Attribute(self, node):
         if node.attr == 'append' and 'LIST_APPEND' not in self.results:
@@ -42,6 +45,9 @@ class Finder(ast.NodeVisitor):
     def visit_List(self, node):
         if self.inside_assignment and 'LIST_ASSIGNMENT' not in self.results:
             self.results['LIST_ASSIGNMENT'] = (node.lineno, node.col_offset)
+    def visit_Dict(self, node):
+        if self.inside_assignment and 'DICT_ASSIGNMENT' not in self.results:
+            self.results['DICT_ASSIGNMENT'] = (node.lineno, node.col_offset)
         
     def visit_Assign(self, node):
         if 'ASSIGNMENT' not in self.results:
@@ -49,14 +55,19 @@ class Finder(ast.NodeVisitor):
         self.inside_assignment = True
         ast.NodeVisitor.generic_visit(self, node)
         self.inside_assignment = False
-        
+    
+    def visit_If(self, node):
+        if 'IF_STATEMENT' not in self.results:
+            self.results['IF_STATEMENT'] = (node.lineno, node.col_offset)
+        ast.NodeVisitor.generic_visit(self, node)
+    
     def visit_For(self, node):
         if 'FOR_LOOP' not in self.results:
             self.results['FOR_LOOP'] = (node.lineno, node.col_offset)
         ast.NodeVisitor.generic_visit(self, node)
         
     def visit_Import(self, node):
-        modules = [alias.name for alias in node.names]
+        modules = [alias.name.split('.')[-1] for alias in node.names]
         for module in modules:
             if module.startswith('matplotlib') and 'IMPORT_MATPLOTLIB' not in self.results:
                 self.results['IMPORT_MATPLOTLIB'] = (node.lineno, node.col_offset)
