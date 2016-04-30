@@ -710,6 +710,8 @@ def assess(student_code, instructor_code):
     instructor_module_name = os.path.splitext(os.path.basename(instructor_code))[0]
     f = open("support/tmp/run.js", "w")
     f.write("""
+Sk.console = [];
+Sk.skip_drawing = true;
 var printError = function(error) {{
     if (error.constructor == Sk.builtin.NameError
         && error.args.v.length > 0
@@ -723,6 +725,9 @@ var student_code = read('{student_code_filename}');
 var instructor_code = read('{instructor_code_filename}');
 var outputList = [];
 Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ if (text !== "\\n") {{ outputList.push(text); }} }} }});
+Sk.console.printHtml = function(chart, lines) {{
+    outputList.push(lines);
+}};
 // Run students' code
 Sk.misceval.asyncToPromise(function() {{
     return Sk.importMainWithBody("<student>", false, student_code, true);

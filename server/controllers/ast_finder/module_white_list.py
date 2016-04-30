@@ -28,6 +28,7 @@ MODULE_WHITE_LIST = [
 	'gutenberg',
 	'baseball',
 	'billionaires',
+	'johnsongrass',
 	'stocks',
 	'medalofhonor',
 	'airports',

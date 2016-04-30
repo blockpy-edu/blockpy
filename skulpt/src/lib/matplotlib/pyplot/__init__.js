@@ -1699,39 +1699,57 @@ var $builtinmodule = function(name) {
             });
             xdata[0] = [];
         }
+        
+        if (Sk.skip_drawing !== true) {
 
-        // empty canvas from previous plots
-        create_chart();
-        // create new plot instance, should be replaced with Line2D and then added to the plot
-        if (!plot) {
-            plot = jsplotlib.plot(chart);
-        }
-
-        // create line objects
-        var line;
-
-        if (xdata.length === 1 && ydata.length === 1 && stylestring.length === 0) {
-            // handle case for plot(x, y)
-            // Where the x and y are integers, not lists
-            line = new jsplotlib.Line2D(xdata[0], ydata[0]);
-            plot.add_line(line);
-        } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
-            for (i = 0; i < xdata.length; i++) {
-                line = new jsplotlib.Line2D(xdata[i], ydata[i]);
-                var ftm_tuple = jsplotlib._process_plot_format(stylestring[i]);
-                line.update({
-                    'linestyle': ftm_tuple.linestyle,
-                    'marker': jsplotlib.parse_marker(ftm_tuple.marker),
-                    'color': ftm_tuple.color
-                });
-                plot.add_line(line);
+            // empty canvas from previous plots
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
             }
-        } else {
-            throw new Sk.builtin.ValueError('Cannot parse given combination of "*args"!');
-        }
 
-        // set kwargs that apply for all lines
-        plot.update(kwargs);
+            // create line objects
+            var line;
+
+            if (xdata.length === 1 && ydata.length === 1 && stylestring.length === 0) {
+                // handle case for plot(x, y)
+                // Where the x and y are integers, not lists
+                line = new jsplotlib.Line2D(xdata[0], ydata[0]);
+                plot.add_line(line);
+            } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
+                for (i = 0; i < xdata.length; i++) {
+                    line = new jsplotlib.Line2D(xdata[i], ydata[i]);
+                    var ftm_tuple = jsplotlib._process_plot_format(stylestring[i]);
+                    line.update({
+                        'linestyle': ftm_tuple.linestyle,
+                        'marker': jsplotlib.parse_marker(ftm_tuple.marker),
+                        'color': ftm_tuple.color
+                    });
+                    plot.add_line(line);
+                }
+            } else {
+                throw new Sk.builtin.ValueError('Cannot parse given combination of "*args"!');
+            }
+
+            // set kwargs that apply for all lines
+            plot.update(kwargs);
+        } else {
+            if (!plot) {
+                plot = {"_lines":[]};
+            }
+            var line;
+            if (xdata.length === 1 && ydata.length === 1 && stylestring.length === 0) {
+                plot._lines.push([xdata[0], ydata[0]]);
+            } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
+                for (i = 0; i < xdata.length; i++) {
+                    plot._lines.push([xdata[i], ydata[i]]);
+                }
+            } else {
+                throw new Sk.builtin.ValueError('Cannot parse given combination of "*args"!');
+            }
+            
+        }
 
         // result
         var result = [];
@@ -1743,13 +1761,17 @@ var $builtinmodule = function(name) {
 
     var show_f = function() {
         // call drawing routine
-        if (plot && plot.draw) {
-            plot.draw();
+        if (Sk.skip_drawing !== true) {
+            if (plot && plot.draw) {
+                plot.draw();
+            } else {
+                throw new Sk.builtin.ValueError(
+                    "Can not call show without any plot created.");
+            }
+            var lines = plot._lines.map(function(elem) { return [elem._x, elem._y] })
         } else {
-            throw new Sk.builtin.ValueError(
-                "Can not call show without any plot created.");
+            var lines = plot._lines;
         }
-        var lines = plot._lines.map(function(elem) { return [elem._x, elem._y] })
         Sk.console.printHtml(chart, lines);
         //$(Sk.matplotlibCanvas).show();
     };
@@ -1765,14 +1787,16 @@ var $builtinmodule = function(name) {
 
         var label_unwrap = Sk.ffi.remapToJs(label);
 
-        create_chart();
-        // create new plot instance, should be replaced with Line2D and then added to the plot
-        if (!plot) {
-            plot = jsplotlib.plot(chart);
-        }
+        if (Sk.skip_drawing !== true) {
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
+            }
 
-        if (plot && plot.title) {
-            plot.title(label_unwrap);
+            if (plot && plot.title) {
+                plot.title(label_unwrap);
+            }
         }
 
         return new Sk.builtin.str(label_unwrap);
@@ -1817,14 +1841,16 @@ var $builtinmodule = function(name) {
                 "' is not supported for s.");
         }
 
-        create_chart();
-        // create new plot instance, should be replaced with Line2D and then added to the plot
-        if (!plot) {
-            plot = jsplotlib.plot(chart);
-        }
+        if (Sk.skip_drawing !== true) {
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
+            }
 
-        if (plot && plot.xlabel) {
-            plot.xlabel(Sk.ffi.remapToJs(s));
+            if (plot && plot.xlabel) {
+                plot.xlabel(Sk.ffi.remapToJs(s));
+            }
         }
     };
 
@@ -1842,14 +1868,16 @@ var $builtinmodule = function(name) {
                 "' is not supported for s.");
         }
 
-        create_chart();
-        // create new plot instance, should be replaced with Line2D and then added to the plot
-        if (!plot) {
-            plot = jsplotlib.plot(chart);
-        }
+        if (Sk.skip_drawing !== true) {
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
+            }
 
-        if (plot && plot.ylabel) {
-            plot.ylabel(Sk.ffi.remapToJs(s));
+            if (plot && plot.ylabel) {
+                plot.ylabel(Sk.ffi.remapToJs(s));
+            }
         }
     };
 

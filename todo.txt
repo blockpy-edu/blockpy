@@ -1,3 +1,41 @@
-Undo/Redo in Blockly
 Table Block
 Assessment API/Blocks
+
+
+Time rewinder
+Tooltips over errors
+Connect blocks to text by storing line numbers in the converted AST
+Multiple block levels by manipulating the paths in the block.js file
+    Remove color, reduce padding, simplify text
+    Swap append order
+    Drop "set" from assignment
+    Add colons onto the end of lines
+    create empty list becomes []
+Add in variable dictionary block
+Add the word "module" to datasets
+Call friend
+    Identifies students in the cohort who are on the same problem
+    Signals to the TA that the student has an issue
+    Emails a question to the TA
+Dramatically improve weather et al API naming conventions
+    Fix the crime dataset
+Default provide if, if/else, if/elif/else blocks
+Static analysis
+Upload images so they can be reported to the user
+Popup question dialog
+    Fill in the blank
+    Multiple choice
+        What variable is a dictionary (selectable list of variables) - optionally show type.
+    TAs see answers to questions
+Side-by-side views of code and blocks with the mappings
+
+If then else - logic for instructor API
+    Allowed to write python snippets
+    Should the whole thing translate to python?
+    
+Put examples on the left of the canvas, to make suggestions as you type.
+Input block
+Turn off name wrangler? It might be better to let them make mistakes and then point them out.
+Highlight parser error line in the code block!
+
+Instead of having it shown as a value changing, visualize it as a cursor moving through list

@@ -215,7 +215,10 @@ class Submission(Base):
                     'IMPORT_MATPLOTLIB': {'line': 0, 'present': False, 'answer': '', 'name': 'IMPORT_MATPLOTLIB'},
                     'ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'ASSIGNMENT'},
                     'MATPLOTLIB_PLOT': {'line': 0, 'present': False, 'answer': '', 'name': 'MATPLOTLIB_PLOT'},
-                    'LIST_ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'LIST_ASSIGNMENT'}
+                    'LIST_ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'LIST_ASSIGNMENT'},
+                    'IF_STATEMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'IF_STATEMENT'},
+                    'DICT_ASSIGNMENT': {'line': 0, 'present': False, 'answer': '', 'name': 'DICT_ASSIGNMENT'},
+                    'PRINT_USE': {'line': 0, 'present': False, 'answer': '', 'name': 'PRINT_USE'}
                 }
         }
         
@@ -257,7 +260,8 @@ class Submission(Base):
         
     ELEMENT_PRIORITY_LIST = ['CORGIS_USE', 'FOR_LOOP', 'DICTIONARY_ACCESS', 
                          'IMPORT_CORGIS', 'LIST_APPEND', 'IMPORT_MATPLOTLIB', 
-                         'ASSIGNMENT', 'MATPLOTLIB_PLOT']
+                         'ASSIGNMENT', 'MATPLOTLIB_PLOT', 'IF_STATEMENT',
+                         'DICT_ASSIGNMENT', 'PRINT_USE']
                          
     @staticmethod
     def abbreviate_element_type(element_type):

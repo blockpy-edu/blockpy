@@ -60,7 +60,8 @@ var $builtinmodule = function(name)
     
     mod.get_all = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_all", arguments, 0, 0);
-        return Sk.ffi.remapToPy(_CRIME_DATA);
+        return [];
+        //return Sk.ffi.remapToPy(_CRIME_DATA);
     });
     
 

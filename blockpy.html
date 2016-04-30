@@ -178,7 +178,7 @@ function getQueryParams(){
     }
     kennel = new Kennel(document.getElementById('kennel-div'),
                         mode, // Instructor mode
-                        $("#problem-presentation").text(), // problem
+                        $("#problem-presentation").html(), // problem
                         body, // Current code
                         $('#default-on-run').html(), // On run code
                         "def on_step(code, output, properties):\n    pass", // On step code
@@ -195,7 +195,7 @@ function getQueryParams(){
                           'server': false},
                         { 'question_id': 'cw-1-blockly',
                           'student_id': 1,
-                          'name': 'Untitled',
+                          'name': '#1.2',
                           'version': 1,
                           'book_id': 'compthink'});
     if ("url" in params) {
@@ -204,24 +204,20 @@ function getQueryParams(){
   });
   
         </script>
+<pre id='problem-presentation' style='display:none'>Plot the forecasted temperatures of Miami in Celsius. You'll need to use the "create empty list" and "append" blocks to create a new list of Celsius temperatures from the forecasted temperatures in Blacksburg, and then plot these new temperatures against the old ones.
+</pre>
 <pre id='default-body' style='display:none'>
-a = weather.get_forecasted_reports("Blacksburg, VA")
-
+celsius_temperatures = []
+for t in weather.get_forecasts("Miami, FL"):
+    celsius = (t - 32) / 2
+    celsius_temperatures.append(celsius)
+plt.plot(celsius_temperatures)
+plt.title('Temperatures in Miami')
+plt.show()
 </pre>
 <pre id='default-on-run' style='display:none'>
 def on_run(code, output, properties):
-    if 'crime.get_by_year' not in code:
-        return True #return "You'll need to use the 'get by year' block!"
-    elif 'violent' not in code:
-        return "You need to get the violent crime rate."
-    elif 'state' not in code:
-        return "You also need to store the state name while you iterate!"
-    elif 'if' not in code:
-        return "You will need some decision in your code. This is similar to the problems we did before where we found the maximum."
-    elif output.strip() == 'District of Columbia':
-        return true
-    else:
-        return 'You can do it!'
+    return True
 </pre>
   
 <xml id="toolbox" style="display: none">
