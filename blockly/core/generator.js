@@ -78,6 +78,7 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
   this.init(workspace);
   var blocks = workspace.getTopBlocks(true);
   for (var x = 0, block; block = blocks[x]; x++) {
+    block.setLineNumber(""+x);
     var line = this.blockToCode(block);
     if (goog.isArray(line)) {
       // Value blocks return tuples of code and operator order.

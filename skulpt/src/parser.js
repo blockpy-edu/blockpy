@@ -149,7 +149,7 @@ Parser.prototype.addtoken = function (type, value, context) {
 
         //print("findInDfa: " + JSON.stringify(arcs)+" vs. " + tp.state);
         if (findInDfa(arcs, [0, tp.state])) {
-            // an accepting state, pop it and try somethign else
+            // an accepting state, pop it and try something else
             //print("WAA");
             this.pop();
             if (this.stack.length === 0) {
@@ -360,7 +360,6 @@ Sk.parse = function parse(filename, input) {
     for (i = 0; i < lines.length; ++i) {
         ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
     }
-
     /*
      * Small adjustments here in order to return th flags and the cst
      */

@@ -11,7 +11,8 @@ Multiple block levels by manipulating the paths in the block.js file
     Drop "set" from assignment
     Add colons onto the end of lines
     create empty list becomes []
-Add in variable dictionary block
+Add in variable dictionary access block
+Tabular block
 Add the word "module" to datasets
 Call friend
     Identifies students in the cohort who are on the same problem
@@ -39,3 +40,11 @@ Turn off name wrangler? It might be better to let them make mistakes and then po
 Highlight parser error line in the code block!
 
 Instead of having it shown as a value changing, visualize it as a cursor moving through list
+    Integrate with JSAV
+Predict the next value of the trace
+Explain a given line of code
+"All the variables you need are here" <-- prevent them from creating new variables.
+
+Walk the AST to add in unique IDs. When an exception occurs, the exact ID of the parse tree can be returned. This ID can be used to identify the relevant block, and the "lineno"/"endlineno"/"colno"/"endcolno" can be used to identify the exact code snippet. Additionally, we can report out the error more clearly - explain the actual type of the object, the expected type of the object, and even other suitable objects from the static analyzer.
+
+Slowmode - when you run, it executes the code but "plays" its results slightly slowed down, so you can see the code highlighting.

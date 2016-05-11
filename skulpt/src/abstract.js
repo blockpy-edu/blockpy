@@ -858,10 +858,12 @@ goog.exportSymbol("Sk.abstr.iternext", Sk.abstr.iternext);
  * @returns {Object}
  */
 
-Sk.abstr.iter = function(obj) {
+Sk.abstr.iter = function(obj, something) {
     var iter;
     var getit;
     var ret;
+    
+    print(something);
 
     /**
      * Builds an iterator around classes that have a __getitem__ method.
@@ -907,6 +909,7 @@ Sk.abstr.iter = function(obj) {
         // create internal iterobject if __getitem__
         return new seqIter(obj);
     }
+    
     throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable");
 };
 goog.exportSymbol("Sk.abstr.iter", Sk.abstr.iter);

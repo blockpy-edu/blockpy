@@ -511,6 +511,10 @@ Blockly.Xml.domToBlockHeadless_ =
   if (editable) {
     block.setEditable(editable == 'true');
   }
+  var lineNumber = xmlBlock.getAttribute('line_number');
+  if (lineNumber) {
+    block.setLineNumber(lineNumber);
+  }
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');

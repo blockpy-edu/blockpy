@@ -736,11 +736,11 @@ Blockly.Blocks['lists_append'] = {
   init: function() {
     this.setHelpUrl(Blockly.Msg.LISTS_APPEND_HELPURL);
     this.setColour(Blockly.Blocks.lists.HUE);
-    this.appendValueInput('ITEM')
-        .appendField(Blockly.Msg.LISTS_APPEND);
     this.appendValueInput('LIST')
         .setCheck('Array')
         .appendField(Blockly.Msg.LISTS_APPEND_TO);
+    this.appendValueInput('ITEM')
+        .appendField(Blockly.Msg.LISTS_APPEND);
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);

@@ -489,6 +489,7 @@ KennelEditor.prototype.setMode = function(mode) {
     }
     // Hide and show elements based on model
     if (mode == 'text') {
+        var w = this.blockly.toolbox_.width;
         // Update the text model from the blocks
         this.updateText();
         // Hide the blocks menu
@@ -499,6 +500,9 @@ KennelEditor.prototype.setMode = function(mode) {
         $(this.text.getWrapperElement()).show();
         // Refresh the CodeMirror instance to prevent graphical glitches
         this.text.refresh();
+        console.log((w - $('.CodeMirror-gutters').width()));
+        $(".kennel-text-spacer").css('width', 
+            (w - $('.CodeMirror-gutters').width()-2)+'px')
     } else if (mode == 'blocks') {
         // Hide the text menu
         this.textTag.css('height', '0%');
@@ -566,6 +570,7 @@ KennelEditor.prototype.updateBlocks = function() {
         } else {
             this.blockly.align();
         }
+        
     //} catch (e) {
       //  this.printError(e);
 //        console.error("Total Conversion Error", e);
@@ -1219,6 +1224,7 @@ Kennel.prototype.loadMain = function() {
                         //"<div class='blockly-area'></div>"+
                     "</div>"+
                     "<div class='kennel-text'>"+
+                        "<div class='kennel-text-spacer' style='width:150px; height: 100%; float:left; background-color: #ddd'>Information goes here</div>"+
                         "<textarea class='language-python'"+
                                    "style='height:"+this.metrics_editor_height+
                                    "'></textarea>"+
@@ -1336,9 +1342,25 @@ Kennel.prototype.printError = function(error) {
         // A weird skulpt thing?
         if (error.tp$str !== undefined) {
             try {
-                this.editor.highlightError(error.args.v[2]-1);
+                this.editor.highlightError(error.traceback[0].lineno-1);
             } catch (e) {
             }
+            
+            var all_blocks = Blockly.mainWorkspace.getAllBlocks();
+            console.log(all_blocks);
+            blockMap = {};
+            all_blocks.forEach(function(elem) {
+                if (elem.lineNumber in blockMap) {
+                    blockMap[elem.lineNumber].push(elem);
+                } else {
+                    blockMap[elem.lineNumber] = [elem];
+                }
+            });
+            var hblocks = blockMap[""+error.traceback[0].lineno];
+            console.log(hblocks);
+            //Blockly.mainWorkspace.highlightBlock(hblocks[0].id);
+            hblocks[0].addSelect();
+            
             if (error.constructor == Sk.builtin.NameError
                 && error.args.v.length > 0
                 && error.args.v[0].v == "name '___' is not defined") {

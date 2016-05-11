@@ -56,15 +56,65 @@
     <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
     
     <!-- Analyzer -->
-    <script type="text/javascript" src="kennel/kennel.js"></script>
+    <script type="text/javascript" src="src/util.js"></script>
+    <script type="text/javascript" src="src/storage.js"></script>
+    <script type="text/javascript" src="src/interface.js"></script>
+    <script type="text/javascript" src="src/server.js"></script>
+    <script type="text/javascript" src="src/presentation.js"></script>
+    <script type="text/javascript" src="src/property_explorer.js"></script>
+    <script type="text/javascript" src="src/editor.js"></script>
+    <script type="text/javascript" src="src/feedback.js"></script>
+    <script type="text/javascript" src="src/toolbar.js"></script>
+    <script type="text/javascript" src="src/main.js"></script>
     
     <!-- AST Walker -->
     <script type="text/javascript" src="converter/ast_node_visitor.js"></script>
+    
+    <style>
+
+    </style>
+    
+    <script>
+    $(document).ready(function() {
+        blockpy = new BlockPy(
+            // settings
+            {
+                'editor': 'Blocks',
+                'blocklyPath': "blockly/",
+                'attachmentPoint': document.getElementById('blockpy-div'),
+            },
+            // assignment
+            {
+                'introduction': "Welcome to BlockPy. Try running the code below.",
+                'name': "#1.2",
+            },
+            // submission
+            {},
+            // programs
+            {
+                '__main__': 'a=0\nb=0'
+            }
+        )
+        
+        function inIframe () {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+        if (inIframe()) {
+            $("#blockpy-container").width("100%");
+        }
+    });
+    </script>
   
 </head>
 <body>
-<div id="kennel-div" style='height:100%'></div>
-<div id="kennel-div2" style='height:100%'></div>
+<div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
+    <div id="blockpy-div" style='height:100%'></div>
+</div>
+<div id="blockpy-div2" style='height:100%'></div>
 <script>
 
 function getQueryParams(){
@@ -177,7 +227,8 @@ function getQueryParams(){
             parsons = true;
         }
     }
-    kennel = new Kennel(document.getElementById('kennel-div'),
+    /*
+    blockpy = new BlockPy(document.getElementById('blockpy-div'),
                         mode, // Instructor mode
                         $("#problem-presentation").html(), // problem
                         body, // Current code
@@ -198,9 +249,9 @@ function getQueryParams(){
                           'student_id': 1,
                           'name': '#1.2',
                           'version': 1,
-                          'book_id': 'compthink'});
+                          'book_id': 'compthink'});*/
     if ("url" in params) {
-        $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
+        $.get(decodeURIComponent(params["url"]), function(result) { blockpy.setCode(result);});   
     }
   });
   

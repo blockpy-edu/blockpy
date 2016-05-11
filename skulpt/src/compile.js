@@ -1132,10 +1132,11 @@ Compiler.prototype.cfor = function (s) {
         // if we're in a generator, we have to store the iterator to a local
         // so it's preserved (as we cross blocks here and assume it survives)
         iter = "$loc." + this.gensym("iter");
-        out(iter, "=Sk.abstr.iter(", toiter, ");");
+        out(iter, "=Sk.abstr.iter(", toiter, ", "+s.constructor.name+");");
     }
     else {
-        iter = this._gr("iter", "Sk.abstr.iter(", toiter, ")");
+        print(JSON.stringify(s.iter))
+        iter = this._gr("iter", "Sk.abstr.iter(", toiter, ", "+JSON.stringify(s.iter)+")");
         this.u.tempsToSave.push(iter); // Save it across suspensions
     }
 

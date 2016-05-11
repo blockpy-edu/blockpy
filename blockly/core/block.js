@@ -154,6 +154,9 @@ Blockly.Block.prototype.fill = function(workspace, prototypeName) {
   // Record initial inline state.
   /** @type {boolean|undefined} */
   this.inputsInlineDefault = this.inputsInline;
+  
+  /** @type {number|undefined} */
+  this.lineNumber = undefined;
 };
 
 /**
@@ -473,6 +476,22 @@ Blockly.Block.prototype.isDeletable = function() {
  */
 Blockly.Block.prototype.setDeletable = function(deletable) {
   this.deletable_ = deletable;
+};
+
+/**
+ * Set the line number of the block.
+ * @param {number} lineNumber The corresponding line number.
+ */
+Blockly.Block.prototype.setLineNumber = function(lineNumber) {
+  this.lineNumber = lineNumber;
+};
+
+/**
+ * Get whether this block is deletable or not.
+ * @return {number} The corresponding line number.
+ */
+Blockly.Block.prototype.getLineNumber = function() {
+  return this.lineNumber;
 };
 
 /**

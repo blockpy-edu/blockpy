@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang="en"> <![endif]-->
+<!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>BlockPy #1.4</title>
+  <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
+
+  <link href="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+  <link href="https://du11hjcvx0uqb.cloudfront.net/dist/images/apple-touch-icon-585e5d997d.png" rel="apple-touch-icon" />
+
+  
+  <link href="https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/879eb50b2fa1b220ddccbe3f99101b8c/new_styles_normal_contrast/bundles/common-23d3b420b9.css" media="all" rel="stylesheet" />
+  
+  <meta content="app-id=480883488" name="apple-itunes-app" />
+<meta content="app-id=com.instructure.candroid" name="google-play-app" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0096db">
+  
+  
+  
+  <script>
+    // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
+      function _earlyClick(e){
+        var cur = e.target || e.srcElement;
+        while ( cur && cur.ownerDocument ) {
+          if ( cur.getAttribute('href') == '#' ) {
+            e.preventDefault();
+            _earlyClick.clicks = _earlyClick.clicks || [];
+            _earlyClick.clicks.push(cur);
+            break;
+          }
+          cur = cur.parentNode;
+        }
+      }
+      document.addEventListener('click', _earlyClick);
+  </script>
+</head>
+
+<body class="ic-framed-lti-tool with-left-side course-menu-expanded">
+<noscript>
+  <div role="alert" class="ic-flash-static ic-flash-error">
+    <h1>You need to have JavaScript enabled in order to access this site.</h1>
+  </div>
+</noscript>
+
+
+
+
+<ul role="alert" aria-live="assertive" id="flash_message_holder"></ul>
+<div role="alert" aria-live="assertive" aria-relevant="additions" id="flash_screenreader_holder" class="screenreader-only"></div>
+
+<div id="application" class="ic-app">
+
+      <header id="header" class="ic-app-header no-print ">
+    <div class="ic-app-header__layout">
+      <div class="ic-app-header__primary">
+      <a href="#content" id="skip_navigation_link">Skip To Content</a>
+        <div role="navigation" class="ic-app-header__main-navigation">
+          <div class="ic-app-header__logomark-container">
+            <a href="https://canvas.instructure.com/" class="ic-app-header__logomark">
+              <span class="screenreader-only">Dashboard</span>
+            </a>
+          </div>
+          <ul role="menu" id="menu"
+            class="ic-app-header__menu-list"
+            aria-label="Main Navigation"
+          >
+              <li class="menu-item ic-app-header__menu-list-item ">
+                <a id="global_nav_profile_link" href="/profile" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container" aria-hidden="true">
+                    <div class="ic-avatar ic-avatar--fake-student">
+                      <img src="https://secure.gravatar.com/avatar/000?s=50&amp;d=https%3A%2F%2Fcanvas.instructure.com%2Fimages%2Fmessages%2Favatar-50.png" alt="Test Student" />
+                    </div>
+                  </div>
+                  <div class="menu-item__text">
+                    Account
+                  </div>
+                </a>
+              </li>
+            <li class="ic-app-header__menu-list-item ">
+              <a id="global_nav_dashboard_link" href="https://canvas.instructure.com/" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ic-icon-svg ic-icon-svg--dashboard" version="1.1" x="0" y="0" viewBox="0 0 280 200" enable-background="new 0 0 280 200" xml:space="preserve"><path d="M231.6 94.2c-2.5-4.9-8.5-6.9-13.4-4.5l-57.3 28.6c-5.4-5.2-12.7-8.4-20.8-8.4 -16.6 0-30 13.5-30 30 0 16.6 13.5 30 30 30 16.6 0 30-13.5 30-30 0-1.3-0.1-2.5-0.2-3.8l57.3-28.6C232 105.2 234 99.2 231.6 94.2zM140 150c-5.5 0-10-4.5-10-10s4.5-10 10-10c5.5 0 10 4.5 10 10S145.6 150 140 150zM70 150H50c-5.5 0-10-4.5-10-10s4.5-10 10-10h20c5.5 0 10 4.5 10 10S75.5 150 70 150zM140 80c-5.5 0-10-4.5-10-10V50c0-5.5 4.5-10 10-10 5.5 0 10 4.5 10 10v20C150 75.5 145.5 80 140 80zM105 89.6c-3.5 0-6.8-1.8-8.7-5l-10-17.3c-2.8-4.8-1.1-10.9 3.7-13.7 4.8-2.8 10.9-1.1 13.7 3.7l10 17.3c2.8 4.8 1.1 10.9-3.7 13.7C108.4 89.1 106.7 89.6 105 89.6zM79.4 115.4c-1.7 0-3.4-0.4-5-1.3l-17.3-10c-4.8-2.8-6.4-8.9-3.7-13.7 2.8-4.8 8.9-6.4 13.7-3.7l17.3 10c4.8 2.8 6.4 8.9 3.7 13.7C86.2 113.6 82.8 115.4 79.4 115.4zM173.6 89.6c-1.7 0-3.4-0.4-5-1.3 -4.8-2.8-6.4-8.9-3.7-13.7l10-17.3c2.8-4.8 8.9-6.4 13.7-3.7 4.8 2.8 6.4 8.9 3.7 13.7l-10 17.3C180.4 87.8 177.1 89.6 173.6 89.6zM140 0C62.8 0 0 63 0 140.5V190c0 5.5 4.5 10 10 10h260c5.5 0 10-4.5 10-10v-49.5C280 63 217.2 0 140 0zM260 180H20v-39.5C20 74.1 73.8 20 140 20c66.2 0 120 54.1 120 120.5V180zM230 150h-20c-5.5 0-10-4.5-10-10s4.5-10 10-10h20c5.5 0 10 4.5 10 10S235.5 150 230 150z"/></svg>
+                </div>
+                <div class="menu-item__text">Dashboard</div>
+              </a>
+            </li>
+            <li class="menu-item ic-app-header__menu-list-item ic-app-header__menu-list-item--active">
+              <a id="global_nav_courses_link" href="/courses" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ic-icon-svg ic-icon-svg--courses" version="1.1" x="0" y="0" viewBox="0 0 280 259" enable-background="new 0 0 280 259" xml:space="preserve"><path d="M226.2 259H32.3c-5.9 0-10.8-4.8-10.8-10.8v-43.5H10.8C4.8 204.8 0 199.9 0 194c0-6 4.8-10.8 10.8-10.8h10.8v-21.6H10.8c-5.9 0-10.8-4.8-10.8-10.8s4.8-10.8 10.8-10.8h10.8v-21.6H10.8c-5.9 0-10.8-4.8-10.8-10.8 0-6 4.8-10.8 10.8-10.8h10.8V75.4H10.8C4.8 75.4 0 70.6 0 64.7s4.8-10.8 10.8-10.8h10.8V10.8c0-6 4.8-10.8 10.8-10.8h193.9c5.9 0 10.8 4.8 10.8 10.8v21.6h32.3c5.9 0 10.8 4.8 10.8 10.8v172.4c0 6-4.8 10.8-10.8 10.8H237v21.9C237 254.2 232.2 259 226.2 259zM43.1 237.4h172.4V21.6H43.1v32.3h10.7c5.9 0 10.8 4.8 10.8 10.8s-4.8 10.8-10.8 10.8H43.1V97h10.7c5.9 0 10.8 4.8 10.8 10.8 0 6-4.8 10.8-10.8 10.8H43.1v21.6h10.7c5.9 0 10.8 4.8 10.8 10.8s-4.8 10.8-10.8 10.8H43.1v21.6h10.7c5.9 0 10.8 4.8 10.8 10.8 0 6-4.8 10.8-10.8 10.8H43.1V237.4zM237 204.8h21.5v-21.6H237V204.8zM237 161.7h21.5v-21.6H237V161.7zM237 118.5h21.5V97H237V118.5zM237 75.4h21.5V53.9H237V75.4zM172.2 129.3H96.9c-5.9 0-10.8-4.8-10.8-10.8V64.7c0-6 4.8-10.8 10.8-10.8h75.3c5.9 0 10.8 4.8 10.8 10.8v53.9C183 124.5 178.2 129.3 172.2 129.3zM107.7 107.8h53.8V75.4h-53.8V107.8z"/></svg>
+                </div>
+                <div class="menu-item__text">
+                  Courses
+                </div>
+              </a>
+            </li>
+            <li class="menu-item ic-app-header__menu-list-item ">
+              <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ic-icon-svg ic-icon-svg--calendar" version="1.1" x="0" y="0" viewBox="0 0 280 280" enable-background="new 0 0 280 280" xml:space="preserve"><path d="M268.3 280H11.7C5.2 280 0 274.8 0 268.3V35c0-6.4 5.2-11.7 11.7-11.7h35V11.7C46.7 5.2 51.9 0 58.3 0h35C99.8 0 105 5.2 105 11.7v11.7h70V11.7C175 5.2 180.2 0 186.7 0h35c6.4 0 11.7 5.2 11.7 11.7v11.7h35c6.4 0 11.7 5.2 11.7 11.7v233.3C280 274.8 274.8 280 268.3 280zM23.3 256.7h233.3v-210h-23.3v11.7c0 6.4-5.2 11.7-11.7 11.7h-35c-6.4 0-11.7-5.2-11.7-11.7V46.7h-70v11.7c0 6.4-5.2 11.7-11.7 11.7h-35c-6.4 0-11.7-5.2-11.7-11.7V46.7H23.3V256.7zM198.3 46.7H210V23.3h-11.7V46.7zM70 46.7h11.7V23.3H70V46.7zM198.3 245c-6.4 0-11.7-5.2-11.7-11.7v-11.7h-35v11.7c0 6.4-5.2 11.7-11.7 11.7 -6.4 0-11.7-5.2-11.7-11.7v-11.7h-35v11.7c0 6.4-5.2 11.7-11.7 11.7S70 239.8 70 233.3v-11.7H46.7c-6.4 0-11.7-5.2-11.7-11.7s5.2-11.7 11.7-11.7H70V175H46.7c-6.4 0-11.7-5.2-11.7-11.7 0-6.4 5.2-11.7 11.7-11.7H70v-23.3H46.7c-6.4 0-11.7-5.2-11.7-11.7S40.2 105 46.7 105H70V93.3c0-6.4 5.2-11.7 11.7-11.7s11.7 5.2 11.7 11.7V105h35V93.3c0-6.4 5.2-11.7 11.7-11.7 6.4 0 11.7 5.2 11.7 11.7V105h35V93.3c0-6.4 5.2-11.7 11.7-11.7 6.4 0 11.7 5.2 11.7 11.7V105h23.3c6.4 0 11.7 5.2 11.7 11.7s-5.2 11.7-11.7 11.7H210v23.3h23.3c6.4 0 11.7 5.2 11.7 11.7 0 6.4-5.2 11.7-11.7 11.7H210v23.3h23.3c6.4 0 11.7 5.2 11.7 11.7s-5.2 11.7-11.7 11.7H210v11.7C210 239.8 204.8 245 198.3 245zM151.7 198.3h35V175h-35V198.3zM93.3 198.3h35V175h-35V198.3zM151.7 151.7h35v-23.3h-35V151.7zM93.3 151.7h35v-23.3h-35V151.7z"/></svg>
+                </div>
+                <div class="menu-item__text">
+                  Calendar
+                </div>
+              </a>
+            </li>
+            <li class="menu-item ic-app-header__menu-list-item ">
+              <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ic-icon-svg ic-icon-svg--inbox" version="1.1" x="0" y="0" viewBox="0 0 280 280" enable-background="new 0 0 280 280" xml:space="preserve"><path d="M93.3 105c0-6.4 5.2-11.7 11.7-11.7h70c6.4 0 11.7 5.2 11.7 11.7s-5.2 11.7-11.7 11.7h-70C98.6 116.7 93.3 111.4 93.3 105zM105 70h23.3c6.4 0 11.7-5.2 11.7-11.7s-5.2-11.7-11.7-11.7H105c-6.4 0-11.7 5.2-11.7 11.7S98.6 70 105 70zM280 198.3v70c0 6.4-5.2 11.7-11.7 11.7H11.7C5.2 280 0 274.8 0 268.3v-69.8c0-1.1 0.1-2.2 0.4-3.3 0.3-1.1 0.8-2.1 1.3-3L36.7 134c2.1-3.5 5.9-5.7 10-5.7h11.7V11.7C58.3 5.2 63.6 0 70 0h140c6.4 0 11.7 5.2 11.7 11.7v116.7h11.7c4.1 0 7.9 2.1 10 5.7l35 58.3c0.1 0.2 0.1 0.5 0.3 0.7 0.4 0.7 0.6 1.4 0.8 2.2 0.2 0.8 0.4 1.5 0.5 2.3C279.9 197.8 280 198.1 280 198.3zM32.3 186.7h67.9c6.4 0 11.7 5.2 11.7 11.7V210c0 7.8 3.5 7.8 6 7.8h48.7c5.7 0 10.5-3.6 10.5-7.8v-11.7c0-6.4 5.2-11.7 11.7-11.7h59l-21-35h-5.1v11.7c0 6.4-5.2 11.7-11.7 11.7s-11.7-5.2-11.7-11.7v-140H81.7v140c0 6.4-5.2 11.7-11.7 11.7s-11.7-5.2-11.7-11.7v-11.7h-5.1L32.3 186.7zM256.7 210h-56.3c0 17.2-15.2 31.1-33.8 31.1h-48.7c-17.6 0-29.4-12.5-29.4-31.1H23.3v46.7h233.3V210zM175 163.3c6.4 0 11.7-5.2 11.7-11.7 0-6.4-5.2-11.7-11.7-11.7h-70c-6.4 0-11.7 5.2-11.7 11.7 0 6.4 5.2 11.7 11.7 11.7H175z"/></svg>
+                  <span class="menu-item__badge" style="display: none">0</span>
+                </div>
+                <div class="menu-item__text">
+                  Inbox
+                </div>
+              </a>
+            </li>
+              
+
+          </ul>
+        </div>
+        <div role="navigation" class="ic-app-header__secondary-navigation">
+          <ul role="menu" class="ic-app-header__menu-list">
+            <li class="ic-app-header__menu-list-item">
+              <a class="support_url help_dialog_trigger ic-app-header__menu-list-link" data-track-category="help system" data-track-label="help button" href="http://help.instructure.com/">
+                <div class="menu-item-icon-container" role="presentation">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ic-icon-svg ic-icon-svg--help" version="1.1" x="0" y="0" viewBox="0 0 280 280" enable-background="new 0 0 280 280" xml:space="preserve"><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_2_)"><defs><path d="M-557-42h-3v-3h3V-42zM-572-57h27v27h-27V-57z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-560" y="-45" clip-path="url(#SVGID_4_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_6_)"><defs><path d="M-557-24h-3v-3h3V-24zM-572-39h27v27h-27V-39z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-560" y="-27" clip-path="url(#SVGID_8_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_10_)"><defs><path d="M-539-33h-3v-3h3V-33zM-554-48h27v27h-27V-48z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-542" y="-36" clip-path="url(#SVGID_12_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_14_)"><defs><path d="M-539-42h-3v-3h3V-42zM-554-57h27v27h-27V-57z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-542" y="-45" clip-path="url(#SVGID_16_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_18_)"><defs><path d="M-539-24h-3v-3h3V-24zM-554-39h27v27h-27V-39z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-542" y="-27" clip-path="url(#SVGID_20_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_22_)"><defs><path d="M-557-33h-3v-3h3V-33zM-572-48h27v27h-27V-48z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-560" y="-36" clip-path="url(#SVGID_24_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_26_)"><defs><path d="M-548-42h-3v-3h3V-42zM-563-57h27v27h-27V-57z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-551" y="-45" clip-path="url(#SVGID_28_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_30_)"><defs><path d="M-548-24h-3v-3h3V-24zM-563-39h27v27h-27V-39z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-551" y="-27" clip-path="url(#SVGID_32_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><defs><rect x="-580" y="-372" width="1440" height="1024"/></defs><clipPath><use overflow="visible"/></clipPath><g clip-path="url(#SVGID_34_)"><defs><path d="M-548-33h-3v-3h3V-33zM-563-48h27v27h-27V-48z"/></defs><clipPath><use overflow="visible"/></clipPath><rect x="-551" y="-36" clip-path="url(#SVGID_36_)" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="3" height="3"/></g><path d="M140 20c32.1 0 62.2 12.5 84.9 35.1C247.5 77.8 260 107.9 260 140s-12.5 62.2-35.1 84.9C202.2 247.5 172.1 260 140 260s-62.2-12.5-84.9-35.1C32.5 202.2 20 172.1 20 140s12.5-62.2 35.1-84.9C77.8 32.5 107.9 20 140 20M140 0C62.7 0 0 62.7 0 140s62.7 140 140 140 140-62.7 140-140S217.3 0 140 0L140 0z"/><path d="M94.7 109.3c0-5.7 1.8-11.5 5.5-17.4 3.7-5.9 9.1-10.8 16.1-14.6 7.1-3.9 15.3-5.8 24.7-5.8 8.7 0 16.5 1.6 23.2 4.8 6.7 3.2 11.9 7.6 15.5 13.2 3.7 5.6 5.5 11.6 5.5 18.1 0 5.1-1 9.6-3.1 13.5 -2.1 3.9-4.6 7.2-7.4 10 -2.9 2.8-8 7.5-15.4 14.2 -2.1 1.9-3.7 3.5-4.9 4.9 -1.2 1.4-2.2 2.7-2.8 3.9 -0.6 1.2-1.1 2.4-1.4 3.5 -0.3 1.2-0.8 3.2-1.5 6.2 -1.1 6.3-4.7 9.4-10.8 9.4 -3.1 0-5.8-1-7.9-3.1 -2.1-2.1-3.2-5.1-3.2-9.1 0-5.1 0.8-9.5 2.4-13.2 1.6-3.7 3.7-7 6.2-9.8 2.6-2.8 6.1-6.1 10.5-10 3.9-3.4 6.7-5.9 8.4-7.6 1.7-1.7 3.2-3.6 4.3-5.7 1.2-2.1 1.8-4.4 1.8-6.9 0-4.8-1.8-8.9-5.4-12.2 -3.6-3.3-8.2-5-13.9-5 -6.6 0-11.5 1.7-14.7 5 -3.1 3.3-5.8 8.3-8 14.8 -2.1 6.8-5.9 10.2-11.7 10.2 -3.4 0-6.2-1.2-8.6-3.6C95.9 114.7 94.7 112.1 94.7 109.3zM138.9 208.5c-3.7 0-6.9-1.2-9.6-3.6 -2.7-2.4-4.1-5.7-4.1-10 0-3.8 1.3-7 4-9.6 2.7-2.6 5.9-3.9 9.8-3.9 3.8 0 7 1.3 9.6 3.9 2.6 2.6 3.9 5.8 3.9 9.6 0 4.2-1.4 7.5-4.1 10C145.6 207.3 142.5 208.5 138.9 208.5z"/></svg>
+                </div>
+                <div class="menu-item__text">
+                  Help
+                </div>
+</a>            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="global_nav_tray_container"></div>
+  </header>
+
+
+  <div id="instructure_ajax_error_box">
+    <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link">Close</a></div>
+    <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;" title="Error"></iframe>
+  </div>
+
+  
+
+  <div id="wrapper-container" class="ic-app-container">
+    <div id="wrapper" class="ic-app-main-layout-vertical">
+        <div class="ic-app-nav-toggle-and-crumbs no-print">
+            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="Show and hide courses menu"><i class="icon-hamburger"></i></button>
+            <div class="ic-app-crumbs">
+          <nav aria-label="breadcrumbs" id="breadcrumbs" role="navigation"><ul><li class="home"><a href="/"><span class="ellipsible">      <i class="icon-home"
+         title="My Dashboard">
+        <span class="screenreader-only">My Dashboard</span>
+      </i>
+</span></a></li><li><a href="/courses/946043"><span class="ellipsible">Computational</span></a></li><li><a href="/courses/946043/assignments"><span class="ellipsible">Assignments</span></a></li><li><span class="ellipsible">BlockPy #1.4</span></li></ul></nav>
+          </div>
+        </div>
+    <div class="ic-app-main-layout-horizontal">
+          <div id="left-side" class="list-view ic-app-course-menu">
+            <nav aria-label="context" role="navigation"><ul id="section-tabs"><li class="section"><a class="home" href="/courses/946043">Home</a></li><li class="section"><a aria-label="Course Assignments" class="assignments active" href="/courses/946043/assignments">Assignments</a></li><li class="section"><a aria-label="Course Discussions" class="discussions" href="/courses/946043/discussion_topics">Discussions</a></li><li class="section"><a aria-label="Course Grades" class="grades" href="/courses/946043/grades">Grades</a></li><li class="section"><a class="people" href="/courses/946043/users">People</a></li><li class="section"><a class="pages" href="/courses/946043/wiki">Pages</a></li><li class="section"><a aria-label="Course Files" class="files" href="/courses/946043/files">Files</a></li><li class="section"><a class="syllabus" href="/courses/946043/assignments/syllabus">Syllabus</a></li><li class="section"><a class="outcomes" href="/courses/946043/outcomes">Outcomes</a></li><li class="section"><a class="conferences" href="/courses/946043/conferences">Conferences</a></li><li class="section"><a class="collaborations" href="/courses/946043/collaborations">Collaborations</a></li></ul></nav>
+        </div>
+        <div id="main" class="ic-app-main-and-right-side">
+          <div id="not_right_side" class="ic-app-main-content">
+            <div id="content-wrapper" class="ic-app-main-content__primary">
+                
+                
+              <div id="content" role="main" >
+                
+
+
+
+
+
+
+<div class="tool_content_wrapper">
+
+<form action="https://localhost:5000/lti_assignments/lti?assignment_id=18"
+      class="hide"
+      method="POST" target=tool_content
+      id="tool_form"
+      data-tool-launch-type=""
+      data-tool-id="blockpy-v1"
+      data-tool-path="/lti_assignments/lti"
+      data-message-type="tool_launch">
+        <input id="oauth_consumer_key" name="oauth_consumer_key" type="hidden" value="BlockPy is fun" />
+        <input id="oauth_signature_method" name="oauth_signature_method" type="hidden" value="HMAC-SHA1" />
+        <input id="oauth_timestamp" name="oauth_timestamp" type="hidden" value="1462861025" />
+        <input id="oauth_nonce" name="oauth_nonce" type="hidden" value="lEhmuLDkkjWoOe4aNupkwcL7uCoVhjQFL2TeglIMKE" />
+        <input id="oauth_version" name="oauth_version" type="hidden" value="1.0" />
+        <input id="assignment_id" name="assignment_id" type="hidden" value="18" />
+        <input id="context_id" name="context_id" type="hidden" value="cbdd860576c6c08ccb998b93009305c318bd269b" />
+        <input id="context_label" name="context_label" type="hidden" value="Computational" />
+        <input id="context_title" name="context_title" type="hidden" value="Computational Thinking - Dev" />
+        <input id="custom_" name="custom_" type="hidden" />
+        <input id="custom_canvas_assignment_points_possible" name="custom_canvas_assignment_points_possible" type="hidden" value="10" />
+        <input id="custom_canvas_assignment_title" name="custom_canvas_assignment_title" type="hidden" value="BlockPy #1.4" />
+        <input id="custom_canvas_enrollment_state" name="custom_canvas_enrollment_state" type="hidden" value="active" />
+        <input id="ext_ims_lis_basic_outcome_url" name="ext_ims_lis_basic_outcome_url" type="hidden" value="https://canvas.instructure.com/api/lti/v1/tools/79954/ext_grade_passback" />
+        <input id="ext_outcome_data_values_accepted" name="ext_outcome_data_values_accepted" type="hidden" value="url,text" />
+        <input id="ext_outcome_result_total_score_accepted" name="ext_outcome_result_total_score_accepted" type="hidden" value="true" />
+        <input id="ext_outcomes_tool_placement_url" name="ext_outcomes_tool_placement_url" type="hidden" value="https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement/79954" />
+        <input id="ext_roles" name="ext_roles" type="hidden" value="urn:lti:instrole:ims/lis/Student,urn:lti:role:ims/lis/Learner,urn:lti:sysrole:ims/lis/User" />
+        <input id="launch_presentation_document_target" name="launch_presentation_document_target" type="hidden" value="iframe" />
+        <input id="launch_presentation_locale" name="launch_presentation_locale" type="hidden" value="en" />
+        <input id="launch_presentation_return_url" name="launch_presentation_return_url" type="hidden" value="https://canvas.instructure.com/courses/946043/external_content/success/external_tool_redirect" />
+        <input id="lis_outcome_service_url" name="lis_outcome_service_url" type="hidden" value="https://canvas.instructure.com/api/lti/v1/tools/79954/grade_passback" />
+        <input id="lis_person_name_family" name="lis_person_name_family" type="hidden" value="Student" />
+        <input id="lis_person_name_full" name="lis_person_name_full" type="hidden" value="Test Student" />
+        <input id="lis_person_name_given" name="lis_person_name_given" type="hidden" value="Test" />
+        <input id="lis_result_sourcedid" name="lis_result_sourcedid" type="hidden" value="79954-946043-4639601-4860212-7000044813712002831daff49d5f861432e1cf1c" />
+        <input id="lti_message_type" name="lti_message_type" type="hidden" value="basic-lti-launch-request" />
+        <input id="lti_version" name="lti_version" type="hidden" value="LTI-1p0" />
+        <input id="oauth_callback" name="oauth_callback" type="hidden" value="about:blank" />
+        <input id="resource_link_id" name="resource_link_id" type="hidden" value="6cfd8d3e1524f79088289a20d14f6e59c0a3996e" />
+        <input id="resource_link_title" name="resource_link_title" type="hidden" value="BlockPy #1.4" />
+        <input id="roles" name="roles" type="hidden" value="Learner" />
+        <input id="tool_consumer_info_product_family_code" name="tool_consumer_info_product_family_code" type="hidden" value="canvas" />
+        <input id="tool_consumer_info_version" name="tool_consumer_info_version" type="hidden" value="cloud" />
+        <input id="tool_consumer_instance_contact_email" name="tool_consumer_instance_contact_email" type="hidden" value="notifications@instructure.com" />
+        <input id="tool_consumer_instance_guid" name="tool_consumer_instance_guid" type="hidden" value="07adb3e60637ff02d9ea11c7c74f1ca921699bd7.canvas.instructure.com" />
+        <input id="tool_consumer_instance_name" name="tool_consumer_instance_name" type="hidden" value="Free For Teachers" />
+        <input id="user_id" name="user_id" type="hidden" value="9f5f37ebb0c8e7b2f3e69dbc182df65299165307" />
+        <input id="oauth_signature" name="oauth_signature" type="hidden" value="Wlc91n4C3KVkPeh1iJNvPDuGq5c=" />
+    <div style="margin-bottom: 20px;">
+        <div class="load_tab">
+            This tool needs to be loaded in a new browser window
+            <div style="margin: 10px 0;">
+                <button class="btn" type="submit"
+                        data-expired_message="The session for this tool has expired. Please reload the page to access the tool again">
+                    Load BlockPy #1.4 in a new window
+                </button>
+            </div>
+        </div>
+        <div class="tab_loaded" style="display: none;">
+            This tool was successfully loaded in a new browser window. Reload the page to access the tool again.
+        </div>
+    </div>
+</form>
+<iframe allowfullscreen="true" class="tool_launch" id="tool_content" mozallowfullscreen="true" name="tool_content" src="blockpy_new.html" tabindex="0" title="Tool Content" webkitallowfullscreen="true"></iframe>
+
+</div>
+
+
+<div id="module_sequence_footer"></div>
+
+              </div>
+            </div>
+            <div id="right-side-wrapper" class="ic-app-main-content__secondary">
+              <aside id="right-side" role="complementary">
+                
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <div id="fixed_bottom">
+</div>
+
+
+    <div style="display:none;"><!-- Everything inside of this should always stay hidden -->
+        <div id="page_view_id">8ba2522e-446d-4e9e-96d4-b7876c314f5c</div>
+        <a id="equella_endpoint_url" href="http://oer.equella.com/signon.do">&nbsp;</a>
+        <a id="equella_callback_url" href="https://canvas.instructure.com/external_content/success/equella">&nbsp;</a>
+        <a id="equella_cancel_url" href="https://canvas.instructure.com/external_content/cancel/equella">&nbsp;</a>
+        <a id="equella_action" href="selectOrAdd">&nbsp;</a>
+          <div id="equella_teaser">Equella is a shared content repository that organizations can use to easily track and reuse content.  This OER repository is a collection of free resources provided by Equella.</div>
+    </div>
+    <div id="cant_record_dialog" style="display: none;">
+  <div>
+    In order to create video or audio recordings your computer needs to be 
+    webcam-enabled.  If you don&#39;t have a webcam on your computer, you can still
+    record audio-only messages by first installing the Google Video Chat
+    plugin.
+  </div>
+  <div style="text-align: center; font-size: 1.5em; margin: 10px;">
+    <a href="http://www.google.com/chat/video" target="_blank" class="btn">Install the Video Plugin</a>
+  </div>
+  <div class="links" style="text-align: right; font-size: 0.8em; display: none;">
+    <a href="#" class="cant_record_link">Don&#39;t have a webcam?</a>
+  </div>
+</div>
+  <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
+  <script>
+  INST = {"environment":"production","allowMediaComments":true,"kalturaSettings":{"domain":"nv.instructuremedia.com","resource_domain":"nv.instructuremedia.com","rtmp_domain":"fms-prod.instructuremedia.com","partner_id":"9","subpartner_id":"0","player_ui_conf":"0","kcw_ui_conf":"0","upload_ui_conf":"0","max_file_size_bytes":534773760,"do_analytics":false,"hide_rte_button":false,"js_uploader":true},"equellaEnabled":true,"googleAnalyticsAccount":"UA-9138420-1","disableScribdPreviews":true,"logPageViews":true,"maxVisibleEditorButtons":3,"editorButtons":[{"name":"BlockpyTesting","id":79954,"url":"https:\/\/localhost:5000\/lti_assignments\/share","icon_url":"https:\/\/localhost:5000\/static\/images\/puppy-corgi-head-tiny.png","canvas_icon_class":null,"width":700,"height":600}],"pandaPubSettings":{"push_url":"https:\/\/pp-beta.instructure.com\/push","application_id":"o9lhB0KU5xBx3SIiP8et"}};
+  ENV = {"ASSET_HOST":"https:\/\/du11hjcvx0uqb.cloudfront.net","active_brand_config":"879eb50b2fa1b220ddccbe3f99101b8c","url_to_what_gets_loaded_inside_the_tinymce_editor_css":"https:\/\/du11hjcvx0uqb.cloudfront.net\/dist\/brandable_css\/879eb50b2fa1b220ddccbe3f99101b8c\/new_styles_normal_contrast\/bundles\/what_gets_loaded_inside_the_tinymce_editor-cf41a971bd.css","current_user_id":"4860212","current_user":{"id":"4860212","display_name":"Test Student","avatar_image_url":"https:\/\/secure.gravatar.com\/avatar\/000?s=50\u0026d=https%3A%2F%2Fcanvas.instructure.com%2Fimages%2Fmessages%2Favatar-50.png","html_url":"https:\/\/canvas.instructure.com\/about\/4860212","fake_student":true},"current_user_roles":["user","student"],"files_domain":"safefiles.instructure.com","DOMAIN_ROOT_ACCOUNT_ID":70000000000010,"use_new_styles":true,"k12":false,"use_high_contrast":false,"SETTINGS":{"open_registration":true},"page_view_update_url":"\/page_views\/8ba2522e-446d-4e9e-96d4-b7876c314f5c?page_view_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiOGJhMjUyMmUtNDQ2ZC00ZTllLTk2ZDQtYjc4NzZjMzE0ZjVjIiwidSI6NzAwMDAwMDQ4NjAyMTIsImMiOiIyMDE2LTA1LTEwVDA2OjE3OjA0LjQyWiJ9.5eiCDwUo17QFF_EYgd-0b3HckfnGhZmTwsU9aweqZJ4","context_asset_string":"course_946043","ping_url":"https:\/\/canvas.instructure.com\/api\/v1\/courses\/946043\/ping","TIMEZONE":"America\/Denver","CONTEXT_TIMEZONE":"America\/Denver","LOCALE":"en-US","TOURS":[],"RICH_CONTENT_SERVICE_ENABLED":false,"redirect_return_success_url":"https:\/\/canvas.instructure.com\/courses\/946043\/assignments","redirect_return_cancel_url":"https:\/\/canvas.instructure.com\/courses\/946043\/assignments","badge_counts":{"submissions":2},"notices":[]};
+
+    // TODO: move this out when we have a single require call
+    require = {
+      translate: true,
+      baseUrl: '/optimized',
+      paths: {
+    "common":"compiled\/bundles\/common",
+    "jqueryui":"vendor\/jqueryui",
+    "compiled\/tinymce":"compiled\/tinymce.js?v2",
+    "demo_site":"plugins\/demo_site",
+    "migration_tool":"plugins\/migration_tool",
+    "catalog_provisioner":"plugins\/catalog_provisioner",
+    "instructure_misc_plugin":"plugins\/instructure_misc_plugin",
+    "analytics":"plugins\/analytics",
+    "multiple_root_accounts":"plugins\/multiple_root_accounts",
+    "canvasnet_registration":"plugins\/canvasnet_registration",
+    "compiled\/bundles\/modules\/content_migration_setup_without_extensions":"compiled\/bundles\/modules\/content_migration_setup",
+    "compiled\/bundles\/modules\/content_migration_setup":"compiled\/bundles\/modules\/content_migration_setup_with_extensions",
+    "compiled\/registration\/main_without_extensions":"compiled\/registration\/main",
+    "compiled\/registration\/main":"compiled\/registration\/main_with_extensions",
+    "compiled\/registration\/signupDialog_without_extensions":"compiled\/registration\/signupDialog",
+    "compiled\/registration\/signupDialog":"compiled\/registration\/signupDialog_with_extensions",
+    "compiled\/bundles\/modules\/account_quota_settings_without_extensions":"compiled\/bundles\/modules\/account_quota_settings",
+    "compiled\/bundles\/modules\/account_quota_settings":"compiled\/bundles\/modules\/account_quota_settings_with_extensions",
+    "canvas_quizzes":"client_apps\/canvas_quizzes",
+    "app\/config\/environments\/production":"empty:"},
+      packages : [{"name":"ic-ajax","location":"bower\/ic-ajax\/dist\/amd"},{"name":"ic-styled","location":"bower\/ic-styled"},{"name":"ic-menu","location":"bower\/ic-menu"},{"name":"ic-tabs","location":"bower\/ic-tabs\/dist\/amd"},{"name":"ic-droppable","location":"bower\/ic-droppable\/dist\/amd"},{"name":"ic-sortable","location":"bower\/ic-sortable\/dist\/amd"},{"name":"ic-modal","location":"bower\/ic-modal\/dist\/amd"},{"name":"ic-lazy-list","location":"bower\/ic-lazy-list"},{"name":"ember-qunit","location":"bower\/ember-qunit\/dist\/amd"}],
+      shim: {
+    'bower/react-router/build/umd/ReactRouter': {
+      deps: ['react'],
+      exports: 'ReactRouter'
+    },
+    'bower/react-tray/dist/react-tray': {
+      deps: ['react']
+    },
+    'bower/react-modal/dist/react-modal': {
+      deps: ['react']
+    },
+    'bower/react-tokeninput/dist/react-tokeninput': {
+      deps: ['react'],
+    },
+    'bower/react-select-box/dist/react-select-box': {
+      deps: ['react'],
+    },
+    'bower/ember/ember': {
+      deps: ['jquery', 'handlebars'],
+      exports: 'Ember'
+    },
+    'bower/ember-data/ember-data': {
+      deps: ['ember'],
+      exports: 'DS'
+    },
+    'bower/handlebars/handlebars.runtime': {
+      exports: 'Handlebars'
+    },
+    'bower/reflux/dist/reflux.js': {
+      deps: ['react'],
+      exports: 'Reflux'
+    },
+    'vendor/FileAPI/FileAPI.min': {
+      deps: ['jquery', 'vendor/FileAPI/config'],
+      exports: 'FileAPI'
+    },
+    'fixed-data-table': {
+      deps: ['object_assign', 'react'],
+      exports: 'fixed-data-table'
+    },
+    'vendor/bootstrap-select/bootstrap-select' : {
+      deps: ['jquery'],
+      exports: '$'
+    },
+    'vendor/jquery.jcrop': {
+      deps: ['jquery'],
+      exports: '$'
+    },
+    'vendor/jquery.smartbanner': {
+      deps: ['jquery'],
+      exports: '$'
+    },
+    'vendor/md5': {
+      exports: 'CryptoJS'
+    },
+    'handlebars': {
+      deps: ['bower/handlebars/handlebars.runtime.amd'],
+      exports: 'Handlebars'
+    },
+    'vendor/i18n': {
+      exports: 'I18n'
+    },
+    'vendor/react-infinite-scroll.min' : {
+      deps: ['react'],
+      exports: 'InfiniteScroll'
+    },
+    'bower/tinymce/tinymce' : {
+      exports: 'tinymce'
+    },
+    'bower/axios/dist/axios' : {
+      exports: 'axios'
+    },
+    'bower/tinymce/themes/modern/theme' : {
+      deps: ['bower/tinymce/tinymce'],
+      exports: 'tinymce'
+    }
+  }
+,
+      map: {"canvas_quizzes":{"lodash":"underscore","d3":"vendor\/d3.v3","backbone":"vendor\/backbone","jquery\/instructure_date_and_time":"jquery.instructure_date_and_time","react":"old_unsupported_dont_use_react","react-router":"old_unsupported_dont_use_react-router"},"*":{"React":"react"}},
+      waitSeconds: 60
+    };
+</script>
+
+  <script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/vendor/require-749d0c60e9.js"></script>
+
+<script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/compiled/bundles/common-c72deef4f9.js"></script>
+<script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/compiled/bundles/legacy/external_tools_tool_show-9bdbf7a803.js"></script>
+<script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/compiled/bundles/external_tool_redirect-821f8da478.js"></script>
+<script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/compiled/bundles/module_sequence_footer-edd2e800ce.js"></script>
+<script src="https://du11hjcvx0uqb.cloudfront.net/dist/optimized/compiled/bundles/navigation_header-c3b6fef525.js"></script>
+<script>
+//<![CDATA[
+          require(['jquery'], function () {
+            ["https:\/\/instructure-uploads.s3.amazonaws.com\/account_70000000000010\/attachments\/40660842\/newUIcanvabadges-plus-tracking.js?AWSAccessKeyId=AKIAJFNFXH2V2O7RPCAA\u0026Expires=1931096420\u0026Signature=8caL6WA8E70VZLhB66zcvEzucL4%3D\u0026response-cache-control=Cache-Control%3Amax-age%3D473364000%2C%20public\u0026response-expires=473364000"].forEach(function (src) {
+              var s = document.createElement('script');
+              s.src = src;
+              document.body.appendChild(s);
+            });
+          });
+
+//]]>
+</script>
+
+
+
+  <script>
+  // Determines if the scripts are loaded.
+  // When we get everything out of the views, and have a single top-level
+  // `require`, this becomes meaningless and will be abandoned.
+  (function() {
+    var attempts = 0;
+    var timeout = 10;
+    var check = function() {
+      attempts++;
+      var done = !window.requirejs.s.contexts._.defQueue.length
+      var giveup = attempts === 100; // 1 second
+      if (done || giveup) {
+        var className = document.documentElement.className;
+        document.documentElement.className = className.replace(/scripts-not-loaded/, '');
+        return;
+      }
+      setTimeout(check, timeout);
+    };
+
+    check();
+  }).call(this);
+  </script>
+
+
+</div> <!-- #application -->
+</body>
+</html>

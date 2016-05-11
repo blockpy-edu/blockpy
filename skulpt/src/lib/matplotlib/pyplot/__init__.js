@@ -50,6 +50,14 @@ jsplotlib.rc = {
 
 var chart_counter = 0; // for creating unique ids
 
+jsplotlib.Bars = function(xdata, ydata) {
+    var that = {};
+    
+    // Initialize parameter defaults
+    that._x = xdata;
+    that._y = ydata;
+}
+
 /** Line2D class for encapsulating all line relevant attributes and methods
         Rebuilds partial matplotlib.Line2D functionality. Does not inherit from
         abstract Artist class. Rather more a data representation.

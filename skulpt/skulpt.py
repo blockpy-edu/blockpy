@@ -716,7 +716,8 @@ var printError = function(error) {{
     if (error.constructor == Sk.builtin.NameError
         && error.args.v.length > 0
         && error.args.v[0].v == "name '___' is not defined") {{
-        print("EXCEPTION: DanglingBlocksError");
+        print("EXCEPTION: "+error.tp$name);
+        //print("EXCEPTION: DanglingBlocksError");
     }} else {{
         print("EXCEPTION: "+error.tp$name);
     }}
@@ -735,7 +736,7 @@ Sk.misceval.asyncToPromise(function() {{
     // Trace table
     var traceTable = []; //JSON.stringify(data.$d);
     // Run instructor's code
-    Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ }} }});
+    /*Sk.configure({{read:read, python3:true, debugging:false, output: function(text) {{ }} }});
     instructor_code += "\\nresult = on_run('''"+student_code+"''', "+
                   JSON.stringify(outputList)+", "+
                   JSON.stringify(traceTable)+")";
@@ -745,10 +746,12 @@ Sk.misceval.asyncToPromise(function() {{
         var result = data.$d.result.v;
         print(result);
     }}, function(e) {{
-        printError(e);
-    }});
+        //printError(e);
+        print("UNCAUGHT EXCEPTION: " + e);
+    }});*/
 }}, function(e) {{
-    printError(e);
+    //printError(e);
+    print(e);
 }});""".format(student_code_filename=student_code, 
                instructor_code_filename=instructor_code))
     f.close()
@@ -779,9 +782,9 @@ def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
     f.write("""
 var input = read('%s');
 var outputList = [];
-print("-----");
-print(input);
-print("-----");
+//print("-----");
+//print(input);
+//print("-----");
 Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s, output: function(text) {if (text !== "\\n") {outputList.push(text); }} });
 Sk.misceval.asyncToPromise(function() {
     return Sk.importMain("%s", %s, true);
@@ -792,10 +795,10 @@ Sk.misceval.asyncToPromise(function() {
     //  JSON.stringify(data.$d);
     // Source code
     //  input
-    print("-----");
+    //print("-----");
 }, function(e) {
     print("UNCAUGHT EXCEPTION: " + e);
-    print(e.stack);
+    //print(e.stack);
 });
     """ % (fn, os.path.split(fn)[0], p3on, debugon, modname, dumpJS))
     f.close()

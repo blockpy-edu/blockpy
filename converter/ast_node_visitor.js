@@ -1,5 +1,5 @@
 var filename = '__main__.py';
-var python_source = 'a, b = 0';
+var python_source = 'a, b = 0\nfor x in y:\n    t = 0';
 parse = Sk.parse(filename, python_source);
 ast = Sk.astFromParse(parse.cst, filename, parse.flags);
 
@@ -47,20 +47,31 @@ NodeVisitor.prototype.generic_visit = function(node) {
 }
 function CodeAnalyzer() {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
+    this.id = 0;
 };
 
 CodeAnalyzer.prototype = new NodeVisitor();
+CodeAnalyzer.prototype.visit = function(node) {
+    node._id = this.id;
+    this.id += 1;
+    NodeVisitor.prototype.visit.call(this, node);
+    //console.log(node);
+}
+/*
 CodeAnalyzer.prototype.visit_Num = function(node) {
+    node._id = this.id;
+    this.id += 1;
     console.log(node.n.v);
     // NodeVisitor.prototype.visit_Num.call(this, node);
-};
+};*/
 
 var ca = new CodeAnalyzer();
 var nv = new NodeVisitor();
-console.log("Old", nv, nv.visit(ast));
-console.log("New", ca, ca.visit(ast));
+console.log("Old", nv.visit(ast), nv);
+console.log("New", ca.visit(ast), ca);
 
-console.log((new NodeVisitor()).visit(ast));
+//console.log((new NodeVisitor()).visit(ast));
+console.log(ast);
 
 function AbstractInterpreter() {
     this.identifiers = {

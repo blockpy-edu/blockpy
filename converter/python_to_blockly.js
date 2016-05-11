@@ -31,7 +31,7 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
             xml.appendChild(converted[block]);
         }
     }
-    return {"xml": xmlToString(xml), "error": null};
+    return {"xml": xmlToString(xml), "error": null, "lineMap": this.lineMap};
 }
 
 PythonToBlocks.prototype.identifier = function(node) {
@@ -145,10 +145,11 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     return children;
 }
 
-function block(type, fields, values, settings, mutations, statements) {
+function block(type, lineNumber, fields, values, settings, mutations, statements) {
     var newBlock = document.createElement("block");
     // Settings
     newBlock.setAttribute("type", type);
+    newBlock.setAttribute("line_number", lineNumber);
     for (var setting in settings) {
         var settingValue = settings[setting];
         newBlock.setAttribute(setting, settingValue);
@@ -216,7 +217,7 @@ function block(type, fields, values, settings, mutations, statements) {
 }
 
 raw_block = function(text) {
-    return block("raw_block", { "TEXT": text });
+    return block("raw_block", 0, { "TEXT": text });
 }
 
 PythonToBlocks.prototype.convert = function(node, is_top_level) {
@@ -322,7 +323,7 @@ PythonToBlocks.prototype.FunctionDef = function(node)
     if (decorator_list.length > 0) {
         throw new Error("Decorators are not implemented.");
     }
-    return block("procedures_defnoreturn", {
+    return block("procedures_defnoreturn", node.lineno, {
         "NAME": this.identifier(name)
     }, {
     }, {
@@ -358,7 +359,7 @@ PythonToBlocks.prototype.Return = function(node)
 {
     var value = node.value;
     // No field, one title, one setting
-    return block("procedures_return", {}, {
+    return block("procedures_return", node.lineno, {}, {
         "VALUE": this.convert(value)
     }, {
         "inline": "false"
@@ -387,7 +388,7 @@ PythonToBlocks.prototype.Assign = function(node)
     if (targets.length == 0) {
         throw new Error("Nothing to assign to!");
     } else if (targets.length == 1) {
-        return block("variables_set", {
+        return block("variables_set", node.lineno, {
             "VAR": this.Name_str(targets[0]) //targets
         }, {
             "VALUE": this.convert(value)
@@ -412,7 +413,7 @@ PythonToBlocks.prototype.AugAssign = function(node)
         //TODO
         throw new Error("Only addition is currently supported for augmented assignment!");
     } else {
-        return block("math_change", {
+        return block("math_change", node.lineno, {
             "VAR": this.Name_str(target)
         }, {
             "DELTA": this.convert(value)
@@ -433,11 +434,11 @@ PythonToBlocks.prototype.Print = function(node)
     var nl = node.nl;
     
     if (values.length == 1) {
-        return block("text_print", {}, {
+        return block("text_print", node.lineno, {}, {
             "TEXT": this.convert(values[0])
         });
     } else {
-        return block("text_print_multiple", {}, 
+        return block("text_print_multiple", node.lineno, {}, 
             this.convertElements("PRINT", values), 
         {
             "inline": "true"
@@ -465,7 +466,7 @@ PythonToBlocks.prototype.For = function(node) {
         throw new Error("Or-else block of For is not implemented.");
     }
     
-    return block("controls_forEach", {
+    return block("controls_forEach", node.lineno, {
         "VAR": this.Name_str(target)
     }, {
         "LIST": this.convert(iter)
@@ -489,7 +490,7 @@ PythonToBlocks.prototype.While = function(node) {
         // TODO
         throw new Error("Or-else block of While is not implemented.");
     }
-    return block("controls_while", {}, {
+    return block("controls_while", node.lineno, {}, {
         "BOOL": this.convert(test)
     }, {}, {}, {
         "DO": this.convertBody(body)
@@ -538,7 +539,7 @@ PythonToBlocks.prototype.If = function(node)
         }
     }
     
-    return block("controls_if", {
+    return block("controls_if", node.lineno, {
     }, IF_values, {
         "inline": "false"
     }, {
@@ -672,7 +673,7 @@ PythonToBlocks.prototype.Expr = function(node, is_top_level) {
     } else if (is_top_level === true) {
         return [this.convert(value)];
     } else {
-        return block("raw_empty", {}, {
+        return block("raw_empty", node.lineno, {}, {
             "VALUE": this.convert(value)
         });
     }
@@ -690,8 +691,8 @@ PythonToBlocks.prototype.Pass = function() {
  *
  *
  */
-PythonToBlocks.prototype.Break = function() {
-    return block("controls_flow_statements", {
+PythonToBlocks.prototype.Break = function(node) {
+    return block("controls_flow_statements", node.lineno, {
         "FLOW": "BREAK"
     });
 }
@@ -700,8 +701,8 @@ PythonToBlocks.prototype.Break = function() {
  *
  *
  */
-PythonToBlocks.prototype.Continue = function() {
-    return block("controls_flow_statements", {
+PythonToBlocks.prototype.Continue = function(node) {
+    return block("controls_flow_statements", node.lineno, {
         "FLOW": "CONTINUE"
     });
 }
@@ -730,7 +731,7 @@ PythonToBlocks.prototype.BoolOp = function(node) {
     var op = node.op;
     var values = node.values;
     // TODO: is there ever a case where it's != 2 values?
-    return block("logic_operation", {
+    return block("logic_operation", node.lineno, {
         "OP": this.booleanOperator(op)
     }, {
         "A": this.convert(values[0]),
@@ -762,7 +763,7 @@ PythonToBlocks.prototype.BinOp = function(node)
     var left = node.left;
     var op = node.op;
     var right = node.right;
-    return block("math_arithmetic", {
+    return block("math_arithmetic", node.lineno, {
         "OP": this.binaryOperator(op) // TODO
     }, {
         "A": this.convert(left),
@@ -781,7 +782,7 @@ PythonToBlocks.prototype.UnaryOp = function(node)
     var op = node.op;
     var operand = node.operand;
     if (op.name == "Not") {
-        return block("logic_negate", {}, {
+        return block("logic_negate", node.lineno, {}, {
             "BOOL": this.convert(operand) 
         }, {
             "inline": "false"
@@ -832,7 +833,7 @@ PythonToBlocks.prototype.Dict = function(node) {
         valueList["VALUE"+i] = this.convert(values[i]);
     }
     
-    return block("dicts_create_with", keyList, valueList, {
+    return block("dicts_create_with", node.lineno, keyList, valueList, {
         "inline": "false"
     }, {
         "@items": keys.length
@@ -934,7 +935,7 @@ PythonToBlocks.prototype.Compare = function(node)
     if (ops.length != 1) {
         throw new Error("Only one comparison operator is supported");
     } else if (ops[0].name == "In" || ops[0].name == "NotIn") {
-        return block("logic_isIn", {
+        return block("logic_isIn", node.lineno, {
             "OP": this.compareOperator(ops[0])
         }, {
             "ITEM": this.convert(left),
@@ -943,7 +944,7 @@ PythonToBlocks.prototype.Compare = function(node)
             "inline": "true"
         });
     } else {
-        return block("logic_compare", {
+        return block("logic_compare", node.lineno, {
             "OP": this.compareOperator(ops[0])
         }, {
             "A": this.convert(left),
@@ -1018,11 +1019,11 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
         var module = this.identifier(func.value.id);
         if (module == "plt" && name == "plot") {
             if (args.length == 1) {
-                return [block("plot_line", {}, {
+                return [block("plot_line", func.lineno, {}, {
                     "y_values": this.convert(args[0])
                 }, {"inline": "false"})];
             } else if (args.length == 2) {
-                return [block("plot_lineXY", {}, {
+                return [block("plot_lineXY", func.lineno, {}, {
                     "x_values": this.convert(args[0]),
                     "y_values": this.convert(args[1])
                 }, {"inline": "false"})];
@@ -1054,9 +1055,9 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                 fields[first] = second;
             }
             if (isExpression) {
-                return block(blockName, fields);
+                return block(blockName, func.lineno, fields);
             } else {
-                return [block(blockName, fields)];
+                return [block(blockName, func.lineno, fields)];
             }
         }
     } 
@@ -1067,20 +1068,20 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                     throw new Error("Incorrect number of arguments to .append");
                 }
                 // Return as statement
-                return [block("lists_append", {}, {
+                return [block("lists_append", func.lineno, {}, {
                     "ITEM": this.convert(args[0]),
                     "LIST": this.convert(func.value)
                 }, {
                     "inline": "true"
                 })];
             case "strip":
-                return block("text_trim", { "MODE": "BOTH" }, 
+                return block("text_trim", func.lineno, { "MODE": "BOTH" }, 
                     { "TEXT": this.convert(func.value) });
             case "lstrip":
-                return block("text_trim", { "MODE": "LEFT" }, 
+                return block("text_trim", func.lineno, { "MODE": "LEFT" }, 
                     { "TEXT": this.convert(func.value) });
             case "rstrip":
-                return block("text_trim", { "MODE": "RIGHT" }, 
+                return block("text_trim", func.lineno, { "MODE": "RIGHT" }, 
                     { "TEXT": this.convert(func.value) });
             default: throw new Error("Unknown function call!");
         }
@@ -1117,26 +1118,26 @@ PythonToBlocks.prototype.Call = function(node) {
             switch (this.identifier(func.id)) {
                 case "print":
                     if (args.length == 1) {
-                        return [block("text_print", {}, {
+                        return [block("text_print", node.lineno, {}, {
                             "TEXT": this.convert(args[0])})];
                     } else {
-                        return [block("text_print_multiple", {}, 
+                        return [block("text_print_multiple", node.lineno, {}, 
                             this.convertElements("PRINT", args), 
                             {"inline": "true"
                             }, { "@items": args.length})];
                     }
                 case "abs":
-                    return block("math_single", {"OP": "ABS"}, {"NUM": this.convert(args[0])})
+                    return block("math_single", node.lineno, {"OP": "ABS"}, {"NUM": this.convert(args[0])})
                 case "round":
-                    return block("math_round", {"OP": "ROUND"}, {"NUM": this.convert(args[0])})
+                    return block("math_round", node.lineno, {"OP": "ROUND"}, {"NUM": this.convert(args[0])})
                 case "sum":
-                    return block("math_on_list", {"OP": "SUM"}, {"LIST": this.convert(args[0])})
+                    return block("math_on_list", node.lineno, {"OP": "SUM"}, {"LIST": this.convert(args[0])})
                 case "min":
-                    return block("math_on_list", {"OP": "MIN"}, {"LIST": this.convert(args[0])})
+                    return block("math_on_list", node.lineno, {"OP": "MIN"}, {"LIST": this.convert(args[0])})
                 case "max":
-                    return block("math_on_list", {"OP": "MAX"}, {"LIST": this.convert(args[0])})
+                    return block("math_on_list", node.lineno, {"OP": "MAX"}, {"LIST": this.convert(args[0])})
                 case "len":
-                    return block("lists_length", {}, {"VALUE": this.convert(args[0])})
+                    return block("lists_length", node.lineno, {}, {"VALUE": this.convert(args[0])})
                 default:
                     if (starargs !== null && starargs.length > 0) {
                         throw new Error("*args (variable arguments) are not implemented yet.");
@@ -1149,7 +1150,7 @@ PythonToBlocks.prototype.Call = function(node) {
                         arguments["ARG"+i] = this.convert(args[i]);
                         argumentsMutation[i] = this.convert(args[i]);
                     }
-                    return block("procedures_callreturn", {}, arguments, {
+                    return block("procedures_callreturn", node.lineno, {}, arguments, {
                         "inline": "false"
                     }, argumentsMutation);
             }
@@ -1177,7 +1178,7 @@ PythonToBlocks.prototype.Repr = function(node)
 PythonToBlocks.prototype.Num = function(node)
 {
     var n = node.n;
-    return block("math_number", {"NUM": Sk.ffi.remapToJs(n)});
+    return block("math_number", node.lineno, {"NUM": Sk.ffi.remapToJs(n)});
 }
 
 /*
@@ -1187,7 +1188,7 @@ PythonToBlocks.prototype.Num = function(node)
 PythonToBlocks.prototype.Str = function(node)
 {
     var s = node.s;
-    return block("text", {"TEXT": Sk.ffi.remapToJs(s)});
+    return block("text", node.lineno, {"TEXT": Sk.ffi.remapToJs(s)});
 }
 
 PythonToBlocks.prototype.Str_value = function(node) {
@@ -1223,13 +1224,13 @@ PythonToBlocks.prototype.Subscript = function(node)
     var ctx = node.ctx;
     
     if (slice.value._astname == "Str") {
-        return block("dict_get_literal", {
+        return block("dict_get_literal", node.lineno, {
             "ITEM": this.Str_value(slice.value)
         }, {
             "DICT": this.convert(value)
         });
     } else if (slice.value._astname == "Num") {
-        return block("lists_index", {}, {
+        return block("lists_index", node.lineno, {}, {
             "ITEM": this.convert(slice.value),
             "LIST": this.convert(value),
         });
@@ -1248,13 +1249,13 @@ PythonToBlocks.prototype.Name = function(node)
     var ctx = node.ctx;
     switch (this.Name_str(node)) {
         case "True":
-            return block("logic_boolean", {"BOOL": "TRUE"});
+            return block("logic_boolean", node.lineno, {"BOOL": "TRUE"});
         case "False":
-            return block("logic_boolean", {"BOOL": "FALSE"});
+            return block("logic_boolean", node.lineno, {"BOOL": "FALSE"});
         case "___":
             return null;
         default:
-            return block('variables_get', {
+            return block('variables_get', node.lineno, {
                 "VAR": this.identifier(id)
             });
     }
@@ -1288,7 +1289,7 @@ PythonToBlocks.prototype.List = function(node) {
     var elts = node.elts;
     var ctx = node.ctx;
     
-    return block("lists_create_with", {}, 
+    return block("lists_create_with", node.lineno, {}, 
         this.convertElements("ADD", elts)
     , {
         "inline": "false"
