@@ -66,19 +66,20 @@ Code.LANGUAGE_NAME = {
   'sk': 'Slovenčina',
   'sr': 'Српски',
   'sv': 'Svenska',
+  'ta': 'தமிழ்',
   'th': 'ภาษาไทย',
   'tlh': 'tlhIngan Hol',
   'tr': 'Türkçe',
   'uk': 'Українська',
   'vi': 'Tiếng Việt',
-  'zh-hans': '簡體中文',
+  'zh-hans': '简体中文',
   'zh-hant': '正體中文'
 };
 
 /**
  * List of RTL languages.
  */
-Code.LANGUAGE_RTL = ['ar', 'fa', 'he'];
+Code.LANGUAGE_RTL = ['ar', 'fa', 'he', 'lki'];
 
 /**
  * Blockly's main workspace.
@@ -138,11 +139,11 @@ Code.loadBlocks = function(defaultXml) {
     // Language switching stores the blocks during the reload.
     delete window.sessionStorage.loadOnceBlocks;
     var xml = Blockly.Xml.textToDom(loadOnce);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if (defaultXml) {
     // Load the editor with default starting blocks.
     var xml = Blockly.Xml.textToDom(defaultXml);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if ('BlocklyStorage' in window) {
     // Restore saved blocks in a separate thread so that subsequent
     // initialization is not affected from a failed load.
@@ -243,7 +244,7 @@ Code.LANG = Code.getLang();
  * List of tab names.
  * @private
  */
-Code.TABS_ = ['blocks', 'javascript', 'php', 'python', 'dart', 'xml'];
+Code.TABS_ = ['blocks', 'javascript', 'php', 'python', 'dart', 'lua', 'xml'];
 
 Code.selected = 'blocks';
 
@@ -269,7 +270,7 @@ Code.tabClick = function(clickedName) {
     }
     if (xmlDom) {
       Code.workspace.clear();
-      Blockly.Xml.domToWorkspace(Code.workspace, xmlDom);
+      Blockly.Xml.domToWorkspace(xmlDom, Code.workspace);
     }
   }
 
@@ -340,6 +341,14 @@ Code.renderContent = function() {
       code = prettyPrintOne(code, 'dart');
       content.innerHTML = code;
     }
+  } else if (content.id == 'content_lua') {
+    code = Blockly.Lua.workspaceToCode(Code.workspace);
+    content.textContent = code;
+    if (typeof prettyPrintOne == 'function') {
+      code = content.innerHTML;
+      code = prettyPrintOne(code, 'lua');
+      content.innerHTML = code;
+    }
   }
 };
 
@@ -384,7 +393,9 @@ Code.init = function() {
        media: '../../media/',
        rtl: rtl,
        toolbox: toolbox,
-       zoom: {enabled: true}
+       zoom:
+           {controls: true,
+            wheel: true}
       });
 
   // Add to reserved word list: Local variables in execution environment (runJS)
@@ -512,9 +523,11 @@ Code.runJS = function() {
 Code.discard = function() {
   var count = Code.workspace.getAllBlocks().length;
   if (count < 2 ||
-      window.confirm(MSG['discard'].replace('%1', count))) {
+      window.confirm(Blockly.Msg.DELETE_ALL_BLOCKS.replace('%1', count))) {
     Code.workspace.clear();
-    window.location.hash = '';
+    if (window.location.hash) {
+      window.location.hash = '';
+    }
   }
 };
 

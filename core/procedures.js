@@ -152,53 +152,65 @@ Blockly.Procedures.rename = function(text) {
 
 /**
  * Construct the blocks required by the flyout for the procedure category.
- * @param {!Array.<!Blockly.Block>} blocks List of blocks to show.
- * @param {!Array.<number>} gaps List of widths between blocks.
- * @param {number} margin Standard margin width for calculating gaps.
- * @param {!Blockly.Workspace} workspace The flyout's workspace.
+ * @param {!Blockly.Workspace} workspace The workspace contianing procedures.
+ * @return {!Array.<!Element>} Array of XML block elements.
  */
-Blockly.Procedures.flyoutCategory = function(blocks, gaps, margin, workspace) {
+Blockly.Procedures.flyoutCategory = function(workspace) {
+  var xmlList = [];
   if (Blockly.Blocks['procedures_defnoreturn']) {
-    var block = Blockly.Block.obtain(workspace, 'procedures_defnoreturn');
-    block.initSvg();
-    blocks.push(block);
-    gaps.push(margin * 2);
+    // <block type="procedures_defnoreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_defnoreturn');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
   }
   if (Blockly.Blocks['procedures_defreturn']) {
-    var block = Blockly.Block.obtain(workspace, 'procedures_defreturn');
-    block.initSvg();
-    blocks.push(block);
-    gaps.push(margin * 2);
+    // <block type="procedures_defreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_defreturn');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
   }
   if (Blockly.Blocks['procedures_ifreturn']) {
-    var block = Blockly.Block.obtain(workspace, 'procedures_ifreturn');
-    block.initSvg();
-    blocks.push(block);
-    gaps.push(margin * 2);
+    // <block type="procedures_ifreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_ifreturn');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
   }
-  if (gaps.length) {
+  if (xmlList.length) {
     // Add slightly larger gap between system blocks and user calls.
-    gaps[gaps.length - 1] = margin * 3;
+    xmlList[xmlList.length - 1].setAttribute('gap', 24);
   }
 
   function populateProcedures(procedureList, templateName) {
-    for (var x = 0; x < procedureList.length; x++) {
-      var block = Blockly.Block.obtain(workspace, templateName);
-      block.setFieldValue(procedureList[x][0], 'NAME');
-      var tempIds = [];
-      for (var t = 0; t < procedureList[x][1].length; t++) {
-        tempIds[t] = 'ARG' + t;
+    for (var i = 0; i < procedureList.length; i++) {
+      var name = procedureList[i][0];
+      var args = procedureList[i][1];
+      // <block type="procedures_callnoreturn" gap="16">
+      //   <mutation name="do something">
+      //     <arg name="x"></arg>
+      //   </mutation>
+      // </block>
+      var block = goog.dom.createDom('block');
+      block.setAttribute('type', templateName);
+      block.setAttribute('gap', 16);
+      var mutation = goog.dom.createDom('mutation');
+      mutation.setAttribute('name', name);
+      block.appendChild(mutation);
+      for (var t = 0; t < args.length; t++) {
+        var arg = goog.dom.createDom('arg');
+        arg.setAttribute('name', args[t]);
+        mutation.appendChild(arg);
       }
-      block.setProcedureParameters(procedureList[x][1], tempIds);
-      block.initSvg();
-      blocks.push(block);
-      gaps.push(margin * 2);
+      xmlList.push(block);
     }
   }
 
-  var tuple = Blockly.Procedures.allProcedures(workspace.targetWorkspace);
+  var tuple = Blockly.Procedures.allProcedures(workspace);
   populateProcedures(tuple[0], 'procedures_callnoreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
+  return xmlList;
 };
 
 /**
@@ -239,16 +251,28 @@ Blockly.Procedures.disposeCallers = function(name, workspace) {
 /**
  * When a procedure definition changes its parameters, find and edit all its
  * callers.
- * @param {string} name Name of edited procedure definition.
- * @param {!Blockly.Workspace} workspace The workspace to delete callers from.
- * @param {!Array.<string>} paramNames Array of new parameter names.
- * @param {!Array.<string>} paramIds Array of unique parameter IDs.
+ * @param {!Blockly.Block} defBlock Procedure definition block.
  */
-Blockly.Procedures.mutateCallers = function(name, workspace,
-                                            paramNames, paramIds) {
-  var callers = Blockly.Procedures.getCallers(name, workspace);
-  for (var i = 0; i < callers.length; i++) {
-    callers[i].setProcedureParameters(paramNames, paramIds);
+Blockly.Procedures.mutateCallers = function(defBlock) {
+  var oldRecordUndo = Blockly.Events.recordUndo;
+  var name = defBlock.getProcedureDef()[0];
+  var xmlElement = defBlock.mutationToDom(true);
+  var callers = Blockly.Procedures.getCallers(name, defBlock.workspace);
+  for (var i = 0, caller; caller = callers[i]; i++) {
+    var oldMutationDom = caller.mutationToDom();
+    var oldMutation = oldMutationDom && Blockly.Xml.domToText(oldMutationDom);
+    caller.domToMutation(xmlElement);
+    var newMutationDom = caller.mutationToDom();
+    var newMutation = newMutationDom && Blockly.Xml.domToText(newMutationDom);
+    if (oldMutation != newMutation) {
+      // Fire a mutation on every caller block.  But don't record this as an
+      // undo action since it is deterministically tied to the procedure's
+      // definition mutation.
+      Blockly.Events.recordUndo = false;
+      Blockly.Events.fire(new Blockly.Events.Change(
+          caller, 'mutation', null, oldMutation, newMutation));
+      Blockly.Events.recordUndo = oldRecordUndo;
+    }
   }
 };
 

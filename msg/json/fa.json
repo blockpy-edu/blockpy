@@ -6,7 +6,8 @@
 			"Alirezaaa",
 			"Mehran",
 			"MohandesWiki",
-			"Dalba"
+			"Dalba",
+			"Hamisun"
 		]
 	},
 	"VARIABLES_DEFAULT_NAME": "مورد",
@@ -18,6 +19,8 @@
 	"INLINE_INPUTS": "ورودی‌های درون خطی",
 	"DELETE_BLOCK": "حذف بلوک",
 	"DELETE_X_BLOCKS": "حذف بلوک‌های %1",
+	"DELETE_ALL_BLOCKS": "حذف همهٔ بلاک‌های %1؟",
+	"CLEAN_UP": "تمیز کردن بلوک‌ها",
 	"COLLAPSE_BLOCK": "فروپاشی بلوک",
 	"COLLAPSE_ALL": "فروپاشی بلوک‌ها",
 	"EXPAND_BLOCK": "گسترش بلوک",
@@ -25,6 +28,8 @@
 	"DISABLE_BLOCK": "غیرفعال‌سازی بلوک",
 	"ENABLE_BLOCK": "فعال‌سازی بلوک",
 	"HELP": "راهنما",
+	"UNDO": "واگردانی",
+	"REDO": "واگردانی",
 	"CHAT": "با همکارتان با نوشتن در این کادر چت کنید!",
 	"AUTH": "لطفا این اپلیکیشن را ثبت کنید و آثارتان را فعال کنید تا ذخیره شود و اجازهٔ اشتراک‌گذاری توسط شما داده شود.",
 	"ME": "من",
@@ -229,7 +234,7 @@
 	"LISTS_INLIST": "در فهرست",
 	"LISTS_INDEX_OF_FIRST": "یافتن اولین رخ‌داد مورد",
 	"LISTS_INDEX_OF_LAST": "یافتن آخرین رخ‌داد مورد",
-	"LISTS_INDEX_OF_TOOLTIP": "شاخصی از اولین/آخرین رخ‌داد مورد در فهرست را بر می‌گرداند. ۰ بر می‌گرداند اگر متن موجود نبود.",
+	"LISTS_INDEX_OF_TOOLTIP": "شاخصی از اولین/آخرین رخ‌داد مورد در فهرست را بر می‌گرداند. ۰ بر می‌گرداند اگر آیتم موجود نبود.",
 	"LISTS_GET_INDEX_GET": "گرفتن",
 	"LISTS_GET_INDEX_GET_REMOVE": "گرفتن و حذف‌کردن",
 	"LISTS_GET_INDEX_REMOVE": "حذف‌کردن",

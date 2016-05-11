@@ -11,7 +11,10 @@
 			"Rodrigo codignoli",
 			"Webysther",
 			"Fasouzafreitas",
-			"Almondega"
+			"Almondega",
+			"Rogerio Melfi",
+			"Caçador de Palavras",
+			"Luk3"
 		]
 	},
 	"VARIABLES_DEFAULT_NAME": "item",
@@ -23,6 +26,8 @@
 	"INLINE_INPUTS": "Entradas incorporadas",
 	"DELETE_BLOCK": "Remover bloco",
 	"DELETE_X_BLOCKS": "Remover %1 blocos",
+	"DELETE_ALL_BLOCKS": "Apagar todos os %1 blocos?",
+	"CLEAN_UP": "Limpar blocos",
 	"COLLAPSE_BLOCK": "Recolher bloco",
 	"COLLAPSE_ALL": "Recolher blocos",
 	"EXPAND_BLOCK": "Expandir bloco",
@@ -30,6 +35,8 @@
 	"DISABLE_BLOCK": "Desabilitar bloco",
 	"ENABLE_BLOCK": "Habilitar bloco",
 	"HELP": "Ajuda",
+	"UNDO": "Desfazer",
+	"REDO": "Refazer",
 	"CHAT": "Converse com o seu colaborador digitando nesta caixa!",
 	"AUTH": "Por favor autorize este aplicativo para permitir que o seu trabalho seja gravado e que ele seja compartilhado por você.",
 	"ME": "Eu",
@@ -230,11 +237,11 @@
 	"LISTS_LENGTH_TITLE": "tamanho de %1",
 	"LISTS_LENGTH_TOOLTIP": "Retorna o tamanho de uma lista.",
 	"LISTS_ISEMPTY_TITLE": "%1 é vazia",
-	"LISTS_ISEMPTY_TOOLTIP": "Retona verdadeiro se a lista estiver vazia.",
+	"LISTS_ISEMPTY_TOOLTIP": "Retorna ao verdadeiro se a lista estiver vazia.",
 	"LISTS_INLIST": "na lista",
 	"LISTS_INDEX_OF_FIRST": "encontre a primeira ocorrência do item",
 	"LISTS_INDEX_OF_LAST": "encontre a última ocorrência do item",
-	"LISTS_INDEX_OF_TOOLTIP": "Retorna a posição da primeira/última ocorrência do item na lista.  Retorna 0 se o texto não for encontrado.",
+	"LISTS_INDEX_OF_TOOLTIP": "Retorna o índice da primeira/última ocorrência do item na lista.  Retorna 0 se o item não for encontrado.",
 	"LISTS_GET_INDEX_GET": "obter",
 	"LISTS_GET_INDEX_GET_REMOVE": "obter e remover",
 	"LISTS_GET_INDEX_REMOVE": "remover",
@@ -293,6 +300,7 @@
 	"PROCEDURES_BEFORE_PARAMS": "com:",
 	"PROCEDURES_CALL_BEFORE_PARAMS": "com:",
 	"PROCEDURES_DEFNORETURN_TOOLTIP": "Cria uma função que não tem retorno.",
+	"PROCEDURES_DEFNORETURN_COMMENT": "Descreva esta função...",
 	"PROCEDURES_DEFRETURN_RETURN": "retorna",
 	"PROCEDURES_DEFRETURN_TOOLTIP": "Cria uma função que possui um valor de retorno.",
 	"PROCEDURES_ALLOW_STATEMENTS": "permitir declarações",
@@ -308,5 +316,6 @@
 	"PROCEDURES_HIGHLIGHT_DEF": "Destacar definição da função",
 	"PROCEDURES_CREATE_DO": "Criar \"%1\"",
 	"PROCEDURES_IFRETURN_TOOLTIP": "Se um valor é verdadeiro, então retorna um valor.",
+	"PROCEDURES_IFRETURN_HELPURL": "http://c2.com/cgi/wiki?GuardClause",
 	"PROCEDURES_IFRETURN_WARNING": "Atenção: Este bloco só pode ser utilizado dentro da definição de uma função."
 }
