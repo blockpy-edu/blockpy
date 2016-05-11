@@ -91,6 +91,10 @@ Blockly.Python.PASS = '    pass\n';
  * @param {!Blockly.Workspace} workspace Workspace to generate code from.
  */
 Blockly.Python.init = function(workspace) {
+  /**
+   * Empty loops or conditionals are not allowed in Python.
+   */
+  Blockly.Python.PASS = this.INDENT + 'pass\n';
   // Create a dictionary of definitions to be printed before the code.
   Blockly.Python.definitions_ = Object.create(null);
   // Create a dictionary mapping desired function names in definitions_

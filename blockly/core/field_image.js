@@ -67,32 +67,35 @@ Blockly.FieldImage.prototype.EDITABLE = false;
 
 /**
  * Install this image on a block.
- * @param {!Blockly.Block} block The block containing this text.
  */
-Blockly.FieldImage.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.FieldImage.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Image has already been initialized once.
     return;
   }
-  this.sourceBlock_ = block;
   // Build the DOM.
+  /** @type {SVGElement} */
   this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
   if (!this.visible_) {
     this.fieldGroup_.style.display = 'none';
   }
+  /** @type {SVGElement} */
   this.imageElement_ = Blockly.createSvgElement('image',
       {'height': this.height_ + 'px',
        'width': this.width_ + 'px'}, this.fieldGroup_);
   this.setValue(this.src_);
   if (goog.userAgent.GECKO) {
-    // Due to a Firefox bug which eats mouse events on image elements,
-    // a transparent rectangle needs to be placed on top of the image.
+    /**
+     * Due to a Firefox bug which eats mouse events on image elements,
+     * a transparent rectangle needs to be placed on top of the image.
+     * @type {SVGElement}
+     */
     this.rectElement_ = Blockly.createSvgElement('rect',
         {'height': this.height_ + 'px',
          'width': this.width_ + 'px',
          'fill-opacity': 0}, this.fieldGroup_);
   }
-  block.getSvgRoot().appendChild(this.fieldGroup_);
+  this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
 
   // Configure the field to be transparent with respect to tooltips.
   var topElement = this.rectElement_ || this.imageElement_;

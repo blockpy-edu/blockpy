@@ -143,6 +143,13 @@ Blockly.Css.CONTENT = [
     'z-index: 999;',
   '}',
 
+  '.blocklyNonSelectable {',
+    'user-select: none;',
+    '-moz-user-select: none;',
+    '-webkit-user-select: none;',
+    '-ms-user-select: none;',
+  '}',
+
   '.blocklyTooltipDiv {',
     'background-color: #ffffc7;',
     'border: 1px solid #ddc;',
@@ -276,6 +283,16 @@ Blockly.Css.CONTENT = [
     'opacity: .6;',
   '}',
 
+  '.blocklyIconShape {',
+    'fill: #00f;',
+    'stroke: #fff;',
+    'stroke-width: 1px;',
+  '}',
+
+  '.blocklyIconSymbol {',
+    'fill: #fff;',
+  '}',
+
   '.blocklyMinimalBody {',
     'margin: 0;',
     'padding: 0;',
@@ -370,7 +387,7 @@ Blockly.Css.CONTENT = [
 
   '.blocklyAngleGauge {',
     'fill: #f88;',
-    'fill-opacity: .8;  ',
+    'fill-opacity: .8;',
   '}',
 
   '.blocklyAngleLine {',

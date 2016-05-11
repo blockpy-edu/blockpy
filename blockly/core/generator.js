@@ -64,6 +64,13 @@ Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
 Blockly.Generator.prototype.STATEMENT_PREFIX = null;
 
 /**
+ * The method of indenting.  Defaults to two spaces, but language generators
+ * may override this to increase indent or change to tabs.
+ * @type {string}
+ */
+Blockly.Generator.prototype.INDENT = '  ';
+
+/**
  * Generate code for all blocks in the workspace to the specified language.
  * @param {Blockly.Workspace} workspace Workspace to generate code from.
  * @return {string} Generated code.
@@ -169,6 +176,8 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   var code = func.call(block, block);
   if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
+    goog.asserts.assert(block.outputConnection,
+        'Expecting string from statement block "%s".', block.type);
     return [this.scrub_(block, code[0]), code[1]];
   } else if (goog.isString(code)) {
     if (this.STATEMENT_PREFIX) {
@@ -208,8 +217,8 @@ Blockly.Generator.prototype.valueToCode = function(block, name, order) {
   }
   // Value blocks must return code and order of operations info.
   // Statement blocks must only return code.
-  goog.asserts.assertArray(tuple,
-      'Expecting tuple from value block "%s".', targetBlock.type);
+  goog.asserts.assertArray(tuple, 'Expecting tuple from value block "%s".',
+      targetBlock.type);
   var code = tuple[0];
   var innerOrder = tuple[1];
   if (isNaN(innerOrder)) {
@@ -245,8 +254,7 @@ Blockly.Generator.prototype.statementToCode = function(block, name) {
   var code = this.blockToCode(targetBlock);
   // Value blocks must return code and order of operations info.
   // Statement blocks must only return code.
-  goog.asserts.assertString(code,
-      'Expecting code from statement block "%s".',
+  goog.asserts.assertString(code, 'Expecting code from statement block "%s".',
       targetBlock && targetBlock.type);
   if (code) {
     code = this.prefixLines(/** @type {string} */ (code), this.INDENT);
@@ -317,7 +325,7 @@ Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_ = '{leCUI8hutHZI4480Dc}';
  * The code gets output when Blockly.Generator.finish() is called.
  *
  * @param {string} desiredName The desired name of the function (e.g., isPrime).
- * @param {!Array.<string>} code A list of Python statements.
+ * @param {!Array.<string>} code A list of statements.  Use '  ' for indents.
  * @return {string} The actual name of the new function.  This may differ
  *     from desiredName if the former has already been taken by the user.
  * @private
@@ -327,8 +335,15 @@ Blockly.Generator.prototype.provideFunction_ = function(desiredName, code) {
     var functionName =
         this.variableDB_.getDistinctName(desiredName, this.NAME_TYPE);
     this.functionNames_[desiredName] = functionName;
-    this.definitions_[desiredName] = code.join('\n').replace(
+    var codeText = code.join('\n').replace(
         this.FUNCTION_NAME_PLACEHOLDER_REGEXP_, functionName);
+    // Change all '  ' indents into the desired indent.
+    var oldCodeText;
+    while (oldCodeText != codeText) {
+      oldCodeText = codeText;
+      codeText = codeText.replace(/^((  )*)  /gm, '$1' + this.INDENT);
+    }
+    this.definitions_[desiredName] = codeText;
   }
   return this.functionNames_[desiredName];
 };
