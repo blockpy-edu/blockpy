@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block body %}
+
+<h1>Login</h1>
+
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% include "security/_messages.html" %}
+
+<div class='container'>
+<div class="row">
+<div class="col-md-6">
+    <form role="form" class='form-inline' action="{{ url_for_security('login') }}" method="POST" name="login" id='login-form'>
+        {{ login_user_form.hidden_tag() }}
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.email, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.password, class_='form-control') }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ render_field_with_errors(login_user_form.remember, class_='checkbox') }}
+        </div><br>
+        <div class="form-group">
+            {{ login_user_form.submit(class_='btn btn-default') }} or <a href='{{ url_for_security("register") }}'>register</a> or <a href='{{ url_for('security.forgot_password') }}'>reset your password</a>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+
+
+{% endblock %}

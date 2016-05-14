@@ -1,27 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+{% extends 'layout.html' %}
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap.min.css') }}">
-</head>
-<body>
+{% block title %}
+BlockPy
+{% endblock %}
 
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+<script type='text/javascript'>
+</script>
+{% endblock %}
+
+{% block body %}
     <div class="jumbotron" style='padding-top: 20px; padding-bottom: 20px'>
         <div class="container">
             <div class='row'>
                 <div class='col-md-6'>
                     <h1>BlockPy</h1>
-                    <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.</p>
-                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy') }}" role="button">Try BlockPy Now &raquo;</a></p>
+                    <p>BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science, equipped with powerful tools like the State Explorer, and scaffolding beginners with Guided Feedback, the goal of BlockPy is to let you authentically solve real-world problems.</p>
+                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('blockpy.blockpy_canvas') }}" role="button">Try BlockPy Now &raquo;</a></p>
                 </div>
                 
                 <div class='col-md-6'>
+                <br></br>
                     <img src='{{ url_for("static", filename="images/blockly-corgi-logo-large.png") }}' />
                 </div>
             </div>
@@ -33,14 +35,26 @@
             <div class='col-md-4'>
                 <h2>For Instructors</h2>
                 <p>Interested in making BlockPy problems for your class?</p>
-                <p><a href="{{ url_for('blockpy', mode='instructor') }}">Try it now!</a></p>
+                <ul>
+                <li><a href="{{ url_for('blockpy.blockpy_canvas', mode='instructor') }}">Try building problems now!</a></li>
+                <li><a href="{{ url_for('courses.index') }}">See some sample problems!</a></li>
+                <li><a href="https://virginiatech.qualtrics.com/SE/?SID=SV_0UMPv09Ci7gdRCB">Take our survey!</a></li>
+                </ul>
+                <p>Interested in using BlockPy in your course? Check out our <a href='https://groups.google.com/forum/#!forum/blockpy'>Community</a>
+                or get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a></p>
                 <!--<p>Embed BlockPy (<a href="/tool_config.xml">LTI Configuration</a>)</p>-->
             </div>
             
             <div class='col-md-4'>
-                <h2>For Users</h2>
-                <p>Try out the BlockPy sandbox!</p>
-                <p><a href="{{ url_for('blockpy') }}">Learn more!</a></p>
+                <h2>For Developers</h2>
+                <p>BlockPy is 100% open-source!</p>
+                <ul>
+                <li><a href="https://github.com/RealTimeWeb/blockpy">Check out our source code!</a></li>
+                <li><a href="https://github.com/RealTimeWeb/blockpy/issues">Report an issue!</a></li>
+                <li><a href="https://github.com/RealTimeWeb/blockpy/pulls">Submit a Pull Request!</a></li>
+                </ul>
+                <p>Have some ideas for the future of BlockPy? Check out our <a href='https://groups.google.com/forum/#!forum/blockpy'>Community</a>
+                or get in touch with <a href='mailto:acbart@vt.edu'>acbart@vt.edu</a></p>
             </div>
             
             <div class='col-md-4'>
@@ -57,13 +71,4 @@
             
         </div>
     </div>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
-</body>
-</html>
-
-</body>
-</html>
+{% endblock %}

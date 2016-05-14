@@ -5,9 +5,9 @@ function xmlToString(xml) {
     return new XMLSerializer().serializeToString(xml);
 }
 
+
 PythonToBlocks.prototype.convertSource = function(python_source) {
     var xml = document.createElement("xml");
-    xml.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     if (python_source.trim() === "") {
         return {"xml": xmlToString(xml), "error": null};
     }
@@ -44,7 +44,7 @@ PythonToBlocks.prototype.recursiveMeasure = function(node, nextBlockLine) {
     }
     var myNext = nextBlockLine;
     if ("orelse" in node && node.orelse.length > 0) {
-        if (node.orelse.length == 1 && node.orelse[0].constructor.name == "If_") {
+        if (node.orelse.length == 1 && node.orelse[0]._astname == "If") {
             myNext = node.orelse[0].lineno-1;
         } else {
             myNext = node.orelse[0].lineno-1-1;
@@ -220,7 +220,7 @@ raw_block = function(text) {
 }
 
 PythonToBlocks.prototype.convert = function(node, is_top_level) {
-    return this[node.constructor.name](node, is_top_level);
+    return this[node._astname](node, is_top_level);
 }
 
 function arrayMax(array) {
@@ -239,7 +239,6 @@ PythonToBlocks.prototype.convertStatement = function(node, full_source, is_top_l
     try {
         return this.convert(node, is_top_level);
     } catch (e) {
-        console.error(e);
         heights = this.getChunkHeights(node);
         extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
         return raw_block(extractedSource);
@@ -329,7 +328,7 @@ PythonToBlocks.prototype.FunctionDef = function(node)
     }, {
         "inline": "false"
     }, {
-        "args": this.arguments_(args)
+        "arg": this.arguments_(args)
     }, {
         "STACK": this.convertBody(body)
     });
@@ -355,7 +354,7 @@ PythonToBlocks.prototype.ClassDef = function(node)
  * value: expr_ty
  *
  */
-PythonToBlocks.prototype.Return_ = function(node)
+PythonToBlocks.prototype.Return = function(node)
 {
     var value = node.value;
     // No field, one title, one setting
@@ -370,7 +369,7 @@ PythonToBlocks.prototype.Return_ = function(node)
  * targets: asdl_seq
  *
  */
-PythonToBlocks.prototype.Delete_ = function(/* {asdl_seq *} */ targets)
+PythonToBlocks.prototype.Delete = function(/* {asdl_seq *} */ targets)
 {
     this.targets = targets;
     // TODO
@@ -455,7 +454,7 @@ PythonToBlocks.prototype.Print = function(node)
  * orelse: asdl_seq
  *
  */
-PythonToBlocks.prototype.For_ = function(node) {
+PythonToBlocks.prototype.For = function(node) {
     var target = node.target;
     var iter = node.iter;
     var body = node.body;
@@ -482,7 +481,7 @@ PythonToBlocks.prototype.For_ = function(node) {
  * body: asdl_seq
  * orelse: asdl_seq
  */
-PythonToBlocks.prototype.While_ = function(node) {
+PythonToBlocks.prototype.While = function(node) {
     var test = node.test;
     var body = node.body;
     var orelse = node.orelse;
@@ -503,7 +502,7 @@ PythonToBlocks.prototype.While_ = function(node) {
  * orelse: asdl_seq
  *
  */
-PythonToBlocks.prototype.If_ = function(node)
+PythonToBlocks.prototype.If = function(node)
 {
     var test = node.test;
     var body = node.body;
@@ -518,9 +517,9 @@ PythonToBlocks.prototype.If_ = function(node)
     
     // Handle weird orelse stuff
     if (orelse !== undefined) {
-        if (orelse.length == 1 && orelse[0].constructor.name == "If_") {
+        if (orelse.length == 1 && orelse[0]._astname == "If") {
             // This is an 'ELIF'
-            while (orelse.length == 1  && orelse[0].constructor.name == "If_") {
+            while (orelse.length == 1  && orelse[0]._astname == "If") {
                 this.heights.shift();
                 elseifCount += 1;
                 body = orelse[0].body;
@@ -553,7 +552,7 @@ PythonToBlocks.prototype.If_ = function(node)
  * optional_vars: expr_ty
  * body: asdl_seq
  */
-PythonToBlocks.prototype.With_ = function(node)
+PythonToBlocks.prototype.With = function(node)
 {
     var context_expr = node.context_expr;
     var optional_vars = node.optional_vars;
@@ -615,7 +614,7 @@ PythonToBlocks.prototype.Assert = function(node)
  * names: asdl_seq
  *
  */
-PythonToBlocks.prototype.Import_ = function(node)
+PythonToBlocks.prototype.Import = function(node)
 {
     var names = node.names;
     // The import statement isn't used in blockly because it happens implicitly
@@ -691,7 +690,7 @@ PythonToBlocks.prototype.Pass = function() {
  *
  *
  */
-PythonToBlocks.prototype.Break_ = function() {
+PythonToBlocks.prototype.Break = function() {
     return block("controls_flow_statements", {
         "FLOW": "BREAK"
     });
@@ -701,7 +700,7 @@ PythonToBlocks.prototype.Break_ = function() {
  *
  *
  */
-PythonToBlocks.prototype.Continue_ = function() {
+PythonToBlocks.prototype.Continue = function() {
     return block("controls_flow_statements", {
         "FLOW": "CONTINUE"
     });
@@ -711,7 +710,7 @@ PythonToBlocks.prototype.Continue_ = function() {
  * TODO: what does this do?
  *
  */
-PythonToBlocks.prototype.Debugger_ = function() {
+PythonToBlocks.prototype.Debugger = function() {
     return null;
 }
 
@@ -826,7 +825,7 @@ PythonToBlocks.prototype.Dict = function(node) {
     var keyList = [];
     var valueList = [];
     for (var i = 0; i < keys.length; i+= 1) {
-        if (keys[i].constructor.name != "Str") {
+        if (keys[i]._astname != "Str") {
             throw new Error("Dictionary Keys should be Strings.");
         }
         keyList["KEY"+i] = this.Str_value(keys[i]);
@@ -1015,7 +1014,7 @@ PythonToBlocks.prototype.KNOWN_MODULES = {
 PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
 PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
     var name = this.identifier(func.attr);
-    if (func.value.constructor.name == "Name") {
+    if (func.value._astname == "Name") {
         var module = this.identifier(func.value.id);
         if (module == "plt" && name == "plot") {
             if (args.length == 1) {
@@ -1113,37 +1112,46 @@ PythonToBlocks.prototype.Call = function(node) {
     var starargs = node.starargs;
     var kwargs = node.kwargs;
     
-    switch (func.constructor.name) {
+    switch (func._astname) {
         case "Name":
-            if (starargs !== null && starargs.length > 0) {
-                throw new Error("*args (variable arguments) are not implemented yet.");
-            } else if (kwargs !== null && kwargs.length > 0) {
-                throw new Error("**args (keyword arguments) are not implemented yet.");
-            }
-            var arguments = {};
-            var argumentsMutation = {"@name": this.identifier(func.id)};
-            for (var i = 0; i < args.length; i+= 1) {
-                arguments["ARG"+i] = this.convert(args[i]);
-                argumentsMutation[i] = this.convert(args[i]);
-            }
-            if (this.identifier(func.id) == "print") {
-                if (args.length == 1) {
-                    return [block("text_print", {}, {
-                        "TEXT": this.convert(args[0])
-                    })];
-                } else {
-                    return [block("text_print_multiple", {}, 
-                        this.convertElements("PRINT", args), 
-                    {
-                        "inline": "true"
-                    }, {
-                        "@items": args.length
-                    })];
-                }
-            } else {
-                return block("procedures_callreturn", {}, arguments, {
-                    "inline": "false"
-                }, argumentsMutation);
+            switch (this.identifier(func.id)) {
+                case "print":
+                    if (args.length == 1) {
+                        return [block("text_print", {}, {
+                            "TEXT": this.convert(args[0])})];
+                    } else {
+                        return [block("text_print_multiple", {}, 
+                            this.convertElements("PRINT", args), 
+                            {"inline": "true"
+                            }, { "@items": args.length})];
+                    }
+                case "abs":
+                    return block("math_single", {"OP": "ABS"}, {"NUM": this.convert(args[0])})
+                case "round":
+                    return block("math_round", {"OP": "ROUND"}, {"NUM": this.convert(args[0])})
+                case "sum":
+                    return block("math_on_list", {"OP": "SUM"}, {"LIST": this.convert(args[0])})
+                case "min":
+                    return block("math_on_list", {"OP": "MIN"}, {"LIST": this.convert(args[0])})
+                case "max":
+                    return block("math_on_list", {"OP": "MAX"}, {"LIST": this.convert(args[0])})
+                case "len":
+                    return block("lists_length", {}, {"VALUE": this.convert(args[0])})
+                default:
+                    if (starargs !== null && starargs.length > 0) {
+                        throw new Error("*args (variable arguments) are not implemented yet.");
+                    } else if (kwargs !== null && kwargs.length > 0) {
+                        throw new Error("**args (keyword arguments) are not implemented yet.");
+                    }
+                    var arguments = {};
+                    var argumentsMutation = {"@name": this.identifier(func.id)};
+                    for (var i = 0; i < args.length; i+= 1) {
+                        arguments["ARG"+i] = this.convert(args[i]);
+                        argumentsMutation[i] = this.convert(args[i]);
+                    }
+                    return block("procedures_callreturn", {}, arguments, {
+                        "inline": "false"
+                    }, argumentsMutation);
             }
         // Direct function call
         case "Attribute":
@@ -1214,15 +1222,20 @@ PythonToBlocks.prototype.Subscript = function(node)
     var slice = node.slice;
     var ctx = node.ctx;
     
-    if (slice.value.constructor.name !== "Str") {
-        throw new Error("Currently, dictionary access only works for strings!");
+    if (slice.value._astname == "Str") {
+        return block("dict_get_literal", {
+            "ITEM": this.Str_value(slice.value)
+        }, {
+            "DICT": this.convert(value)
+        });
+    } else if (slice.value._astname == "Num") {
+        return block("lists_index", {}, {
+            "ITEM": this.convert(slice.value),
+            "LIST": this.convert(value),
+        });
     }
     
-    return block("dict_get_literal", {
-        "ITEM": this.Str_value(slice.value)
-    }, {
-        "DICT": this.convert(value)
-    });
+    throw new Error("This kind of subscript is not supported.");
 }
 
 /*

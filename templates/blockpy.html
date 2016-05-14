@@ -1,85 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>BlockPy</title>
-    
-    <!-- Style sheets -->
-    {% for css in ['libs/bootstrap.min.css',
-                   'libs/codemirror/codemirror.css',
-                   'libs/font-awesome.min.css',
-                   'libs/summernote/summernote.css',
-                   'kennel/kennel.css'] %}
-        <link rel="stylesheet" href="{{ url_for('static', filename=css) }}">
-    {% endfor %}
-    
-    <!-- Useful snippets -->
-    <script>
-    var storage = {
-        set: function(directive, value) {
-            localStorage.setItem(directive+"_value", value);
-            localStorage.setItem(directive+"_timestamp", $.now());
-        },
-        remove: function(directive) {
-            localStorage.removeItem(directive+"_value");
-            localStorage.removeItem(directive+"_timestamp");
-        },
-        get: function(directive) {
-            return localStorage.getItem(directive+"_value");
-        },
-        has: function(directive) {
-            return localStorage.getItem(directive+"_value") !== null;
-        },
-        // Tests whether the server has the newer version
-        is_new: function(directive, server_time) {
-            var stored_time = localStorage.getItem(directive+"_timestamp");
-            return (server_time >= stored_time+5000);
-        },
-    };
+{% extends 'layout.html' %}
+{% set skip_jquery = True %}
 
-    var timers = {};
-    function addDelay(directive, action, delay) {
-        if (delay === undefined) {
-            delay = 400;
-        }
-        clearTimeout(timers[directive]);
-        timers[directive] = setTimeout(action, delay);
-    }
-    </script>
+{% block title %}
+BlockPy
+{% endblock %}
+
+{% block statusbar %}
+{% endblock %}
+
+{% block extrahead %}
+
+    {% assets "blockpy_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% assets "blockpy_css" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}" />
+    {% endassets %}
     
-    <!-- JQuery, D3, Math.js, Bootstrap -->
-    {% for js in ['libs/jquery.js',
-                   'libs/jquery.hotkeys.js',
-                   'libs/d3.min.js',
-                   'libs/math.0.19.0.min.js',
-                   'libs/bootstrap.min.js',
-                   'libs/bootstrap-wysiwyg.js',
-                   "libs/mindmup-editabletable.js",
-                   "libs/codemirror/codemirror.js",
-                   "libs/codemirror/python.js",
-                   "libs/codemirror/htmlmixed.js",
-                   "libs/codemirror/xml.js",
-                   "libs/summernote/summernote.min.js",
-                   "libs/summernote/summernote-ext-hint.js",
-                   "libs/summernote/summernote-ext-video.js",
-                   "libs/crime_data.js",
-                   "blockly/blockly_compressed.js",
-                   "blockly/blocks_compressed.js",
-                   "blockly/python_compressed.js",
-                   "blockly/javascript_compressed.js",
-                   "blockly/msg/js/en.js",
-                   "skulpt/dist/skulpt.min.js",
-                   "skulpt/dist/skulpt-stdlib.js",
-                   "analyzer/analyzer.js",
-                   "analyzer/python_errors.js",
-                   "converter/python_to_blockly.js",
-                   "kennel/kennel.js",
-                   "converter/renderBlocklyToPng.js"
-                   ] %}
-    <script type="text/javascript" src="{{ url_for('static', filename=js) }}"></script>
-    {% endfor %}
-    
-</head>
+<style>
+.embedded-data {
+    display: none;
+}
+</style>
 
 <script>
 function getQueryParams(){
@@ -135,72 +77,40 @@ $(document).ready(function() {
     kennel = new Kennel(document.getElementById('kennel-div'),
                         mode, // Instructor mode
                         $("#problem-presentation").text(), // problem
-                        body, // Current code
-                        $('#default-on-run').html(), // On run code
-                        "def on_step(code, output, properties):\n    pass", // On step code
-                        "alpha = 0", // Starting code
+                        $("#default-body").text(), // Current code
+                        $('#default-on-run').text(), // On run code
+                        $('#default-on-step').text(), // On step code
+                        $('#default-on-start').text(), // Starting code
                         mode == "instructor",
                         view,
                         "{{ url_for('static', filename='blockly/') }}",
-                        parsons,
-                        { 'save_code': 'blockpy/save',
-                          'load_code': 'blockpy/load',
-                          'save_success': 'blockpy/save',
-                          'load_success': 'blockpy/load',
+                        {'parsons': false, 'read_only': false},
+                        { 'save_code': '{{ url_for("blockpy.save")}}',
+                          'load_code': false,
+                          'save_success': '{{ url_for("blockpy.save")}}',
+                          'load_success': '{{ url_for("blockpy.load")}}',
+                          'load_success': {{ "true" if submission.correct else "false" }},
                           'log_event': ''},
-                        { 'question_id': 'cw-1-blockly',
-                          'student_id': 1,
-                          'book_id': 'compthink'});
+                        { 'question_id': {{ assignment.id }},
+                          'student_id': {{ user.id }},
+                          'book_id': {{ course.id }}});
     if ("url" in params) {
         $.get(decodeURIComponent(params["url"]), function(result) { kennel.setCode(result);});   
-    }    
+    } else if ("code" in params) {
+        kennel.setCode(decodeURIComponent(params["code"]));
+    }
   });
 </script>
 
-<body>
+{% endblock %}
+
+{% block body %}
 <div id="kennel-div" style='height:100%'></div>
 
-<pre id='problem-presentation' style='display:none'>
-{{ program.presentation }}
-</pre>
-<pre id='default-body' style='display:none'>
-{{ program.code }}
-</pre>
-<pre id='default-on-run' style='display:none'>
-{{ program.on_run }}
-</pre>
+<pre id='problem-presentation' class='embedded-data'>{{ assignment.body }}</pre>
+<pre id='default-body'         class='embedded-data'>{{ submission.code }}</pre>
+<pre id='default-on-run'       class='embedded-data'>{{ assignment.on_run }}</pre>
+<pre id='default-on-step'      class='embedded-data'>{{ assignment.on_step }}</pre>
+<pre id='default-on-start'     class='embedded-data'>{{ assignment.on_start }}</pre>
   
-<!-- Google Analytics -->
-<script>
-switch(window.location.protocol) {
-case 'file:':
-    break;
-default:
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-38802329-2', 'auto');
-    ga('send', 'pageview');
-    }
-</script>
-
-</body>
-</html>
-
-<!--<script>
-  var TP = TP || {};
-  <% if defined? @tp %>
-  <% if @tp.outcome_service? %>
-	  TP.outcomeService = true;
-  <% else %>
-  	TP.outcomeService = false;
-  <% end %>
-  TP.toParams = {};
-  TP.toParams.launch_params = {};
-  <% @tp.to_params.each do |key, value| %>
-    TP.toParams.launch_params.<%= key %> = "<%= value %>";
-  <% end %>
-  <% end %>
-</script>-->
+{% endblock %}

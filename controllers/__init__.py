@@ -2,33 +2,32 @@ import os
 
 from main import app
 
-from models.models import User
+from models.models import db, User, Role
 from flask import session, g, send_from_directory, request, jsonify, render_template
 from flask import redirect, url_for
 from flask_security.core import current_user
 
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-    
-@app.route('/shutdown', methods=['GET', 'POST'])
-def shutdown():
-    shutdown_server()
-    return 'Server shutting down...'
+from controllers.helpers import admin_required
 
 @app.before_request
 def load_user():
-    pass #g.user = current_user
-    #if current_user.is_authenticated():
-    #    g.user = current_user
-    #    #log_page_access()
-    #else:
-    #    g.user = None
+    if current_user.is_authenticated():
+        g.user = current_user
+    else:
+        g.user = None
 
-from teachers import teachers
-app.register_blueprint(teachers)
+from admin import admin
+
+import security 
+
+from users import users
+app.register_blueprint(users)
+
+from courses import courses
+app.register_blueprint(courses)
+
+from lti import lti_assignments
+app.register_blueprint(lti_assignments)
 
 from services import services
 app.register_blueprint(services)
@@ -46,16 +45,16 @@ def index():
     """
     return render_template('index.html')
     
-@app.route('/blockpy', methods=['GET', 'POST'])
-def blockpy():
+@app.route('/about/', methods=['GET', 'POST'])
+@app.route('/about', methods=['GET', 'POST'])
+def about():
     """ initial access page to the lti provider.  This page provides
     authorization for the user.
 
     :param lti: the `lti` object from `pylti`
     :return: index page for lti provider
     """
-    return render_template('blockpy.html',
-                           program={})
+    return render_template('about.html')
 
 @app.route('/favicon.ico', methods=['GET', 'POST'])
 def favicon():
@@ -63,14 +62,20 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 @app.route("/site-map", methods=['GET', 'POST'])
 def site_map():
-    links = []
+    import urllib
+    output = []
     for rule in app.url_map.iter_rules():
-        # Filter out rules we can't navigate to in a browser
-        # and rules that require parameters
+
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "[{0}]".format(arg)
+
+        methods = ','.join(rule.methods)
         try:
-            url = url_for(rule.endpoint)
+            url = url_for(rule.endpoint, **options)
         except:
-            url = "Unknown"
-        links.append((url, rule.endpoint))
-    # links is now a list of url, endpoint tuples
-    return "<br>\n".join(["{} => {}".format(u, e) for u, e in links])
+            url = "Unknown error"
+        line = urllib.unquote("<td>{:50s}</td><td>{:20s}</td><td>{}</td>".format(rule.endpoint, methods, url))
+        output.append(line)
+    return "<table><tr>{}</tr></table>".format("</tr><tr>".join(sorted(output)))
+        

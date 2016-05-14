@@ -20,6 +20,9 @@ class Config(object):
     WTF_CSRF_ENABLED = True
     SITE_NAME = 'BlockPy'
     SYS_ADMINS = ['acbart@vt.edu']
+    ROOT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+    STATIC_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'static')
+    BLOCKLY_LOG_DIR = os.path.join(ROOT_DIRECTORY, 'logs')
     
     # secret key for flask authentication
     SECRET_KEY = secrets.get('FLASK_SECRET_KEY', 'flask-secret-key')
@@ -32,6 +35,22 @@ class Config(object):
             }
         }
     }
+    
+    #configured for GMAIL
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = 'vt.blockpy@gmail.com'
+    MAIL_PASSWORD = secrets.get("EMAIL_PASSWORD")
+    DEFAULT_MAIL_SENDER = 'BlockPy Admin'
+    
+    SECURITY_CONFIRMABLE = True
+    SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_PASSWORD_HASH='bcrypt'
+    SECURITY_PASSWORD_SALT=secrets.get('SECURITY_PASSWORD_SALT')
+    SECURITY_DEFAULT_REMEMBER_ME = True
 
     
 class ProductionConfig(Config):
@@ -41,7 +60,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://compthink:runestone@127.0.0.1/blockpy'
     
 class TestingConfig(Config):
-    TESTING = True
+    DEBUG = True
     PORT = 5001
     HOST = 'localhost'
     SITE_ROOT_URL = 'localhost:5001'

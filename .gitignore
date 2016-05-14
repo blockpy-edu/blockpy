@@ -1,3 +1,11 @@
+static/.webassets-cache/
+static/gen/
+
+test.db
+
+logs/
+queued_logs/
+
 certs/
 secrets.json
 consumer_key.pem
