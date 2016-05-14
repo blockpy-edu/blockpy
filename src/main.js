@@ -14,6 +14,8 @@ function BlockPy(settings, assignment, submission, programs) {
             'read_only': ko.observable(settings.read_only),
             // string
             'filename': ko.observable("__main__"),
+            // string
+            'level': ko.observable("level")
         },
         'status': {
             // boolean
@@ -37,8 +39,8 @@ function BlockPy(settings, assignment, submission, programs) {
             'context_id': assignment.book_id,
             'version': assignment.version,
             'lis_result_sourcedid': assignment.lis_result_sourcedid,
-            'name': assignment.name,
-            'introduction': assignment.introduction,
+            'name': ko.observable(assignment.name),
+            'introduction': ko.observable(assignment.introduction),
             'presentation': assignment.presentation,
             "on_run": assignment.on_run, 
             "on_change": assignment.on_change, 
@@ -149,15 +151,11 @@ BlockPy.prototype.initModel = function() {
 BlockPy.prototype.initComponents = function() {
     var container = this.model.constants.container;
     this.components = {};
-    this.components.toolbar = new BlockPyToolbar(this, container.find('.kennel-toolbar'));
+    this.components.dialog = new BlockPyDialog(this, container.find('.blockpy-popup'));
+    this.components.toolbar  = new BlockPyToolbar(this,  container.find('.kennel-toolbar'));
     this.components.feedback = new BlockPyFeedback(this, container.find('.kennel-feedback'));
-    this.components.editor = new BlockPyEditor(this, container.find('.kennel-editor'),
-        function(e) {kennel.printError(e); },
-        this.model,
-        container.find('.kennel-blocks'),
-        container.find('.kennel-text'),
-        this.model.blocklyPath
-    );
+    this.components.editor   = new BlockPyEditor(this,   container.find('.kennel-editor'));
+    this.components.presentation = new BlockPyPresentation(this, container.find('.blockpy-presentation'));
 }
 
 BlockPy.prototype.reportError = function(component, message) {
@@ -177,42 +175,6 @@ BlockPy.prototype.activateToolbar = function() {
     var elements = this.toolbar.elements;
     var kennel = this, server = this.server;
     // Editor mode
-    elements.editor_mode.click(function() {
-        if (kennel.model.settings.editor == "blocks") {
-            server.logEvent('editor', 'blocks');
-            elements.editor_mode.html("<span class='glyphicon glyphicon-th'></span> Blocks");
-        } else {
-            server.logEvent('editor', 'text');
-            elements.editor_mode.html("<span class='glyphicon glyphicon-italic'></span> Text");
-        }
-        kennel.editor.changeMode();
-    });
-    if (this.model.settings.editor == "text") {
-        elements.editor_mode.html("<span class='glyphicon glyphicon-th'></span> Blocks");
-    } else {
-        elements.editor_mode.html("<span class='glyphicon glyphicon-italic'></span> Text");
-    }
-    // Instructor/Student/Grade mode
-    elements.kennel_mode.click(function() {
-        server.logEvent('editor', 'mode');
-        kennel.changeBlockPyMode();
-    });
-    /*elements.to_rst.click(function(ev) {
-        ev.preventDefault();
-        var presentation = kennel.model.presentation.replace(/(\r\n|\n|\r)/gm,"");
-        var starting = indent(kennel.model.programs.starting_code, 1, 4);
-        var testing = indent(kennel.model.programs.on_run, 1, 4);
-        var text = ".. blockly:: ___\n"+
-                   "    :comment: " + presentation + "\n"+
-                   "\n"+
-                   "    preload::\n"+ starting + "\n"+
-                   "    test::\n"+ testing + "\n";
-        var popup = kennel.mainDiv.find('.kennel-popup');
-        popup.find('.modal-title').html("RST");
-        popup.find('.modal-body').text(text);
-        popup.modal('show');
-        
-    });*/
     
     elements.to_pseudo.click(function(ev) {
         ev.preventDefault();
@@ -696,84 +658,3 @@ BlockPy.prototype.getHighlightMap = function() {
     return highlightMap;
 }
 
-/*
- * Runs the given python code, resetting the console and Trace Table.
- */
-BlockPy.prototype.run = function() {
-    //this.editor.updateBlocks();
-    var code = this.model.programs['__main__']();
-    if (code.trim() == "") {
-        this.printError("You haven't written any code yet!");
-        return;
-    }
-    this.resetConsole();
-    // Actually run the python code
-    var executionPromise = Sk.misceval.asyncToPromise(function() {
-        return Sk.importMainWithBody("<stdin>", false, code, true);
-    });
-    
-    /*var ai = new AbstractInterpreter();
-    try {
-        var results = ai.analyze(code);
-        this.printAnalysis(results);
-    } catch (e) {
-        // pass
-    }*/
-    
-    // Change "Run" to "Executing"
-    this.toolbar.elements.run.prop('disabled', true);
-    
-    var kennel = this;
-    var server = this.server;
-    executionPromise.then(
-        function (module) {
-            // Run the afterSingleExecution one extra time for final state
-            Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
-            kennel.explorer.reload(kennel.traceTable, -1);
-            // Handle checks
-            kennel.check(code, kennel.traceTable, kennel.outputList);
-            // Reenable "Run"
-            kennel.toolbar.elements.run.prop('disabled', false);
-        },
-        function(error) {
-            kennel.printError(error);
-            kennel.toolbar.elements.run.prop('disabled', false);
-            server.logEvent('blockly_error', error);
-        }
-    );
-}
-
-BlockPy.prototype.check = function(student_code, traceTable, output) {
-    var kennel = this;
-    var server = this.server;
-    var on_run = this.model.programs['on_run']();
-    if (on_run.trim() !== "") {
-        var backupExecution = Sk.afterSingleExecution;
-        console.log(output);
-        Sk.afterSingleExecution = undefined;
-        on_run += "\nresult = on_run('''"+student_code+"''', "+
-                  JSON.stringify(output)+", "+
-                  JSON.stringify(traceTable)+", "+
-                  ")";
-        var executionPromise = Sk.misceval.asyncToPromise(function() {
-            return Sk.importMainWithBody("<stdin>", false, on_run, true);
-        });
-        executionPromise.then(
-            function (module) {
-                var result = Sk.ffi.remapToJs(module.$d.result);
-                if (result === 1) {  
-                    kennel.server.markSuccess(1.0);
-                    kennel.feedback.success();
-                } else {
-                    kennel.server.markSuccess(0.0);
-                    kennel.feedback.error(result);
-                }
-                Sk.afterSingleExecution = backupExecution;
-            }, function (error) {
-                Sk.afterSingleExecution = backupExecution;
-                kennel.feedback.error("Error in instructor's feedback. "+error);
-                console.error("Instructor Feedback Error:", error);
-                server.logEvent('blockly_instructor_error', error);
-            });
-    }
-}

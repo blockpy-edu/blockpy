@@ -18,12 +18,13 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
     try {
         parse = Sk.parse(filename, python_source);
         ast = Sk.astFromParse(parse.cst, filename, parse.flags);
-        symbol_table = Sk.symboltable(ast, filename, python_source, filename, parse.flags);
+        //symbol_table = Sk.symboltable(ast, filename, python_source, filename, parse.flags);
     } catch (e) {
         error = e;
         xml.appendChild(raw_block(python_source))
         return {"xml": xmlToString(xml), "error": error};
     }
+    this.comments = parse.comments;
     this.measureNode(ast);
     var converted = this.convert(ast);
     if (converted !== null) {
@@ -31,7 +32,7 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
             xml.appendChild(converted[block]);
         }
     }
-    return {"xml": xmlToString(xml), "error": null, "lineMap": this.lineMap};
+    return {"xml": xmlToString(xml), "error": null, "lineMap": this.lineMap, 'comment': this.comments};
 }
 
 PythonToBlocks.prototype.identifier = function(node) {

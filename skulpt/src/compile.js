@@ -1135,7 +1135,7 @@ Compiler.prototype.cfor = function (s) {
         out(iter, "=Sk.abstr.iter(", toiter, ", "+s.constructor.name+");");
     }
     else {
-        print(JSON.stringify(s.iter))
+        //print(JSON.stringify(s.iter))
         iter = this._gr("iter", "Sk.abstr.iter(", toiter, ", "+JSON.stringify(s.iter)+")");
         this.u.tempsToSave.push(iter); // Save it across suspensions
     }

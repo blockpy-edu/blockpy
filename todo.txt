@@ -1,7 +1,6 @@
 Table Block
 Assessment API/Blocks
 
-
 Time rewinder
 Tooltips over errors
 Connect blocks to text by storing line numbers in the converted AST
@@ -48,3 +47,17 @@ Explain a given line of code
 Walk the AST to add in unique IDs. When an exception occurs, the exact ID of the parse tree can be returned. This ID can be used to identify the relevant block, and the "lineno"/"endlineno"/"colno"/"endcolno" can be used to identify the exact code snippet. Additionally, we can report out the error more clearly - explain the actual type of the object, the expected type of the object, and even other suitable objects from the static analyzer.
 
 Slowmode - when you run, it executes the code but "plays" its results slightly slowed down, so you can see the code highlighting.
+
+Multiple levels of blocks (Block sets)
+
+
+
+CT-server
+    Datasets
+    Blockpy
+    Maze
+    
+    
+Quick look - this seems really nice! One question that this raises in my mind is the equivalent of NetLogo's "info" tab - the description of the data, what the data fields are, what questions could be asked.  It seems very labor intensive to create this kind of information (and some expertise as well in some cases), but maybe this is was a highly curated data set needs?
+
+As a tactical matter, we have to be in a position to "guide" students toward "interesting" questions to convey the idea that this is not just random graphing of data - but that something can be learned from it.

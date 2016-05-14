@@ -17,7 +17,7 @@
 function Parser (filename, grammar) {
     this.filename = filename;
     this.grammar = grammar;
-    this.comments = [];
+    this.comments = {};
     this.p_flags = 0;
     return this;
 }
@@ -71,7 +71,7 @@ function findInDfa (a, obj) {
 
 // Add a comment
 Parser.prototype.addcomment = function(value, start, end, line) {
-    this.comments.push([value, start, end, line]);
+    this.comments[start] = value;
 };
 
 

@@ -1,0 +1,16 @@
+function BlockPyDialog(main, tag) {
+    this.main = main;
+    this.tag = tag;
+    
+    this.titleTag = tag.find('.modal-title');
+    this.bodyTag = tag.find('.modal-body');
+}
+
+BlockPyDialog.prototype.show = function(title, body) {
+    this.titleTag.html(title);
+    this.bodyTag.html(body);
+    this.tag.modal('show');
+    this.tag.draggable({
+        'handle': '.modal-title'
+    });
+}

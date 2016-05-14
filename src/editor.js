@@ -24,8 +24,13 @@ function BlockPyEditor(main, tag) {
     this.initText();
     
     var editor = this;
+    
+    // Handle mode switching
     this.main.model.settings.editor.subscribe(function() {editor.setMode()});
     this.setMode();
+    
+    // Handle level switching
+    this.main.model.settings.level.subscribe(function() {editor.setLevel()});
 }
 
 BlockPyEditor.prototype.initBlockly = function() {
@@ -43,7 +48,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     // Register model changer
     var editor = this;
     this.blockly.addChangeListener(function() {editor.updateCodeFromBlocks()});
-    this.main.model.program.subscribe(function() {editor.updateBlocks()});
+    //this.main.model.program.subscribe(function() {editor.updateBlocks()});
     // Force the proper window size
     this.blockly.resize();
     // Keep the toolbox width set
@@ -180,57 +185,42 @@ BlockPyEditor.prototype.setMode = function(mode) {
 }
 
 BlockPyEditor.prototype.updateCodeFromBlocks = function() {
-    console.log("updateCodeFromBlocks: ", this.updateStack);
     if (this.updateStack.slice(-1).pop() !== undefined) {
-        console.log("\tAborting updateCodeFromBlocks early");
         return;
     }
     var newCode = Blockly.Python.workspaceToCode(this.blockly);
     this.updateStack.push('blocks');
     this.main.setCode(newCode);
-    console.log("Popping off blocks:", this.updateStack.pop())
-    //this.updateStack.pop();
+    this.updateStack.pop();
 }
 BlockPyEditor.prototype.updateCodeFromText = function() {
-    console.log("updateCodeFromText: ", this.updateStack);
     if (this.updateStack.slice(-1).pop() !== undefined) {
-        console.log("\tAborting updateCodeFromText early");
         return;
     }
     var newCode = this.codeMirror.getValue();
     this.updateStack.push('text');
     this.main.setCode(newCode);
     this.unhighlightLines();
-    console.log("Popping off text:", this.updateStack.pop())
-    //this.updateStack.pop();
+    this.updateStack.pop();
     // Ensure that we maintain proper highlighting
 }
 
 BlockPyEditor.prototype.updateText = function() {
-    console.log("updateText: ", this.updateStack);
     if (this.updateStack.slice(-1).pop() == 'text') {
-        console.log("\tAborting updateText early");
         return;
     }
-    console.log("Before get program: ", this.updateStack);
     var code = this.main.model.program();
-    console.log("After get program: ", this.updateStack);
     this.updateStack.push('text');
-    console.log("Inside updateText: ", this.updateStack);
     if (code == "") {
         this.codeMirror.setValue("\n");
     } else {
         this.codeMirror.setValue(code);
     }
-    console.log("Popping off text:", this.updateStack.pop())
-    //this.updateStack.pop();
-    console.log("Leaving updateText");
+    this.updateStack.pop();
 }
 
 BlockPyEditor.prototype.updateBlocks = function() {
-    console.log("updateBlocks: ", this.updateStack);
     if (this.updateStack.slice(-1).pop() == 'blocks') {
-        console.log("\tAborting updateBlocks early");
         return;
     }
     var code = this.main.model.program();
@@ -250,9 +240,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
     } else {
         this.blockly.align();
     }
-    console.log("Popping off blocks:", this.updateStack.pop())
-    //this.updateStack.pop();
-    console.log("Leaving updateBlocks");
+    this.updateStack.pop();
 }
 
 BlockPyEditor.prototype.getBlocksFromXml = function() {
@@ -261,7 +249,7 @@ BlockPyEditor.prototype.getBlocksFromXml = function() {
           
 BlockPyEditor.prototype.setBlocksFromXml = function(xml) {
     this.blockly.clear();
-    Blockly.Xml.domToWorkspace(this.blockly, xml);
+    Blockly.Xml.domToWorkspace(xml, this.blockly);
 }
 
 BlockPyEditor.prototype.previousLine = null;
@@ -295,12 +283,18 @@ BlockPyEditor.prototype.unhighlightLines = function() {
     this.previousLine = null;
 }
 
+BlockPyEditor.prototype.setLevel = function() {
+    var level = this.main.model.settings.level();
+    
+}
+
 BlockPyEditor.prototype.getToolbox = function() {
     return '<xml id="toolbox" style="display: none">'+
                 '<category name="Properties" custom="VARIABLE" colour="240">'+
                 '</category>'+
                 '<category name="Decisions" colour="330">'+
                     '<block type="controls_if"></block>'+
+                    '<block type="controls_if"><mutation else="1"></mutation></block>'+
                     '<block type="logic_compare"></block>'+
                     '<block type="logic_operation"></block>'+
                     '<block type="logic_negate"></block>'+

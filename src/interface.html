@@ -1,5 +1,5 @@
 <div class='kennel-content container-fluid' style='background-color :#fcf8e3; border: 1px solid #faebcc; '>
-    <div class='kennel-popup modal fade' style='display:none'>
+    <div class='blockpy-popup modal fade' style='display:none'>
         <div class='modal-dialog' style='width:750px'>
             <div class='modal-content' id='modal-message' >
                 <div class='modal-header'>
@@ -17,11 +17,15 @@
     <div class='row' style='padding-bottom: 10px; border-bottom: 1px solid #faebcc; '>
         <div class='kennel-content-top col-md-10 col-sm-10'>
             <span class='kennel-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
-            <strong>BlockPy: </strong> <span class='kennel-presentation-name' data-bind="text: assignment.name"></span>
-            <div class='kennel-presentation' data-bind="text: assignment.introduction">
-                this.model.presentation
+            <strong>BlockPy: </strong> 
+            <span class='blockpy-presentation-name'
+                  data-bind="text: assignment.name, visible: !settings.instructor()"></span>
+            <form class="form-inline" style='display:inline-block'>
+            <input type='text' class='blockpy-presentation-name-editor form-control'
+                   data-bind='visible: settings.instructor, textInput: assignment.name'> 
+            </form>
+            <div class='blockpy-presentation' data-bind="text: assignment.introduction">
             </div>
-            <input type='text' class='kennel-presentation-name-editor form-control' style='display:none'> 
         </div>
         <div class='kennel-content-topright col-md-2 col-sm-2'>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
@@ -41,7 +45,7 @@
                  <div class='kennel-explorer-errors-body'>
                  
             </div>-->
-            <span>Runtime Error</span>
+            <span class='label label-danger'>Runtime Error</span>
             <pre>'Int' is not iterable on line 4 (the FOR block).</pre>
                  <br>You are attempting to use a <a href="">property</a> of type <a href="">Integer</a> (number) as the iteration list of a <a href="">FOR loop</a>. You can only iterate (walk) through a <a href="">List</a>, not an Integer. You used the property 'temperature' - perhaps you should look at the 'temperatures' property, since that is a list of integers?</div>
         </div>
@@ -49,17 +53,24 @@
     <div class="row"
          style='background-color :#fcf8e3; padding-bottom: 10px; border: 1px solid #faebcc'>
         <div class='col-md-12 col-sm-12 kennel-toolbar btn-toolbar' role='toolbar'>
-            <button type='button' class='btn btn-success'>
+            <button type='button' class='btn btn-success' style='float:left'>
                 <span class='glyphicon glyphicon-play'></span> Run
             </button>
-            <button type='button' class='kennel-change-mode btn btn-default'>
-                <span class='glyphicon glyphicon-puzzle'
-                      data-bind="css: { 
-                                    'glyphicon-pencil': settings.editor() == 'Text', 
-                                    'glyphicon-th-large': settings.editor() =='Blocks',
-                                }"></span> 
-                <span data-bind="text: settings.editor() == 'Text' ? '&nbsp;Text&nbsp;&nbsp;' : 'Blocks'"></span>
-            </button>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default blockpy-mode-set-blocks active">
+                    <span class='glyphicon glyphicon-th-large'></span>
+                    <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> Blocks
+                </label>
+                <label class="btn btn-default blockpy-mode-set-instructor"
+                       data-bind="visible: settings.instructor">
+                    <span class='glyphicon glyphicon-list-alt'></span>
+                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
+                </label>
+                <label class="btn btn-default blockpy-mode-set-text">
+                    <span class='glyphicon glyphicon-pencil'></span>
+                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
+                </label>
+            </div>
             <button type='button' class='btn btn-default'>
                 <span class='glyphicon glyphicon-refresh'></span> Reset
             </button>

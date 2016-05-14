@@ -858,12 +858,12 @@ goog.exportSymbol("Sk.abstr.iternext", Sk.abstr.iternext);
  * @returns {Object}
  */
 
-Sk.abstr.iter = function(obj, something) {
+Sk.abstr.iter = function(obj) {
     var iter;
     var getit;
     var ret;
     
-    print(something);
+    //print(something);
 
     /**
      * Builds an iterator around classes that have a __getitem__ method.
