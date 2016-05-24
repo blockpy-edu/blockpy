@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="libs/codemirror/codemirror.css">
     <link rel="stylesheet" href="libs/font-awesome.min.css">
     <link rel="stylesheet" href="libs/summernote/summernote.css">
-    <link rel="stylesheet" href="kennel/kennel.css">
+    <link rel="stylesheet" href="src/blockpy.css">
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
     
     <!-- JQuery, D3, Math.js, Bootstrap -->
@@ -47,19 +47,16 @@
     <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
     <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
     
-    <!-- Analyzer -->
-    <script type="text/javascript" src="analyzer/analyzer.js"></script>
-    <script type="text/javascript" src="analyzer/python_errors.js"></script>
-    
-    <!-- Renderer -->
-    <script type="text/javascript" src="converter/python_to_blockly.js"></script>
-    <script type="text/javascript" src="converter/variable_tracker.js"></script>
-    <script type="text/javascript" src="converter/renderBlocklyToPng.js"></script>
-    
-    <!-- Analyzer -->
+    <!-- Source Code -->
+    <script type="text/javascript" src="src/python_errors.js"></script>
+    <script type="text/javascript" src="src/ast_node_visitor.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter.js"></script>    
+    <script type="text/javascript" src="src/python_to_blockly.js"></script>
+    <script type="text/javascript" src="src/renderBlocklyToPng.js"></script>
     <script type="text/javascript" src="src/util.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
+    <script type="text/javascript" src="src/printer.js"></script>
     <script type="text/javascript" src="src/interface.js"></script>
     <script type="text/javascript" src="src/server.js"></script>
     <script type="text/javascript" src="src/presentation.js"></script>
@@ -69,9 +66,6 @@
     <script type="text/javascript" src="src/toolbar.js"></script>
     <script type="text/javascript" src="src/engine.js"></script>
     <script type="text/javascript" src="src/main.js"></script>
-    
-    <!-- AST Walker -->
-    <script type="text/javascript" src="converter/ast_node_visitor.js"></script>
     
     <style>
 
@@ -95,7 +89,7 @@
             {},
             // programs
             {
-                '__main__': 'a=0\nb=0'
+                '__main__': $("#default-body").html()
             }
         )
         
@@ -262,7 +256,8 @@ function getQueryParams(){
 <pre id='problem-presentation' style='display:none'>Plot the forecasted temperatures of Miami in Celsius. You'll need to use the "create empty list" and "append" blocks to create a new list of Celsius temperatures from the forecasted temperatures in Blacksburg, and then plot these new temperatures against the old ones.
 </pre>
 <pre id='default-body' style='display:none'>
-celsius_temperatures = [][0]
+print("TEST")
+celsius_temperatures = []
 for t in weather.get_forecasts("Miami, FL"):
     celsius = (t - 32) / 2
     celsius_temperatures.append(celsius)

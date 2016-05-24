@@ -2,24 +2,26 @@ function PropertyExplorer(main, tag, stepConsole, stepEditor, tag, server) {
     this.main = main;
     this.tag = tag;
     
+    this.traceTable = [];
+    
     this.stepConsole = stepConsole;
     this.stepEditor = stepEditor;
     this.server = server;
     this.tag = tag;
     this.tags = {
-        "message": tag.find('.kennel-explorer-run-hide'),
-        "errors": tag.find('.kennel-explorer-errors'),
-        "errors_body": tag.find('.kennel-explorer-errors-body'),
-        "errors_hide": tag.find('.kennel-explorer-errors-hide'),
-        "first": tag.find('.kennel-explorer-first'),
-        "back": tag.find('.kennel-explorer-back'),
-        "next": tag.find('.kennel-explorer-next'),
-        "last": tag.find('.kennel-explorer-last'),
-        "step": tag.find('.kennel-explorer-step-span'),
-        "length": tag.find('.kennel-explorer-length-span'),
-        "line": tag.find('.kennel-explorer-line-span'),
-        "table": tag.find('.kennel-explorer-table'),
-        "modules": tag.find('.kennel-explorer-modules')
+        "message": tag.find('.blockpy-explorer-run-hide'),
+        "errors": tag.find('.blockpy-explorer-errors'),
+        "errors_body": tag.find('.blockpy-explorer-errors-body'),
+        "errors_hide": tag.find('.blockpy-explorer-errors-hide'),
+        "first": tag.find('.blockpy-explorer-first'),
+        "back": tag.find('.blockpy-explorer-back'),
+        "next": tag.find('.blockpy-explorer-next'),
+        "last": tag.find('.blockpy-explorer-last'),
+        "step": tag.find('.blockpy-explorer-step-span'),
+        "length": tag.find('.blockpy-explorer-length-span'),
+        "line": tag.find('.blockpy-explorer-line-span'),
+        "table": tag.find('.blockpy-explorer-table'),
+        "modules": tag.find('.blockpy-explorer-modules')
     };
     this.tags.first.prop("disabled", true);
     this.tags.back.prop("disabled", true);
@@ -123,4 +125,9 @@ PropertyExplorer.prototype.reload = function(traceTable) {
     this.traceTable = traceTable;
     this.move(-1);
     this.tags.message.hide();
+}
+
+PropertyExplorer.prototype.load = function() {
+    this.tags.errors.hide();
+    this.step = 0;
 }

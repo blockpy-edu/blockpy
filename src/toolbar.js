@@ -10,37 +10,37 @@ function BlockPyToolbar(main, tag) {
     var programsGroup = $(groupHtml).appendTo(tag);
     this.elements = {
         'undo': $("<button></button>")
-                            .addClass('btn btn-default kennel-toolbar-undo')
+                            .addClass('btn btn-default blockpy-toolbar-undo')
                             .attr("role", "group")
                             .html('<i class="fa fa-undo"></i>')
                             .appendTo(doGroup),
         'redo': $("<button></button>")
-                            .addClass('btn btn-default kennel-toolbar-redo')
+                            .addClass('btn btn-default blockpy-toolbar-redo')
                             .attr("role", "group")
                             .html('<i class="fa fa-repeat"></i>')
                             .appendTo(doGroup),
         'align': $("<button></button>")
-                            .addClass('btn btn-default kennel-toolbar-align')
+                            .addClass('btn btn-default blockpy-toolbar-align')
                             .attr("role", "group")
                             .html('<i class="fa fa-align-left"></i> Align')
                             .appendTo(doGroup),
         'reset': $("<button></button>")
-                            .addClass('btn btn-default kennel-toolbar-reset')
+                            .addClass('btn btn-default blockpy-toolbar-reset')
                             .attr("role", "group")
                             .html('<i class="fa fa-refresh"></i> Reset')
                             .appendTo(doGroup),
         'clear': $("<button></button>")
-                            .addClass('btn btn-default kennel-toolbar-clear')
+                            .addClass('btn btn-default blockpy-toolbar-clear')
                             .attr("role", "group")
                             .html('<i class="fa fa-trash-o"></i> Clear')
                             .appendTo(doGroup),
         'programs': $("<div></div>")
-                            .addClass('btn-group kennel-programs')
+                            .addClass('btn-group blockpy-programs')
                             .attr("data-toggle", "buttons")
                             .appendTo(programsGroup)
     };    
     this.elements.programs.hide();
-    this.elements.editor_mode = this.tag.find('.kennel-change-mode');
+    this.elements.editor_mode = this.tag.find('.blockpy-change-mode');
     this.activateToolbar();
 }
 
@@ -65,6 +65,9 @@ BlockPyToolbar.prototype.hidePrograms = function() {
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
     var elements = this.elements;
+    this.tag.find('.blockpy-run').click(function() {
+        main.components.engine.run();
+    });
     this.tag.find('.blockpy-mode-set-text').click(function() {
         main.model.settings.editor("Text");
     });
@@ -74,4 +77,9 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");
     });
+    this.tag.find('.blockpy-toolbar-capture').click(function() {
+        main.components.editor.copyImage();
+    });
+    
+    
 }

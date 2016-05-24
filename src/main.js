@@ -17,6 +17,18 @@ function BlockPy(settings, assignment, submission, programs) {
             // string
             'level': ko.observable("level")
         },
+        'execution': {
+            // 'waiting', 'running'
+            'status': ko.observable('waiting'),
+            // integer
+            'step': ko.observable(0),
+            // list of string/list of int
+            'output': ko.observableArray([]),
+            // integer
+            'line_number': ko.observable(0),            
+            // array of simple objects
+            'trace': ko.observableArray([])
+        },
         'status': {
             // boolean
             'loaded': ko.observable(false),
@@ -34,6 +46,7 @@ function BlockPy(settings, assignment, submission, programs) {
         },
         // Assignment level settings
         "assignment": {
+            'modules': ko.observableArray(['weather', 'earthquakes', 'books', 'stocks', 'crime']),
             'assignment_id': assignment.question_id,
             'student_id': assignment.student_id,
             'context_id': assignment.book_id,
@@ -61,17 +74,17 @@ function BlockPy(settings, assignment, submission, programs) {
     
     /*
     this.model.get = function() {
-        return kennel.model.programs[kennel.model.settings.program];
+        return blockpy.model.programs[blockpy.model.settings.program];
     }
     this.model.set = function(content) {
-        kennel.model.programs[kennel.model.settings.program] = content;
-        kennel.server.save();
+        blockpy.model.programs[blockpy.model.settings.program] = content;
+        blockpy.server.save();
     }
     
     this.model.load = function(content) {
-        kennel.model.programs['__main__'] = content;
-        if (kennel.editor !== undefined) {
-            kennel.editor.setPython(content);
+        blockpy.model.programs['__main__'] = content;
+        if (blockpy.editor !== undefined) {
+            blockpy.editor.setPython(content);
         }
     }
     
@@ -79,51 +92,51 @@ function BlockPy(settings, assignment, submission, programs) {
     this.attachmentPoint = attachmentPoint;
     
     this.loadMain();
-    var kennel = this;
+    var blockpy = this;
     
     
     
     // Add the Server connection
-    this.server = new KennelServer(this.model,
+    this.server = new blockpyServer(this.model,
                                    this,
                                    function(message) {
-                                        return kennel.alert(message);
+                                        return blockpy.alert(message);
                                     });
     this.server.load();
     
     // Initialize the toolbar so other things can refer to it
-    this.toolbar = new KennelToolbar(this.mainDiv.find('.kennel-toolbar'));
+    this.toolbar = new blockpyToolbar(this.mainDiv.find('.blockpy-toolbar'));
     
     // Add the Property Explorer
     this.explorer = new PropertyExplorer(
         function(step, page) { 
-            kennel.stepConsole(step);
+            blockpy.stepConsole(step);
         },
         function(step, page) { 
-            kennel.editor.highlightLine(page.line-1);
+            blockpy.editor.highlightLine(page.line-1);
             if (page.block) {
-                kennel.editor.highlightBlock(page.block);
+                blockpy.editor.highlightBlock(page.block);
             } else {
-                kennel.editor.highlightBlock(null);
+                blockpy.editor.highlightBlock(null);
             }
         },
-        kennel.mainDiv.find('.kennel-explorer'),
-        kennel.server
+        blockpy.mainDiv.find('.blockpy-explorer'),
+        blockpy.server
     );
     
     this.loadConsole();
     
     // Add the presentation block
-    this.presentation = new KennelPresentation(
+    this.presentation = new blockpyPresentation(
         function(content) { 
-            kennel.model.presentation = content;
-            kennel.editor.blockly.resize();
-            var val = kennel.mainDiv.find('.kennel-presentation-name-editor').val();
-            kennel.server.savePresentation(content, val, kennel.model.settings.parsons);
+            blockpy.model.presentation = content;
+            blockpy.editor.blockly.resize();
+            var val = blockpy.mainDiv.find('.blockpy-presentation-name-editor').val();
+            blockpy.server.savePresentation(content, val, blockpy.model.settings.parsons);
         },
-        function() { return kennel.model.presentation; },
-        kennel.mainDiv.find('.kennel-presentation'),
-        kennel.mainDiv.find('.kennel-presentation-name')
+        function() { return blockpy.model.presentation; },
+        blockpy.mainDiv.find('.blockpy-presentation'),
+        blockpy.mainDiv.find('.blockpy-presentation-name')
     );
     
     // Add events to the toolbar
@@ -152,10 +165,12 @@ BlockPy.prototype.initComponents = function() {
     var container = this.model.constants.container;
     this.components = {};
     this.components.dialog = new BlockPyDialog(this, container.find('.blockpy-popup'));
-    this.components.toolbar  = new BlockPyToolbar(this,  container.find('.kennel-toolbar'));
-    this.components.feedback = new BlockPyFeedback(this, container.find('.kennel-feedback'));
-    this.components.editor   = new BlockPyEditor(this,   container.find('.kennel-editor'));
+    this.components.toolbar  = new BlockPyToolbar(this,  container.find('.blockpy-toolbar'));
+    this.components.feedback = new BlockPyFeedback(this, container.find('.blockpy-feedback'));
+    this.components.editor   = new BlockPyEditor(this,   container.find('.blockpy-editor'));
     this.components.presentation = new BlockPyPresentation(this, container.find('.blockpy-presentation'));
+    this.components.printer = new BlockPyPrinter(this, container.find('.blockpy-printer'));
+    this.components.engine = new BlockPyEngine(this);
 }
 
 BlockPy.prototype.reportError = function(component, message) {
@@ -173,51 +188,51 @@ function BlockPy(attachmentPoint, mode, presentation, current_code,
 
 BlockPy.prototype.activateToolbar = function() {
     var elements = this.toolbar.elements;
-    var kennel = this, server = this.server;
+    var blockpy = this, server = this.server;
     // Editor mode
     
     elements.to_pseudo.click(function(ev) {
         ev.preventDefault();
-        kennel.editor.updateBlocks();
+        blockpy.editor.updateBlocks();
         server.logEvent('editor', 'pseudo');
-        var popup = kennel.mainDiv.find('.kennel-popup');
+        var popup = blockpy.mainDiv.find('.blockpy-popup');
         popup.find('.modal-title').html("Pseudo-code Explanation");
-        popup.find('.modal-body').html(Blockly.Pseudo.workspaceToCode(kennel.editor.blockly));
+        popup.find('.modal-body').html(Blockly.Pseudo.workspaceToCode(blockpy.editor.blockly));
         popup.modal('show');
     });
-    kennel.mainDiv.find('.kennel-popup').on('hidden.bs.modal', function () {
+    blockpy.mainDiv.find('.blockpy-popup').on('hidden.bs.modal', function () {
         server.logEvent('editor', 'close_pseudo');
     });
     if (!this.model.settings.instructor) {
-        elements.kennel_mode.hide();
+        elements.blockpy_mode.hide();
         //elements.to_rst.hide();
     }
     // Run
     elements.run.click(function() {
         server.logEvent('editor', 'run');
-        kennel.run();
+        blockpy.run();
     });
     // Undo
     elements.undo.click(function() {
         server.logEvent('editor', 'undo');
-        if (kennel.model.settings.editor() == 'blocks') {
-            kennel.editor.blockly.undo();
+        if (blockpy.model.settings.editor() == 'blocks') {
+            blockpy.editor.blockly.undo();
         } else {
-            kennel.editor.text.undo();
+            blockpy.editor.text.undo();
         }
     });
     // Redo
     elements.redo.click(function() {
         server.logEvent('editor', 'redo');
-        if (kennel.model.settings.editor() == 'blocks') {
-            kennel.editor.blockly.redo();
+        if (blockpy.model.settings.editor() == 'blocks') {
+            blockpy.editor.blockly.redo();
         } else {
-            kennel.editor.text.redo();
+            blockpy.editor.text.redo();
         }
     });
     // Wide
-    var left = kennel.mainDiv.find('.kennel-content-left'),
-        right = kennel.mainDiv.find('.kennel-content-right');
+    var left = blockpy.mainDiv.find('.blockpy-content-left'),
+        right = blockpy.mainDiv.find('.blockpy-content-right');
     elements.wide.click(function() {
         if (elements.wide.attr("data-side") == "skinny") {
             server.logEvent('editor', 'wide');
@@ -243,48 +258,48 @@ BlockPy.prototype.activateToolbar = function() {
             right.addClass('col-md-10 col-sm-12 col-xs-12 col-md-offset-1');
         }
         // Hack: Force the blockly window to fit the width
-        if (kennel.model.settings.editor == 'blocks') {
-            kennel.editor.blockly.render();
+        if (blockpy.model.settings.editor == 'blocks') {
+            blockpy.editor.blockly.render();
         }
     });
     // Reset code
     elements.reset.click(function() {
         server.logEvent('editor', 'reset');
-        kennel.setCode(kennel.model.programs.starting_code);
+        blockpy.setCode(blockpy.model.programs.starting_code);
     });
     // Clear code
     elements.clear.click(function() {
         server.logEvent('editor', 'clear');
-        kennel.setCode("");
+        blockpy.setCode("");
     });
     // Align blocks
     elements.align.click(function() {
         server.logEvent('editor', 'align');
-        kennel.editor.blockly.align();
+        blockpy.editor.blockly.align();
     });
     // Change programs
     for (var name in this.model.programs) {
         this.toolbar.addProgram(name);
     }
     this.toolbar.elements.programs.button('toggle').change(function(event) {
-        if (kennel.silentChange_) {
-            kennel.silentChange_ = false;
+        if (blockpy.silentChange_) {
+            blockpy.silentChange_ = false;
         } else {
             var name = $(event.target).attr("data-name");
-            kennel.changeProgram(name);
+            blockpy.changeProgram(name);
         }
     });
     
-    var parsonBox = kennel.mainDiv.find('.kennel-presentation-parsons-check input');
-    var textFirstBox = kennel.mainDiv.find('.kennel-presentation-text-first input');
-    var nameEditor = kennel.mainDiv.find('.kennel-presentation-name-editor');
+    var parsonBox = blockpy.mainDiv.find('.blockpy-presentation-parsons-check input');
+    var textFirstBox = blockpy.mainDiv.find('.blockpy-presentation-text-first input');
+    var nameEditor = blockpy.mainDiv.find('.blockpy-presentation-name-editor');
     var updatePresentation = function() {
-        kennel.model.settings.parsons = parsonBox.prop('checked');
-        kennel.model.settings.text_first = textFirstBox.prop('checked');
-        kennel.server.savePresentation(kennel.presentation.get(), 
+        blockpy.model.settings.parsons = parsonBox.prop('checked');
+        blockpy.model.settings.text_first = textFirstBox.prop('checked');
+        blockpy.server.savePresentation(blockpy.presentation.get(), 
                                        nameEditor.val(), 
-                                       kennel.model.settings.parsons,
-                                       kennel.model.settings.text_first);
+                                       blockpy.model.settings.parsons,
+                                       blockpy.model.settings.text_first);
     }
     // Save name editing
     nameEditor.change(updatePresentation);
@@ -294,8 +309,6 @@ BlockPy.prototype.activateToolbar = function() {
     textFirstBox.change(updatePresentation).prop('checked', this.model.settings.text_first);
 }
 
-BlockPy.prototype.metrics_editor_height = '100%';
-
 BlockPy.prototype.setCode = function(code, name) {
     if (name === undefined) {
         name = this.model.settings.filename();
@@ -303,57 +316,8 @@ BlockPy.prototype.setCode = function(code, name) {
     this.model.programs[name](code);
 }
 
-BlockPy.prototype.changeBlockPyMode = function() {
-    var nameSpan = this.mainDiv.find('.kennel-presentation-name');
-    var nameInput = this.mainDiv.find('.kennel-presentation-name-editor');
-    var parsonBox = this.mainDiv.find('.kennel-presentation-parsons-check');
-    var textFirstBox = this.mainDiv.find('.kennel-presentation-text-first');
-    if (this.mode == 'instructor') {
-        // Make the presentation editable
-        this.presentation.startEditor();
-        // Make the name editable
-        nameSpan.hide();
-        nameInput.val(nameSpan.html()).show();
-        parsonBox.show();
-        textFirstBox.show();
-        // Display the extra programs
-        this.toolbar.showPrograms();
-        // Expose Teacher API
-        this.editor.resizeBlockly();
-        // Extra Config options
-        this.mode = "student";
-    } else if (this.mode == 'student') {
-        // Make the presentation read-only
-        this.presentation.closeEditor();
-        // Make the name read-only
-        nameSpan.html(nameInput.val()).show();
-        nameInput.hide();
-        parsonBox.hide();
-        textFirstBox.hide();
-        // Hide the extra programs
-        this.toolbar.hidePrograms();
-        this.changeProgram('__main__');
-        // Hide the Teacher API
-        this.editor.resizeBlockly();
-        // Show the __main__ program
-        this.mode = "instructor";
-    } else if (this.mode == 'grade') {
-    } else if (this.mode == 'public') {
-        // Hide the feedback box
-        // Hide the property explorer
-        // Hide the toolbar
-    }
-}
-
-BlockPy.prototype.changeProgram = function(name) {
-    this.silentChange_ = true;
-    this.model.settings.filename = name;
-    this.editor.setPython(this.model.programs[name]);
-    this.toolbar.elements.programs.find("[data-name="+name+"]").click();
-}
-
 BlockPy.prototype.alert = function(message) {
-    var box = this.mainDiv.find('.kennel-alert');
+    var box = this.mainDiv.find('.blockpy-alert');
     box.text(message).show();
     return box;
 }
@@ -361,300 +325,3 @@ BlockPy.prototype.alert = function(message) {
 /*
  * Resets skulpt to some default values
  */
-BlockPy.prototype.loadConsole = function() {
-    this.console = this.mainDiv.find('.kennel-console')[0];
-    this.resetConsole();
-}
-
-BlockPy.prototype.stepConsole = function(step, page) {
-    $(this.console).find('.kennel-console-output').each(function() {
-        if ($(this).attr("data-step") <= step) {
-            $(this).show();
-        } else {
-            $(this).hide();
-        }
-    });
-}
-
-BlockPy.prototype.printAnalysis = function(result) {
-    //this.explorer.tags.message.show();
-    //this.explorer.tags.message.html(JSON.stringify(result.identifiers));
-    console.log(result);
-}
-
-/*
- * Print an error to the consoles -- the on screen one and the browser one
- */
-BlockPy.prototype.printError = function(error) {
-    console.log("Printing Error", error);
-    this.explorer.tags.errors.show();
-    // Is it a string?
-    if (typeof error !== "string") {
-        // A weird skulpt thing?
-        if (error.tp$str !== undefined) {
-            try {
-                this.editor.highlightError(error.traceback[0].lineno-1);
-            } catch (e) {
-            }
-            
-            var all_blocks = Blockly.mainWorkspace.getAllBlocks();
-            console.log(all_blocks);
-            blockMap = {};
-            all_blocks.forEach(function(elem) {
-                if (elem.lineNumber in blockMap) {
-                    blockMap[elem.lineNumber].push(elem);
-                } else {
-                    blockMap[elem.lineNumber] = [elem];
-                }
-            });
-            var hblocks = blockMap[""+error.traceback[0].lineno];
-            console.log(hblocks);
-            //Blockly.mainWorkspace.highlightBlock(hblocks[0].id);
-            hblocks[0].addSelect();
-            
-            if (error.constructor == Sk.builtin.NameError
-                && error.args.v.length > 0
-                && error.args.v[0].v == "name '___' is not defined") {
-                error = "<b>Error: </b> You have incomplete blocks. Make sure that you do not have any dangling blocks.<br><br><b>Extended Error Explanation:</b> If you look at the text view of your Python code, you'll see <code>___</code> in the code. The converter will create these <code>___</code> to show that you have a block that's missing a piece.";
-            } else if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
-                error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
-            } else {
-                error = error.tp$str().v;
-            }
-        } else {
-            // An error?
-            error = ""+error.name + ": " + error.message;
-            console.log("Unknown Error"+error.stack);
-        }
-    }
-    // Perform any necessary cleaning
-    this.explorer.tags.errors_body.html(error);
-}
-
-/*
- * Print a successful line to the on-screen console.
- */
-BlockPy.prototype.print = function(text) {
-    // Perform any necessary cleaning
-    if (text !== "\n") {
-        this.outputList.push(text);
-        text = encodeHTML(text);
-        text = $("<samp data-toggle='tooltip' data-placement='right' "+
-                     "class='kennel-console-output' data-step='"+this.step+"' "+
-                     "title='Step "+this.step+", Line "+this.stepLineMap[this.step-1]+"'>"+
-                text+
-               "</samp>");
-        // Append to the current text
-        $(this.console).append(text).append("<br>");
-        text.tooltip();
-    }
-}
-
-/*
- *
- * html: A blob of HTML to render in the tag
- * value: a value to push on the outputList for comparison
- */
-BlockPy.prototype.printHtml = function(chart, value) {
-    this.outputList.push(value);
-    var outerDiv = $(chart[0]);//.parent();
-    outerDiv.parent().show();
-    outerDiv.attr({
-        "data-toggle": 'tooltip',
-        "data-placement": 'right',
-        //"data-container": '#'+chart.attr("id"),
-        "class": "kennel-console-output",
-        "data-step": this.step,
-        "title": "Step "+this.step+", Line "+this.stepLineMap[this.step-1]
-    });
-    //outerDiv.parent().parent().append("<br>");
-    //outerHtml.append($(html[0]));
-    //var temp = d3.select(outerHtml[0]).append('svg');
-    //temp.html(html.html());
-    // Append to the current text
-    //$(this.console).append(outerHtml);
-    outerDiv.tooltip();
-}
-
-BlockPy.prototype.resetConsole = function() {
-    this.console.innerHTML = "";
-    this.explorer.tags.errors.hide();
-    this.step = 0;
-    var highlightMap = this.getHighlightMap();
-    this.traceTable = [];
-    this.outputList = [];
-    this.stepLineMap = [];
-    var kennel = this;
-    // Skulpt settings
-    // No connected services
-    Sk.connectedServices = {}
-    // Limit execution to 5 seconds
-    Sk.execLimit = 5000;
-    // Ensure version 3, so we get proper print handling
-    Sk.python3 = true
-    // Major Skulpt configurations
-    Sk.configure({
-        // Function to handle the text outputted by Skulpt
-        output: function(text) { kennel.print(text); },
-        // Function to handle loading in new files
-        read: function (filename) {
-                    if (Sk.builtinFiles === undefined ||
-                        Sk.builtinFiles["files"][filename] === undefined) {
-                        throw "File not found: '" + filename + "'";
-                    }
-                    return Sk.builtinFiles["files"][filename];
-                }
-    });
-    // Identify the location to put new charts
-    Sk.console = {
-        'printHtml': function(html, value) {kennel.printHtml(html, value);},
-        'width': $(this.console).width(),
-        'height': $(this.console).height(),
-        'console': this.console
-    }
-    // Stepper!
-    Sk.afterSingleExecution = function(variables, lineNumber, 
-                                       columnNumber, filename, astType, ast) {
-        if (filename == '<stdin>.py') {
-            var globals = kennel.parseGlobals(variables);
-            kennel.traceTable.push({'step': kennel.step, 
-                                  'filename': filename,
-                                  'block': highlightMap[lineNumber-1],
-                                  'line': lineNumber,
-                                  'column': columnNumber,
-                                  'properties': globals["properties"],
-                                  'modules': globals["modules"]});
-            kennel.step += 1;
-            kennel.stepLineMap.push(lineNumber);
-        }
-    };
-}
-
-BlockPy.prototype.parseGlobals = function(variables) {
-    var result = Array();
-    var modules = Array();
-    for (var property in variables) {
-        var value = variables[property];
-        if (property !== "__name__" && property !== "__doc__") {
-            property = property.replace('_$rw$', '')
-                               .replace('_$rn$', '');
-            var parsed = this.parseValue(property, value);
-            if (parsed !== null) {
-                result.push(parsed);
-            } else if (value.constructor == Sk.builtin.module) {
-                modules.push(value.$d.__name__.v);
-            }
-        }
-    }
-    return {"properties": result, "modules": modules};
-}
-
-BlockPy.prototype.parseValue = function(property, value) {
-    switch (value.constructor) {
-        case Sk.builtin.func:
-            return {'name': property,
-                    'type': "Function",
-                    "value":  
-                        (value.func_code.co_varnames !== undefined ?
-                         " Arguments: "+value.func_code.co_varnames.join(", ") :
-                         ' No arguments')
-                    };
-        case Sk.builtin.module: return null;
-        case Sk.builtin.str:
-            return {'name': property,
-                'type': "String",
-                "value": value.$r().v
-            };
-        case Sk.builtin.none:
-            return {'name': property,
-                'type': "None",
-                "value": "None"
-            };
-        case Sk.builtin.bool:
-            return {'name': property,
-                'type': "Boolean",
-                "value": value.$r().v
-            };
-        case Sk.builtin.nmber:
-            return {'name': property,
-                'type': "int" == value.skType ? "Integer": "Float",
-                "value": value.$r().v
-            };
-        case Sk.builtin.int_:
-            return {'name': property,
-                'type': "Integer",
-                "value": value.$r().v
-            };
-        case Sk.builtin.float_:
-            return {'name': property,
-                'type': "Float",
-                "value": value.$r().v
-            };
-        case Sk.builtin.tuple:
-            return {'name': property,
-                'type': "Tuple",
-                "value": value.$r().v
-            };
-        case Sk.builtin.list:
-            return {'name': property,
-                'type': "List",
-                "value": value.$r().v
-            };
-        case Sk.builtin.dict:
-            return {'name': property,
-                'type': "Dictionary",
-                "value": value.$r().v
-            };
-        case Number:
-            return {'name': property,
-                'type': value % 1 === 0 ? "Integer" : "Float",
-                "value": value
-            };
-        case String:
-            return {'name': property,
-                'type': "String",
-                "value": value
-            };
-        case Boolean:
-                return {'name': property,
-                    'type': "Boolean",
-                    "value": (value ? "True": "False")
-                };
-        default:
-            return {'name': property,
-                    'type': value.$r().v,
-                    "value": value.$r().v
-                    };
-    }
-}
-
-/*
- * Builds up an array indicating the relevant block ID for a given step.
- * Operates on the current this.blockly instance
- * It works by injecting __HIGHLIGHT__(id); at the start of every line of code
- *  and then extracting that with regular expressions. This makes it vulnerable
- *  if someone decides to use __HIGHLIGHT__ in their code. I'm betting on that
- *  never being a problem, though.
- */
-BlockPy.prototype.getHighlightMap = function() {
-    // Protect the current STATEMENT_PREFIX
-    var backup = Blockly.Python.STATEMENT_PREFIX;
-    Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
-    Blockly.Python.addReservedWords('__HIGHLIGHT__');
-    // Get the source code, injected with __HIGHLIGHT__(id)
-    var highlightedCode = Blockly.Python.workspaceToCode(this.editor.blockly);
-    Blockly.Python.STATEMENT_PREFIX = backup;
-    // Build up the array by processing the highlighted code line-by-line
-    var highlightMap = [];
-    var lines = highlightedCode.split("\n");
-    for (var i = 0; i < lines.length; i++) {
-        // Get the block ID from the line
-        var id = lines[i].match(/\W*__HIGHLIGHT__\(\'(.+?)\'\)/);
-        if (id !== null) {
-            // Convert it into a base-10 number, because JavaScript.
-            highlightMap[i] = parseInt(id[1], 10);
-        }
-    }
-    return highlightMap;
-}
-
