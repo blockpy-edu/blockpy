@@ -1,11 +1,11 @@
-function BlockPyServer(main, model, kennel, alertBox) {
+function BlockPyServer(main, model, blockpy, alertBox) {
     this.main = main;
     this.model = model;
-    this.kennel = kennel;
+    this.blockpy = blockpy;
     this.alertBox = alertBox;
     
     // Add the LocalStorage connection
-    this.storage = new KennelStorage();
+    this.storage = new blockpyStorage();
     
     this.eventQueue = [];
     this.eventTimer = {};
@@ -148,7 +148,7 @@ BlockPyServer.prototype.load = function() {
         'context_id': this.model.question.context_id
     };
     var alertBox = this.alertBox;
-    var server = this, kennel = this.kennel;
+    var server = this, blockpy = this.blockpy;
     if (this.model.urls.server !== false && this.model.urls.load_code !== false) {
         $.post(this.model.urls.load_code, data, function(response) {
             if (response.success) {
@@ -169,7 +169,7 @@ BlockPyServer.prototype.load = function() {
                     }
                 }
                 if (response.completed) {
-                    kennel.feedback.success('');
+                    blockpy.feedback.success('');
                 }
                 alertBox("Loaded").delay(200).fadeOut("slow");
             } else {
@@ -185,7 +185,7 @@ BlockPyServer.prototype.load = function() {
         server.model.loaded = true;
         alertBox("Loaded").delay(200).fadeOut("slow");
         if (this.model.urls.load_success === true) {
-            this.kennel.feedback.success('');
+            this.blockpy.feedback.success('');
         }
     }
 };

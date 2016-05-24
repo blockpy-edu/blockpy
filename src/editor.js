@@ -5,8 +5,8 @@ function BlockPyEditor(main, tag) {
     this.converter = new PythonToBlocks();
     
     // HTML DOM accessors
-    this.blockTag = tag.find('.kennel-blocks');
-    this.textTag = tag.find('.kennel-text');
+    this.blockTag = tag.find('.blockpy-blocks');
+    this.textTag = tag.find('.blockpy-text');
     this.uploadTag = tag.find('.blockpy-upload');
     this.instructorTag = tag.find('.blockpy-instructor');
     this.textSidebarTag = this.textTag.find(".blockpy-text-sidebar");
@@ -78,6 +78,19 @@ BlockPyEditor.prototype.initText = function() {
     this.main.model.program.subscribe(function() {editor.updateText()});
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
+    
+    this.tag.find('.blockpy-text-insert-if').click(function() {
+        var line_number = blockpy.components.editor.codeMirror.getCursor().line;
+        var line = blockpy.components.editor.codeMirror.getLine(line_number);
+        var whitespace = line.match(/^(\s*)/)[1];
+        editor.codeMirror.replaceSelection("if ___:\n    "+whitespace+"pass");
+    });
+    this.tag.find('.blockpy-text-insert-if-else').click(function() {
+        var line_number = blockpy.components.editor.codeMirror.getCursor().line;
+        var line = blockpy.components.editor.codeMirror.getLine(line_number);
+        var whitespace = line.match(/^(\s*)/)[1];
+        editor.codeMirror.replaceSelection("if ___:\n    "+whitespace+"pass\n"+whitespace+"else:\n    "+whitespace+"pass");
+    });
 };
 
 BlockPyEditor.prototype.hideTextMenu = function() {
@@ -283,6 +296,44 @@ BlockPyEditor.prototype.unhighlightLines = function() {
     this.previousLine = null;
 }
 
+/*
+ * Builds up an array indicating the relevant block ID for a given step.
+ * Operates on the current this.blockly instance
+ * It works by injecting __HIGHLIGHT__(id); at the start of every line of code
+ *  and then extracting that with regular expressions. This makes it vulnerable
+ *  if someone decides to use __HIGHLIGHT__ in their code. I'm betting on that
+ *  never being a problem, though.
+ */
+BlockPyEditor.prototype.getHighlightMap = function() {
+    // Protect the current STATEMENT_PREFIX
+    var backup = Blockly.Python.STATEMENT_PREFIX;
+    Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
+    Blockly.Python.addReservedWords('__HIGHLIGHT__');
+    // Get the source code, injected with __HIGHLIGHT__(id)
+    var highlightedCode = Blockly.Python.workspaceToCode(this.blockly);
+    Blockly.Python.STATEMENT_PREFIX = backup;
+    // Build up the array by processing the highlighted code line-by-line
+    var highlightMap = [];
+    var lines = highlightedCode.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+        // Get the block ID from the line
+        var id = lines[i].match(/\W*__HIGHLIGHT__\(\'(.+?)\'\)/);
+        if (id !== null) {
+            // Convert it into a base-10 number, because JavaScript.
+            highlightMap[i] = parseInt(id[1], 10);
+        }
+    }
+    return highlightMap;
+}
+
+
+BlockPyEditor.prototype.changeProgram = function(name) {
+    this.silentChange_ = true;
+    this.model.settings.filename = name;
+    this.editor.setPython(this.model.programs[name]);
+    this.toolbar.elements.programs.find("[data-name="+name+"]").click();
+}
+
 BlockPyEditor.prototype.setLevel = function() {
     var level = this.main.model.settings.level();
     
@@ -378,4 +429,34 @@ BlockPyEditor.prototype.getToolbox = function() {
                     '<block type="books_get"></block>'+
                 '</category>'+
             '</xml>';
+}
+
+
+BlockPyEditor.prototype.copyImage = function() {
+    aleph = this.blockly.svgBlockCanvas_.cloneNode(true);
+    aleph.removeAttribute("width");
+    aleph.removeAttribute("height");
+    if (aleph.children[0] !== undefined) {
+        aleph.removeAttribute("transform");
+        aleph.children[0].removeAttribute("transform");
+        aleph.children[0].children[0].removeAttribute("transform");
+        var linkElm = document.createElementNS("http://www.w3.org/1999/xhtml", "style");
+        linkElm.textContent = Blockly.Css.CONTENT.join('') + '\n\n';
+        aleph.insertBefore(linkElm, aleph.firstChild);
+        var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
+        var xml = new XMLSerializer().serializeToString(aleph);
+        xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
+        var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+        var img  = document.createElement("img");
+        img.setAttribute('src', data);
+        img.style.display = 'block';
+        var span = document.createElement('span');
+        span.textContent = "Right-click and copy the image below."
+        var div = document.createElement('div');
+        div.appendChild(span);
+        div.appendChild(img);
+        //document.body.appendChild(img);
+        
+        this.main.components.dialog.show("Blocks as Image", div);
+    }
 }

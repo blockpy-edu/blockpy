@@ -1,6 +1,7 @@
 Table Block
 Assessment API/Blocks
 
+Unrolled Loop mode
 Time rewinder
 Tooltips over errors
 Connect blocks to text by storing line numbers in the converted AST
@@ -22,6 +23,7 @@ Dramatically improve weather et al API naming conventions
 Default provide if, if/else, if/elif/else blocks
 Static analysis
 Upload images so they can be reported to the user
+    Or rather, map programs to stored block images; generate images on demand, or via some kind of an API? Can we generate images on the server side?
 Popup question dialog
     Fill in the blank
     Multiple choice
@@ -50,7 +52,7 @@ Slowmode - when you run, it executes the code but "plays" its results slightly s
 
 Multiple levels of blocks (Block sets)
 
-
+URL shortened forms
 
 CT-server
     Datasets
@@ -61,3 +63,32 @@ CT-server
 Quick look - this seems really nice! One question that this raises in my mind is the equivalent of NetLogo's "info" tab - the description of the data, what the data fields are, what questions could be asked.  It seems very labor intensive to create this kind of information (and some expertise as well in some cases), but maybe this is was a highly curated data set needs?
 
 As a tactical matter, we have to be in a position to "guide" students toward "interesting" questions to convey the idea that this is not just random graphing of data - but that something can be learned from it.
+
+
+NameError
+    Have they defined the variable after use? (differentiate between an update and an initialization)
+        Line X attempts to use the variable <A> before it is declared. You have a declaration on Line Y. However, remember that your program executes top-to-bottom.
+        
+        If line X and line Y are equal
+            Line X attempts to update the variable <A> with itself. You must initialize a variable before you can update it. Remember that the RIGHT-side of assignment statements are evaluate BEFORE the LEFT-side.
+        
+        Check to see if the usage is within a loop
+            
+    Have they possibly typo'd it?
+        You attempted to use a variable <A> on line X. You have not declared a variable with that name. However, there is an <integer> variable named <A'>.
+        
+    Is there just nothing about it anywhere?
+        You attempted to use the variable <A> before it is declared. Currently, you have not declared the variable anywhere. Remember that your program executes top-to-bottom.
+        
+TypeError
+    Addition/Subtraction between list and number
+    Addition/Subtraction between string and number
+    Iterating over integer
+        
+    
+ZeroDivisionError
+    This error occurs because you attempted to divide by zero.
+    It looks like you are using an empty list 
+    
+
+Using color heatmaps to teach students about iteration and decision- can we demonstrate how some code paths are explored more often? 

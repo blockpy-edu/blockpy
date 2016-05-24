@@ -1,4 +1,4 @@
-<div class='kennel-content container-fluid' style='background-color :#fcf8e3; border: 1px solid #faebcc; '>
+<div class='blockpy-content container-fluid' style='background-color :#fcf8e3; border: 1px solid #faebcc; '>
     <div class='blockpy-popup modal fade' style='display:none'>
         <div class='modal-dialog' style='width:750px'>
             <div class='modal-content' id='modal-message' >
@@ -15,8 +15,8 @@
         </div>
     </div>
     <div class='row' style='padding-bottom: 10px; border-bottom: 1px solid #faebcc; '>
-        <div class='kennel-content-top col-md-10 col-sm-10'>
-            <span class='kennel-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
+        <div class='blockpy-content-top col-md-10 col-sm-10'>
+            <span class='blockpy-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
             <strong>BlockPy: </strong> 
             <span class='blockpy-presentation-name'
                   data-bind="text: assignment.name, visible: !settings.instructor()"></span>
@@ -27,22 +27,22 @@
             <div class='blockpy-presentation' data-bind="text: assignment.introduction">
             </div>
         </div>
-        <div class='kennel-content-topright col-md-2 col-sm-2'>
+        <div class='blockpy-content-topright col-md-2 col-sm-2'>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
     </div>
     <div class='row' style='margin-top: 5px border: 1px solid #bce8f1;'>
-        <div class='kennel-content-left col-md-6 col-sm-6'
+        <div class='blockpy-content-left col-md-6 col-sm-6'
              style='padding:10px'>
             <strong>Printer</strong>
-            <div class='kennel-console' style='background-color: white'></div>
+            <div class='blockpy-printer blockpy-printer-default'></div>
         </div>
-        <div class='kennel-content-right col-md-6 col-sm-6 bubble'
+        <div class='blockpy-content-right col-md-6 col-sm-6 bubble'
              style='padding:10px'>
-            <strong>Feedback:</strong> <span class='kennel-feedback'></span>
-            <!--<div class='kennel-explorer-errors alert alert-danger alert-dismissible' role='alert'>
-                 <button type='button' class='kennel-explorer-errors-hide close' aria-label='Close'><span  aria-hidden='true'>&times;</span></button>
-                 <div class='kennel-explorer-errors-body'>
+            <strong>Feedback:</strong> <span class='blockpy-feedback'></span>
+            <!--<div class='blockpy-explorer-errors alert alert-danger alert-dismissible' role='alert'>
+                 <button type='button' class='blockpy-explorer-errors-hide close' aria-label='Close'><span  aria-hidden='true'>&times;</span></button>
+                 <div class='blockpy-explorer-errors-body'>
                  
             </div>-->
             <span class='label label-danger'>Runtime Error</span>
@@ -52,8 +52,10 @@
     </div>
     <div class="row"
          style='background-color :#fcf8e3; padding-bottom: 10px; border: 1px solid #faebcc'>
-        <div class='col-md-12 col-sm-12 kennel-toolbar btn-toolbar' role='toolbar'>
-            <button type='button' class='btn btn-success' style='float:left'>
+        <div class='col-md-12 col-sm-12 blockpy-toolbar btn-toolbar' role='toolbar'>
+            <button type='button' class='btn blockpy-run' style='float:left',
+                data-bind='css: execution.status() == "running" ? "btn-info" :
+                                execution.status() == "error" ? "btn-danger" : "btn-success" ' >
                 <span class='glyphicon glyphicon-play'></span> Run
             </button>
             <div class="btn-group" data-toggle="buttons">
@@ -74,29 +76,34 @@
             <button type='button' class='btn btn-default'>
                 <span class='glyphicon glyphicon-refresh'></span> Reset
             </button>
+            <button type='button' class='btn btn-default blockpy-toolbar-capture'>
+                <span class='glyphicon glyphicon-picture'></span> Capture
+            </button>
         </div>
     </div>
-    <div class='row kennel-content-bottom'
+    <div class='row blockpy-content-bottom'
          style='padding-bottom: 10px; border: 1px solid #faebcc'>
-        <div class='kennel-editor col-md-12 col-sm-12'>
-            <div class='kennel-blocks blockpy-editor-menu' 
-                 style='height:this.metrics_editor_height'>
+        <div class='blockpy-editor col-md-12 col-sm-12'>
+            <div class='blockpy-blocks blockpy-editor-menu' 
+                 style='height:100%'>
                 <div class='blockly-div' style='height:450px; width: 100%' '></div>
                 <!-- <div class='blockly-area'></div> -->
             </div>
-            <div class='kennel-text blockpy-editor-menu'>
-                <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>Information goes here</div>
+            <div class='blockpy-text blockpy-editor-menu'>
+                <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>
+                <button type='button' class='btn btn-default blockpy-text-insert-if'>Decision (If)</button>
+                <button type='button' class='btn btn-default blockpy-text-insert-if-else'>Decision (If/Else)</button>
+                </div>
                 <textarea class='codemirror-div language-python'
-                           style='height:this.metrics_editor_height
-                           '></textarea>
+                           style='height:100%'></textarea>
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
                 <!-- Parsons -->
-                <label style='display:none' class='kennel-presentation-parsons-check'>
+                <label style='display:none' class='blockpy-presentation-parsons-check'>
                 <input type='checkbox' class='form-control'> Parsons
                 </label> 
                 <!-- Initial mode -->
-                <label style='display:none' class='kennel-presentation-text-first'>
+                <label style='display:none' class='blockpy-presentation-text-first'>
                 <input type='checkbox' class='form-control'> Text first
                 </label>
             </div>
@@ -105,38 +112,38 @@
         </div>
     </div>
     <div>
-        <div class='kennel-content-right col-md-5 col-sm-5 alert alert-info'>
+        <div class='blockpy-content-right col-md-5 col-sm-5 alert alert-info'>
             <div class='panel panel-default'>
                 <div class='panel-heading'>Data Explorer</div>
                 <div class='panel-body'>
-                <div class='kennel-explorer'>
+                <div class='blockpy-explorer'>
                     <table><tr>
                     <!-- Step: X of Y (Line: Z) -->
                     <td colspan='4'>
-                        <div class='kennel-explorer-run-hide'>
+                        <div class='blockpy-explorer-run-hide'>
                             <i>Run your code to explore it.</i>
                         </div>
-                        <div class='kennel-explorer-status'>
+                        <div class='blockpy-explorer-status'>
                             <strong>Step: </strong>
-                            <span class='kennel-explorer-step-span'>0</span> of 
-                            <span class='kennel-explorer-length-span'>0</span> 
+                            <span class='blockpy-explorer-step-span'>0</span> of 
+                            <span class='blockpy-explorer-length-span'>0</span> 
                             (<strong>Line: </strong>
-                            <span class='kennel-explorer-line-span'>0</span>)
+                            <span class='blockpy-explorer-line-span'>0</span>)
                         </div>
                     </td>
                     </tr><tr>
                     <!-- First Previous Next Last -->
                     <td style='width:25%'>
-                        <button type='button' class='btn btn-default kennel-explorer-first'>
+                        <button type='button' class='btn btn-default blockpy-explorer-first'>
                         <span class='glyphicon glyphicon-fast-backward'></span> First</button>
                     </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default kennel-explorer-back'>
+                        <button type='button' class='btn btn-default blockpy-explorer-back'>
                         <span class='glyphicon glyphicon-backward'></span> Back</button>
                     </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default kennel-explorer-next'>
+                        <button type='button' class='btn btn-default blockpy-explorer-next'>
                         Next <span class='glyphicon glyphicon-forward'></span></button>
                     </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default kennel-explorer-last'>
+                        <button type='button' class='btn btn-default blockpy-explorer-last'>
                         Last <span class='glyphicon glyphicon-fast-forward'></span> </button>
                     </td>
                     </tr></table>
@@ -145,13 +152,13 @@
                     <!-- Modules -->
                     <br><div>
                         <strong>Loaded Modules: </strong>
-                        <i class='kennel-explorer-modules'>None</i>
+                        <i class='blockpy-explorer-modules'>None</i>
                     </div>
                     <!-- Actual Trace data -->
                     <br><strong>Trace Table</strong>
                     <br><table style='width: 100%'
                             class='table table-condensed table-striped 
-                                   table-bordered table-hover kennel-explorer-table'>
+                                   table-bordered table-hover blockpy-explorer-table'>
                         <!-- Property Type Value -->
                         <tr>
                             <th>Property</th>
