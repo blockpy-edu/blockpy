@@ -1,12 +1,20 @@
 function BlockPyFeedback(main, tag) {
     this.main = main;
     this.tag = tag;
+    
+    this.body = this.tag.find('.blockpy-feedback-body');
+    this.title = this.tag.find('.blockpy-feedback-title');
+    this.original = this.tag.find('.blockpy-feedback-original');
+    this.status = this.tag.find('.blockpy-feedback-status');
+    
+    this.original.hide();
 };
 
 BlockPyFeedback.prototype.error = function(html) {
     this.tag.html(html);
     this.tag.removeClass("alert-success");
     this.tag.addClass("alert-warning");
+    this.main.components.printer.print("Execution stopped - there was an error!");
 }
 
 BlockPyFeedback.prototype.success = function() {
@@ -14,11 +22,92 @@ BlockPyFeedback.prototype.success = function() {
     this.tag.removeClass("alert-warning");
 }
 
+BlockPyFeedback.prototype.editorError = function(original, message, line) {
+    original = this.prettyPrintError(original);
+    this.title.html("Editor Error");
+    this.original.show().html(original);
+    this.body.html(message);
+    this.main.model.status.error("editor");
+    this.main.components.editor.highlightError(line-1);
+    this.main.components.printer.print("Editor error - could not make blocks!");
+}
+
+BlockPyFeedback.prototype.complete = function() {
+    this.title.html("Complete!");
+    this.original.hide();
+    this.body.html("Great work!");
+    this.main.model.status.error("complete");
+    this.main.components.editor.unhighlightLines();
+}
+
+BlockPyFeedback.prototype.noErrors = function() {
+    this.title.html("Ran");
+    this.original.hide();
+    this.body.html("No errors reported. View your output on the left.");
+    this.main.model.status.error("no errors");
+    this.main.components.editor.unhighlightLines();
+}
+
+BlockPyFeedback.prototype.syntaxError = function(original, message, line) {
+    original = this.prettyPrintError(original);
+    this.title.html("Syntax Error");
+    this.original.show().html(original);
+    this.body.html(message);
+    this.main.model.status.error("syntax");
+    this.main.components.editor.highlightError(line-1);
+    this.main.components.printer.print("Execution stopped - there was an error!");
+}
+
+BlockPyFeedback.prototype.semanticError = function(name, message, line) {
+    this.title.html(name);
+    this.original.hide();
+    this.body.html(message);
+    this.main.model.status.error("semantic");
+    this.main.components.editor.highlightError(line-1);
+    this.main.components.printer.print("Execution stopped - there was an error!");
+}
+
+BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
+    this.title.html(name);
+    this.original.hide();
+    this.body.html(message);
+    this.main.model.status.error("feedback");
+    if (line !== undefined) {
+        this.main.components.editor.highlightError(line-1);
+    }
+}
+
+BlockPyFeedback.prototype.emptyProgram = function() {
+    this.title.html("Blank Program");
+    this.original.hide().html("");
+    this.body.html("You have not written any code yet.");
+    this.main.model.status.error("runtime");
+}
+
+BlockPyFeedback.prototype.prettyPrintError = function(error) {
+    if (typeof error === "string") {
+        return error;
+    } else {
+        // A weird skulpt thing?
+        if (error.tp$str !== undefined) {
+            return error.tp$str().v;
+        } else {
+            return ""+error.name + ": " + error.message;
+        }
+    }
+}
+
 /*
  * Print an error to the printers -- the on screen one and the browser one
  */
 BlockPyFeedback.prototype.printError = function(error) {
-    console.log("Printing Error", error);
+    //console.log(error);
+    original = this.prettyPrintError(error);
+    this.title.html(error.tp$name);
+    this.original.show().html(original);
+    this.body.html(error.enhanced);
+    this.main.model.status.error("runtime");
+    this.main.components.editor.highlightError(error.traceback[0].lineno-1);
     return;
     // Is it a string?
     if (typeof error !== "string") {
@@ -30,7 +119,6 @@ BlockPyFeedback.prototype.printError = function(error) {
             }
             
             var all_blocks = Blockly.mainWorkspace.getAllBlocks();
-            printer.log(all_blocks);
             blockMap = {};
             all_blocks.forEach(function(elem) {
                 if (elem.lineNumber in blockMap) {
@@ -40,9 +128,8 @@ BlockPyFeedback.prototype.printError = function(error) {
                 }
             });
             var hblocks = blockMap[""+error.traceback[0].lineno];
-            printer.log(hblocks);
-            //Blockly.mainWorkspace.highlightBlock(hblocks[0].id);
-            hblocks[0].addSelect();
+            Blockly.mainWorkspace.highlightBlock(hblocks[0].id);
+            //hblocks[0].addSelect();
             
             if (error.constructor == Sk.builtin.NameError
                 && error.args.v.length > 0
@@ -64,8 +151,14 @@ BlockPyFeedback.prototype.printError = function(error) {
 }
 
 
-BlockPyFeedback.prototype.printAnalysis = function(result) {
+BlockPyFeedback.prototype.printSemantic = function(result) {
     //this.explorer.tags.message.show();
     //this.explorer.tags.message.html(JSON.stringify(result.identifiers));
-    printer.log(result);
+    var out = $("<div></div>");
+    for (var title in result) {
+        if (result[title].length >0) {
+            out.append("<b>"+title+"</b>: "+result[title].join()+"<br>");
+        }
+    }
+    this.body.html(out);
 }

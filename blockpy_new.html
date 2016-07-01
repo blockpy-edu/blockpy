@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="libs/codemirror/codemirror.css">
     <link rel="stylesheet" href="libs/font-awesome.min.css">
     <link rel="stylesheet" href="libs/summernote/summernote.css">
+    <link rel="stylesheet" href="libs/multi-select.css">
     <link rel="stylesheet" href="src/blockpy.css">
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
     
@@ -15,6 +16,7 @@
     <script type="text/javascript" src="libs/jquery.js"></script>
     <script type="text/javascript" src="libs/jquery-ui.min.js"></script>
     <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="libs/jquery.multi-select.js"></script>
     <script type="text/javascript" src="libs/d3.min.js"></script>
     <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
     <script type="text/javascript" src="libs/bootstrap.min.js"></script>
@@ -32,7 +34,6 @@
     <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
   
     <!-- Datasets -->
-    <!--<script type="text/javascript" src="libs/sql.js"></script>-->
     <script type="text/javascript" src="libs/crime_data.js"></script>
     
     <!-- Blockly -->
@@ -52,7 +53,7 @@
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter.js"></script>    
     <script type="text/javascript" src="src/python_to_blockly.js"></script>
-    <script type="text/javascript" src="src/renderBlocklyToPng.js"></script>
+    <script type="text/javascript" src="src/imported.js"></script>
     <script type="text/javascript" src="src/util.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
@@ -79,17 +80,21 @@
                 'editor': 'Blocks',
                 'blocklyPath': "blockly/",
                 'attachmentPoint': document.getElementById('blockpy-div'),
+                'instructor': true
             },
             // assignment
             {
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
+                'generate_feedback': 'give_feedback("There was no feedback.")',
+                'starting_code': ''
             },
             // submission
             {},
             // programs
             {
-                '__main__': $("#default-body").html()
+                '__main__': "x = 0\nprint(x)"
+                //$("#default-body").html()
             }
         )
         
@@ -256,98 +261,22 @@ function getQueryParams(){
 <pre id='problem-presentation' style='display:none'>Plot the forecasted temperatures of Miami in Celsius. You'll need to use the "create empty list" and "append" blocks to create a new list of Celsius temperatures from the forecasted temperatures in Blacksburg, and then plot these new temperatures against the old ones.
 </pre>
 <pre id='default-body' style='display:none'>
-print("TEST")
-celsius_temperatures = []
-for t in weather.get_forecasts("Miami, FL"):
-    celsius = (t - 32) / 2
-    celsius_temperatures.append(celsius)
-plt.plot(celsius_temperatures)
-plt.title('Temperatures in Miami')
-plt.show()
+a = 0
+a = 5
+#print(a)
+#print("TEST")
+#celsius_temperatures = []
+#for t in weather.get_forecasts("Miami, FL"):
+#    celsius = (t - 32) / 2
+#    celsius_temperatures.append(celsius)
+#plt.plot(celsius_temperatures)
+#plt.title('Temperatures in Miami')
+#plt.show()
 </pre>
 <pre id='default-on-run' style='display:none'>
 def on_run(code, output, properties):
     return True
 </pre>
-  
-<xml id="toolbox" style="display: none">
-    <category name="Properties" custom="VARIABLE">
-    </category>
-    <category name="Decisions">
-        <block type="controls_if"></block>
-        <block type="logic_compare"></block>
-        <block type="logic_operation"></block>
-        <block type="logic_negate"></block>
-    </category>
-    <category name="Iteration">
-        <block type="controls_forEach"></block>
-    </category>
-    <category name="Functions" custom="PROCEDURE">
-    </category>
-    <category name="Calculation">
-        <block type="raw_table"></block>
-        <block type="math_arithmetic"></block>
-        <block type="type_check"></block>
-        <block type="raw_block"></block>
-        <block type="raw_expression"></block>
-        <block type="raw_empty"></block>
-        <!--<block type="math_single"></block>
-        <block type="math_number_property"></block>
-        <block type="math_round"></block>
-        <block type="text_join"></block>-->
-    </category>
-    <category name="Output">
-        <block type="text_print"></block>
-        <block type="text_print_multiple"></block>
-        <block type="plot_line"></block>
-        <block type="plot_scatter"></block>
-        <block type="plot_show"></block>
-        <block type="plot_title"></block>
-    </category>
-    <sep></sep>
-    <category name="Values">
-        <block type="text"></block>
-        <block type="math_number"></block>
-        <block type="logic_boolean"></block>
-    </category>
-    <category name="Lists">
-        <block type="lists_create_with"></block>
-        <block type="lists_create_empty"></block>
-        <block type="lists_append"></block>
-        <block type="lists_length"></block>
-    </category>
-    <category name="Dictionaries">
-        <block type="dicts_create_with"></block>
-        <block type="dict_get_literal"></block>
-        <block type="dict_keys"></block>
-    </category>
-    <sep></sep>
-    <category name="Data - Weather">
-        <block type="weather_temperature"></block>
-        <block type="weather_report"></block>
-        <block type="weather_forecasts"></block>
-        <block type="weather_report_forecasts"></block>
-        <block type="weather_all_forecasts"></block>
-        <block type="weather_highs_lows"></block>
-    </category>
-    <category name="Data - Stock">
-        <block type="stocks_current"></block>
-        <block type="stocks_past"></block>
-    </category>
-    <category name="Data - Earthquakes">
-        <block type="earthquake_get"></block>
-        <block type="earthquake_both"></block>
-        <block type="earthquake_all"></block>
-    </category>
-    <category name="Data - Crime">
-        <block type="crime_state"></block>
-        <block type="crime_year"></block>
-        <block type="crime_all"></block>
-    </category>
-    <category name="Data - Books">
-        <block type="books_get"></block>
-    </category>
-</xml>
 
 <script>
 /*$(document).ready(function() {

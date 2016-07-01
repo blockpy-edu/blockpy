@@ -92,3 +92,7 @@ ZeroDivisionError
     
 
 Using color heatmaps to teach students about iteration and decision- can we demonstrate how some code paths are explored more often? 
+
+Color code (site creations) and (site overwrites)
+
+songbird25

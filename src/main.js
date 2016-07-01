@@ -15,7 +15,11 @@ function BlockPy(settings, assignment, submission, programs) {
             // string
             'filename': ko.observable("__main__"),
             // string
-            'level': ko.observable("level")
+            'level': ko.observable("level"),
+            // boolean
+            'disable_semantic_errors': ko.observable(false),
+            // boolean
+            'auto_upload': ko.observable(true)
         },
         'execution': {
             // 'waiting', 'running'
@@ -27,12 +31,18 @@ function BlockPy(settings, assignment, submission, programs) {
             // integer
             'line_number': ko.observable(0),            
             // array of simple objects
-            'trace': ko.observableArray([])
+            'trace': ko.observableArray([]),
+            // object
+            'ast': {}
         },
         'status': {
             // boolean
             'loaded': ko.observable(false),
+            // 'none', 'runtime', 'syntax', 'semantic', 'feedback', 'complete', 'editor'
             'text': ko.observable("Loading"),
+            'error': ko.observable('none'),
+            // "Loading", "Saving", "Ready", "Disconnected", "Error"
+            'server': ko.observable("Loading")
         },
         'constants': {
             // string
@@ -43,113 +53,75 @@ function BlockPy(settings, assignment, submission, programs) {
             'attachmentPoint': settings.attachmentPoint,
             // JQuery object
             'container': null,
+            // Maps codes ('log_event', 'save_code') to URLs
+            'urls': settings.urls
         },
         // Assignment level settings
         "assignment": {
-            'modules': ko.observableArray(['weather', 'earthquakes', 'books', 'stocks', 'crime']),
-            'assignment_id': assignment.question_id,
+            'modules': ko.observableArray(['Properties', 'Decisions', 'Iteration', 'Separator',
+                                           'Calculation', 'Output', 'Separator',
+                                           'Values', 'Lists', 'Dictionaries', 'Separator',
+                                           'Data - Weather', 'Data - Books',
+                                           'Data - Parking']),
+            'assignment_id': assignment.assignment_id,
             'student_id': assignment.student_id,
-            'context_id': assignment.book_id,
-            'version': assignment.version,
-            'lis_result_sourcedid': assignment.lis_result_sourcedid,
+            'course_id': assignment.course_id,
+            'version': ko.observable(assignment.version),
+            //'lis_result_sourcedid': assignment.lis_result_sourcedid,
             'name': ko.observable(assignment.name),
             'introduction': ko.observable(assignment.introduction),
-            'presentation': assignment.presentation,
-            "on_run": assignment.on_run, 
-            "on_change": assignment.on_change, 
-            "initial_view": assignment.initial_view,
-            "starting_code": assignment.starting_code,
-            'parsons': ko.observable(assignment.parsons),
-            'urls': assignment.urls
+            "initial_view": ko.observable(assignment.initial_view),
+            'parsons': ko.observable(assignment.parsons)
         },
         "programs": {
             "__main__": ko.observable(programs.__main__),
+            "starting_code": ko.observable(assignment.starting_code),
+            "give_feedback": ko.observable(assignment.give_feedback),
         }
     };
     this.model.program = ko.computed(function() {
         return this.programs[this.settings.filename()]();
     }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
     
-    this.initMain();
+    this.model.server_is_connected = function(url) {
+        return this.constants.urls !== undefined && this.constants.urls[url] !== undefined;
+    };
     
-    /*
-    this.model.get = function() {
-        return blockpy.model.programs[blockpy.model.settings.program];
-    }
-    this.model.set = function(content) {
-        blockpy.model.programs[blockpy.model.settings.program] = content;
-        blockpy.server.save();
-    }
-    
-    this.model.load = function(content) {
-        blockpy.model.programs['__main__'] = content;
-        if (blockpy.editor !== undefined) {
-            blockpy.editor.setPython(content);
+    this.model.status_feedback_class = ko.computed(function() {
+        switch (this.status.error()) {
+            default: case 'none': return ['label-none', ''];
+            case 'runtime': return ['label-runtime-error', 'Runtime Error'];
+            case 'syntax': return ['label-syntax-error', 'Syntax Error'];
+            case 'editor': return ['label-syntax-error', 'Editor Error'];
+            case 'semantic': return ['label-semantic-error', 'Semantic Error'];
+            case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
+            case 'complete': return ['label-problem-complete', 'Complete'];
+            case 'no errors': return ['label-no-errors', 'No errors'];
         }
-    }
+    }, this.model);
     
-    // The Div or whatever HTML element we attach everything to
-    this.attachmentPoint = attachmentPoint;
+    this.model.status_server_class = ko.computed(function() {
+        switch (this.status.server()) {
+            default: case 'Loading': return ['label-default', 'Loading'];
+            case 'Offline': return ['label-default', 'Offline'];
+            case 'Loaded': return ['label-success', 'Loaded'];
+            case 'Logging': return ['label-primary', 'Logging'];
+            case 'Saving': return ['label-primary', 'Saving'];
+            case 'Saved': return ['label-success', 'Saved'];
+            case 'Disconnected': return ['label-danger', 'Disconnected'];
+            case 'Error': return ['label-danger', 'Error'];
+        }
+    }, this.model);
     
-    this.loadMain();
-    var blockpy = this;
-    
-    
-    
-    // Add the Server connection
-    this.server = new blockpyServer(this.model,
-                                   this,
-                                   function(message) {
-                                        return blockpy.alert(message);
-                                    });
-    this.server.load();
-    
-    // Initialize the toolbar so other things can refer to it
-    this.toolbar = new blockpyToolbar(this.mainDiv.find('.blockpy-toolbar'));
-    
-    // Add the Property Explorer
-    this.explorer = new PropertyExplorer(
-        function(step, page) { 
-            blockpy.stepConsole(step);
-        },
-        function(step, page) { 
-            blockpy.editor.highlightLine(page.line-1);
-            if (page.block) {
-                blockpy.editor.highlightBlock(page.block);
-            } else {
-                blockpy.editor.highlightBlock(null);
-            }
-        },
-        blockpy.mainDiv.find('.blockpy-explorer'),
-        blockpy.server
-    );
-    
-    this.loadConsole();
-    
-    // Add the presentation block
-    this.presentation = new blockpyPresentation(
-        function(content) { 
-            blockpy.model.presentation = content;
-            blockpy.editor.blockly.resize();
-            var val = blockpy.mainDiv.find('.blockpy-presentation-name-editor').val();
-            blockpy.server.savePresentation(content, val, blockpy.model.settings.parsons);
-        },
-        function() { return blockpy.model.presentation; },
-        blockpy.mainDiv.find('.blockpy-presentation'),
-        blockpy.mainDiv.find('.blockpy-presentation-name')
-    );
-    
-    // Add events to the toolbar
-    this.activateToolbar();
-
-    this.changeProgram('__main__');
-    */
+    this.initMain();
 }
 
 BlockPy.prototype.initMain = function() {
     this.initInterface();
     this.initModel();
     this.initComponents();
+    this.initSubscriptions();
+    this.model.status.server('Loaded')
 }
 
 BlockPy.prototype.initInterface = function(postCompletion) {
@@ -171,9 +143,29 @@ BlockPy.prototype.initComponents = function() {
     this.components.presentation = new BlockPyPresentation(this, container.find('.blockpy-presentation'));
     this.components.printer = new BlockPyPrinter(this, container.find('.blockpy-printer'));
     this.components.engine = new BlockPyEngine(this);
+    this.components.server = new BlockPyServer(this);
+    
+    this.components.editor.setMode();
 }
 
-BlockPy.prototype.reportError = function(component, message) {
+BlockPy.prototype.initSubscriptions = function() {
+    var server = this.components.server;
+    this.model.program.subscribe(function() { server.saveCode(); });
+    this.model.assignment.name.subscribe(function() { server.saveAssignment();});
+    this.model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
+    this.model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
+    this.model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
+    this.model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
+}
+
+BlockPy.prototype.reportError = function(component, original, message, line) {
+    if (component == 'editor') {
+        this.components.feedback.editorError(original, message, line);
+    } else if (component == 'syntax') {
+        this.components.feedback.syntaxError(original, message, line);
+    } else if (component == 'semantic') {
+        this.components.feedback.semanticError(name, message, line);
+    }
     console.error(component, message)
 }
 
