@@ -48,7 +48,7 @@ Blockly.JavaScript['lists_create_with'] = function(block) {
 Blockly.JavaScript['lists_repeat'] = function(block) {
   // Create a list with one element repeated.
   var functionName = Blockly.JavaScript.provideFunction_(
-      'lists_repeat',
+      'listsRepeat',
       [ 'function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
           '(value, n) {',
         '  var array = [];',
@@ -88,7 +88,7 @@ Blockly.JavaScript['lists_indexOf'] = function(block) {
   var argument1 = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_MEMBER) || '[]';
   var code = argument1 + '.' + operator + '(' + argument0 + ') + 1';
-  return [code, Blockly.JavaScript.ORDER_MEMBER];
+  return [code, Blockly.JavaScript.ORDER_ADDITION];
 };
 
 Blockly.JavaScript['lists_getIndex'] = function(block) {
@@ -145,7 +145,7 @@ Blockly.JavaScript['lists_getIndex'] = function(block) {
       return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
     } else if (mode == 'GET_REMOVE' || mode == 'REMOVE') {
       var functionName = Blockly.JavaScript.provideFunction_(
-          'lists_remove_from_end',
+          'listsRemoveFromEnd',
           [ 'function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
               '(list, x) {',
             '  x = list.length - x;',
@@ -160,7 +160,7 @@ Blockly.JavaScript['lists_getIndex'] = function(block) {
     }
   } else if (where == 'RANDOM') {
     var functionName = Blockly.JavaScript.provideFunction_(
-        'lists_get_random_item',
+        'listsGetRandomItem',
         [ 'function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
             '(list, remove) {',
           '  var x = Math.floor(Math.random() * list.length);',
@@ -272,7 +272,7 @@ Blockly.JavaScript['lists_getSublist'] = function(block) {
     var code = list + '.concat()';
   } else {
     var functionName = Blockly.JavaScript.provideFunction_(
-        'lists_get_sublist',
+        'listsGetSublist',
         [ 'function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
             '(list, where1, at1, where2, at2) {',
           '  function getAt(where, at) {',
@@ -307,23 +307,23 @@ Blockly.JavaScript['lists_sort'] = function(block) {
   var direction = block.getFieldValue('DIRECTION') === '1' ? 1 : -1;
   var type = block.getFieldValue('TYPE');
   var getCompareFunctionName = Blockly.JavaScript.provideFunction_(
-          'lists_get_sort_compare',
+          'listsGetSortCompare',
   ['function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
     '(type, direction) {',
       '  var compareFuncs = {',
       '    "NUMERIC": function(a, b) {',
       '        return parseFloat(a) - parseFloat(b); },',
       '    "TEXT": function(a, b) {',
-      '        return a.toString().localeCompare(b.toString(), "en"); },',
+      '        return a.toString() > b.toString() ? 1 : -1; },',
       '    "IGNORE_CASE": function(a, b) {',
-      '        return a.toString().localeCompare(b.toString(), "en",',
-      '          {"sensitivity": "base"}); },',
+      '        return a.toString().toLowerCase() > ' +
+      'b.toString().toLowerCase() ? 1 : -1; },',
       '  };',
       '  var compare = compareFuncs[type];',
       '  return function(a, b) { return compare(a, b) * direction; }',
       '}']);
-  return ['(' + listCode + ').slice().sort(' + 
-      getCompareFunctionName + '("' + type + '", ' + direction + '))', 
+  return ['(' + listCode + ').slice().sort(' +
+      getCompareFunctionName + '("' + type + '", ' + direction + '))',
       Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
