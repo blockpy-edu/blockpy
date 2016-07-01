@@ -1,7 +1,9 @@
+/*
 var filename = '__main__.py';
 var python_source = 'a, b = 0\nfor x in y:\n    t = 0';
 parse = Sk.parse(filename, python_source);
 ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+*/
 
 var iter_fields = function(node) {
     /** Yield a tuple of ``(fieldname, value)`` for each field in ``node._fields``
@@ -21,6 +23,9 @@ var iter_child_nodes = function(node) {
     var resultList = [];
     for (var i = 0; i < fieldList.length; i += 1) {
         var field = fieldList[i][0], value = fieldList[i][1];
+        if (value === null) {
+            continue;
+        }
         if ("_astname" in value) {
             resultList.push(value);
         } else if (value.constructor === Array) {
@@ -57,11 +62,23 @@ NodeVisitor.prototype.walk = function(node) {
     return resultList;
 }
 
+NodeVisitor.prototype.visitList = function(nodes) {
+    for (var j = 0; j < nodes.length; j += 1) {
+        var node = nodes[j];
+        if ("_astname" in node) {
+            this.visit(node);
+        }
+    }
+}
+
 NodeVisitor.prototype.generic_visit = function(node) {
     /** Called if no explicit visitor function exists for a node. **/
     var fieldList = iter_fields(node);
     for (var i = 0; i < fieldList.length; i += 1) {
         var field = fieldList[i][0], value = fieldList[i][1];
+        if (value === null) {
+            continue;
+        }
         if (Array === value.constructor) {
             for (var j = 0; j < value.length; j += 1) {
                 var subvalue = value[j];
@@ -75,6 +92,7 @@ NodeVisitor.prototype.generic_visit = function(node) {
     }
 }
 
+/*
 function CodeAnalyzer() {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
     this.id = 0;
@@ -87,6 +105,8 @@ CodeAnalyzer.prototype.visit = function(node) {
     NodeVisitor.prototype.visit.call(this, node);
     //console.log(node);
 }
+*/
+
 /*
 CodeAnalyzer.prototype.visit_Num = function(node) {
     node._id = this.id;

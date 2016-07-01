@@ -41,13 +41,18 @@ Sk.builtin.BaseException = function (args) {
         this.traceback.push({lineno: this.args.v[2],
                              filename: this.args.v[1].v || "<unknown>"});
     }
+    
+    if (arguments.length >= 2) {
+        this.enhanced = arguments[1];
+    } else {
+        this.enhanced = "";
+    }
 };
 Sk.builtin.BaseException.prototype.tp$name = "BaseException";
 
 Sk.builtin.BaseException.prototype.tp$str = function () {
     var i;
     var ret = "";
-
     ret += this.tp$name;
     if (this.args) {
         ret += ": " + (this.args.v.length > 0 ? this.args.v[0].v : "");
@@ -64,6 +69,10 @@ Sk.builtin.BaseException.prototype.tp$str = function () {
             ret += " ";
         }
         ret += "^\n";
+    }
+    
+    if (this.enhanced !== "") {
+        ret += "\n"+this.enhanced+"\n";
     }
 
     /*for (i = 0; i < this.traceback.length; i++) {

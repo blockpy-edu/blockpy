@@ -1,146 +1,122 @@
-function BlockPyServer(main, model, blockpy, alertBox) {
+function BlockPyServer(main) {
     this.main = main;
-    this.model = model;
-    this.blockpy = blockpy;
-    this.alertBox = alertBox;
     
     // Add the LocalStorage connection
-    this.storage = new blockpyStorage();
+    this.storage = new LocalStorageWrapper("BLOCKPY");
     
-    this.eventQueue = [];
-    this.eventTimer = {};
     this.saveTimer = {};
     this.presentationTimer = null;
 }
 
-BlockPyServer.prototype.MAX_LOG_SIZE = 20;
-BlockPyServer.prototype.LOG_DELAY = 4000;
-BlockPyServer.prototype.SAVE_DELAY = 1000;
+BlockPyServer.prototype.TIMER_DELAY = 1000;
 
-BlockPyServer.prototype.logEvent = function(event, action) {
-    var filename = this.model.settings.program;
-    var data = {'event': event, 
-                'action': action,
-                'version': this.model.question.version,
-                'question_id': this.model.question.question_id,
-                'student_id': this.model.question.student_id,
-                'context_id': this.model.question.context_id};    
-    var alertBox = this.alertBox;
-    var server = this;
-    if (this.model.urls.server !== false && this.model.urls.log_event !== false) {
-        $.post(server.model.urls.log_event, data, function(response) {
-            if (response.success) {
-                alertBox("Logged").delay(100).fadeOut("slow");
-            } else {
-                alertBox("Logging failed");
-            }
-        }).fail(function() {
-            alertBox("Logging failed");
-        });
+BlockPyServer.prototype.createServerData = function() {
+    var assignment = this.main.model.assignment;
+    return {
+        'assignment_id': assignment.assignment_id,
+        'course_id': assignment.course_id,
+        'student_id': assignment.student_id,
+        'version': assignment.version()
     }
 }
 
-BlockPyServer.prototype.uploadEvents = function() {
-    var data = {
-        'events': JSON.stringify(this.eventQueue)
-    };
-    if (this.model.urls.server !== false) {
-        
+BlockPyServer.prototype.setStatus = function(status) {
+    this.main.model.status.server(status);
+}
+
+BlockPyServer.prototype.defaultResponse = function(response) {
+    if (response.is_version_correct) {
+        this.setStatus('Out of date');
+    } else if (response.success) {
+        this.setStatus('Saved');
+    } else {
+        console.error(response);
+        this.setStatus('Error');
+    }
+}
+BlockPyServer.prototype.defaultFailure = function() {
+    this.setStatus('Disconnected');
+}
+
+BlockPyServer.prototype.logEvent = function(event_name, action) {
+    var data = this.createServerData();
+    data['event'] = event_name;
+    data['action'] = action;
+    
+    this.setStatus('Logging');
+    if (this.main.model.server_is_connected('log_event')) {
+        $.post(this.main.model.constants.urls.log_event, data, 
+               this.defaultResponse.bind(this))
+         .fail(this.defaultFailure.bind(this));
+    } else {
+        this.setStatus('Offline');
     }
 }
 
 BlockPyServer.prototype.markSuccess = function(success) {
-    var data = {
-        'code': this.model.programs.__main__,
-        'type': 'blockly',
-        'version': this.model.question.version,
-        'question_id': this.model.question.question_id,
-        'lis_result_sourcedid': this.model.question.lis_result_sourcedid,
-        'student_id': this.model.question.student_id,
-        'context_id': this.model.question.context_id,
-        'status': success
-    };
-    var alertBox = this.alertBox;
-    if (this.model.urls.server !== false && this.model.urls.save_success !== false) {
-        $.post(this.model.urls.save_success, data, function(response) {
-            if (success) {
-                if (response.success) {
-                    alertBox("Success reported").delay(200).fadeOut("slow");
-                } else {
-                    alertBox("Success report failed");
-                    console.error("Server Success Report Error", response.message);
-                }
-            }
-        }).fail(function() {
-            alertBox("Status report failed");
-        });
+    var data = this.createServerData();
+    data['code'] = this.main.model.programs.__main__;
+    data['status'] = success;
+    data['image'] = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEi';
+    this.setStatus('Saving');
+    if (this.main.model.server_is_connected('save_success')) {
+        $.post(this.main.model.constants.urls.save_success, data, 
+               this.defaultResponse.bind(this))
+         .fail(this.defaultFailure.bind(this));
+    } else {
+        this.setStatus('Offline');
     }
 };
 
-BlockPyServer.prototype.savePresentation = function(presentation, name, parsons, text_first) {
-    var data = {
-        'presentation': presentation,
-        'parsons': parsons,
-        'text_first': text_first,
-        'name': name,
-        'question_id': this.model.question.question_id,
-    };
-    var alertBox = this.alertBox;
+BlockPyServer.prototype.saveAssignment = function() {
+    var data = this.createServerData();
+    var model = this.main.model;
+    data['introduction'] = model.assignment.introduction();
+    data['parsons'] = model.assignment.parsons();
+    data['initial'] = model.assignment.initial_view();
+    data['name'] = model.assignment.name();
+    //data['disabled'] = disabled;
+    data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
+    
     var server = this;
-    if (this.model.urls.server !== false && this.model.urls.save_presentation) {
+    this.setStatus('Saving');
+    if (this.main.model.server_is_connected('save_assignment') && 
+        this.main.model.settings.auto_upload()) {
         clearTimeout(this.presentationTimer);
         this.presentationTimer = setTimeout(function() {
-            $.post(server.model.urls.save_presentation, data, function(response) {
-                if (response.success) {
-                    alertBox("Saved").delay(200).fadeOut("slow");
-                } else {
-                    alertBox("Saving failed");
-                    console.error("Server Saving Error", response.message);
-                }
-            }).fail(function() {
-                alertBox("Saving failed");
-            });
-        }, this.SAVE_DELAY);
+            $.post(server.main.model.constants.urls.save_assignment, data, 
+                   server.defaultResponse.bind(server))
+             .fail(server.defaultFailure.bind(server));
+        }, this.TIMER_DELAY);
+    } else {
+        this.setStatus('Offline');
     }
 }
 
-BlockPyServer.prototype.save = function() {
-    var filename = this.model.settings.program;
-    var data = {
-        'filename': filename,
-        'code': this.model.programs[filename],
-        'type': 'blockly',
-        'version': this.model.question.version,
-        'question_id': this.model.question.question_id,
-        'student_id': this.model.question.student_id,
-        'context_id': this.model.question.context_id
-    };
-    var alertBox = this.alertBox;
+BlockPyServer.prototype.saveCode = function() {
+    var filename = this.main.model.settings.filename();
+    var data = this.createServerData();
+    data['filename'] = filename;
+    data['code'] = this.main.model.programs[filename]();
+    
     var server = this;
-    if (this.model.urls.server !== false && this.model.urls.save_code !== false) {
+    this.setStatus('Saving');
+    if (this.main.model.server_is_connected('save_code') && 
+        this.main.model.settings.auto_upload()) {
         if (this.saveTimer[filename]) {
             clearTimeout(this.saveTimer);
         }
         this.saveTimer[filename] = setTimeout(function() {
-            server.storage.set(data.question_id, data.code);
-            $.post(server.model.urls.save_code, data, function(response) {
-                if (response.is_version_correct === false) {
-                    alertBox("New version available! Reload!");
-                    server.storage.remove(data.question_id);
-                } else if (response.success) {
-                    alertBox("Saved").delay(200).fadeOut("slow");
-                    server.storage.remove(data.question_id);
-                } else {
-                    alertBox("Saving failed");
-                    console.error("Server Saving Error", response.message);
-                }
-            }).fail(function() {
-                alertBox("Saving failed");
-            });
-        }, this.SAVE_DELAY);
+            $.post(server.main.model.constants.urls.save_code, data, 
+                   server.defaultResponse.bind(server))
+             .fail(server.defaultFailure.bind(server));
+        }, this.TIMER_DELAY);
+    } else {
+        this.setStatus('Offline');
     }
-};
+}
 
+/*
 BlockPyServer.prototype.load = function() {
     var data = {
         'question_id': this.model.question.question_id,
@@ -189,3 +165,4 @@ BlockPyServer.prototype.load = function() {
         }
     }
 };
+*/

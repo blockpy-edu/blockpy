@@ -102,6 +102,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     // This is tricked by semicolons. Hard to get around that...
     // TODO: Force semicolon breaks in a preprocessor, and extract comments too
+    //console.log(this.comments);
+    //console.log('text_comment');
     
     // Build the actual blocks
     var from = node[0].lineno;
@@ -915,7 +917,7 @@ PythonToBlocks.prototype.compareOperator = function(op) {
         case "Gt": return "GT";
         case "LtE": return "LTE";
         case "GtE": return "GTE";
-        case "In": return "IN";
+        case "In_": return "IN";
         case "NotIn": return "NOTIN";
         // Is, IsNot, In, NotIn
         default: throw new Error("Operator not supported:"+op.name);
@@ -935,7 +937,7 @@ PythonToBlocks.prototype.Compare = function(node)
     
     if (ops.length != 1) {
         throw new Error("Only one comparison operator is supported");
-    } else if (ops[0].name == "In" || ops[0].name == "NotIn") {
+    } else if (ops[0].name == "In_" || ops[0].name == "NotIn") {
         return block("logic_isIn", node.lineno, {
             "OP": this.compareOperator(ops[0])
         }, {
@@ -978,7 +980,7 @@ toTitleCase = function(str) {
     });
 }
             
-PythonToBlocks.prototype.KNOWN_MODULES = {
+PythonToBlocks.KNOWN_MODULES = {
     "weather": {
         "get_temperature": ["weather_temperature", "CITY"],
         "get_report": ["weather_report", "CITY"],
@@ -1031,8 +1033,8 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             } else {
                 throw new Error("Incorrect number of arguments to plt.plot");
             }
-        } else if (module in this.KNOWN_MODULES && name in this.KNOWN_MODULES[module]) {
-            var definition = this.KNOWN_MODULES[module][name];
+        } else if (module in PythonToBlocks.KNOWN_MODULES && name in PythonToBlocks.KNOWN_MODULES[module]) {
+            var definition = PythonToBlocks.KNOWN_MODULES[module][name];
             var blockName = definition[0];
             var isExpression = true;
             if (blockName.charAt(0) == "*") {

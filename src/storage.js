@@ -19,4 +19,4 @@ function LocalStorageWrapper(namespace) {
         return (server_time >= stored_time+5000);
     };
 };
-BlockPyLocalStorage = new LocalStorageWrapper("BLOCKPY")
+//BlockPyLocalStorage = new LocalStorageWrapper("BLOCKPY")

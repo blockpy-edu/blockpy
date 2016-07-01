@@ -239,8 +239,8 @@ Blockly.Python['math_number_property'] = function(block) {
 
 Blockly.Python['math_change'] = function(block) {
   // Add to a variable in place.
-  Blockly.Python.definitions_['from_numbers_import_Number'] =
-      'from numbers import Number';
+  //Blockly.Python.definitions_['from_numbers_import_Number'] =
+  //    'from numbers import Number';
   var argument0 = Blockly.Python.valueToCode(block, 'DELTA',
       Blockly.Python.ORDER_ADDITIVE) || '___';
   var varName = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),

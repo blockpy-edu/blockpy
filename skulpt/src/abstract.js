@@ -910,7 +910,8 @@ Sk.abstr.iter = function(obj) {
         return new seqIter(obj);
     }
     
-    throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable");
+    print("HELLO")
+    throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable", "Can't iterate over the value "+obj.$r().v+" because it is "+Sk.abstr.typeName(obj)+", not list.");
 };
 goog.exportSymbol("Sk.abstr.iter", Sk.abstr.iter);
 

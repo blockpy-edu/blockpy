@@ -7,6 +7,8 @@ function BlockPyEngine(main) {
     this.main = main;
     
     this.loadEngine();
+    
+    //this.main.model.program.subscribe(this.analyze.bind(this))
 }
 
 BlockPyEngine.prototype.loadEngine = function() {
@@ -80,30 +82,70 @@ Question Error
  * Gives suggestions on the given code
  */
 BlockPyEngine.prototype.analyze = function() {
-    /*var ai = new AbstractInterpreter();
-    try {
-        var results = ai.analyze(code);
-        this.printAnalysis(results);
-    } catch (e) {
-        // pass
-    }*/
+    this.main.model.execution.status("analyzing");
+    
+    // Get the code
+    var code = this.main.model.programs['__main__']();
+    if (code.trim() == "") {
+        this.main.components.feedback.emptyProgram("You haven't written any code yet!");
+        //this.main.model.feedback.status("semantic");
+        return false;
+    }
+    
+    var analyzer = new AbstractInterpreter(code);
+    this.main.model.execution.ast = analyzer.ast;
+    
+    result = analyzer.analyze();
+    // Syntax error
+    if (result !== true) {
+        this.main.reportError('syntax', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
+        return false;
+    }
+    
+    var report = analyzer.report;
+    // Semantic error
+    //console.log(report);
+    
+    // TODO: variables defined AFTER their use
+    if (report["Undefined variables"].length >= 1) {
+        var variable = report["Undefined variables"][0];
+        this.main.reportError('semantic', "Undefined Property", "The property <code>"+variable.name+"</code> was read on line "+variable.line.split("|")[0]+", but it was not defined on any previous lines. You cannot use a variable until it has been set.", variable.line.split("|")[0])
+        return false;
+    } else if (report["Unread variables"].length >= 1) {
+        var variable = report["Unread variables"][0];
+        this.main.reportError('semantic', "Unused Property", "The property <code>"+variable.name+"</code> was created on line "+variable.line.split("|")[0]+", but was never used.", variable.line.split("|")[0])
+        return false;
+    } else if (report["Overwritten variables"].length >= 1) {
+        var variable = report["Overwritten variables"][0];
+        this.main.reportError('semantic', "Overwritten Property", "The property <code>"+variable.name+"</code> was set on line "+variable.first_location.split("|")[0]+", but before it could be read it was changed on line "+variable.last_location.split("|")[0]+". It is unnecessary to change an existing variable's value without reading it first.", variable.last_location.split("|")[0])
+        return false;
+    }
+    
+    return true;
 }
 
 /*
  * Runs the given python code, resetting the console and Trace Table.
  */
 BlockPyEngine.prototype.run = function() {
+    // Reset everything
+    this.reset();
+    
+    if (!this.main.model.settings.disable_semantic_errors()) {
+        var success = this.analyze();
+        if (success === false) {
+            return;
+        }
+    }
+    
     this.main.model.execution.status("running");
     
     var feedback = this.main.components.feedback;
     
-    // Reset everything
-    this.reset();
-    
     // Get the code
     var code = this.main.model.program();
     if (code.trim() == "") {
-        feedback.printError("You haven't written any code yet!");
+        feedback.emptyProgram();
         this.main.model.execution.status("error");
         return;
     }
@@ -112,57 +154,70 @@ BlockPyEngine.prototype.run = function() {
         return Sk.importMainWithBody("<stdin>", false, code, true);
     });
     
-    var blockpy = this;
+    var engine = this;
     var server = this.server;
+    var execution = this.main.model.execution;
     executionPromise.then(
         function (module) {
             // Run the afterSingleExecution one extra time for final state
             Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
             //blockpy.explorer.reload(blockpy.traceTable, -1);
             // Handle checks
-            //blockpy.check(code, blockpy.traceTable, blockpy.outputList);
+            feedback.noErrors()
+            engine.check(code, execution.trace, execution.output, execution.ast);
             // Reenable "Run"
-            blockpy.main.model.execution.status("waiting");
+            engine.main.model.execution.status("waiting");
         },
         function(error) {
             feedback.printError(error);
-            blockpy.main.model.execution.status("error");
+            engine.main.model.execution.status("error");
             //server.logEvent('blockly_error', error);
         }
     );
 }
 
-BlockPyEngine.prototype.check = function(student_code, traceTable, output) {
-    var blockpy = this;
+BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) {
+    var engine = this;
     var server = this.server;
-    var on_run = this.model.programs['on_run']();
+    var on_run = this.main.model.programs['give_feedback']();
     if (on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
-        console.log(output);
         Sk.afterSingleExecution = undefined;
-        on_run += "\nresult = on_run('''"+student_code+"''', "+
-                  JSON.stringify(output)+", "+
-                  JSON.stringify(traceTable)+", "+
-                  ")";
+        Sk.builtins.output = Sk.ffi.remapToPy(output);
+        Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
+        Sk.builtins.code = Sk.ffi.remapToPy(student_code);
+        Sk.builtins.ast = Sk.ffi.remapToPy(ast);
+        Sk.builtins.give_feedback = new Sk.builtin.func(function(message) {
+            throw new Sk.builtin.SystemExit(message);
+        });
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
         executionPromise.then(
             function (module) {
+                Sk.afterSingleExecution = backupExecution;
                 var result = Sk.ffi.remapToJs(module.$d.result);
                 if (result === 1) {  
-                    blockpy.server.markSuccess(1.0);
-                    blockpy.feedback.success();
+                    server.markSuccess(1.0);
+                    engine.feedback.success();
                 } else {
-                    blockpy.server.markSuccess(0.0);
-                    blockpy.feedback.error(result);
+                    server.markSuccess(0.0);
+                    engine.feedback.error(result);
                 }
-                Sk.afterSingleExecution = backupExecution;
             }, function (error) {
                 Sk.afterSingleExecution = backupExecution;
-                blockpy.feedback.error("Error in instructor's feedback. "+error);
+                Sk.builtins.output = undefined;
+                Sk.builtins.trace = undefined;
+                Sk.builtins.code = undefined;
+                Sk.builtins.ast = undefined;
+                Sk.builtins.give_feedback = undefined;
+                if (error.tp$name == "SystemExit") {
+                    engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
+                } else {
+                    engine.main.components.feedback.error("Error in instructor's feedback. "+error);
+                }
                 console.error("Instructor Feedback Error:", error);
-                server.logEvent('blockly_instructor_error', error);
+                //server.logEvent('blockly_instructor_error', error);
             });
     }
 }

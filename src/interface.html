@@ -19,15 +19,17 @@
             <span class='blockpy-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
             <strong>BlockPy: </strong> 
             <span class='blockpy-presentation-name'
-                  data-bind="text: assignment.name, visible: !settings.instructor()"></span>
-            <form class="form-inline" style='display:inline-block'>
-            <input type='text' class='blockpy-presentation-name-editor form-control'
-                   data-bind='visible: settings.instructor, textInput: assignment.name'> 
-            </form>
-            <div class='blockpy-presentation' data-bind="text: assignment.introduction">
+                  data-bind='text: assignment.name'></span>
+            <div class='blockpy-presentation' data-bind="html: assignment.introduction">
             </div>
         </div>
         <div class='blockpy-content-topright col-md-2 col-sm-2'>
+            <span class='pull-right label label-default'
+                  data-bind="css: status_server_class()[0],
+                             text: status_server_class()[1]">Loading</span>
+            <div class='pull-right'>
+                Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors">
+            </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
     </div>
@@ -35,29 +37,49 @@
         <div class='blockpy-content-left col-md-6 col-sm-6'
              style='padding:10px'>
             <strong>Printer</strong>
-            <div class='blockpy-printer blockpy-printer-default'></div>
+            <div class='blockpy-printer blockpy-printer-default'>
+            </div>
         </div>
         <div class='blockpy-content-right col-md-6 col-sm-6 bubble'
              style='padding:10px'>
-            <strong>Feedback:</strong> <span class='blockpy-feedback'></span>
-            <!--<div class='blockpy-explorer-errors alert alert-danger alert-dismissible' role='alert'>
-                 <button type='button' class='blockpy-explorer-errors-hide close' aria-label='Close'><span  aria-hidden='true'>&times;</span></button>
-                 <div class='blockpy-explorer-errors-body'>
-                 
-            </div>-->
-            <span class='label label-danger'>Runtime Error</span>
-            <pre>'Int' is not iterable on line 4 (the FOR block).</pre>
-                 <br>You are attempting to use a <a href="">property</a> of type <a href="">Integer</a> (number) as the iteration list of a <a href="">FOR loop</a>. You can only iterate (walk) through a <a href="">List</a>, not an Integer. You used the property 'temperature' - perhaps you should look at the 'temperatures' property, since that is a list of integers?</div>
+            <div class='blockpy-feedback'>
+                <strong>Feedback: </strong>
+                <span class='label blockpy-feedback-status' data-bind="css: status_feedback_class()[0], text: status_feedback_class()[1]">Runtime Error</span>
+                <br>
+                <pre class='blockpy-feedback-original'></pre>
+                <strong class='blockpy-feedback-title'></strong>
+                <div class='blockpy-feedback-body'><i>Run your code to get feedback.</i></div>
+            </div>
         </div>
     </div>
     <div class="row"
          style='background-color :#fcf8e3; padding-bottom: 10px; border: 1px solid #faebcc'>
         <div class='col-md-12 col-sm-12 blockpy-toolbar btn-toolbar' role='toolbar'>
+            
             <button type='button' class='btn blockpy-run' style='float:left',
                 data-bind='css: execution.status() == "running" ? "btn-info" :
                                 execution.status() == "error" ? "btn-danger" : "btn-success" ' >
                 <span class='glyphicon glyphicon-play'></span> Run
             </button>
+            
+            <!--<div class="btn-group">
+              <button type="button" class="btn blockpy-run"
+                data-bind='css: execution.status() == "running" ? "btn-info" :
+                                execution.status() == "error" ? "btn-danger" : "btn-success" '>
+                <span class='glyphicon glyphicon-play'></span> Run
+              </button>
+              <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                data-bind='css: execution.status() == "running" ? "btn-info" :
+                                execution.status() == "error" ? "btn-danger" : "btn-success" '>
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#">... as if it were Tuesday</a></li>
+                <li><a href="#">... as if it were Wednesday</a></li>
+              </ul>
+            </div>-->
+            
             <div class="btn-group" data-toggle="buttons">
                 <label class="btn btn-default blockpy-mode-set-blocks active">
                     <span class='glyphicon glyphicon-th-large'></span>
@@ -79,6 +101,19 @@
             <button type='button' class='btn btn-default blockpy-toolbar-capture'>
                 <span class='glyphicon glyphicon-picture'></span> Capture
             </button>
+            
+            <select data-bind="visible: settings.instructor, value: settings.filename"
+                    class="blockpy-toolbar-filename-picker">
+                <option value='__main__' selected>Student Code</option>
+                <option value='starting_code'>Starting Code</option>
+                <option value='generate_feedback'>Generate Feedback</option>
+            </select>
+            
+            <label class='blockpy-toolbar-auto-upload' data-bind="visible: settings.instructor">
+            Auto-save:
+            <input type='checkbox' data-bind="checked:settings.auto_upload">
+            </label> 
+                
         </div>
     </div>
     <div class='row blockpy-content-bottom'
@@ -91,21 +126,66 @@
             </div>
             <div class='blockpy-text blockpy-editor-menu'>
                 <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>
+                <!--
                 <button type='button' class='btn btn-default blockpy-text-insert-if'>Decision (If)</button>
                 <button type='button' class='btn btn-default blockpy-text-insert-if-else'>Decision (If/Else)</button>
+                -->
                 </div>
                 <textarea class='codemirror-div language-python'
                            style='height:100%'></textarea>
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
+                <!-- Name -->
+                <form class="form-inline" style='display:inline-block'>
+                <label>Name:</label>
+                <input type='text' class='blockpy-presentation-name-editor form-control'
+                       data-bind='textInput: assignment.name'> 
+                </form>
+                <br>
+                <br>
+                
+                <label>Introduction:</label>
+                <div class='blockpy-presentation-body-editor'> 
+                </div>
+                
                 <!-- Parsons -->
-                <label style='display:none' class='blockpy-presentation-parsons-check'>
-                <input type='checkbox' class='form-control'> Parsons
+                <label class='blockpy-presentation-parsons-check'>
+                Parsons:
+                <input type='checkbox' class='form-control' data-bind="checked:assignment.parsons">
                 </label> 
+                <br>
+                
                 <!-- Initial mode -->
-                <label style='display:none' class='blockpy-presentation-text-first'>
-                <input type='checkbox' class='form-control'> Text first
+                <label class='blockpy-presentation-text-first'>
+                Initial View:
+                <select data-bind="value: assignment.initial_view">
+                    <option value="Blocks" selected>Blocks</option>
+                    <option value="Text">Text</option>
+                    <option value="Instructor">Instructor</option>
+                    <option value="Upload">Upload</option>
+                </select>
                 </label>
+                <br>
+                
+                <label>Available Modules</lable>
+                <select class='blockpy-available-modules' multiple='multiple'
+                        data-bind="selectedOptions: assignment.modules">
+                    <option>Properties</option>
+                    <option>Decisions</option>
+                    <option>Iteration</option>
+                    <option>Functions</option>
+                    <option>Calculation</option>
+                    <option>Output</option>
+                    <option>Python</option>
+                    <option>Values</option>
+                    <option>Lists</option>
+                    <option>Dictionaries</option>
+                    <option>Data - Weather</option>
+                    <option>Data - Books</option>
+                    <option>Data - Stocks</option>
+                    <option>Data - Earthquakes</option>
+                    <option>Data - Crime</option>
+                
             </div>
             <div class='blockpy-upload blockpy-editor-menu'>
             </div>
@@ -172,3 +252,9 @@
         </div>
     </div>
 </div>
+
+<!--<div class='blockpy-explorer-errors alert alert-danger alert-dismissible' role='alert'>
+                     <button type='button' class='blockpy-explorer-errors-hide close' aria-label='Close'><span  aria-hidden='true'>&times;</span></button>
+                     <div class='blockpy-explorer-errors-body'>
+                     
+                </div>-->

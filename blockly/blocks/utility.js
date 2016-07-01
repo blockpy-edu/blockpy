@@ -81,6 +81,19 @@ Blockly.Blocks['raw_empty'] = {
   }
 };
 
+Blockly.Blocks['text_comment'] = {
+  // Text value.
+  init: function() {
+    this.setColour(Blockly.Blocks.utility.HUE);
+    this.appendDummyInput()
+        .appendTitle('Comment:')
+        .appendTitle(new Blockly.FieldTextInput(''), 'TEXT');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('This comment will be ignored by Python');
+  }
+};
+
 Blockly.Blocks['type_check'] = {
   // Set element at index.
   init: function() {

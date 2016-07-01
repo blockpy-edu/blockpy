@@ -31,7 +31,7 @@ goog.require('Blockly.Blocks');
 /**
  * Common HSV hue for all blocks in this category.
  */
-var DATA_HUE = 100, LOGIC_HUE = 230;
+var DATA_HUE = 100, LOGIC_HUE = 230, VARIABLE_HUE = 240;
 Blockly.Blocks.math.HUE = 270;
 
 Blockly.Blocks['math_number'] = {
@@ -314,7 +314,7 @@ Blockly.Blocks['math_change'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.MATH_CHANGE_TITLE,
+      "message0": "increase %1 by %2", //Blockly.Msg.MATH_CHANGE_TITLE,
       "args0": [
         {
           "type": "field_variable",
@@ -329,7 +329,7 @@ Blockly.Blocks['math_change'] = {
       ],
       "previousStatement": null,
       "nextStatement": null,
-      "colour": Blockly.Blocks.math.HUE,
+      "colour": VARIABLE_HUE,
       "helpUrl": Blockly.Msg.MATH_CHANGE_HELPURL
     });
     // Assign 'this' to a variable for use in the tooltip closure below.
@@ -392,7 +392,7 @@ Blockly.Blocks['math_on_list'] = {
     // Assign 'this' to a variable for use in the closures below.
     var thisBlock = this;
     this.setHelpUrl(Blockly.Msg.MATH_ONLIST_HELPURL);
-    this.setColour(Blockly.Blocks.math.HUE);
+    this.setColour(DATA_HUE);
     this.setOutput(true, 'Number');
     var dropdown = new Blockly.FieldDropdown(OPERATORS, function(newOp) {
       thisBlock.updateType_(newOp);

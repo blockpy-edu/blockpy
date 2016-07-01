@@ -88,6 +88,19 @@
     background-color: white;
 }
 
+.label-syntax-error { background-color: darkred; }
+.label-runtime-error { background-color: #d9534f; }
+.label-semantic-error { background-color: orangered; }
+.label-feedback-error { background-color: #f0ad4e; }
+.label-problem-complete { background-color: #5cb85c; }
+.label-none { background-color: rgba(0,0,0,0); }
+.label-no-errors { background-color: #5bc0de; }
+
+.blockpy-content-right {
+    overflow-y: auto;
+    max-height: 230px;
+}
+
 
 /*
 .col-md-1 { padding-left: 0px; padding-right: 0px; }

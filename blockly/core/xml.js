@@ -521,6 +521,7 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
   if (lineNumber) {
     block.setLineNumber(lineNumber);
   }
+  //console.log("LN:", lineNumber);
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');

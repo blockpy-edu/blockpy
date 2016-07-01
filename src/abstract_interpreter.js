@@ -20,12 +20,15 @@ AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'},
                                 'None': {"type": 'None'}}
 AbstractInterpreter.prototype.MODULES = {
     'weather': {
-        'get_temperature': 'int',
-        'get_forecasts': ['int'],
-        'get_report': {"temperature": 'int', "humidity": "int", "wind": "int"},
-        'get_forecasted_reports': [{"temperature": 'int', "humidity": "int", "wind": "int"}],
+        'get_temperature': {"type": 'Num'},
+        'get_forecasts': {"type": "List", "empty": false, "component": {"type": 'Num'}},
+        'get_report': {"type": "Dict", "all_strings": true,
+                       "keys": {"temperature": {"type": 'Num'}, 
+                                "humidity": {"type": "Num"},
+                       "wind": {"type": "Num"}}},
+        'get_forecasted_reports': [{"temperature": 'Num', "humidity": "Num", "wind": "Num"}],
         'get_all_forecasted_temperatures': [{'city': 'str', 'forecasts': ['int']}],
-        'get_highs_lows': {'highs': ['int'], 'lows': ['int']}
+        'get_highs_lows': {'highs': ['Num'], 'lows': ['Num']}
     },
     'stocks': {
         'get_current': 'float',
@@ -56,13 +59,15 @@ AbstractInterpreter.prototype.newReport = function(parentFrame) {
             "Unread variables": [],
             "Undefined variables": [],
             "Overwritten variables": [],
-            "Used plurals": [],
-            "Unused singulars": [],
+            "Append to non-list": [],
+            "Used iteration list": [],
+            "Unused iteration variable": [],
             "Non-list iterations": [],
             "Empty iterations": [],
             "Type changes": [],
-            "Singular is plural": [],
-            "Unknown functions": []
+            "Iteration variable is iteration list": [],
+            "Unknown functions": [],
+            "Incompatible types": []
         }
 }
 
@@ -80,10 +85,9 @@ AbstractInterpreter.prototype.newFrame = function(parentFrame) {
 
 AbstractInterpreter.prototype.analyze = function() {    
     // Attempt parsing - might fail!
-    var ast;
     try {
         var parse = Sk.parse(this.filename, this.code);
-        ast = Sk.astFromParse(parse.cst, this.filename, parse.flags);
+        this.ast = Sk.astFromParse(parse.cst, this.filename, parse.flags);
     } catch (error) {
         return {"error": error, "message": "Parsing error"};
     }
@@ -97,8 +101,9 @@ AbstractInterpreter.prototype.analyze = function() {
         this.setType(name, this.BUILTINS[name]);
     }
     
-    this.visit(ast);
+    this.visit(this.ast);
     this.postProcess();
+    return true;
 }
 
 AbstractInterpreter.prototype.postProcess = function() {
@@ -125,29 +130,75 @@ AbstractInterpreter.prototype.addFrame = function() {
 AbstractInterpreter.prototype.leaveFrame = function() {
     this.currentFrame = this.currentFrame.parentFrame;
 }
-AbstractInterpreter.prototype.addVariable = function(name) {
+AbstractInterpreter.prototype.addVariable = function(name, loc) {
     var currentFrame = this.currentFrame;
     currentFrame.writes.push(name);
     while (currentFrame !== null) {
         if (name in currentFrame.variables) {
             var behavior = currentFrame.variables[name].behavior;
-            if (behavior.slice(-1)[0] == "write") {
-                this.report["Overwritten variables"].push(name)
+            if (behavior.slice(-1)[0].mode == "write") {
+                this.report["Overwritten variables"].push({
+                    'name': name,
+                    'last_location': loc,
+                    'first_location': behavior[0].location
+                })
             }
-            behavior.push("write");
+            behavior.push({"mode": "write", "location": loc});
             return;
         }
         currentFrame = currentFrame.parentFrame;
     }
-    this.currentFrame.variables[name] = {"behavior": ["write"], "type": null};
+    this.currentFrame.variables[name] = {"behavior": [{"mode": "write", "location": loc}], "type": null};
 }
-AbstractInterpreter.prototype.setType = function(name, type) {
+
+AbstractInterpreter.prototype.setListType = function(name, type, loc) {
+    var currentFrame = this.currentFrame;
+    while (currentFrame !== null) {
+        if (name in currentFrame.variables) {
+            var variable = currentFrame.variables[name];
+            if (variable.type.type === "List") {
+                if (variable.type.empty || this.testTypeEquality(variable.type.component, type)) {
+                    variable.type = {"type": "List", "empty": false, "component": type};
+                } else {
+                    this.report["Type changes"].push(loc);
+                }
+            } else {
+                this.report["Append to non-list"].push(name);
+            }
+            // Adjust the read to become a write
+            for (var i = variable.behavior.length-1; i > 0; i = i-1) {
+                if (variable.behavior[i].location == loc) {
+                    variable.behavior[i].mode = "append";
+                }
+            }
+        }
+        currentFrame = currentFrame.parentFrame;
+    }
+}
+AbstractInterpreter.prototype.testTypeEquality = function(left, right) {
+    if (left === null || right === null) {
+        return false;
+    } else if (left.type === null || right.type === null) {
+        return false;
+    } else if (left.type === "List" && right.type === "List") {
+        if (left.empty && right.empty) {
+            return true;
+        } else if (left.empty || right.empty) {
+            return false;
+        } else {
+            return left.component == right.component
+        }
+    } else {
+        return left.type == right.type;
+    }
+}
+AbstractInterpreter.prototype.setType = function(name, type, loc) {
     var currentFrame = this.currentFrame;
     while (currentFrame !== null) {
         if (name in currentFrame.variables) {
             var variable = currentFrame.variables[name];
             if (variable.type !== null) {
-                if (variable.type !== type) {
+                if (!this.testTypeEquality(variable.type, type)) {
                     this.report["Type changes"].push(name);
                 }
             }
@@ -171,30 +222,41 @@ AbstractInterpreter.prototype.getType = function(name) {
 
 AbstractInterpreter.prototype.isTypeEmptyList = function(name) {
     var type = this.getType(name);
-    return (type !== null && type.constructor === Array) && (type.length == 0);
+    return (type !== null && type.type === "List") && (type.empty);
 }
 AbstractInterpreter.prototype.isTypeList = function(name) {
     var type = this.getType(name);
-    return (type !== null && type.constructor === Array);
+    return (type !== null && type.type === "List");
 }
-AbstractInterpreter.prototype.readVariable = function(name) {
+AbstractInterpreter.prototype.readVariable = function(name, loc) {
     var currentFrame = this.currentFrame;
     currentFrame.reads.push(name);
     while (currentFrame !== null) {
         if (name in currentFrame.variables) {
-            currentFrame.variables[name].behavior.push("read");
+            currentFrame.variables[name].behavior.push({"mode": "read", "location": loc});
             return;
         }
         currentFrame = currentFrame.parentFrame;
     }
-    this.report["Undefined variables"].push(name);
+    this.report["Undefined variables"].push({'name': name, 'line': loc});
 }
 AbstractInterpreter.prototype.checkUnreadVariables = function(frame) {
     //TODO: Make it check EVERYWHERE before deciding to report unread
     for (var name in frame.variables) {
-        if (!("read" in frame.variables[name].behavior)) {
-            if (!(name in this.BUILTINS)) {
-                this.report["Unread variables"].push(name);
+        if (!(name in this.BUILTINS)) {
+            var is_read = false
+            for (var i = 0, len = frame.variables[name].behavior.length;
+                 i < len; i++) {
+                is_read = is_read || frame.variables[name].behavior[i].mode == "read";
+            }
+            if (!is_read) {
+                var typeInfo = this.getType(name);
+                //console.log(frame.variables[name].behavior[0])
+                this.report["Unread variables"].push({
+                    'name': name, 
+                    'type': typeInfo == null ? null : typeInfo.type,
+                    'line': frame.variables[name].behavior[0].location
+                });
             }
         }
     }
@@ -206,7 +268,7 @@ AbstractInterpreter.prototype.checkUnreadVariables = function(frame) {
 AbstractInterpreter.prototype.checkUnusedSingular = function(frame) {
     for (var i = 0, len = frame.singulars.length; i < len; i++) {
         if (!(this.walkFramesForUse(frame, frame.singulars[i], "reads"))) {
-            this.report["Unused singulars"].push(frame.singulars[i])
+            this.report["Unused iteration variable"].push(frame.singulars[i])
         }
     }
     for (var i = 0, len = frame.children.length; i < len; i++) {
@@ -216,7 +278,7 @@ AbstractInterpreter.prototype.checkUnusedSingular = function(frame) {
 AbstractInterpreter.prototype.checkUsedPlural = function(frame) {
     for (var i = 0, len = frame.plurals.length; i < len; i++) {
         if (this.walkFramesForUse(frame, frame.plurals[i], "both")) {
-            this.report["Used plurals"].push(frame.plurals[i])
+            this.report["Used iteration list"].push(frame.plurals[i])
         }
     }
     for (var i = 0, len = frame.children.length; i < len; i++) {
@@ -227,7 +289,7 @@ AbstractInterpreter.prototype.checkSingularIsPlural = function(frame) {
     for (var i = 0, len = frame.plurals.length; i < len; i++) {
         for (var j = 0, len = frame.singulars.length; j < len; j++) {
             if (frame.plurals[i] == frame.singulars[j]) {
-                this.report["Singular is plural"].push(frame.singulars[j]);
+                this.report["Iteration variable is iteration list"].push(frame.singulars[j]);
             }
         }
     }
@@ -271,14 +333,26 @@ AbstractInterpreter.prototype.typecheck = function(value) {
             }
             return {"type": "Tuple", "components": components};
         case "Dict":
-            var keys = [], values = [], string_keys = true;
+            var literals = true;
             for (var i = 0, len = value.keys.length; i < len; i++) {
-                var key_type = this.typecheck(value.keys[i]);
-                keys.push(key_type);
-                values.push(this.typecheck(value.values[i]))
-                string_keys = string_keys && (key_type.type == "Str");
+                literals = literals && (key_type.type == "Str");
             }
-            return {"type": "Dict", "keys": keys, "values": values, "all strings": string_keys};
+            if (literals) {
+                var components = {};
+                for (var i = 0, len = value.keys.length; i < len; i++) {
+                    var key_type = this.typecheck(value.keys[i]);
+                    var value_type = this.typecheck(value.values[i]);
+                    components[value.keys[i].id.v] = {"key": key_type, "value": value_type};
+                }
+                return {"type": "Dict", "literals": true, "components": components};
+            } else {
+                var key_type = {"type": "Unknown"}, value_type = {"type": "Unknown"};
+                if (value.keys.length > 0) {
+                    key_type = this.typecheck(value.keys[0]);
+                    value_type = this.typecheck(value.values[0]);
+                }
+                return {"type": "Dict", "literals": false, "key": key_type, "value": value_type};
+            }
         case "List":
             if (value.elts.length == 0) {
                 return {"type": "List", "empty": true};
@@ -287,27 +361,37 @@ AbstractInterpreter.prototype.typecheck = function(value) {
             }
         case "Call":
             return this.walkAttributeChain(value.func);
+        case "BinOp":
+            var left = this.typecheck(value.left),
+                right = this.typecheck(value.right);
+            if (left === null || right === null) {
+                return {"type": "Unknown"}
+            } else if (left.type != right.type) {
+                this.report["Incompatible types"].push(value.lineno);
+            } else {
+                return left;
+            }
         default:
             return {"type": "Unknown"}
     }
 }
 
 AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
-    if (this._astname == "Attribute") {
+    if (attribute._astname == "Attribute") {
         var result = this.walkAttributeChain(attribute.value);
         if (result == null) {
             return null;
-        } else if (attribute.attr in result) {
-            return result[attribute.attr];
+        } else if (attribute.attr.v in result) {
+            return result[attribute.attr.v];
         } else {
-            this.report["Unknown functions"].append(attribute.attr);
+            this.report["Unknown functions"].push(attribute.attr.v);
             return null;
         }
-    } else if (this._astname == "Name") {
+    } else if (attribute._astname == "Name") {
         if (attribute.id.v in this.MODULES) {
-            return MODULES[attribute.id.v];
+            return this.MODULES[attribute.id.v];
         } else {
-            this.report["Unknown functions"].append(attribute.attr);
+            this.report["Unknown functions"].push(attribute.attr);
             return null;
         }
     }
@@ -315,20 +399,36 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
 
 AbstractInterpreter.prototype.visit_AugAssign = function(node) {
     var typeValue = this.typecheck(node.value);
-    this.generic_visit(node);
+    this.visit(node.value);
+    this.visit(node.target);
     var walked = this.walk(node.target);
     for (var i = 0, len = walked.length; i < len; i++) {
         var targetChild = walked[i];
         if (targetChild._astname == "Tuple") {
             
         } else if (targetChild._astname == "Name") {
-            this.setType(targetChild.id.v, typeValue);
+            this.setType(targetChild.id.v, typeValue, this.getLocation(node));
+        }
+    }
+}
+AbstractInterpreter.prototype.visit_Call = function(node) {
+    this.generic_visit(node);
+    if (node.func._astname == "Attribute") {
+        if (node.func.attr.v == "append") {
+            if (node.args.length >= 1) {
+                var valueType = this.typecheck(node.args[0]);
+                if (node.func.value._astname == "Name") {
+                    var target = node.func.value.id.v;
+                    this.setListType(target, valueType, this.getLocation(node));
+                }
+            }
         }
     }
 }
 AbstractInterpreter.prototype.visit_Assign = function(node) {
     var typeValue = this.typecheck(node.value);
-    this.generic_visit(node);
+    this.visit(node.value);
+    this.visitList(node.targets);
     for (var i = 0, len = node.targets.length; i < len; i++) {
         var walked = this.walk(node.targets[i]);
         for (var j = 0, len = walked.length; j < len; j++) {
@@ -336,33 +436,36 @@ AbstractInterpreter.prototype.visit_Assign = function(node) {
             if (targetChild._astname == "Tuple") {
                 
             } else if (targetChild._astname == "Name") {
-                this.setType(targetChild.id.v, typeValue);
+                this.setType(targetChild.id.v, typeValue, this.getLocation(node));
             }
         }
     }
+}
+AbstractInterpreter.prototype.getLocation = function(node) {
+    return node.lineno+"|"+node.col_offset;
 }
 AbstractInterpreter.prototype.visit_Import = function(node) {
     for (var i = 0, len = node.names.length; i < len; i++) {
         var module = node.names[i];
         var asname = module.asname === null ? module.name : module.asname;
-        this.addVariable(asname.v);
-        this.setType(asname.v, {"type": "Module"});
+        this.addVariable(asname.v, this.getLocation(node));
+        this.setType(asname.v, {"type": "Module"}, this.getLocation(node));
     }
 }
 AbstractInterpreter.prototype.visit_ImportFrom = function(node) {
     for (var i = 0, len = node.names.length; i < len; i++) {
         var module = node.module === null ? node.names[i] : node.module + node.names[i];
         var asname = module.asname === null ? module.name : module.asname;
-        this.addVariable(asname.v);
-        this.setType(asname.v, {"type": "Module"});
+        this.addVariable(asname.v, this.getLocation(node));
+        this.setType(asname.v, {"type": "Module"}, this.getLocation(node));
     }
 }
 
 AbstractInterpreter.prototype.visit_Name = function(node) {
     if (node.ctx.name == "Store") {
-        this.addVariable(node.id.v);
+        this.addVariable(node.id.v, this.getLocation(node));
     } else if (node.ctx.name === "Load") {
-        this.readVariable(node.id.v);
+        this.readVariable(node.id.v, this.getLocation(node));
     }
     this.generic_visit(node);
 }
@@ -380,24 +483,24 @@ AbstractInterpreter.prototype.visit_For = function(node) {
             if (!(this.isTypeList(child.id.v))) {
                 this.report["Non-list iterations"].push(child.id.v);
             }
-            this.addPlural(child.id.v);
+            this.addPlural(child.id.v, this.getLocation(node));
         } else if (child._astname === "List" && child.elts.length === 0) {
             this.report["Empty iterations"].push(child.lineno);
         } else {
-            console.log(child);
+            //console.log(child);
         }
     }
     walked = this.walk(node.target);
     for (var i = 0, len = walked.length; i < len; i++) {
         var child = walked[i];
         if (child._astname === "Name" && child.ctx.name === "Store") {
-            this.addSingular(child.id.v);
+            this.addSingular(child.id.v, this.getLocation(node));
         }
     }
     this.visit(node.target);
     var iterType = this.typecheck(node.iter);
     if (iterType !== null && iterType.type == "List" && !iterType.empty) {
-        this.setType(node.target.id.v, iterType.component);
+        this.setType(node.target.id.v, iterType.component, this.getLocation(node));
     }
     for (var i = 0, len = node.body.length; i < len; i++) {
         this.visit(node.body[i]);
@@ -408,9 +511,14 @@ AbstractInterpreter.prototype.visit_For = function(node) {
     this.leaveFrame();
 }
 
+
+/*
 var filename = '__main__.py';
-var python_source = 'import weather\nb = 0\nfor x in y:\n    t = 0\nfor x in []:\n    p = 0\nfor temp in temp:\n    temp += 1\nweather = 7\nred = 7\nb = "red"';
+var python_source = 'total=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
 var analyzer = new AbstractInterpreter(python_source);
 analyzer.analyze()
 console.log(python_source);
+console.log(analyzer.ast);
+console.log(analyzer.rootFrame);
 console.log(analyzer.report);
+*/

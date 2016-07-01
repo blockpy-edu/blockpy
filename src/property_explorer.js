@@ -32,6 +32,25 @@ function PropertyExplorer(main, tag, stepConsole, stepEditor, tag, server) {
     this.tags.errors_hide.click(function() {
        errors.hide();
     });
+    
+    /*
+        // Add the Property Explorer
+    this.explorer = new PropertyExplorer(
+        function(step, page) { 
+            blockpy.stepConsole(step);
+        },
+        function(step, page) { 
+            blockpy.editor.highlightLine(page.line-1);
+            if (page.block) {
+                blockpy.editor.highlightBlock(page.block);
+            } else {
+                blockpy.editor.highlightBlock(null);
+            }
+        },
+        blockpy.mainDiv.find('.blockpy-explorer'),
+        blockpy.server
+    );
+    */
 }
 
 PropertyExplorer.prototype.move = function(step) {

@@ -1,6 +1,11 @@
 function BlockPyToolbar(main, tag) {
     this.main = main;
     this.tag = tag;
+    
+    this.tags = {};
+    this.tags.mode_set_text = this.tag.find('.blockpy-mode-set-text');
+    this.tags.filename_picker = this.tag.find('.blockpy-toolbar-filename-picker');
+    
     var groupHtml = '<div class="btn-group" role="group"></div>';
     var runGroup =      $(groupHtml).appendTo(tag);
     var modeGroup =     $(groupHtml).appendTo(tag);
@@ -19,7 +24,7 @@ function BlockPyToolbar(main, tag) {
                             .attr("role", "group")
                             .html('<i class="fa fa-repeat"></i>')
                             .appendTo(doGroup),
-        'align': $("<button></button>")
+        /*'align': $("<button></button>")
                             .addClass('btn btn-default blockpy-toolbar-align')
                             .attr("role", "group")
                             .html('<i class="fa fa-align-left"></i> Align')
@@ -33,7 +38,7 @@ function BlockPyToolbar(main, tag) {
                             .addClass('btn btn-default blockpy-toolbar-clear')
                             .attr("role", "group")
                             .html('<i class="fa fa-trash-o"></i> Clear')
-                            .appendTo(doGroup),
+                            .appendTo(doGroup),*/
         'programs': $("<div></div>")
                             .addClass('btn-group blockpy-programs')
                             .attr("data-toggle", "buttons")
@@ -61,14 +66,13 @@ BlockPyToolbar.prototype.hidePrograms = function() {
 }
     
     
-    
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
     var elements = this.elements;
     this.tag.find('.blockpy-run').click(function() {
         main.components.engine.run();
     });
-    this.tag.find('.blockpy-mode-set-text').click(function() {
+    this.tags.mode_set_text.click(function() {
         main.model.settings.editor("Text");
     });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {
@@ -80,6 +84,4 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tag.find('.blockpy-toolbar-capture').click(function() {
         main.components.editor.copyImage();
     });
-    
-    
 }

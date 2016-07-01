@@ -412,7 +412,7 @@ Blockly.Blocks['logic_boolean'] = {
         }
       ],
       "output": "Boolean",
-      "colour": Blockly.Blocks.logic.HUE,
+      "colour": DATA_HUE,
       "tooltip": Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP,
       "helpUrl": Blockly.Msg.LOGIC_BOOLEAN_HELPURL
     });
@@ -428,7 +428,7 @@ Blockly.Blocks['logic_null'] = {
     this.jsonInit({
       "message0": Blockly.Msg.LOGIC_NULL,
       "output": null,
-      "colour": Blockly.Blocks.logic.HUE,
+      "colour": DATA_HUE,
       "tooltip": Blockly.Msg.LOGIC_NULL_TOOLTIP,
       "helpUrl": Blockly.Msg.LOGIC_NULL_HELPURL
     });
