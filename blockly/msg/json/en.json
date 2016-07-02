@@ -1,7 +1,7 @@
 {
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
-		"lastupdated": "2016-05-11 11:29:57.970000",
+		"lastupdated": "2016-07-01 13:52:48.810000",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},
@@ -103,7 +103,7 @@
 	"LOGIC_BOOLEAN_TOOLTIP": "Returns either true or false.",
 	"LOGIC_NULL_HELPURL": "https://en.wikipedia.org/wiki/Nullable_type",
 	"LOGIC_NULL": "None",
-	"LOGIC_NULL_TOOLTIP": "Returns null.",
+	"LOGIC_NULL_TOOLTIP": "Returns the special None object.",
 	"LOGIC_TERNARY_HELPURL": "https://en.wikipedia.org/wiki/%3F:",
 	"LOGIC_TERNARY_CONDITION": "test",
 	"LOGIC_TERNARY_IF_TRUE": "if true",

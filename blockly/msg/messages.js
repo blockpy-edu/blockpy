@@ -53,7 +53,8 @@ goog.require('Blockly.Msg');
 /// For more context, see
 /// [[Translating:Blockly#infrequent_message_types]].\n{{Identical|Item}}
 Blockly.Msg.VARIABLES_DEFAULT_NAME = 'property_name';
-/// button text - Botton that sets a calendar to today's date.\n{{Identical|Today}}
+/// button text - Button that sets a calendar to today's date.\n{{Identical|Today}}
+>>>>>>> ae83207510f4d9e3abe4108670fab04bf2f50ae7
 Blockly.Msg.TODAY = 'Today';
 
 // Context menus.
@@ -284,7 +285,7 @@ Blockly.Msg.LOGIC_NULL_HELPURL = 'https://en.wikipedia.org/wiki/Nullable_type';
 /// block text - In computer languages, ''null'' is a special value that indicates that no value has been set.  You may use your language's word for "nothing" or "invalid".
 Blockly.Msg.LOGIC_NULL = 'None';
 /// tooltip - This should use the word from the previous message.
-Blockly.Msg.LOGIC_NULL_TOOLTIP = 'Returns null.';
+Blockly.Msg.LOGIC_NULL_TOOLTIP = 'Returns the special None object.';
 
 /// url - Describes the programming language operator known as the ''ternary'' or ''conditional'' operator.  It is recommended that you use the translation of [https://en.wikipedia.org/wiki/%3F: https://en.wikipedia.org/wiki/%3F:] if it exists.
 Blockly.Msg.LOGIC_TERNARY_HELPURL = 'https://en.wikipedia.org/wiki/%3F:';
@@ -978,13 +979,13 @@ Blockly.Msg.LISTS_GET_SUBLIST_TOOLTIP = 'Creates a copy of the specified portion
 
 /// url - Information describing sorting a list.
 Blockly.Msg.LISTS_SORT_HELPURL = 'https://github.com/google/blockly/wiki/Lists#sorting-a-list';
-/// Sort as type %1 (numeric or alphabetic) in order %2 (ascending or descending) a list of items %3.
+/// Sort as type %1 (numeric or alphabetic) in order %2 (ascending or descending) a list of items %3.\n{{Identical|Sort}}
 Blockly.Msg.LISTS_SORT_TITLE = 'sort %1 %2 %3';
 /// tooltip - See [https://github.com/google/blockly/wiki/Lists#sorting-a-list].
 Blockly.Msg.LISTS_SORT_TOOLTIP = 'Sort a copy of a list.';
-/// sorting order or direction from low to high value for numeric, or A-Z for alphabetic.
+/// sorting order or direction from low to high value for numeric, or A-Z for alphabetic.\n{{Identical|Ascending}}
 Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = 'ascending';
-/// sorting order or direction from high to low value for numeric, or Z-A for alphabetic.
+/// sorting order or direction from high to low value for numeric, or Z-A for alphabetic.\n{{Identical|Descending}}
 Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = 'descending';
 /// sort by treating each item as a number.
 Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = 'numeric';

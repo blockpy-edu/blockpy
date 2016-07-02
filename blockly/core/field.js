@@ -156,10 +156,6 @@ Blockly.Field.prototype.init = function() {
       Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
   // Force a render.
   this.updateTextNode_();
-  if (Blockly.Events.isEnabled()) {
-    Blockly.Events.fire(new Blockly.Events.Change(
-        this.sourceBlock_, 'field', this.name, '', this.getValue()));
-  }
 };
 
 /**
@@ -230,6 +226,14 @@ Blockly.Field.prototype.setVisible = function(visible) {
  */
 Blockly.Field.prototype.setValidator = function(handler) {
   this.validator_ = handler;
+};
+
+/**
+ * Gets the validation function for editable fields.
+ * @return {Function} Validation function, or null.
+ */
+Blockly.Field.prototype.getValidator = function() {
+  return this.validator_;
 };
 
 /**
@@ -450,7 +454,7 @@ Blockly.Field.prototype.setTooltip = function(newTip) {
 /**
  * Return the absolute coordinates of the top-left corner of this field.
  * The origin (0,0) is the top-left corner of the page body.
- * @return {{!goog.math.Coordinate}} Object with .x and .y properties.
+ * @return {!goog.math.Coordinate} Object with .x and .y properties.
  * @private
  */
 Blockly.Field.prototype.getAbsoluteXY_ = function() {

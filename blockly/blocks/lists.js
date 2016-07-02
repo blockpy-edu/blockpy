@@ -639,17 +639,19 @@ Blockly.Blocks['lists_getSublist'] = {
     }
     var menu = new Blockly.FieldDropdown(this['WHERE_OPTIONS_' + n],
         function(value) {
-      var newAt = (value == 'FROM_START') || (value == 'FROM_END');
-      // The 'isAt' variable is available due to this function being a closure.
-      if (newAt != isAt) {
-        var block = this.sourceBlock_;
-        block.updateAt_(n, newAt);
-        // This menu has been destroyed and replaced.  Update the replacement.
-        block.setFieldValue(value, 'WHERE' + n);
-        return null;
-      }
-      return undefined;
-    });
+          var newAt = (value == 'FROM_START') || (value == 'FROM_END');
+          // The 'isAt' variable is available due to this function being a
+          // closure.
+          if (newAt != isAt) {
+            var block = this.sourceBlock_;
+            block.updateAt_(n, newAt);
+            // This menu has been destroyed and replaced.
+            // Update the replacement.
+            block.setFieldValue(value, 'WHERE' + n);
+            return null;
+          }
+          return undefined;
+        });
     this.getInput('AT' + n)
         .appendField(menu, 'WHERE' + n);
     if (n == 1) {
@@ -679,7 +681,7 @@ Blockly.Blocks['lists_sort'] = {
           "options": [
             [Blockly.Msg.LISTS_SORT_TYPE_NUMERIC, "NUMERIC"],
             [Blockly.Msg.LISTS_SORT_TYPE_TEXT, "TEXT"],
-            [Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE, "IGNORE_CASE"] 
+            [Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE, "IGNORE_CASE"]
           ]
         },
         {

@@ -61,8 +61,8 @@ Blockly.Python.addReservedWords(
 Blockly.Python.ORDER_ATOMIC = 0;            // 0 "" ...
 Blockly.Python.ORDER_COLLECTION = 1;        // tuples, lists, dictionaries
 Blockly.Python.ORDER_STRING_CONVERSION = 1; // `expression...`
-Blockly.Python.ORDER_MEMBER = 2;            // . []
-Blockly.Python.ORDER_FUNCTION_CALL = 2;     // ()
+Blockly.Python.ORDER_MEMBER = 2.1;          // . []
+Blockly.Python.ORDER_FUNCTION_CALL = 2.2;   // ()
 Blockly.Python.ORDER_EXPONENTIATION = 3;    // **
 Blockly.Python.ORDER_UNARY_SIGN = 4;        // + -
 Blockly.Python.ORDER_BITWISE_NOT = 4;       // ~
@@ -85,6 +85,33 @@ Blockly.Python.ORDER_NONE = 99;             // (...)
  * Empty loops or conditionals are not allowed in Python.
  */
 Blockly.Python.PASS = '    pass\n';
+
+/*
+ * List of outer-inner pairings that do NOT require parentheses.
+ * @type {!Array.<!Array.<number>>}
+ */
+Blockly.Python.ORDER_OVERRIDES = [
+  // (foo()).bar -> foo().bar
+  // (foo())[0] -> foo()[0]
+  [Blockly.Python.ORDER_FUNCTION_CALL, Blockly.Python.ORDER_MEMBER],
+  // (foo())() -> foo()()
+  [Blockly.Python.ORDER_FUNCTION_CALL, Blockly.Python.ORDER_FUNCTION_CALL],
+  // (foo.bar).baz -> foo.bar.baz
+  // (foo.bar)[0] -> foo.bar[0]
+  // (foo[0]).bar -> foo[0].bar
+  // (foo[0])[1] -> foo[0][1]
+  [Blockly.Python.ORDER_MEMBER, Blockly.Python.ORDER_MEMBER],
+  // (foo.bar)() -> foo.bar()
+  // (foo[0])() -> foo[0]()
+  [Blockly.Python.ORDER_MEMBER, Blockly.Python.ORDER_FUNCTION_CALL],
+
+  // not (not foo) -> not not foo
+  [Blockly.Python.ORDER_LOGICAL_NOT, Blockly.Python.ORDER_LOGICAL_NOT],
+  // a and (b and c) -> a and b and c
+  [Blockly.Python.ORDER_LOGICAL_AND, Blockly.Python.ORDER_LOGICAL_AND],
+  // a or (b or c) -> a or b or c
+  [Blockly.Python.ORDER_LOGICAL_OR, Blockly.Python.ORDER_LOGICAL_OR]
+];
 
 /**
  * Initialise the database of variable names.
@@ -160,7 +187,7 @@ Blockly.Python.scrubNakedValue = function(line) {
  * @private
  */
 Blockly.Python.quote_ = function(string) {
-  // TODO: This is a quick hack.  Replace with goog.string.quote
+  // Can't use goog.string.quote since % must also be escaped.
   string = string.replace(/\\/g, '\\\\')
                  .replace(/\n/g, '\\\n');
   if (string.indexOf('"') > -1 && string.indexOf('"') == -1) {
@@ -188,8 +215,14 @@ Blockly.Python.scrub_ = function(block, code) {
   if (!block.outputConnection || !block.outputConnection.targetConnection) {
     // Collect comment for this block.
     var comment = block.getCommentText();
+    comment = Blockly.utils.wrap(comment, Blockly.Python.COMMENT_WRAP - 3);
     if (comment) {
-      commentCode += Blockly.Python.prefixLines(comment, '# ') + '\n';
+      if (block.getProcedureDef) {
+        // Use a comment block for function comments.
+        commentCode += '"""' + comment + '\n"""\n';
+      } else {
+        commentCode += Blockly.Python.prefixLines(comment + '\n', '# ');
+      }
     }
     // Collect comments for all value arguments.
     // Don't collect comments for nested statements.

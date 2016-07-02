@@ -56,7 +56,7 @@ Blockly.Blocks['factory_base'] = {
     this.setTooltip('Build a custom block by plugging\n' +
         'fields, inputs and other blocks here.');
     this.setHelpUrl(
-        'https://developers.google.com/blockly/custom-blocks/block-factory');
+        'https://developers.google.com/blockly/guides/create-custom-blocks/block-factory');
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -470,11 +470,9 @@ Blockly.Blocks['field_image'] = {
         .appendField(new Blockly.FieldTextInput(src), 'SRC');
     this.appendDummyInput()
         .appendField('width')
-        .appendField(new Blockly.FieldTextInput('15',
-            Blockly.FieldTextInput.numberValidator), 'WIDTH')
+        .appendField(new Blockly.FieldNumber('15', 0, NaN, 1), 'WIDTH')
         .appendField('height')
-        .appendField(new Blockly.FieldTextInput('15',
-            Blockly.FieldTextInput.numberValidator), 'HEIGHT')
+        .appendField(new Blockly.FieldNumber('15', 0, NaN, 1), 'HEIGHT')
         .appendField('alt text')
         .appendField(new Blockly.FieldTextInput('*'), 'ALT');
     this.setPreviousStatement(true, 'Field');

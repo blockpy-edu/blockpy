@@ -28,6 +28,7 @@ goog.provide('Blockly.BlockSvg');
 
 goog.require('Blockly.Block');
 goog.require('Blockly.ContextMenu');
+goog.require('Blockly.RenderedConnection');
 goog.require('goog.Timer');
 goog.require('goog.asserts');
 goog.require('goog.dom');
@@ -48,16 +49,31 @@ goog.require('goog.userAgent');
  */
 Blockly.BlockSvg = function(workspace, prototypeName, opt_id) {
   // Create core elements for the block.
-  /** @type {SVGElement} */
+  /**
+   * @type {SVGElement}
+   * @private
+   */
   this.svgGroup_ = Blockly.createSvgElement('g', {}, null);
-  /** @type {SVGElement} */
+
+  /**
+   * @type {SVGElement}
+   * @private
+   */
   this.svgPathDark_ = Blockly.createSvgElement('path',
       {'class': 'blocklyPathDark', 'transform': 'translate(1,1)'},
       this.svgGroup_);
-  /** @type {SVGElement} */
+
+  /**
+   * @type {SVGElement}
+   * @private
+   */
   this.svgPath_ = Blockly.createSvgElement('path', {'class': 'blocklyPath'},
       this.svgGroup_);
-  /** @type {SVGElement} */
+
+  /**
+   * @type {SVGElement}
+   * @private
+   */
   this.svgPathLight_ = Blockly.createSvgElement('path',
       {'class': 'blocklyPathLight'}, this.svgGroup_);
   this.svgPath_.tooltip = this;
@@ -148,7 +164,6 @@ Blockly.BlockSvg.prototype.select = function() {
   Blockly.Events.fire(event);
   Blockly.selected = this;
   this.addSelect();
-  Blockly.fireUiEvent(this.workspace.getCanvas(), 'blocklySelectChange');
 };
 
 /**
@@ -163,7 +178,6 @@ Blockly.BlockSvg.prototype.unselect = function() {
   Blockly.Events.fire(event);
   Blockly.selected = null;
   this.removeSelect();
-  Blockly.fireUiEvent(this.workspace.getCanvas(), 'blocklySelectChange');
 };
 
 /**
@@ -218,9 +232,9 @@ Blockly.BlockSvg.onMouseMoveWrapper_ = null;
 
 /**
  * Stop binding to the global mouseup and mousemove events.
- * @private
+ * @package
  */
-Blockly.BlockSvg.terminateDrag_ = function() {
+Blockly.BlockSvg.terminateDrag = function() {
   Blockly.BlockSvg.disconnectUiStop_();
   if (Blockly.BlockSvg.onMouseUpWrapper_) {
     Blockly.unbindEvent_(Blockly.BlockSvg.onMouseUpWrapper_);
@@ -249,17 +263,17 @@ Blockly.BlockSvg.terminateDrag_ = function() {
       // Ensure that any stap and bump are part of this move's event group.
       var group = Blockly.Events.getGroup();
       setTimeout(function() {
-          Blockly.Events.setGroup(group);
-          selected.snapToGrid();
-          Blockly.Events.setGroup(false);
+        Blockly.Events.setGroup(group);
+        selected.snapToGrid();
+        Blockly.Events.setGroup(false);
       }, Blockly.BUMP_DELAY / 2);
       setTimeout(function() {
-          Blockly.Events.setGroup(group);
-          selected.bumpNeighbours_();
-          Blockly.Events.setGroup(false);
+        Blockly.Events.setGroup(group);
+        selected.bumpNeighbours_();
+        Blockly.Events.setGroup(false);
       }, Blockly.BUMP_DELAY);
       // Fire an event to allow scrollbars to resize.
-      Blockly.fireUiEvent(window, 'resize');
+      Blockly.resizeSvgContents(selected.workspace);
     }
   }
   Blockly.dragMode_ = Blockly.DRAG_NONE;
@@ -329,6 +343,7 @@ Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
       'translate(' + (xy.x + dx) + ',' + (xy.y + dy) + ')');
   this.moveConnections_(dx, dy);
   event.recordNew();
+  Blockly.resizeSvgContents(this.workspace);
   Blockly.Events.fire(event);
 };
 
@@ -367,7 +382,8 @@ Blockly.BlockSvg.prototype.snapToGrid = function() {
 /**
  * Returns a bounding box describing the dimensions of this block
  * and any blocks stacked below it.
- * @return {!{height: number, width: number}} Object with height and width properties.
+ * @return {!{height: number, width: number}} Object with height and width
+ *    properties.
  */
 Blockly.BlockSvg.prototype.getHeightWidth = function() {
   var height = this.height;
@@ -386,10 +402,10 @@ Blockly.BlockSvg.prototype.getHeightWidth = function() {
 };
 
 /**
- * Returns the coordinates of a bounding box describing the dimensions of this block
- * and any blocks stacked below it.
+ * Returns the coordinates of a bounding box describing the dimensions of this
+ * block and any blocks stacked below it.
  * @return {!{topLeft: goog.math.Coordinate, bottomRight: goog.math.Coordinate}}
- *         Object with top left and bottom right coordinates of the bounding box.
+ *    Object with top left and bottom right coordinates of the bounding box.
  */
 Blockly.BlockSvg.prototype.getBoundingRectangle = function() {
   var blockXY = this.getRelativeToSurfaceXY(this);
@@ -399,10 +415,12 @@ Blockly.BlockSvg.prototype.getBoundingRectangle = function() {
   var bottomRight;
   if (this.RTL) {
     // Width has the tab built into it already so subtract it here.
-    topLeft = new goog.math.Coordinate(blockXY.x - (blockBounds.width - tab), blockXY.y);
+    topLeft = new goog.math.Coordinate(blockXY.x - (blockBounds.width - tab),
+        blockXY.y);
     // Add the width of the tab/puzzle piece knob to the x coordinate
     // since X is the corner of the rectangle, not the whole puzzle piece.
-    bottomRight = new goog.math.Coordinate(blockXY.x + tab, blockXY.y + blockBounds.height);
+    bottomRight = new goog.math.Coordinate(blockXY.x + tab,
+        blockXY.y + blockBounds.height);
   } else {
     // Subtract the width of the tab/puzzle piece knob to the x coordinate
     // since X is the corner of the rectangle, not the whole puzzle piece.
@@ -513,14 +531,10 @@ Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
     e.stopPropagation();
     return;
   }
-  Blockly.setPageSelectable(false);
   this.workspace.markFocused();
-  // Update Blockly's knowledge of its own location.
-  Blockly.svgResize(this.workspace);
   Blockly.terminateDrag_();
   this.select();
   Blockly.hideChaff();
-  this.workspace.recordDeleteAreas();
   if (Blockly.isRightButton(e)) {
     // Right-click.
     this.showContextMenu_(e);
@@ -558,6 +572,7 @@ Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
   }
   // This event has been handled.  No need to bubble up to the document.
   e.stopPropagation();
+  e.preventDefault();
 };
 
 /**
@@ -573,7 +588,6 @@ Blockly.BlockSvg.prototype.onMouseUp_ = function(e) {
     Blockly.Events.fire(
         new Blockly.Events.Ui(this, 'click', undefined, undefined));
   }
-  Blockly.setPageSelectable(true);
   Blockly.terminateDrag_();
   if (Blockly.selected && Blockly.highlightedConnection_) {
     // Connect two blocks together.
@@ -596,10 +610,6 @@ Blockly.BlockSvg.prototype.onMouseUp_ = function(e) {
       goog.Timer.callOnce(trashcan.close, 100, trashcan);
     }
     Blockly.selected.dispose(false, true);
-    // Dropping a block on the trash can will usually cause the workspace to
-    // resize to contain the newly positioned block.  Force a second resize
-    // now that the block has been deleted.
-    Blockly.fireUiEvent(window, 'resize');
   }
   if (Blockly.highlightedConnection_) {
     Blockly.highlightedConnection_.unhighlight();
@@ -797,8 +807,11 @@ Blockly.BlockSvg.prototype.setDragging_ = function(adding) {
     group.translate_ = '';
     group.skew_ = '';
     this.addDragging();
+    Blockly.draggingConnections_ =
+        Blockly.draggingConnections_.concat(this.getConnections_(true));
   } else {
     this.removeDragging();
+    Blockly.draggingConnections_ = [];
   }
   // Recurse through all blocks attached under this one.
   for (var i = 0; i < this.childBlocks_.length; i++) {
@@ -859,6 +872,11 @@ Blockly.BlockSvg.prototype.onMouseMove_ = function(e) {
     // Check to see if any of this block's connections are within range of
     // another block's connection.
     var myConnections = this.getConnections_(false);
+    // Also check the last connection on this stack
+    var lastOnStack = this.lastConnectionInStack_();
+    if (lastOnStack && lastOnStack != this.nextConnection) {
+      myConnections.push(lastOnStack);
+    }
     var closestConnection = null;
     var localConnection = null;
     var radiusConnection = Blockly.SNAP_RADIUS;
@@ -894,6 +912,7 @@ Blockly.BlockSvg.prototype.onMouseMove_ = function(e) {
   }
   // This event has been handled.  No need to bubble up to the document.
   e.stopPropagation();
+  e.preventDefault();
 };
 
 /**
@@ -957,7 +976,11 @@ Blockly.BlockSvg.prototype.getSvgRoot = function() {
  * @param {boolean} animate If true, show a disposal animation and sound.
  */
 Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
+  Blockly.Tooltip.hide();
   Blockly.Field.startCache();
+  // Save the block's workspace temporarily so we can resize the
+  // contents once the block is disposed.
+  var blockWorkspace = this.workspace;
   // If this block is being dragged, unlink the mouse events.
   if (Blockly.selected == this) {
     this.unselect();
@@ -984,6 +1007,7 @@ Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
   Blockly.BlockSvg.superClass_.dispose.call(this, healStack);
 
   goog.dom.removeNode(this.svgGroup_);
+  Blockly.resizeSvgContents(blockWorkspace);
   // Sever JavaScript to DOM connections.
   this.svgGroup_ = null;
   this.svgPath_ = null;
@@ -1009,7 +1033,7 @@ Blockly.BlockSvg.prototype.disposeUiEffect = function() {
   this.workspace.getParentSvg().appendChild(clone);
   clone.bBox_ = clone.getBBox();
   // Start the animation.
-  Blockly.BlockSvg.disposeUiStep_(clone, this.RTL, new Date(),
+  Blockly.BlockSvg.disposeUiStep_(clone, this.RTL, new Date,
       this.workspace.scale);
 };
 
@@ -1024,7 +1048,7 @@ Blockly.BlockSvg.prototype.disposeUiEffect = function() {
  * @private
  */
 Blockly.BlockSvg.disposeUiStep_ = function(clone, rtl, start, workspaceScale) {
-  var ms = (new Date()) - start;
+  var ms = new Date - start;
   var percent = ms / 150;
   if (percent > 1) {
     goog.dom.removeNode(clone);
@@ -1066,7 +1090,7 @@ Blockly.BlockSvg.prototype.connectionUiEffect = function() {
        'stroke': '#888', 'stroke-width': 10},
       this.workspace.getParentSvg());
   // Start the animation.
-  Blockly.BlockSvg.connectionUiStep_(ripple, new Date(), this.workspace.scale);
+  Blockly.BlockSvg.connectionUiStep_(ripple, new Date, this.workspace.scale);
 };
 
 /**
@@ -1077,7 +1101,7 @@ Blockly.BlockSvg.prototype.connectionUiEffect = function() {
  * @private
  */
 Blockly.BlockSvg.connectionUiStep_ = function(ripple, start, workspaceScale) {
-  var ms = (new Date()) - start;
+  var ms = new Date - start;
   var percent = ms / 150;
   if (percent > 1) {
     goog.dom.removeNode(ripple);
@@ -1108,7 +1132,7 @@ Blockly.BlockSvg.prototype.disconnectUiEffect = function() {
     magnitude *= -1;
   }
   // Start the animation.
-  Blockly.BlockSvg.disconnectUiStep_(this.svgGroup_, magnitude, new Date());
+  Blockly.BlockSvg.disconnectUiStep_(this.svgGroup_, magnitude, new Date);
 };
 
 /**
@@ -1122,7 +1146,7 @@ Blockly.BlockSvg.disconnectUiStep_ = function(group, magnitude, start) {
   var DURATION = 200;  // Milliseconds.
   var WIGGLES = 3;  // Half oscillations.
 
-  var ms = (new Date()) - start;
+  var ms = new Date - start;
   var percent = ms / DURATION;
 
   if (percent > 1) {
@@ -1435,6 +1459,7 @@ Blockly.BlockSvg.prototype.setColour = function(colour) {
  */
 Blockly.BlockSvg.prototype.setPreviousStatement =
     function(newBoolean, opt_check) {
+  /* eslint-disable indent */
   Blockly.BlockSvg.superClass_.setPreviousStatement.call(this, newBoolean,
       opt_check);
 
@@ -1442,7 +1467,7 @@ Blockly.BlockSvg.prototype.setPreviousStatement =
     this.render();
     this.bumpNeighbours_();
   }
-};
+};  /* eslint-enable indent */
 
 /**
  * Set whether another block can chain onto the bottom of this block.
@@ -1572,4 +1597,14 @@ Blockly.BlockSvg.prototype.getConnections_ = function(all) {
     }
   }
   return myConnections;
+};
+
+/**
+ * Create a connection of the specified type.
+ * @param {number} type The type of the connection to create.
+ * @return {!Blockly.RenderedConnection} A new connection of the specified type.
+ * @private
+ */
+Blockly.BlockSvg.prototype.makeConnection_ = function(type) {
+  return new Blockly.RenderedConnection(this, type);
 };
