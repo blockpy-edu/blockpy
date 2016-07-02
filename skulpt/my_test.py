@@ -1,2 +1,5 @@
-a = 3.3
-a, b = a
+class Feedback(Exception):
+    pass
+    
+f = Feedback()
+print(f)

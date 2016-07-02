@@ -28,13 +28,33 @@ Sk.builtin.object.prototype.GenericGetAttr = function (name) {
     var f;
     var descr;
     var tp;
+    var dict;
     var pyName = new Sk.builtin.str(name);
     goog.asserts.assert(typeof name === "string");
 
     tp = this.ob$type;
     goog.asserts.assert(tp !== undefined, "object has no ob$type!");
 
-    //print("getattr", tp.tp$name, name);
+    dict = this["$d"] || this.constructor["$d"];
+
+    // todo; assert? force?
+    if (dict) {
+        if (dict.mp$lookup) {
+            res = dict.mp$lookup(pyName);
+        } else if (dict.mp$subscript) {
+            try {
+                res = dict.mp$subscript(pyName);
+            } catch (x) {
+                res = undefined;
+            }
+        } else if (typeof dict === "object") {
+            // todo; definitely the wrong place for this. other custom tp$getattr won't work on object -- bnm -- implemented custom __getattr__ in abstract.js
+            res = dict[name];
+        }
+        if (res !== undefined) {
+            return res;
+        }
+    }
 
     descr = Sk.builtin.type.typeLookup(tp, name);
 
@@ -44,31 +64,6 @@ Sk.builtin.object.prototype.GenericGetAttr = function (name) {
         // todo;
         //if (f && descr.tp$descr_set) // is a data descriptor if it has a set
         //return f.call(descr, this, this.ob$type);
-    }
-
-    // todo; assert? force?
-    if (this["$d"]) {
-        if (this["$d"].mp$lookup) {
-            res = this["$d"].mp$lookup(pyName);
-        } else if (this["$d"].mp$subscript) {
-            try {
-                res = this["$d"].mp$subscript(pyName);
-            } catch (x) {
-                res = undefined;
-            }
-        } else if (typeof this["$d"] === "object") {
-            // todo; definitely the wrong place for this. other custom tp$getattr won't work on object -- bnm -- implemented custom __getattr__ in abstract.js
-            res = this["$d"][name];
-        }
-        if (res !== undefined) {
-            return res;
-        }
-    } else if (this instanceof Sk.builtin.object) {
-        // Initialize inner dictionary for builtin types
-        // This is not done upon instantiation to improve performance
-        this["$d"] = {
-            "Sk.builtin.object": true   // Indicates this is a builtin object
-        };
     }
 
     if (f) {
@@ -91,26 +86,24 @@ goog.exportSymbol("Sk.builtin.object.prototype.GenericPythonGetAttr", Sk.builtin
 
 Sk.builtin.object.prototype.GenericSetAttr = function (name, value) {
     var objname = Sk.abstr.typeName(this);
+    var pyname;
+    var dict;
     goog.asserts.assert(typeof name === "string");
     // todo; lots o' stuff
 
-    if (this["$d"] === undefined && this instanceof Sk.builtin.object) {
-        // Initialize inner dictionary for builtin types
-        // This is not done upon instantiation to improve performance
-        this["$d"] = {
-            "Sk.builtin.object": true   // Indicates this is a builtin object
-        };
-    }
+    dict = this["$d"] || this.constructor["$d"];
 
-    if (this["$d"].mp$ass_subscript) {
-        this["$d"].mp$ass_subscript(new Sk.builtin.str(name), value);
-    } else if (typeof this["$d"] === "object") {
-        // Cannot add new attributes to a builtin object
-        if (this["$d"]["Sk.builtin.object"] && this["$d"][name] === undefined) {
+    if (dict.mp$ass_subscript) {
+        pyname = new Sk.builtin.str(name);
+
+        if (this instanceof Sk.builtin.object && !(this.ob$type.sk$klass) &&
+            dict.mp$lookup(pyname) === undefined) {
+            // Cannot add new attributes to a builtin object
             throw new Sk.builtin.AttributeError("'" + objname + "' object has no attribute '" + name + "'");
         }
-
-        this["$d"][name] = value;
+        dict.mp$ass_subscript(new Sk.builtin.str(name), value);
+    } else if (typeof dict === "object") {
+        dict[name] = value;
     }
 };
 goog.exportSymbol("Sk.builtin.object.prototype.GenericSetAttr", Sk.builtin.object.prototype.GenericSetAttr);
@@ -143,6 +136,7 @@ Sk.builtin.object.prototype.tp$name = "object";
  * @type {Sk.builtin.type}
  */
 Sk.builtin.object.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj("object", Sk.builtin.object);
+Sk.builtin.object.prototype.ob$type.sk$klass = undefined;   // Nonsense for closure compiler
 
 /** Default implementations of dunder methods found in all Python objects */
 
@@ -383,7 +377,7 @@ Sk.builtin.object.prototype.ob$ge = function (other) {
  * Array of all the Python functions which are methods of this class.
  * @type {Array}
  */
-Sk.builtin.object.prototype.pythonFunctions = ["__repr__", "__str__", "__hash__",
+Sk.builtin.object.pythonFunctions = ["__repr__", "__str__", "__hash__",
 "__eq__", "__ne__", "__lt__", "__le__", "__gt__", "__ge__", "__getattr__", "__setattr__"];
 
 /**

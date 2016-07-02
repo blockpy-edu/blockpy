@@ -25,6 +25,7 @@ var $builtinmodule = function (name) {
     var mod = {};
     var imList = [];
     var looping = true;
+    var instance = null;
 
     // We need this to store a reference to the actual processing object which is not created
     // until the run function is called.  Even then the processing object is passed by the
@@ -120,13 +121,6 @@ var $builtinmodule = function (name) {
     mod.MODEL = new Sk.builtin.int_( 4);
     mod.SHAPE = new Sk.builtin.int_( 5);
     
-    // Stroke modes
-    mod.SQUARE = Sk.builtin.assk$(  'butt', Sk.builtin.nmber.str);
-    mod.ROUND = Sk.builtin.assk$(   'round', Sk.builtin.nmber.str);
-    mod.PROJECT = Sk.builtin.assk$( 'square', Sk.builtin.nmber.str);
-    mod.MITER = Sk.builtin.assk$(   'miter', Sk.builtin.nmber.str);
-    mod.BEVEL = Sk.builtin.assk$(   'bevel', Sk.builtin.nmber.str);
-    
     // Lighting modes
     mod.AMBIENT = new Sk.builtin.int_(     0);
     mod.DIRECTIONAL = new Sk.builtin.int_( 1);
@@ -185,9 +179,8 @@ var $builtinmodule = function (name) {
 
     mod.DEG_TO_RAD = new Sk.builtin.float_( Math.PI / 180);
     mod.RAD_TO_DEG = new Sk.builtin.float_( 180 / Math.PI);
-    
-    mod.WHITESPACE = Sk.builtin.assk$(" \t\n\r\f\u00A0", Sk.builtin.nmber.str);
-    
+
+    mod.WHITESPACE = Sk.builtin.str(" \t\n\r\f\u00A0");
     // Shape modes
     mod.POINT = new Sk.builtin.int_(2);
     mod.POINTS = new Sk.builtin.int_(2);
@@ -250,12 +243,12 @@ var $builtinmodule = function (name) {
     mod.PERSPECTIVE = new Sk.builtin.int_(  3);
     
     // Cursors
-    mod.ARROW = Sk.builtin.assk$('default', Sk.builtin.str);
-    mod.CROSS = Sk.builtin.assk$('crosshair', Sk.builtin.str);
-    mod.HAND = Sk.builtin.assk$('pointer', Sk.builtin.str);
-    mod.MOVE = Sk.builtin.assk$('move', Sk.builtin.str);
-    mod.TEXT = Sk.builtin.assk$('text', Sk.builtin.str);
-    mod.WAIT = Sk.builtin.assk$('wait', Sk.builtin.str);
+    mod.ARROW = new Sk.builtin.str("default");
+    mod.CROSS = new Sk.builtin.str("crosshair");
+    mod.HAND = new Sk.builtin.str("pointer");
+    mod.MOVE = new Sk.builtin.str("move");
+    mod.TEXT = new Sk.builtin.str("text");
+    mod.WAIT = new Sk.builtin.str("wait");
     mod.NOCURSOR = Sk.builtin.assk$("url('data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='), auto", Sk.builtin.nmber.str);
 
     // Hints
@@ -1234,20 +1227,24 @@ var $builtinmodule = function (name) {
 
     });
 
-    mod.fill = new Sk.builtin.func(function (r, g, b) {
+    mod.fill = new Sk.builtin.func(function (r, g, b, alpha) {
         // r will be either:
         //      a number in which case the fill will be grayscale
         //      a color object
         // g, and b may be undefined.  If they hold values it will
         // be assumed that we have an r,g,b color tuple
+        // alpha may also be undefined - if defined, it is the opacity of the fill
         if (typeof(g) !== "undefined") {
             g = g.v;
         }
         if (typeof(b) !== "undefined") {
             b = b.v;
         }
+        if (typeof(alpha) !== "undefined") {
+            alpha = alpha.v;
+        }
 
-        mod.processing.fill(r.v, g, b);
+        mod.processing.fill(r.v, g, b, alpha);
 
     });
 
@@ -1270,14 +1267,27 @@ var $builtinmodule = function (name) {
     });
 
 
-    mod.colorMode = new Sk.builtin.func(function (model, maxV) {
+    mod.colorMode = new Sk.builtin.func(function (mode, maxV, maxG, maxB, maxAlpha) {
+        // mode is one of RGB or HSB
+        // maxV is either the max value for all color elements
+        // or the range for Red/Hue (depending on mode) if maxG and maxB are defined
         if (typeof(maxV) === "undefined") {
             maxV = 255;
         }
         else {
             maxV = maxV.v;
         }
-        mod.processing.colorMode(model.v, maxV);
+        if (typeof(maxG) !== "undefined") {
+            maxG = maxG.v;
+        }
+        if (typeof(maxB) !== "undefined") {
+            maxB = maxB.v;
+        }
+        if (typeof(maxAlpha) !== "undefined") {
+            maxAlpha = maxAlpha.v;
+        }
+
+        mod.processing.colorMode(mode.v, maxV, maxG, maxB, maxAlpha);
     });
 
     mod.noFill = new Sk.builtin.func(function () {
@@ -1549,6 +1559,11 @@ var $builtinmodule = function (name) {
         window.Processing.logger = { log : function(message) {
             Sk.misceval.print_(message);
         }};
+        // if a Processing instance already exists it's likely still running, stop it by exiting
+        instance = window.Processing.getInstanceById(Sk.canvas);
+        if (instance) {
+            instance.exit();
+        }
         mod.p = new window.Processing(canvas, sketchProc);
 
 
@@ -1866,7 +1881,7 @@ var $builtinmodule = function (name) {
 
 	$loc.normalize = new Sk.builtin.func(function (self) {
 	    // normalize()	Normalizes the vector
-	    self.v.normalize(vec.v);
+	    self.v.normalize();
 	});
 
 	$loc.limit = new Sk.builtin.func(function (self, value) {
