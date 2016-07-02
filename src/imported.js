@@ -117,8 +117,8 @@ Blockly.Blocks['datetime_time'] = {
                 var minuteMenu = new Blockly.FieldDropdown(MINUTES);
                 var meridianMenu = new Blockly.FieldDropdown(MERIDIANS);
                 this.appendDummyInput('EXTENDED')
-                    .appendField(minuteMenu, 'MINUTE')
                     .appendField(':')
+                    .appendField(minuteMenu, 'MINUTE')
                     .appendField(meridianMenu, 'MERIDIAN');
             }
         } else if (inputExists) {
