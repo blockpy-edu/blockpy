@@ -37,13 +37,13 @@ var DAYS = [
   ]
 
 var DAYS_MAP = {
-        'MON': 'dates.monday',
-        'TUE': 'dates.tuesday',
-        'WED': 'dates.wednesday',
-        'THU': 'dates.thursday',
-        'FRI': 'dates.friday',
-        'SAT': 'dates.saturday',
-        'TODAY': 'dates.today'
+        'MON': 'dates.date("MON")',
+        'TUE': 'dates.tuesday()',
+        'WED': 'dates.wednesday()',
+        'THU': 'dates.thursday()',
+        'FRI': 'dates.friday()',
+        'SAT': 'dates.saturday()',
+        'TODAY': 'dates.today()'
     };
 
 
