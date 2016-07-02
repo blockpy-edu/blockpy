@@ -180,7 +180,7 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
     var engine = this;
     var server = this.server;
     var on_run = this.main.model.programs['give_feedback']();
-    if (on_run.trim() !== "") {
+    if (on_run !== undefined && on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
         Sk.afterSingleExecution = undefined;
         Sk.builtins.output = Sk.ffi.remapToPy(output);
