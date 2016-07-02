@@ -11,7 +11,7 @@ class TestCase:
         self.numFailed = 0
         self.assertPassed = 0
         self.assertFailed = 0
-        self.verbose = True
+        self.verbosity = 1
         self.tlist = []
         testNames = {}
         for name in dir(self):
@@ -19,7 +19,7 @@ class TestCase:
                 self.tlist.append(getattr(self,name))
                 testNames[name]=True
 
-    def setup(self):
+    def setUp(self):
         pass
 
     def tearDown(self):
@@ -34,10 +34,10 @@ class TestCase:
     def main(self):
 
         for func in self.tlist:
-            if self.verbose:
+            if self.verbosity > 1:
                 print('Running %s' % self.cleanName(func))
             try:
-                self.setup()
+                self.setUp()
                 self.assertPassed = 0
                 self.assertFailed = 0
                 func()
@@ -101,12 +101,26 @@ class TestCase:
         res = not isinstance(a,b)
         self.appendResult(res,str(a)+' to not be an instance of ',b,feedback)
 
-    def assertAlmostEqual(self, a, b, places=7, feedback=""):
-        res = round(a-b, places) == 0
-        self.appendResult(res,str(a)+' to equal ',b,feedback)
+    def assertAlmostEqual(self, a, b, places=None, feedback="", delta=None):
 
-    def assertNotAlmostEqual(self, a, b, places=7, feedback=""):
-        res = round(a-b, places) != 0
+        if delta is not None:
+            res = abs(a - b) <= delta
+        else:
+            if places is None:
+                places = 7
+            res = round(abs(a-b), places) == 0
+
+        self.appendResult(res,str(a)+' to equal ', b, feedback)
+
+    def assertNotAlmostEqual(self, a, b, places=None, feedback="", delta=None):
+
+        if delta is not None:
+            res = not (a == b) and abs(a - b) > delta
+        else:
+            if places is None:
+                places = 7
+            res = not (a == b) and round(abs(a-b), places) != 0
+
         self.appendResult(res,str(a)+' to not equal ',b,feedback)
 
     def assertGreater(self,a,b, feedback=""):
@@ -170,7 +184,7 @@ class TestCase:
 
 
 
-def main(verbose=False, names=None):
+def main(verbosity=1, names=None):
     glob = globals() # globals() still needs work
     if names == None:
         names = glob
@@ -178,7 +192,7 @@ def main(verbose=False, names=None):
         if issubclass(glob[name],TestCase):
             try:
                 tc = glob[name]()
-                tc.verbose = verbose
+                tc.verbosity = verbosity
                 tc.main()
             except:
                 print("Uncaught Error in: ", name)

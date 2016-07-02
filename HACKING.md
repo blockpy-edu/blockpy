@@ -73,7 +73,7 @@ To give you some idea of what is going on behind the scenes with skulpt lets loo
 
 So, 50 lines of Javascript for hello world eh?  That sounds kind of crazy, but you have to recognize that the environment with global variables, local variables, error handling, etc all has to happen even for the simplest program to run.  The parts of the program above that really print "hello world" are lines 26-29.  If you have a look at them you will see that we have to construct a string object from the string literal and then pass that off to some print function.
 
-In the example above `Sk.builtin.str` and `Sk.misceval.print_` are part of the Skuplt runtime.  It is usually the case that to extend Skupt one of these runtime functions must be modified, or a new runtime function must be created and exposed so that it can be used in an ordinary Python program.  The rest of this manual will take you through the essential parts of Skulpt so you can feel comfortable working on and extending the runtime environment. 
+In the example above `Sk.builtin.str` and `Sk.misceval.print_` are part of the Skulpt runtime.  It is usually the case that to extend Skulpt one of these runtime functions must be modified, or a new runtime function must be created and exposed so that it can be used in an ordinary Python program.  The rest of this manual will take you through the essential parts of Skulpt so you can feel comfortable working on and extending the runtime environment. 
 
 An important thing to keep in mind as you are trying to understand Skulpt is that it is heavily influenced by the implementation of CPython.  So although Python and Javascript are both object oriented languages many parts of the skulpt implementation are quite procedural.  For example using functions that take an object as their first parameter may seem strange as we should have just created a method on that object.  But in order to follow the CPython implementation this decision was made early on.
 
@@ -457,7 +457,7 @@ and goes through the evaluation of the if condition. The second block is
 the if true block of the if. The third block is the else block of the if
 statement, and the final block is the rest of the program after the
 if/else is all done. You can verify this for yourself by putting this
-program into a file `simple.py` and runing `./skulpt.py run simple.py`
+program into a file `simple.py` and running `./skulpt.py run simple.py`
 If you examine the output you will see that the `$blk` variable is
 manipulated to control which `case` is executed the next time through
 the while loop. Very clever! If Javascript had `goto statements` this
@@ -493,7 +493,7 @@ straightforward path. So start as follows:
     x = [1,2,3]
     print(sorted(x,reverse=True))
 
-Now run this using `skulpt.py run test.py` and you will get a compiled
+Now run this using `./skulpt.py run test.py` and you will get a compiled
 program. With a little bit of sleuthing you find:
 
     /*    35 */                     // line 2:
@@ -581,10 +581,10 @@ skulpt.min.js and skulpt-stdlib.js A very minimal installation only uses
 skulpt.min.js, whereas if you want to use any modules they are in
 skulpt-stdlib.js. Looking around the distribution you will not
 immediately find skulpt.min.js because you need to build it. You get a
-sculpt.js file by using the m script that comes with the distribution.
-running m --help will give you the full list of commands, but the two
-that you probably most care about are m dist and m docbi The dist
-command builds both skulpt.min.js and skulpt-stdlib.js docbi builds
+sculpt.js file by using the skulpty.py script that comes with the distribution.
+running `./skulpt.py --help` will give you the full list of commands, but the two
+that you probably most care about are `./skulpt.py dist` and `./skulpt.py docbi`
+The dist command builds both skulpt.min.js and skulpt-stdlib.js docbi builds
 skulpt-stdlib.js and puts a new copy of it in the doc/static directory.
 Lets begin with a quick tour of the source tree:
 
@@ -604,9 +604,9 @@ Lets begin with a quick tour of the source tree:
     add modules to the simpler editor later in this article.
 -   test - this directory contains a bunch of files for testing the
     implementation in a batch mode. These tests are run whenever you run
-    m dist, or m test.
--   dist - This directory gets created and populated when you run the m
-    dist command. It contains the built and compressed versions of
+    `./skulpt.py dist`, or `./skulpt.py test`.
+-   dist - This directory gets created and populated when you run the
+    `skulpt.py dist` command. It contains the built and compressed versions of
     skulpt.min.js and skulpt-stdlib.js
 
 To illustrate how to make use of modules, here's an extended version of
@@ -681,8 +681,8 @@ included after skulpt.min.js
 Now as far as the module itself goes, the easiest thing to do is to
 start your module in the src/lib directory. This way it will
 automatically get built and included in skulpt-stdlib.js. If you don't
-put it there then you are going to have to modify the m script,
-specifically the docbi function in the m script to include your module.
+put it there then you are going to have to modify the skulpt.py script,
+specifically the docbi function in the skulpt.py script to include your module.
 Suppose that you want to have a module called bnm.test Here's what you
 have to do. First, you need to make a bnm directory under lib. In this
 directory you will need to have either \_\_init\_\_.py or
@@ -759,8 +759,8 @@ function.js if you want more explanation of how the builtin.func method
 works.
 
 Well, I think this should be enough to get you going. Its worth
-repeating, if you made it this far, don't forget to call m docbi or m
-dist after you make changes in your module, its easy to get into the
+repeating, if you made it this far, don't forget to call `./skulpt.py docbi` or
+`./skulpt.py dist` after you make changes in your module, its easy to get into the
 mode of thinking that the new javascript is automatically loaded. But
 skulpt-stdlib.js is not automatically rebuilt!
 

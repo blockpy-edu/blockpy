@@ -1,4 +1,4 @@
-var interned = {};
+Sk.builtin.interned = {};
 
 /**
  * @constructor
@@ -51,16 +51,14 @@ Sk.builtin.str = function (x) {
     }
 
     // interning required for strings in py
-    if (Object.prototype.hasOwnProperty.call(interned, "1" + ret)) {
-        // note, have to use Object to avoid __proto__, etc.
-        // failing
-        return interned["1" + ret];
+    if (Sk.builtin.interned["1" + ret]) {
+        return Sk.builtin.interned["1" + ret];
     }
 
     this.__class__ = Sk.builtin.str;
     this.v = ret;
     this["v"] = this.v;
-    interned["1" + ret] = this;
+    Sk.builtin.interned["1" + ret] = this;
     return this;
 
 };
@@ -430,6 +428,7 @@ Sk.builtin.str.prototype["rpartition"] = new Sk.builtin.func(function (self, sep
 });
 
 Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, start, end) {
+    var normaltext;
     var ctl;
     var slice;
     var m;
@@ -458,7 +457,8 @@ Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, sta
         end = end >= 0 ? end : self.v.length + end;
     }
 
-    m = new RegExp(pat.v, "g");
+    normaltext = pat.v.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    m = new RegExp(normaltext, "g");
     slice = self.v.slice(start, end);
     ctl = slice.match(m);
     if (!ctl) {
