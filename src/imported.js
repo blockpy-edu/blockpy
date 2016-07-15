@@ -230,14 +230,13 @@ Blockly.Blocks['datetime_check_time'] = {
     this.setColour(Blockly.Blocks.logic.HUE);
     this.setOutput(true, 'Boolean');
     this.appendValueInput('LEFT')
-        .setCheck('DatetimeTime');
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(equalityOperators), 'OP')
+        .setCheck('DatetimeTime')
         .appendField(new Blockly.FieldDropdown(HOURS), 'HOURS')
         .appendField(':')
         .appendField(new Blockly.FieldDropdown(MINUTES), 'MINUTES')
-        .appendField(new Blockly.FieldDropdown(MERIDIANS), 'MERIDIANS');
-    this.setInputsInline(true);
+        .appendField(new Blockly.FieldDropdown(MERIDIANS), 'MERIDIANS')
+        .appendField(new Blockly.FieldDropdown(equalityOperators), 'OP');
+    //this.setInputsInline(true);
   }
 };
 

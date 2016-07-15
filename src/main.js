@@ -80,6 +80,7 @@ function BlockPy(settings, assignment, submission, programs) {
         }
     };
     this.model.program = ko.computed(function() {
+        console.log(this.settings.filename())
         return this.programs[this.settings.filename()]();
     }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
     
