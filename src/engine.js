@@ -164,7 +164,7 @@ BlockPyEngine.prototype.run = function() {
             //blockpy.explorer.reload(blockpy.traceTable, -1);
             // Handle checks
             feedback.noErrors()
-            engine.check(code, execution.trace, execution.output, execution.ast);
+            engine.check(code, execution.trace(), execution.output(), execution.ast);
             // Reenable "Run"
             engine.main.model.execution.status("waiting");
         },
@@ -183,6 +183,16 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
     if (on_run !== undefined && on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
         Sk.afterSingleExecution = undefined;
+        
+        // Old code to handle lame checking
+        on_run += "\nresult = on_run('''"+student_code+"''', "+
+                  JSON.stringify(output)+", "+
+                  JSON.stringify(traceTable)+" "+
+                  ")";
+        console.log(on_run);
+        
+        // New code to handle sophisticated checking
+        /*
         Sk.builtins.output = Sk.ffi.remapToPy(output);
         Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
         Sk.builtins.code = Sk.ffi.remapToPy(student_code);
@@ -190,6 +200,8 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
         Sk.builtins.give_feedback = new Sk.builtin.func(function(message) {
             throw new Sk.builtin.SystemExit(message);
         });
+        */
+        
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
@@ -197,25 +209,29 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
             function (module) {
                 Sk.afterSingleExecution = backupExecution;
                 var result = Sk.ffi.remapToJs(module.$d.result);
-                if (result === 1) {  
-                    server.markSuccess(1.0);
-                    engine.feedback.success();
+                if (result === true) {  
+                    //server.markSuccess(1.0);
+                    engine.main.components.feedback.complete();
                 } else {
-                    server.markSuccess(0.0);
-                    engine.feedback.error(result);
+                    //server.markSuccess(0.0);
+                    engine.main.components.feedback.instructorFeedback(result);
                 }
             }, function (error) {
                 Sk.afterSingleExecution = backupExecution;
+                /*
                 Sk.builtins.output = undefined;
                 Sk.builtins.trace = undefined;
                 Sk.builtins.code = undefined;
                 Sk.builtins.ast = undefined;
                 Sk.builtins.give_feedback = undefined;
+                
                 if (error.tp$name == "SystemExit") {
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
                 } else {
                     engine.main.components.feedback.error("Error in instructor's feedback. "+error);
                 }
+                */
+                engine.main.components.feedback.error("Error in instructor's feedback. "+error);
                 console.error("Instructor Feedback Error:", error);
                 //server.logEvent('blockly_instructor_error', error);
             });

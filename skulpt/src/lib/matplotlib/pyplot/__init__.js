@@ -50,12 +50,145 @@ jsplotlib.rc = {
 
 var chart_counter = 0; // for creating unique ids
 
-jsplotlib.Bars = function(xdata, ydata) {
+jsplotlib.Bars = function(ydata, color) {
     var that = {};
     
     // Initialize parameter defaults
-    that._x = xdata;
     that._y = ydata;
+    that._color = color || null;
+    
+    that.color = function(cs) {
+        if (cs)
+            this._color = jsplotlib.color_to_hex(cs);
+        return this;
+    };
+    
+    that.draw = function(parent_chart) {
+        // should be called in the pplot command
+        // each plot call adds a new set of bars to our existing plot
+        // object and draws them all, when show is called
+        // this._init_common();
+        var number_of_points = this._y.length; // implement need to move those from the original construct_graph class to lines
+        if (!this._linestyle && !this._marker) {
+            this._linestyle = jsplotlib.rc['lines.linestyle'];
+        }
+
+        /*
+        if (!this._marker && !this._linestyle) {
+          this._marker = jsplotlib.rc['lines.marker'];
+        }
+        */
+
+        if (!this._color) {
+            this._color = jsplotlib.color_to_hex(parent_chart.get_next_color());
+        }
+
+        // set defaults for all attributes
+        if (!this._markersize) {
+            this._markersize = jsplotlib.rc['lines.markersize'];
+        }
+
+        if (!this._markeredgecolor) {
+            this._markeredgecolor = 'k';
+        }
+
+        if (!this._linewidth) {
+            this._linewidth = jsplotlib.rc['lines.linewidth'];
+        }
+
+        if (!this._dash_capstyle) {
+            this._dash_capstyle = "butt";
+        }
+
+        if (!this._solid_capstyle) {
+            this._solid_capstyle = "butt";
+        }
+
+        if (!this._solid_joinstyle) {
+            this._solid_joinstyle = "miter";
+        }
+
+        if (!this._dash_joinstyle) {
+            this._dash_joinstyle = "miter";
+        }
+
+        // default markerfacecolor is linecolor
+        if (!this._markerfacecolor) {
+            this._markerfacecolor = jsplotlib.color_to_hex(this._color);
+        }
+
+        if (!this._markeredgewidth) {
+            this._markeredgewidth = 0.75;
+        }
+
+        if (!this._alpha) {
+            this._alpha = 1;
+        }
+
+        // local storage for drawing
+        var y = this._y;
+        
+        //x.domain([d3.min(y), d3.max(y)]);
+        //var bins = parseInt(mainModel.settings.bins());
+        //tempScale = d3.scale.linear().domain([0, bins]).range(d3.extent(ys));
+        /*tickArray = d3.range(bins).map(tempScale).map(function(e) {
+            return e;
+        });*/
+        //var histMapper = d3.layout.histogram().bins(tickArray)(ys);
+        //y.domain([0, d3.max(histMapper, function(d) { return d.y; })]);
+
+        // create array of point pairs with optional s value
+        // from [x1,x2], [y1, y2], [s1, s2]
+        // to [[x1,y1,s1],[x2,y2,s2]]
+        var xscale = parent_chart.get_xscale(); // should come from axis o.O
+        var yscale = parent_chart.get_yscale();
+
+        var xformat = parent_chart._xaxis._formatter || function(x) {
+            return x;
+        };
+
+        var yformat = parent_chart._yaxis._formatter || function(x) {
+            return x;
+        };
+
+        // this adds the bars to the chart
+        this._bars = parent_chart.chart.append("svg:g").attr("id", this._artist_id);
+        this._bars_containers = this._bars.selectAll("g.pplot_bars").data(y).enter()
+            .append("g").attr("class", "pplot_bars");
+            
+        /*
+        bars.enter().append("rect")
+            .attr("class", "bar")
+            .attr("y", y(0))
+            .style('fill', mainModel.settings.color().fill)
+            .style('outline', '1px solid '+mainModel.settings.color().stroke)
+            .attr("height", height - y(0));
+        */
+
+        // set appropriate line style
+        this._bars = this._bars_containers.append("line")
+            .attr("x1", function(d) {
+                return xscale(d[0][0]);
+            })
+            .attr("x2", function(d) {
+                return xscale(d[1][0]);
+            })
+            .attr("y1", function(d) {
+                return yscale(d[0][1]);
+            })
+            .attr("y2", function(d) {
+                return yscale(d[1][1]);
+            })
+            .style("stroke", jsplotlib.color_to_hex(this._color))
+            .style("stroke-linecap", this._solid_capstyle)
+            .style("stroke-linejoin", this._solid_joinstyle)
+            .style("stroke-opacity", this._alpha)
+            .style("stroke-width", this._linewidth);
+
+        return this;
+    };
+    
+    return that;
 }
 
 /** Line2D class for encapsulating all line relevant attributes and methods
@@ -609,7 +742,7 @@ jsplotlib.Line2D = function(xdata, ydata, linewidth, linestyle, color, marker,
 jsplotlib.plot = function(chart) {
     /*
       list of responsibilites
-       - holds all lines
+       - holds all lines, bars, etc. ("artists")
        - updates axis
        - construct axis
        - knows color_cycle
@@ -622,13 +755,13 @@ jsplotlib.plot = function(chart) {
     };
 
     that.axes_colorcycle_position = 0;
-    that.line_count = 0;
-    that._lines = []; // we support multiple lines
+    that.artist_count = 0;
+    that._artists = []; // we support multiple artists
 
-    that.add_line = function(line) {
-        if (line) {
-            this._lines.push(line);
-            line._line_id = this.line_count++;
+    that.add_artist = function(artist) {
+        if (artist) {
+            this._artists.push(artist);
+            artist._artist_id = this.artist_count++;
             this._update_limits();
         }
 
@@ -715,14 +848,15 @@ jsplotlib.plot = function(chart) {
     };
 
     that._update_limits = function() {
+        //TODO: rework for histogram/bar charts
         var i;
         var xs = []; // all x-values
         var ys = []; // all y-values
 
         // calculate limits
-        for (i = 0; i < this._lines.length; i++) {
-            xs = xs.concat(this._lines[i]._x);
-            ys = ys.concat(this._lines[i]._y);
+        for (i = 0; i < this._artists.length; i++) {
+            xs = xs.concat(this._artists[i]._x);
+            ys = ys.concat(this._artists[i]._y);
         }
 
         this._xlimits([d3.min(xs), d3.max(xs)]);
@@ -812,7 +946,7 @@ jsplotlib.plot = function(chart) {
         };
     };
     /**
-     Draws the lines. Lines are respnsible for their drawing. Here we just initialize
+     Draws the artists. Artists are respnsible for their drawing. Here we just initialize
      the axes and the scaling.
     **/
     that.draw = function() {
@@ -821,8 +955,8 @@ jsplotlib.plot = function(chart) {
         this._init_common(); //
 
         // draw lines
-        for (i = 0; i < this._lines.length; i++) {
-            this._lines[i].draw(this);
+        for (i = 0; i < this._artists.length; i++) {
+            this._artists[i].draw(this);
         }
 
         this._draw_axes();
@@ -832,8 +966,8 @@ jsplotlib.plot = function(chart) {
         var i;
 
         // pass to lines
-        for (i = 0; i < this._lines.length; i++) {
-            this._lines[i].update(kwargs);
+        for (i = 0; i < this._artists.length; i++) {
+            this._artists[i].update(kwargs);
         }
 
         // update own kwargs
@@ -1724,7 +1858,7 @@ var $builtinmodule = function(name) {
                 // handle case for plot(x, y)
                 // Where the x and y are integers, not lists
                 line = new jsplotlib.Line2D(xdata[0], ydata[0]);
-                plot.add_line(line);
+                plot.add_artist(line);
             } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
                 for (i = 0; i < xdata.length; i++) {
                     line = new jsplotlib.Line2D(xdata[i], ydata[i]);
@@ -1734,7 +1868,7 @@ var $builtinmodule = function(name) {
                         'marker': jsplotlib.parse_marker(ftm_tuple.marker),
                         'color': ftm_tuple.color
                     });
-                    plot.add_line(line);
+                    plot.add_artist(line);
                 }
             } else {
                 throw new Sk.builtin.ValueError('Cannot parse given combination of "*args"!');
@@ -1744,14 +1878,14 @@ var $builtinmodule = function(name) {
             plot.update(kwargs);
         } else {
             if (!plot) {
-                plot = {"_lines":[]};
+                plot = {"_artists":[]};
             }
             var line;
             if (xdata.length === 1 && ydata.length === 1 && stylestring.length === 0) {
-                plot._lines.push([xdata[0], ydata[0]]);
+                plot._artists.push([xdata[0], ydata[0]]);
             } else if (xdata.length === ydata.length && xdata.length === stylestring.length) {
                 for (i = 0; i < xdata.length; i++) {
-                    plot._lines.push([xdata[i], ydata[i]]);
+                    plot._artists.push([xdata[i], ydata[i]]);
                 }
             } else {
                 throw new Sk.builtin.ValueError('Cannot parse given combination of "*args"!');
@@ -1776,9 +1910,9 @@ var $builtinmodule = function(name) {
                 throw new Sk.builtin.ValueError(
                     "Can not call show without any plot created.");
             }
-            var lines = plot._lines.map(function(elem) { return [elem._x, elem._y] })
+            var lines = plot._artists.map(function(elem) { return [elem._x, elem._y] })
         } else {
-            var lines = plot._lines;
+            var lines = plot._artists;
         }
         Sk.console.printHtml(chart, lines);
         //$(Sk.matplotlibCanvas).show();
@@ -2247,10 +2381,74 @@ var $builtinmodule = function(name) {
         throw new Sk.builtin.NotImplementedError(
             "hexbin is not yet implemented");
     });
-    mod.hist = new Sk.builtin.func(function() {
-        throw new Sk.builtin.NotImplementedError(
-            "hist is not yet implemented");
-    });
+    mod.values = Array();
+    var hist_f = function(kwa) {
+        // Check kwarg argument
+        Sk.builtin.pyCheckArgs("histk", arguments, 1, Infinity, true, false);
+        args = Array.prototype.slice.call(arguments, 1);
+        mod.values.push(args);
+        kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
+        kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
+        
+        // process arguments into a list
+        var ydata = [];
+        var stylestring = []; // we support only one at the moment
+        
+        for (i = 0; i < args.length; i++) {
+            // Not tackling numpy arrays yet
+            if (args[i] instanceof Sk.builtin.list) {
+                _unpacked = Sk.ffi.remapToJs(args[i]);
+                ydata.push(_unpacked);
+            } else if (Sk.builtin.checkString(args[i])) {
+                stylestring.push(Sk.ffi.remapToJs(args[i]));
+            } else {
+                throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[i]) +
+                    "' is not supported for *args[" + i + "].");
+            }
+        }
+        
+        if (Sk.skip_drawing !== true) {
+
+            // empty canvas from previous plots
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
+            }
+
+            // create line objects
+            var bar;
+
+            for (i = 0; i < xdata.length; i++) {
+                bars = new jsplotlib.Bars(ydata[i]);
+                var ftm_tuple = jsplotlib._process_plot_format(stylestring[i]);
+                bars.update({
+                    'linestyle': ftm_tuple.linestyle,
+                    'marker': jsplotlib.parse_marker(ftm_tuple.marker),
+                    'color': ftm_tuple.color
+                });
+                plot.add_artist(bars);
+            }
+
+            // set kwargs that apply for all lines
+            plot.update(kwargs);
+        } else {
+            if (!plot) {
+                plot = {"_artists":[]};
+            }
+            for (i = 0; i < ydata.length; i++) {
+                plot._artists.push([ydata[i]]);
+            }
+            
+        }
+
+        // result
+        var result = [];
+
+        return new Sk.builtins.tuple(result);
+    }
+    hist_f.co_kwargs = true;
+    mod.hist = new Sk.builtin.func(hist_f);
     mod.hist2d = new Sk.builtin.func(function() {
         throw new Sk.builtin.NotImplementedError(
             "hist2d is not yet implemented");

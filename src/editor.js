@@ -266,7 +266,7 @@ BlockPyEditor.prototype.updateText = function() {
     }
     var code = this.main.model.program();
     this.updateStack.push('text');
-    if (code == "") {
+    if (code == undefined || code.trim() == "") {
         this.codeMirror.setValue("\n");
     } else {
         this.codeMirror.setValue(code);
@@ -280,7 +280,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
         return;
     }
     var code = this.main.model.program();
-    if (code.trim().charAt(0) !== '<') {
+    if (code !== '' && code !== undefined && code.trim().charAt(0) !== '<') {
         var result = this.converter.convertSource(code);
         code = result.xml;
         if (result.error !== null) {
@@ -289,9 +289,14 @@ BlockPyEditor.prototype.updateBlocks = function() {
             return false;
         }
     }
-    var blocklyXml = Blockly.Xml.textToDom(code);
-    this.updateStack.push('blocks');
-    this.setBlocksFromXml(blocklyXml);
+    if (code !== '' && code !== undefined) {
+        var blocklyXml = Blockly.Xml.textToDom(code);
+        this.updateStack.push('blocks');
+        this.setBlocksFromXml(blocklyXml);
+    } else {
+        this.updateStack.push('blocks');
+        this.blockly.clear();
+    }
     // Parsons shuffling
     if (this.main.model.assignment.parsons()) {
         this.blockly.shuffle();

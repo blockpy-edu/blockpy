@@ -54,6 +54,7 @@
     <script type="text/javascript" src="src/abstract_interpreter.js"></script>    
     <script type="text/javascript" src="src/python_to_blockly.js"></script>
     <script type="text/javascript" src="src/imported.js"></script>
+    <script type="text/javascript" src="src/imported_skulpt.js"></script>
     <script type="text/javascript" src="src/util.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
@@ -86,14 +87,15 @@
             {
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
-                'generate_feedback': 'give_feedback("There was no feedback.")',
+                'give_feedback': 'def on_run(code, output, properties):\n    return True',
                 'starting_code': ''
             },
             // submission
             {},
             // programs
             {
-                '__main__': "x = 0\nprint(x)"
+                '__main__': 'a=0\nprint(a)',//"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
+                'give_feedback': 'def on_run(code, output, properties):\n    return True'
                 //$("#default-body").html()
             }
         )
