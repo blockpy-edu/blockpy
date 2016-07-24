@@ -42,6 +42,10 @@
     border-bottom: 1px dashed lightgray;
 }
 
+.blockpy-printer .blockpy-printer-output samp {
+    white-space: pre;
+}
+
 .blockpy-bottom {
     height: 25%;
 }

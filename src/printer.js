@@ -53,7 +53,7 @@ BlockPyPrinter.prototype.print = function(lineText) {
             'data-toggle': 'tooltip',
             'data-placement': 'left',
             'data-step': stepNumber,
-            "text": encodedText,
+            "html": encodedText,
             'title': "Step "+stepNumber + ", Line "+lineNumber,
         })
         lineContainer.append(lineData);

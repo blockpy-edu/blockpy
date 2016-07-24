@@ -278,7 +278,10 @@ Blockly.onKeyDown_ = function(e) {
     }
     if (e.keyCode == 86) {
       // 'v' for paste.
-      if (Blockly.clipboardXml_) {
+      if (localStorage.getItem('_blockly_clipboardXml_')) {
+        var domText = localStorage.getItem('_blockly_clipboardXml_');
+        Blockly.mainWorkspace.paste(Blockly.Xml.textToDom(domText));
+      } else if (Blockly.clipboardXml_) {
         Blockly.clipboardSource_.paste(Blockly.clipboardXml_);
       }
     } else if (e.keyCode == 90) {
@@ -369,6 +372,7 @@ Blockly.copy_ = function(block) {
   xmlBlock.setAttribute('y', xy.y);
   Blockly.clipboardXml_ = xmlBlock;
   Blockly.clipboardSource_ = block.workspace;
+  localStorage.setItem('_blockly_clipboardXml_', Blockly.Xml.domToText(xmlBlock));
 };
 
 /**
