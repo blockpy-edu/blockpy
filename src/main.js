@@ -8,6 +8,7 @@ function BlockPy(settings, assignment, submission, programs) {
             // Default mode when you open the screen is instructor
             // boolean
             'instructor': ko.observable(settings.instructor),
+            'instructor_initial': ko.observable(settings.instructor),
             // boolean
             'enable_blocks': ko.observable(settings.blocks_enabled),
             // boolean
@@ -145,6 +146,7 @@ BlockPy.prototype.initComponents = function() {
     this.components.printer = new BlockPyPrinter(this, container.find('.blockpy-printer'));
     this.components.engine = new BlockPyEngine(this);
     this.components.server = new BlockPyServer(this);
+    this.components.corgis = new BlockPyCorgis(this);
     
     this.components.editor.setMode();
 }

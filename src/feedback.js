@@ -106,6 +106,7 @@ BlockPyFeedback.prototype.printError = function(error) {
     this.title.html(error.tp$name);
     this.original.show().html(original);
     this.body.html(error.enhanced);
+    console.error(error);
     this.main.model.status.error("runtime");
     this.main.components.editor.highlightError(error.traceback[0].lineno-1);
     return;

@@ -61,6 +61,7 @@
     <script type="text/javascript" src="src/printer.js"></script>
     <script type="text/javascript" src="src/interface.js"></script>
     <script type="text/javascript" src="src/server.js"></script>
+    <script type="text/javascript" src="src/corgis.js"></script>
     <script type="text/javascript" src="src/presentation.js"></script>
     <script type="text/javascript" src="src/property_explorer.js"></script>
     <script type="text/javascript" src="src/editor.js"></script>
@@ -81,7 +82,10 @@
                 'editor': 'Blocks',
                 'blocklyPath': "blockly/",
                 'attachmentPoint': document.getElementById('blockpy-div'),
-                'instructor': true
+                'instructor': true,
+                'urls': {
+                    'import_datasets': 'http://localhost:8000/'
+                }
             },
             // assignment
             {
@@ -94,7 +98,7 @@
             {},
             // programs
             {
-                '__main__': 'a=0\nprint(a)',//"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
+                '__main__': 'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',//"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
                 'give_feedback': 'def on_run(code, output, properties):\n    return True'
                 //$("#default-body").html()
             }

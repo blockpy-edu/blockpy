@@ -14,7 +14,7 @@ function BlockPyToolbar(main, tag) {
     var codeGroup =     $(groupHtml).appendTo(tag);
     var programsGroup = $(groupHtml).appendTo(tag);
     this.elements = {
-        'undo': $("<button></button>")
+        /*'undo': $("<button></button>")
                             .addClass('btn btn-default blockpy-toolbar-undo')
                             .attr("role", "group")
                             .html('<i class="fa fa-undo"></i>')
@@ -23,7 +23,7 @@ function BlockPyToolbar(main, tag) {
                             .addClass('btn btn-default blockpy-toolbar-redo')
                             .attr("role", "group")
                             .html('<i class="fa fa-repeat"></i>')
-                            .appendTo(doGroup),
+                            .appendTo(doGroup),*/
         /*'align': $("<button></button>")
                             .addClass('btn btn-default blockpy-toolbar-align')
                             .attr("role", "group")
@@ -75,13 +75,17 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tags.mode_set_text.click(function() {
         main.model.settings.editor("Text");
     });
+    this.tag.find('.blockpy-toolbar-reset').click(function() {
+        main.model.programs['__main__'](main.model.programs['starting_code']());
+        main.components.editor.updateBlocks();
+    });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {
         main.model.settings.editor("Blocks");
     });
     this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");
     });
-    this.tag.find('.blockpy-toolbar-capture').click(function() {
-        main.components.editor.copyImage();
+    this.tag.find('.blockpy-toolbar-import').click(function() {
+        main.components.corgis.openDialog();
     });
 }

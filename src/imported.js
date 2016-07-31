@@ -1,3 +1,4 @@
+/*
 Blockly.Blocks['classics_get_all'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -18,6 +19,7 @@ Blockly.Python['classics_get_all'] = function(block) {
 PythonToBlocks.KNOWN_MODULES['classics'] = {
     "get_all": ["classics_get_all"]
 };
+*/
 
 
 function newBlock(name) {
