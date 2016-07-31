@@ -56,6 +56,8 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.blockly.resize();
     // Keep the toolbox width set
     this.blocklyToolboxWidth = this.blockly.toolbox_.width;
+    
+    Blockly.captureDialog_ = this.copyImage.bind(this);
 };
 
 BlockPyEditor.prototype.initText = function() {
@@ -553,6 +555,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
 
 
 BlockPyEditor.prototype.copyImage = function() {
+    var dialog = this.main.components.dialog;
     aleph = this.blockly.svgBlockCanvas_.cloneNode(true);
     aleph.removeAttribute("width");
     aleph.removeAttribute("height");
@@ -566,19 +569,29 @@ BlockPyEditor.prototype.copyImage = function() {
         aleph.insertBefore(linkElm, aleph.firstChild);
         var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
         var xml = new XMLSerializer().serializeToString(aleph);
-        console.log(xml);
         xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
         var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
         var img  = document.createElement("img");
         img.setAttribute('src', data);
         img.style.display = 'block';
-        var span = document.createElement('span');
-        span.textContent = "Right-click and copy the image below."
-        var div = document.createElement('div');
-        div.appendChild(span);
-        div.appendChild(img);
-        //document.body.appendChild(img);
-        
-        this.main.components.dialog.show("Blocks as Image", div);
+        img.onload = function() {
+            var canvas = d3.select('body').append('canvas').node();
+            //canvas.hide();
+            canvas.width = bbox.width;
+            canvas.height = bbox.height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            var canvasUrl = canvas.toDataURL("image/png");
+            img.onload = function() {
+                var span = document.createElement('span');
+                span.textContent = "Right-click and copy the image below."
+                var div = document.createElement('div');
+                div.appendChild(span);
+                div.appendChild(img);
+                
+                dialog.show("Blocks as Image", div);
+            };
+            img.src = canvasUrl;
+        }
     }
 }

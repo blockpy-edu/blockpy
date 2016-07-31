@@ -975,6 +975,17 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
                     _instance.redo();
   }});
   
+  if (Blockly.captureDialog_ != undefined) {
+    var captureOption = {
+      text: 'Screenshot',
+      enabled: true,
+      callback: function() {
+        Blockly.captureDialog_();
+      }
+    };
+    menuOptions.push(captureOption);
+  }
+  
   // Option to clear all the blocks.
   var clearOption = {enabled: true};
   clearOption.text = "Clear Blocks";

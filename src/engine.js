@@ -258,6 +258,12 @@ BlockPyEngine.prototype.parseGlobals = function(variables) {
 }
 
 BlockPyEngine.prototype.parseValue = function(property, value) {
+    if (value == undefined) {
+        return {'name': property,
+                'type': 'Unknown',
+                "value": 'Undefined'
+                };
+    }
     switch (value.constructor) {
         case Sk.builtin.func:
             return {'name': property,

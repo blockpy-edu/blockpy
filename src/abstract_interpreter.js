@@ -18,7 +18,7 @@ AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'},
                                 'True': {"type": "Bool"}, 
                                 'False': {"type": "Bool"}, 
                                 'None': {"type": 'None'}}
-AbstractInterpreter.prototype.MODULES = {
+AbstractInterpreter.MODULES = {
     'weather': {
         'get_temperature': {"type": 'Num'},
         'get_forecasts': {"type": "List", "empty": false, "component": {"type": 'Num'}},
@@ -388,8 +388,8 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
             return null;
         }
     } else if (attribute._astname == "Name") {
-        if (attribute.id.v in this.MODULES) {
-            return this.MODULES[attribute.id.v];
+        if (attribute.id.v in AbstractInterpreter.MODULES) {
+            return AbstractInterpreter.MODULES[attribute.id.v];
         } else {
             this.report["Unknown functions"].push(attribute.attr);
             return null;

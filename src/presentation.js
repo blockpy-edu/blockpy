@@ -3,7 +3,7 @@ function BlockPyPresentation(main, tag) {
     this.tag = tag;
     
     var presentationEditor = this;
-    this.main.model.settings.instructor.subscribe(function() {presentationEditor.setVisible()});
+    //this.main.model.settings.instructor.subscribe(function() {presentationEditor.setVisible()});
 }
 
 BlockPyPresentation.prototype.closeEditor = function() {

@@ -245,6 +245,7 @@ PythonToBlocks.prototype.convertStatement = function(node, full_source, is_top_l
     } catch (e) {
         heights = this.getChunkHeights(node);
         extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
+        console.error(e);
         return raw_block(extractedSource);
     }
 }
@@ -1042,10 +1043,20 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                 isExpression = false;
             }
             var fields = {};
+            var mutations = {};
             for (var i = 0; i < args.length; i++) {
                 var argument = definition[1+i];
+                console.log(argument);
                 if (typeof argument ==  "string") {
                     fields[argument] = this.Str_value(args[i]);
+                } else if (typeof argument == "object") {
+                    if (argument.type == 'mutation') {
+                        if (argument.index == undefined) {
+                            mutations[argument.name] = this.Str_value(args[i]);
+                        } else {
+                            mutations[argument.name] = this.Str_value(args[argument.index+1]);
+                        }
+                    }
                 } else {
                     var argumentName = argument[0];
                     var argumentMapper = argument[1];
@@ -1058,9 +1069,9 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                 fields[first] = second;
             }
             if (isExpression) {
-                return block(blockName, func.lineno, fields);
+                return block(blockName, func.lineno, fields, [], [], mutations);
             } else {
-                return [block(blockName, func.lineno, fields)];
+                return [block(blockName, func.lineno, fields, [], [], mutations)];
             }
         }
     } 

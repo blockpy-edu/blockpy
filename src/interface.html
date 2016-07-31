@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class='row' style='padding-bottom: 10px; border-bottom: 1px solid #faebcc; '>
-        <div class='blockpy-content-top col-md-10 col-sm-10'>
+        <div class='blockpy-content-top col-md-9 col-sm-9'>
             <span class='blockpy-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
             <strong>BlockPy: </strong> 
             <span class='blockpy-presentation-name'
@@ -23,12 +23,21 @@
             <div class='blockpy-presentation' data-bind="html: assignment.introduction">
             </div>
         </div>
-        <div class='blockpy-content-topright col-md-2 col-sm-2'>
+        <div class='blockpy-content-topright col-md-3 col-sm-3'>
             <span class='pull-right label label-default'
                   data-bind="css: status_server_class()[0],
                              text: status_server_class()[1]">Loading</span>
             <div class='pull-right'>
                 Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors">
+                <label class='blockpy-toolbar-auto-upload' data-bind="visible: settings.instructor">
+                Auto-save:
+                <input type='checkbox' data-bind="checked:settings.auto_upload">
+                </label> 
+                
+                <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
+                Instructor mode: 
+                <input type='checkbox' data-bind="checked:settings.instructor">
+                </label> 
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
@@ -95,11 +104,14 @@
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
                 </label>
             </div>
-            <button type='button' class='btn btn-default'>
+            <button type='button' class='btn btn-default blockpy-toolbar-reset'>
                 <span class='glyphicon glyphicon-refresh'></span> Reset
             </button>
-            <button type='button' class='btn btn-default blockpy-toolbar-capture'>
+            <!--<button type='button' class='btn btn-default blockpy-toolbar-capture'>
                 <span class='glyphicon glyphicon-picture'></span> Capture
+            </button>-->
+            <button type='button' class='btn btn-default blockpy-toolbar-import'>
+                <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
             </button>
             
             <select data-bind="visible: settings.instructor, value: settings.filename"
@@ -108,11 +120,6 @@
                 <option value='starting_code'>Starting Code</option>
                 <option value='give_feedback'>Generate Feedback</option>
             </select>
-            
-            <label class='blockpy-toolbar-auto-upload' data-bind="visible: settings.instructor">
-            Auto-save:
-            <input type='checkbox' data-bind="checked:settings.auto_upload">
-            </label> 
                 
         </div>
     </div>
