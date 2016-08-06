@@ -48,7 +48,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.blockly.enableUndo();
     // Register model changer
     var editor = this;
-    this.blockly.addChangeListener(function() {editor.updateCodeFromBlocks()});
+    this.blockly.addChangeListener(function() { console.log("blockly/CL"); editor.updateCodeFromBlocks()});
     //this.main.model.program.subscribe(function() {editor.updateBlocks()});
     this.main.model.settings.filename.subscribe(function() {editor.updateBlocks()});
     this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
@@ -171,7 +171,7 @@ BlockPyEditor.prototype.setModeToText = function() {
     this.hideInstructorMenu();
     this.showTextMenu();
     // Update the text model from the blocks
-    //this.updateText(); TODO: is this necessary?
+    this.updateText(); //TODO: is this necessary?
 }
 
 BlockPyEditor.prototype.setModeToBlocks = function() {
@@ -241,6 +241,7 @@ BlockPyEditor.prototype.setMode = function(mode) {
 }
 
 BlockPyEditor.prototype.updateCodeFromBlocks = function() {
+    console.log("ucfb:enter")
     if (this.updateStack.slice(-1).pop() !== undefined) {
         return;
     }
@@ -281,20 +282,26 @@ BlockPyEditor.prototype.updateBlocks = function() {
     if (this.updateStack.slice(-1).pop() == 'blocks') {
         return;
     }
-    var code = this.main.model.program();
-    if (code !== '' && code !== undefined && code.trim().charAt(0) !== '<') {
-        var result = this.converter.convertSource(code);
-        code = result.xml;
+    var python_code = this.main.model.program();
+    if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
+        var result = this.converter.convertSource(python_code);
+        xml_code = result.xml;
         if (result.error !== null) {
             this.blocksFailed = true;
             this.main.reportError('editor', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
             return false;
         }
     }
-    if (code !== '' && code !== undefined) {
-        var blocklyXml = Blockly.Xml.textToDom(code);
+    if (xml_code !== '' && xml_code !== undefined) {
+        var blocklyXml = Blockly.Xml.textToDom(xml_code);
         this.updateStack.push('blocks');
-        this.setBlocksFromXml(blocklyXml);
+        try {
+            this.setBlocksFromXml(blocklyXml);
+        } catch (e) {
+            var error_code = this.converter.convertSourceToCodeBlock(python_code);
+            var blocklyXml = Blockly.Xml.textToDom(error_code);
+            this.setBlocksFromXml(blocklyXml);
+        }
     } else {
         this.updateStack.push('blocks');
         this.blockly.clear();
@@ -575,8 +582,8 @@ BlockPyEditor.prototype.copyImage = function() {
         img.setAttribute('src', data);
         img.style.display = 'block';
         img.onload = function() {
-            var canvas = d3.select('body').append('canvas').node();
-            //canvas.hide();
+            //TODO: Make this capture a class descendant. Cross the D3/Jquery barrier!
+            var canvas = d3.select('#capture-canvas').node();//d3.select('body').append('canvas').node();
             canvas.width = bbox.width;
             canvas.height = bbox.height;
             var ctx = canvas.getContext('2d');

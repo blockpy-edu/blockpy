@@ -39,13 +39,13 @@ var DAYS = [
   ]
 
 var DAYS_MAP = {
-        'MON': 'dates.date("MON")',
-        'TUE': 'dates.tuesday()',
-        'WED': 'dates.wednesday()',
-        'THU': 'dates.thursday()',
-        'FRI': 'dates.friday()',
-        'SAT': 'dates.saturday()',
-        'TODAY': 'dates.today()'
+        'MON': 'parking.date("MON")',
+        'TUE': 'parking.tuesday()',
+        'WED': 'parking.wednesday()',
+        'THU': 'parking.thursday()',
+        'FRI': 'parking.friday()',
+        'SAT': 'parking.saturday()',
+        'TODAY': 'parking.today()'
     };
 
 
@@ -72,7 +72,7 @@ Blockly.Blocks['datetime_day'] = {
   }
 };
 Blockly.Python['datetime_day'] = function(block) {
-    Blockly.Python.definitions_['import_dates'] = 'import dates';
+    Blockly.Python.definitions_['import_parking'] = 'import parking';
     var operator = DAYS_MAP[block.getFieldValue('DAY')];
     return [operator, Blockly.Python.ORDER_ATOMIC];
 };
@@ -130,39 +130,39 @@ Blockly.Blocks['datetime_time'] = {
 };
 
 var HOURS_MAP = {
-    '1': 'dates.one()',
-    '2': 'dates.two()',
-    '3': 'dates.three()',
-    '4': 'dates.four()',
-    '5': 'dates.five()',
-    '6': 'dates.six()',
-    '7': 'dates.seven()',
-    '8': 'dates.eight()',
-    '9': 'dates.nine()',
-    '10': 'dates.ten()',
-    '11': 'dates.eleven()',
-    '12': 'dates.twelve()',
-    'NOW': 'dates.now()'
+    '1': 'parking.one()',
+    '2': 'parking.two()',
+    '3': 'parking.three()',
+    '4': 'parking.four()',
+    '5': 'parking.five()',
+    '6': 'parking.six()',
+    '7': 'parking.seven()',
+    '8': 'parking.eight()',
+    '9': 'parking.nine()',
+    '10': 'parking.ten()',
+    '11': 'parking.eleven()',
+    '12': 'parking.twelve()',
+    'NOW': 'parking.now()'
 };
 var MINUTES_MAP = {
-    '00': 'dates.exactly()',
-    '30': 'dates.half()'
+    '00': 'parking.exactly()',
+    '30': 'parking.half()'
 }
 var MERIDIANS_MAP = {
-    'AM': 'dates.am()',
-    'PM': 'dates.pm()'
+    'AM': 'parking.am()',
+    'PM': 'parking.pm()'
 }
 
 Blockly.Python['datetime_time'] = function(block) {
-    Blockly.Python.definitions_['import_dates'] = 'import dates';
+    Blockly.Python.definitions_['import_parking'] = 'import parking';
     var hour = HOURS_MAP[block.getFieldValue('HOUR')];
     var minute = MINUTES_MAP[block.getFieldValue('MINUTE')];
     var meridian = MERIDIANS_MAP[block.getFieldValue('MERIDIAN')];
-    var code = 'dates.time('+hour+','+minute+','+meridian+')';
+    var code = 'parking.time('+hour+','+minute+','+meridian+')';
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-PythonToBlocks.KNOWN_MODULES['dates'] = {
+PythonToBlocks.KNOWN_MODULES['parking'] = {
     "equal_time": ["datetime_check_day", 'LEFT', ['OP', 'IS'], 'VALUE'],
     "before_time": ["datetime_check_day", 'LEFT', ['OP', 'BEFORE'], 'VALUE'],
     "after_time": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
@@ -186,12 +186,12 @@ var equalityOperators = [
     ["!=", "IS_NOT"]
 ];
 var equalityOperatorsConversions = {
-    "IS": "dates.equal",
-    "BEFORE": "dates.before",
-    "AFTER": "dates.after",
-    "BEFORE_EQUAL": "dates.before_equal",
-    "AFTER_EQUAL": "dates.after_equal",
-    "IS_NOT": "dates.not_equal",
+    "IS": "parking.equal",
+    "BEFORE": "parking.before",
+    "AFTER": "parking.after",
+    "BEFORE_EQUAL": "parking.before_equal",
+    "AFTER_EQUAL": "parking.after_equal",
+    "IS_NOT": "parking.not_equal",
 }
 // FINISH _time and _day
 // Add in numbers and days to KNOWN_MODULES
@@ -214,7 +214,7 @@ Blockly.Blocks['datetime_check_day'] = {
 };
 
 Blockly.Python['datetime_check_day'] = function(block) {
-    Blockly.Python.definitions_['import_dates'] = 'import dates';
+    Blockly.Python.definitions_['import_parking'] = 'import parking';
     var value = DAYS_MAP[block.getFieldValue('VALUE')];
     var operator = equalityOperatorsConversions[block.getFieldValue('OP')];
     var left = Blockly.Python.valueToCode(block, 'LEFT', Blockly.Python.ORDER_ATOMIC)
@@ -243,7 +243,7 @@ Blockly.Blocks['datetime_check_time'] = {
 };
 
 Blockly.Python['datetime_check_time'] = function(block) {
-    Blockly.Python.definitions_['import_dates'] = 'import dates';
+    Blockly.Python.definitions_['import_parking'] = 'import parking';
     var hour = HOURS_MAP[block.getFieldValue('HOURS')];
     var minute = MINUTES_MAP[block.getFieldValue('MINUTES')];
     var meridian = MERIDIANS_MAP[block.getFieldValue('MERIDIANS')];
