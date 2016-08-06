@@ -34,17 +34,16 @@ blocklyApp.ToolboxTreeComponent = ng.core
         [attr.aria-selected]="index == 0 && tree.getAttribute('aria-activedescendant') == 'blockly-toolbox-tree-node0'"
         [attr.aria-level]="level">
       <label #blockSummaryLabel [id]="idMap['blockSummaryLabel']">{{block.toString()}}</label>
-      <ol role="group" *ngIf="displayBlockMenu || block.inputList.length > 0"
-          [attr.aria-level]="level+1">
+      <ol role="group" *ngIf="displayBlockMenu || block.inputList.length > 0">
         <li #listItem class="blocklyHasChildren" [id]="idMap['listItem']"
             [attr.aria-labelledBy]="generateAriaLabelledByAttr('blockly-block-menu', idMap['blockSummaryLabel'])"
             *ngIf="displayBlockMenu" role="treeitem"
-            aria-selected=false [attr.aria-level]="level+1">
+            aria-selected="false" [attr.aria-level]="level + 1">
           <label #label [id]="idMap['label']">{{'BLOCK_ACTION_LIST'|translate}}</label>
-          <ol role="group" *ngIf="displayBlockMenu"  [attr.aria-level]="level+2">
+          <ol role="group" *ngIf="displayBlockMenu">
             <li #workspaceCopy [id]="idMap['workspaceCopy']" role="treeitem"
                 [attr.aria-labelledBy]="generateAriaLabelledByAttr(idMap['workspaceCopyButton'], 'blockly-button')"
-                [attr.aria-level]="level+2" aria-selected=false>
+                [attr.aria-level]="level + 2" aria-selected="false">
               <button #workspaceCopyButton [id]="idMap['workspaceCopyButton']"
                       (click)="copyToWorkspace(block)">
                 {{'COPY_TO_WORKSPACE'|translate}}
@@ -52,19 +51,19 @@ blocklyApp.ToolboxTreeComponent = ng.core
             </li>
             <li #blockCopy [id]="idMap['blockCopy']" role="treeitem"
                 [attr.aria-labelledBy]="generateAriaLabelledByAttr(idMap['blockCopyButton'], 'blockly-button')"
-                [attr.aria-level]="level+2" aria-selected=false>
+                [attr.aria-level]="level + 2" aria-selected="false">
               <button #blockCopyButton [id]="idMap['blockCopyButton']"
                       (click)="clipboardService.copy(block, true)">
                 {{'COPY_TO_CLIPBOARD'|translate}}
               </button>
             </li>
             <li #sendToSelected [id]="idMap['sendToSelected']" role="treeitem"
-                [attr.aria-labelledBy]="generateAriaLabelledByAttr(idMap['sendToSelectedButton'], 'blockly-button', !clipboardService.isBlockCompatibleWithMarkedConnection(block))"
-                [attr.aria-level]="level+2" aria-selected=false>
+                [attr.aria-labelledBy]="generateAriaLabelledByAttr(idMap['sendToSelectedButton'], 'blockly-button', !canBeCopiedToMarkedConnection(block))"
+                [attr.aria-level]="level + 2" aria-selected="false">
               <button #sendToSelectedButton
                       [id]="idMap['sendToSelectedButton']"
                       (click)="copyToMarked(block)"
-                      [disabled]="!clipboardService.isBlockCompatibleWithMarkedConnection(block)">
+                      [disabled]="!canBeCopiedToMarkedConnection(block)">
                 {{'COPY_TO_MARKED_SPOT'|translate}}
               </button>
             </li>
@@ -72,18 +71,17 @@ blocklyApp.ToolboxTreeComponent = ng.core
         </li>
         <div *ngFor="#inputBlock of block.inputList; #i=index">
           <blockly-field *ngFor="#field of inputBlock.fieldRow; #j=index"
-                      [attr.aria-level]="level+1" [field]="field"
-                      [level]="level+1">
+                         [field]="field" [level]="level + 1" [disabled]="true">
           </blockly-field>
           <blockly-toolbox-tree *ngIf="inputBlock.connection && inputBlock.connection.targetBlock()"
                                 [block]="inputBlock.connection.targetBlock()"
                                 [displayBlockMenu]="false"
-                                [level]="level+1">
+                                [level]="level + 1">
           </blockly-toolbox-tree>
           <li #listItem1 [id]="idMap['listItem' + i]" role="treeitem"
               *ngIf="inputBlock.connection && !inputBlock.connection.targetBlock()"
               [attr.aria-labelledBy]="generateAriaLabelledByAttr('blockly-argument-text', idMap['listItem' + i + 'Label'])"
-              [attr.aria-level]="level+1" aria-selected=false>
+              [attr.aria-level]="level + 1" aria-selected="false">
             <!--TODO(madeeha): i18n here will need to happen in a different way due to the way grammar changes based on language.-->
             <label #label [id]="idMap['listItem' + i + 'Label']">
               {{utilsService.getInputTypeLabel(inputBlock.connection)}}
@@ -137,6 +135,9 @@ blocklyApp.ToolboxTreeComponent = ng.core
     generateAriaLabelledByAttr: function(mainLabel, secondLabel, isDisabled) {
       return this.utilsService.generateAriaLabelledByAttr(
           mainLabel, secondLabel, isDisabled);
+    },
+    canBeCopiedToMarkedConnection: function(block) {
+      return this.clipboardService.canBeCopiedToMarkedConnection(block);
     },
     copyToWorkspace: function(block) {
       var xml = Blockly.Xml.blockToDom(block);
