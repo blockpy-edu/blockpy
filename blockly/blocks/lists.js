@@ -65,6 +65,7 @@ Blockly.Blocks['lists_create_with'] = {
     this.updateShape_();
     this.setOutput(true, 'Array');
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+    this.setInputsInline(true);
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
   },
   /**

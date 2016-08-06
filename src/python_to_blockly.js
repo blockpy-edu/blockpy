@@ -5,6 +5,11 @@ function xmlToString(xml) {
     return new XMLSerializer().serializeToString(xml);
 }
 
+PythonToBlocks.prototype.convertSourceToCodeBlock = function(python_source) {
+    var xml = document.createElement("xml");
+    xml.appendChild(raw_block(python_source));
+    return xmlToString(xml);
+}
 
 PythonToBlocks.prototype.convertSource = function(python_source) {
     var xml = document.createElement("xml");
@@ -1046,7 +1051,7 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             var mutations = {};
             for (var i = 0; i < args.length; i++) {
                 var argument = definition[1+i];
-                console.log(argument);
+                //console.log(argument);
                 if (typeof argument ==  "string") {
                     fields[argument] = this.Str_value(args[i]);
                 } else if (typeof argument == "object") {

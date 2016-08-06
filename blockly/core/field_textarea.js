@@ -94,6 +94,7 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
     // No change if null.
     return;
   }
+  var oldText = this.text_;
   if (this.sourceBlock_ && this.changeHandler_) {
     var validated = this.changeHandler_(text);
     // If the new text is invalid, validation returns null.
@@ -113,7 +114,8 @@ Blockly.FieldTextArea.prototype.setText = function(text) {
   if (this.sourceBlock_ && this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
     this.sourceBlock_.bumpNeighbours_();
-    this.sourceBlock_.workspace.fireChangeEvent();
+    Blockly.Events.fire(new Blockly.Events.Change(this.sourceBlock_, 'field', this.name, oldText, text));
+    //this.sourceBlock_.workspace.fireChangeEvent();
   }
 };
 
@@ -248,9 +250,9 @@ Blockly.FieldTextArea.prototype.showEditor_ = function(opt_quietInput) {
   htmlInput.onKeyPressWrapper_ =
       Blockly.bindEvent_(htmlInput, 'keypress', this, this.onHtmlInputChange_);
   var workspaceSvg = this.sourceBlock_.workspace.getCanvas();
-  htmlInput.onWorkspaceChangeWrapper_ =
-      Blockly.bindEvent_(workspaceSvg, 'blocklyWorkspaceChange', this,
-      this.resizeEditor_);
+  
+  htmlInput.onWorkspaceChangeWrapper_ = this.resizeEditor_.bind(this);
+  this.sourceBlock_.workspace.addChangeListener(htmlInput.onWorkspaceChangeWrapper_);
 };
 
 /**
@@ -376,7 +378,7 @@ Blockly.FieldTextArea.prototype.widgetDispose_ = function() {
     thisField.sourceBlock_.rendered && thisField.sourceBlock_.render();
     Blockly.unbindEvent_(htmlInput.onKeyUpWrapper_);
     Blockly.unbindEvent_(htmlInput.onKeyPressWrapper_);
-    Blockly.unbindEvent_(htmlInput.onWorkspaceChangeWrapper_);
+    thisField.sourceBlock_.workspace.removeChangeListener(htmlInput.onWorkspaceChangeWrapper_);
     Blockly.FieldTextArea.htmlInput_ = null;
     // Delete the width property.
     var style = Blockly.WidgetDiv.DIV.style;

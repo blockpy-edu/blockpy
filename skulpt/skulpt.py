@@ -1061,7 +1061,7 @@ Sk.misceval.asyncToPromise(function() {{
     except OSError as e:
         print >>sys.stderr, "Execution failed:", e
 
-def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='true'):
+def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
     if not os.path.exists(fn):
         print "%s doesn't exist" % fn
         raise SystemExit()
@@ -1083,7 +1083,7 @@ var outputList = [];
 //print("-----");
 //print(input);
 //print("-----");
-Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s, output: function(text) {if (text !== "\\n") {outputList.push(text); }} });
+Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s, output: function(text) {if (text !== "\\n") {outputList.push(text); print(text) }} });
 Sk.misceval.asyncToPromise(function() {
     return Sk.importMain("%s", %s, true);
 }).then(function (data) {
@@ -1096,7 +1096,7 @@ Sk.misceval.asyncToPromise(function() {
     //print("-----");
 }, function(e) {
     print("UNCAUGHT EXCEPTION: " + e);
-    //print(e.stack);
+    print(e.stack);
 });
     """ % (fn, os.path.split(fn)[0], p3on, debugon, modname, dumpJS))
     f.close()
