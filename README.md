@@ -58,6 +58,12 @@ And now you should be able to try out the example file!
     > start blockpy_new.html
     
 The server has its own requirements.txt and uses a `python manage.py runserver`
+
+If you make edits to either Blockly or Skulpt, you'll need to rerun their build commands. Simiarly, if you edit ``src/interface.html`` than you'll need to rebuild it:
+
+    > python build.py
+    
+Otherwise, you should be able to edit the ``src/*.js`` files freely. To get a sense of the dependencies, check out the ``blockpy_new.html`` file and then the ``src/main.js`` file. These should be good starting points.
    
 
 Commands
