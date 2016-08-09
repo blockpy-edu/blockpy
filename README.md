@@ -55,7 +55,7 @@ And then you'll build Skulpt:
     
 And now you should be able to try out the example file!
 
-    > start blockpy.html
+    > start blockpy_new.html
     
 The server has its own requirements.txt and uses a `python manage.py runserver`
    
