@@ -38,6 +38,11 @@
                 <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
                 Instructor mode: 
                 <input type='checkbox' data-bind="checked:settings.instructor">
+                </label>
+                
+                <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
+                Upload mode: 
+                <input type='checkbox' data-bind="checked:assignment.upload">
                 </label> 
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
@@ -72,25 +77,7 @@
                 <span class='glyphicon glyphicon-play'></span> Run
             </button>
             
-            <!--<div class="btn-group">
-              <button type="button" class="btn blockpy-run"
-                data-bind='css: execution.status() == "running" ? "btn-info" :
-                                execution.status() == "error" ? "btn-danger" : "btn-success" '>
-                <span class='glyphicon glyphicon-play'></span> Run
-              </button>
-              <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                data-bind='css: execution.status() == "running" ? "btn-info" :
-                                execution.status() == "error" ? "btn-danger" : "btn-success" '>
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a href="#">... as if it were Tuesday</a></li>
-                <li><a href="#">... as if it were Wednesday</a></li>
-              </ul>
-            </div>-->
-            
-            <div class="btn-group" data-toggle="buttons">
+            <div class="btn-group" data-toggle="buttons" data-bind="visible: !assignment.upload()">
                 <label class="btn btn-default blockpy-mode-set-blocks active">
                     <span class='glyphicon glyphicon-th-large'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> Blocks
@@ -105,17 +92,17 @@
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
                 </label>
             </div>
-            <button type='button' class='btn btn-default blockpy-toolbar-reset'>
+            <button type='button' class='btn btn-default blockpy-toolbar-reset' data-bind="visible: !assignment.upload()">
                 <span class='glyphicon glyphicon-refresh'></span> Reset
             </button>
             <!--<button type='button' class='btn btn-default blockpy-toolbar-capture'>
                 <span class='glyphicon glyphicon-picture'></span> Capture
             </button>-->
-            <button type='button' class='btn btn-default blockpy-toolbar-import'>
+            <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload()">
                 <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
             </button>
             
-            <select data-bind="visible: settings.instructor, value: settings.filename"
+            <select data-bind="visible: settings.instructor() & !assignment.upload(), value: settings.filename"
                     class="blockpy-toolbar-filename-picker">
                 <option value='__main__' selected>Student Code</option>
                 <option value='starting_code'>Starting Code</option>
@@ -141,6 +128,11 @@
                 </div>
                 <textarea class='codemirror-div language-python'
                            style='height:100%'></textarea>
+            </div>
+            <div class='blockpy-upload blockpy-editor-menu'>
+                <label class="btn btn-default btn-file">
+                    Browse <input type="file" style="display: none;">
+                </label>
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
                 <!-- Name -->

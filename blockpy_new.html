@@ -48,6 +48,7 @@
     <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
     <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
     
+    
     <!-- Source Code -->
     <script type="text/javascript" src="src/python_errors.js"></script>
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
@@ -70,6 +71,10 @@
     <script type="text/javascript" src="src/engine.js"></script>
     <script type="text/javascript" src="src/main.js"></script>
     
+    <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
+    
     <style>
 
     </style>
@@ -84,7 +89,8 @@
                 'attachmentPoint': document.getElementById('blockpy-div'),
                 'instructor': true,
                 'urls': {
-                    'import_datasets': 'http://localhost:8000/'
+                    'import_datasets': 'http://localhost:8000/test_corgis/',
+                    'save_success': 'http://localhost:8000/submit_grade/'
                 }
             },
             // assignment
@@ -92,13 +98,14 @@
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
                 'give_feedback': 'def on_run(code, output, properties):\n    return True',
-                'starting_code': ''
+                'starting_code': '',
+                'initial_view': 'Blocks'
             },
             // submission
             {},
             // programs
             {
-                '__main__': 'if 0:\n    pass',
+                '__main__': 'a = 0\nprint(a)',
                     ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
                     //"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
                 'give_feedback': 'def on_run(code, output, properties):\n    return True'

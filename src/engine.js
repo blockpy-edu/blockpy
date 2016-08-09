@@ -178,7 +178,7 @@ BlockPyEngine.prototype.run = function() {
 
 BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) {
     var engine = this;
-    var server = this.server;
+    var server = this.main.components.server;
     var on_run = this.main.model.programs['give_feedback']();
     if (on_run !== undefined && on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
@@ -210,10 +210,10 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
                 Sk.afterSingleExecution = backupExecution;
                 var result = Sk.ffi.remapToJs(module.$d.result);
                 if (result === true) {  
-                    //server.markSuccess(1.0);
+                    server.markSuccess(1.0);
                     engine.main.components.feedback.complete();
                 } else {
-                    //server.markSuccess(0.0);
+                    server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback(result);
                 }
             }, function (error) {
