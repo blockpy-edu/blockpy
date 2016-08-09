@@ -17,6 +17,21 @@ BlockPyFeedback.prototype.error = function(html) {
     this.main.components.printer.print("Execution stopped - there was an error!");
 }
 
+BlockPyFeedback.prototype.clear = function() {
+    this.title.html("Ready");
+    this.original.hide();
+    this.body.html("Run your program to get feedback.");
+    this.main.model.status.error("none");
+    this.main.components.editor.unhighlightLines();
+    this.main.components.printer.resetPrinter()
+};
+
+BlockPyFeedback.prototype.clearEditorErrors = function() {
+    if (this.main.model.status.error() == "editor") {
+        this.clear();
+    }
+}
+
 BlockPyFeedback.prototype.success = function() {
     this.tag.html("<span class='label label-success'><span class='glyphicon glyphicon-ok'></span> Success!</span>");
     this.tag.removeClass("alert-warning");

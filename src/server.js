@@ -6,7 +6,19 @@ function BlockPyServer(main) {
     
     this.saveTimer = {};
     this.presentationTimer = null;
+    
+    this.createSubscriptions();
 }
+
+BlockPyServer.prototype.createSubscriptions = function() {
+    var server = this, model = this.main.model;
+    model.program.subscribe(function() { server.saveCode(); });
+    model.assignment.name.subscribe(function() { server.saveAssignment();});
+    model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
+    model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
+    model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
+    model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
+};
 
 BlockPyServer.prototype.TIMER_DELAY = 1000;
 
@@ -55,17 +67,22 @@ BlockPyServer.prototype.logEvent = function(event_name, action) {
 
 BlockPyServer.prototype.markSuccess = function(success) {
     var data = this.createServerData();
-    data['code'] = this.main.model.programs.__main__;
+    var server = this,
+        model = this.main.model;
+    data['code'] = model.programs.__main__;
     data['status'] = success;
-    data['image'] = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEi';
-    this.setStatus('Saving');
-    if (this.main.model.server_is_connected('save_success')) {
-        $.post(this.main.model.constants.urls.save_success, data, 
-               this.defaultResponse.bind(this))
-         .fail(this.defaultFailure.bind(this));
-    } else {
-        this.setStatus('Offline');
-    }
+    this.main.components.editor.getPngFromBlocks(function(pngData, img) {
+        data['image'] = pngData;
+        img.remove();
+        server.setStatus('Saving');
+        if (model.server_is_connected('save_success')) {
+            $.post(model.constants.urls.save_success, data, 
+                   server.defaultResponse.bind(server))
+             .fail(server.defaultFailure.bind(server));
+        } else {
+            server.setStatus('Offline');
+        }
+    });
 };
 
 BlockPyServer.prototype.saveAssignment = function() {

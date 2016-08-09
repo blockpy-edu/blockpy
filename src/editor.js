@@ -48,7 +48,10 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.blockly.enableUndo();
     // Register model changer
     var editor = this;
-    this.blockly.addChangeListener(function() { console.log("blockly/CL"); editor.updateCodeFromBlocks()});
+    this.blockly.addChangeListener(function() { 
+        //editor.main.components.feedback.clearEditorErrors();
+        editor.updateCodeFromBlocks();
+    });
     //this.main.model.program.subscribe(function() {editor.updateBlocks()});
     this.main.model.settings.filename.subscribe(function() {editor.updateBlocks()});
     this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
@@ -79,7 +82,10 @@ BlockPyEditor.prototype.initText = function() {
                                       });
     // Register model changer
     var editor = this;
-    this.codeMirror.on("change", function() {editor.updateCodeFromText()});
+    this.codeMirror.on("change", function() {
+        //editor.main.components.feedback.clearEditorErrors();
+        editor.updateCodeFromText()
+    });
     this.main.model.program.subscribe(function() {editor.updateText()});
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
@@ -153,8 +159,12 @@ BlockPyEditor.prototype.showBlockMenu = function() {
     this.blockly.setVisible(true);
 }
 BlockPyEditor.prototype.showUploadMenu = function() {
+    this.uploadTag.css('height', '100%');
+    this.uploadTag.show();
 }
 BlockPyEditor.prototype.hideUploadMenu = function() {
+    this.uploadTag.hide();
+    this.uploadTag.css('height', '0%');
 }
 BlockPyEditor.prototype.showInstructorMenu = function() {
     this.instructorTag.css('height', '100%');
@@ -197,7 +207,6 @@ BlockPyEditor.prototype.setModeToUpload = function() {
     this.hideBlockMenu();
     this.showUploadMenu();
     //TODO: finish upload mode
-    this.main.reportError("editor", "Upload mode has not been implemented");
 }
 
 BlockPyEditor.prototype.setModeToInstructor = function() {
@@ -241,7 +250,6 @@ BlockPyEditor.prototype.setMode = function(mode) {
 }
 
 BlockPyEditor.prototype.updateCodeFromBlocks = function() {
-    console.log("ucfb:enter")
     if (this.updateStack.slice(-1).pop() !== undefined) {
         return;
     }
@@ -282,7 +290,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
     if (this.updateStack.slice(-1).pop() == 'blocks') {
         return;
     }
-    var python_code = this.main.model.program();
+    var python_code = this.main.model.program().trim(), xml_code = "";
     if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
         var result = this.converter.convertSource(python_code);
         xml_code = result.xml;
@@ -440,7 +448,7 @@ BlockPyEditor.prototype.setLevel = function() {
     var level = this.main.model.settings.level();
 }
 
-BlockPyEditor.prototype.CATEGORY_MAP = {
+BlockPyEditor.CATEGORY_MAP = {
     'Properties': '<category name="Properties" custom="VARIABLE" colour="240">'+
                   '</category>',
     'Decisions': '<category name="Decisions" colour="330">'+
@@ -484,22 +492,33 @@ BlockPyEditor.prototype.CATEGORY_MAP = {
                     '<block type="logic_boolean"></block>'+
                 '</category>',
     'Lists':    '<category name="Lists" colour="30">'+
+                    '<block type="lists_create_with">'+
+                        '<value name="ADD0">'+
+                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                        '</value>'+
+                        '<value name="ADD1">'+
+                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                        '</value>'+
+                        '<value name="ADD2">'+
+                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                        '</value>'+
+                    '</block>'+
+                    '<block type="lists_create_with"></block>'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
-                    '<block type="lists_length"></block>'+
-                    '<block type="lists_create_with"></block>'+
-                    '<block type="lists_index">'+
+                    /*'<block type="lists_length"></block>'+*/
+                    /*'<block type="lists_index">'+
                         '<value name="ITEM">'+
                           '<shadow type="math_number">'+
                             '<field name="NUM">0</field>'+
                           '</shadow>'+
                         '</value>'+
-                    '</block>'+
+                    '</block>'+*/
                 '</category>',
     'Dictionaries': '<category name="Dictionaries" colour="0">'+
-                    '<block type="dict_get_literal"></block>'+
-                    '<block type="dict_keys"></block>'+
                     '<block type="dicts_create_with"></block>'+
+                    '<block type="dict_get_literal"></block>'+
+                    //'<block type="dict_keys"></block>'+
                 '</category>',
     'Data - Weather': '<category name="Data - Weather" colour="70">'+
                     '<block type="weather_temperature"></block>'+
@@ -541,7 +560,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     for (var i = 0, length = modules.length; i < length; i = i+1) {
         var module = modules[i];
         if (typeof module == 'string') {
-            xml += this.CATEGORY_MAP[module];
+            xml += BlockPyEditor.CATEGORY_MAP[module];
         } else {
             var category = '<category name="'+module.name+'" colour="'+module.color+'">';
             for (var j= 0; category_length = module.blocks.length; j = j+1) {
@@ -560,22 +579,19 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     }
 };
 
-
-BlockPyEditor.prototype.copyImage = function() {
-    var dialog = this.main.components.dialog;
-    aleph = this.blockly.svgBlockCanvas_.cloneNode(true);
-    aleph.removeAttribute("width");
-    aleph.removeAttribute("height");
-    // Change all display:none to false
-    if (aleph.children[0] !== undefined) {
-        aleph.removeAttribute("transform");
-        aleph.children[0].removeAttribute("transform");
-        aleph.children[0].children[0].removeAttribute("transform");
+BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
+    var blocks = this.blockly.svgBlockCanvas_.cloneNode(true);
+    blocks.removeAttribute("width");
+    blocks.removeAttribute("height");
+    if (blocks.children[0] !== undefined) {
+        blocks.removeAttribute("transform");
+        blocks.children[0].removeAttribute("transform");
+        blocks.children[0].children[0].removeAttribute("transform");
         var linkElm = document.createElementNS("http://www.w3.org/1999/xhtml", "style");
         linkElm.textContent = Blockly.Css.CONTENT.join('') + '\n\n';
-        aleph.insertBefore(linkElm, aleph.firstChild);
+        blocks.insertBefore(linkElm, blocks.firstChild);
         var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
-        var xml = new XMLSerializer().serializeToString(aleph);
+        var xml = new XMLSerializer().serializeToString(blocks);
         xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
         var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
         var img  = document.createElement("img");
@@ -589,16 +605,28 @@ BlockPyEditor.prototype.copyImage = function() {
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
             var canvasUrl = canvas.toDataURL("image/png");
-            img.onload = function() {
-                var span = document.createElement('span');
-                span.textContent = "Right-click and copy the image below."
-                var div = document.createElement('div');
-                div.appendChild(span);
-                div.appendChild(img);
-                
-                dialog.show("Blocks as Image", div);
-            };
-            img.src = canvasUrl;
+            callback(canvasUrl, img);
         }
+        img.onerror = function() {
+            callback("", img);
+        }
+    } else {
+        callback("", document.createElement("img"))
     }
+}
+
+
+BlockPyEditor.prototype.copyImage = function() {
+    var dialog = this.main.components.dialog;
+    this.getPngFromBlocks(function(canvasUrl, img) {
+        img.onload = function() {
+            var span = document.createElement('span');
+            span.textContent = "Right-click and copy the image below."
+            var div = document.createElement('div');
+            div.appendChild(span);
+            div.appendChild(img);
+            dialog.show("Blocks as Image", div);
+        };
+        img.src = canvasUrl;
+    });
 }

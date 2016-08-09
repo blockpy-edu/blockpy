@@ -4,7 +4,7 @@ function BlockPy(settings, assignment, submission, programs) {
         "settings": {
             // Default mode when you open the screen is text
             // 'text', 'blocks'
-            'editor': ko.observable(settings.editor),
+            'editor': ko.observable(assignment.initial_view),
             // Default mode when you open the screen is instructor
             // boolean
             'instructor': ko.observable(settings.instructor),
@@ -63,7 +63,7 @@ function BlockPy(settings, assignment, submission, programs) {
                                            'Calculation', 'Output', 'Separator',
                                            'Values', 'Lists', 'Dictionaries', 'Separator',
                                            'Data - Weather', 'Data - Books',
-                                           'Data - Parking']),
+                                           'Data - Parking', 'Data - Tate']),
             'assignment_id': assignment.assignment_id,
             'student_id': assignment.student_id,
             'course_id': assignment.course_id,
@@ -71,8 +71,9 @@ function BlockPy(settings, assignment, submission, programs) {
             //'lis_result_sourcedid': assignment.lis_result_sourcedid,
             'name': ko.observable(assignment.name),
             'introduction': ko.observable(assignment.introduction),
-            "initial_view": ko.observable(assignment.initial_view),
-            'parsons': ko.observable(assignment.parsons)
+            "initial_view": ko.observable(assignment.initial_view || 'Blocks'),
+            'parsons': ko.observable(assignment.parsons),
+            'upload': ko.observable(assignment.initial_view == 'Upload'),
         },
         "programs": {
             "__main__": ko.observable(programs.__main__),
@@ -81,7 +82,6 @@ function BlockPy(settings, assignment, submission, programs) {
         }
     };
     this.model.program = ko.computed(function() {
-        console.log(this.settings.filename())
         return this.programs[this.settings.filename()]();
     }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
     
@@ -122,8 +122,6 @@ BlockPy.prototype.initMain = function() {
     this.initInterface();
     this.initModel();
     this.initComponents();
-    this.initSubscriptions();
-    this.model.status.server('Loaded')
 }
 
 BlockPy.prototype.initInterface = function(postCompletion) {
@@ -138,27 +136,19 @@ BlockPy.prototype.initModel = function() {
 BlockPy.prototype.initComponents = function() {
     var container = this.model.constants.container;
     this.components = {};
-    this.components.dialog = new BlockPyDialog(this, container.find('.blockpy-popup'));
-    this.components.toolbar  = new BlockPyToolbar(this,  container.find('.blockpy-toolbar'));
-    this.components.feedback = new BlockPyFeedback(this, container.find('.blockpy-feedback'));
-    this.components.editor   = new BlockPyEditor(this,   container.find('.blockpy-editor'));
-    this.components.presentation = new BlockPyPresentation(this, container.find('.blockpy-presentation'));
-    this.components.printer = new BlockPyPrinter(this, container.find('.blockpy-printer'));
-    this.components.engine = new BlockPyEngine(this);
-    this.components.server = new BlockPyServer(this);
-    this.components.corgis = new BlockPyCorgis(this);
-    
-    this.components.editor.setMode();
-}
-
-BlockPy.prototype.initSubscriptions = function() {
-    var server = this.components.server;
-    this.model.program.subscribe(function() { server.saveCode(); });
-    this.model.assignment.name.subscribe(function() { server.saveAssignment();});
-    this.model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
-    this.model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
-    this.model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
-    this.model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
+    var main = this,
+        components = this.components;
+    components.dialog = new BlockPyDialog(main, container.find('.blockpy-popup'));
+    components.toolbar  = new BlockPyToolbar(main,  container.find('.blockpy-toolbar'));
+    components.feedback = new BlockPyFeedback(main, container.find('.blockpy-feedback'));
+    components.editor   = new BlockPyEditor(main,   container.find('.blockpy-editor'));
+    components.presentation = new BlockPyPresentation(main, container.find('.blockpy-presentation'));
+    components.printer = new BlockPyPrinter(main, container.find('.blockpy-printer'));
+    components.engine = new BlockPyEngine(main);
+    components.server = new BlockPyServer(main);
+    components.corgis = new BlockPyCorgis(main);
+    components.editor.setMode();
+    main.model.status.server('Loaded')
 }
 
 BlockPy.prototype.reportError = function(component, original, message, line) {

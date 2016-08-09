@@ -4,6 +4,7 @@ kennel_dist/
 blockly_backup/
 closure-compiler/
 research/
+test_corgis/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
