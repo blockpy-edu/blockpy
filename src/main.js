@@ -1,3 +1,10 @@
+function expandArray(array, addArray, removeArray) {
+    var copyArray = array.filter(function(item) {
+        return removeArray.indexOf(item) === -1;
+    });
+    return copyArray.concat(addArray);
+}
+
 function BlockPy(settings, assignment, submission, programs) {
     this.model = {
         // User level settings
@@ -18,9 +25,13 @@ function BlockPy(settings, assignment, submission, programs) {
             // string
             'level': ko.observable("level"),
             // boolean
-            'disable_semantic_errors': ko.observable(false),
+            'disable_semantic_errors': ko.observable(settings.disable_semantic_errors),
             // boolean
-            'auto_upload': ko.observable(true)
+            'auto_upload': ko.observable(true),
+            // boolean
+            'developer': ko.observable(settings.developer || false),
+            // boolean
+            'mute_printer': ko.observable(false)
         },
         'execution': {
             // 'waiting', 'running'
@@ -59,11 +70,7 @@ function BlockPy(settings, assignment, submission, programs) {
         },
         // Assignment level settings
         "assignment": {
-            'modules': ko.observableArray(['Properties', 'Decisions', 'Iteration', 'Separator',
-                                           'Calculation', 'Output', 'Separator',
-                                           'Values', 'Lists', 'Dictionaries', 'Separator',
-                                           'Data - Weather', 'Data - Books',
-                                           'Data - Parking', 'Data - Tate']),
+            'modules': ko.observableArray(expandArray(BlockPy.DEFAULT_MODULES, assignment.modules.added || [], assignment.modules.removed || [])),
             'assignment_id': assignment.assignment_id,
             'student_id': assignment.student_id,
             'course_id': assignment.course_id,
@@ -118,10 +125,20 @@ function BlockPy(settings, assignment, submission, programs) {
     this.initMain();
 }
 
+BlockPy.DEFAULT_MODULES = ['Properties', 'Decisions', 
+                           'Iteration', 'Separator',
+                           'Calculation', 'Output', 
+                           'Separator',  'Values', 
+                           'Lists', 'Dictionaries', 
+                           'Separator']
+
 BlockPy.prototype.initMain = function() {
     this.initInterface();
     this.initModel();
     this.initComponents();
+    if (this.model.settings.developer()) {
+        this.initDevelopment();
+    }
 }
 
 BlockPy.prototype.initInterface = function(postCompletion) {
@@ -149,6 +166,12 @@ BlockPy.prototype.initComponents = function() {
     components.corgis = new BlockPyCorgis(main);
     components.editor.setMode();
     main.model.status.server('Loaded')
+}
+
+BlockPy.prototype.initDevelopment = function () {
+    /*$.get('src/skulpt_ast.js', function(data) {
+        Sk.builtinFiles['files']['src/lib/ast/__init__.js'] = data;
+    });*/
 }
 
 BlockPy.prototype.reportError = function(component, original, message, line) {

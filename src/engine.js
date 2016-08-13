@@ -124,6 +124,8 @@ BlockPyEngine.prototype.analyze = function() {
     return true;
 }
 
+var GLOBAL_VALUE;
+
 /*
  * Runs the given python code, resetting the console and Trace Table.
  */
@@ -137,6 +139,13 @@ BlockPyEngine.prototype.run = function() {
             return;
         }
     }
+    
+    Sk.builtins.value = new Sk.builtin.func(function() {
+        return Sk.ffi.remapToPy(GLOBAL_VALUE === undefined ? 5 : GLOBAL_VALUE);
+    });
+    Sk.builtins.set_value = new Sk.builtin.func(function(v) {
+        GLOBAL_VALUE = v.v;
+    });
     
     this.main.model.execution.status("running");
     
@@ -176,31 +185,83 @@ BlockPyEngine.prototype.run = function() {
     );
 }
 
+function indent(str) {
+  return str.replace(/^(?=.)/gm, '    ');
+}
+
+var instructor_module = function(name) {
+    var mod = {};
+    Sk.builtin.Feedback = function (args) {
+        var o;
+        if (!(this instanceof Sk.builtin.Feedback)) {
+            o = Object.create(Sk.builtin.Feedback.prototype);
+            o.constructor.apply(o, arguments);
+            return o;
+        }
+        Sk.builtin.Exception.apply(this, arguments);
+    };
+    Sk.abstr.setUpInheritance("Feedback", Sk.builtin.Feedback, Sk.builtin.Exception);
+    Sk.builtin.Success = function (args) {
+        var o;
+        if (!(this instanceof Sk.builtin.Success)) {
+            o = Object.create(Sk.builtin.Success.prototype);
+            o.constructor.apply(o, arguments);
+            return o;
+        }
+        Sk.builtin.Exception.apply(this, arguments);
+    };
+    Sk.abstr.setUpInheritance("Success", Sk.builtin.Success, Sk.builtin.Exception);
+    mod.give_feedback = new Sk.builtin.func(function(message) {
+        Sk.builtin.pyCheckArgs("give_feedback", arguments, 1, 1);
+        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        throw new Sk.builtin.Feedback(message.v);
+    });
+    mod.set_success = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
+        throw new Sk.builtin.Success();
+    });
+    return mod;
+}
+
 BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) {
     var engine = this;
     var server = this.main.components.server;
-    var on_run = this.main.model.programs['give_feedback']();
+    var model = this.main.model;
+    var on_run = model.programs['give_feedback']();
     if (on_run !== undefined && on_run.trim() !== "") {
         var backupExecution = Sk.afterSingleExecution;
         Sk.afterSingleExecution = undefined;
         
         // Old code to handle lame checking
+        /*
         on_run += "\nresult = on_run('''"+student_code+"''', "+
                   JSON.stringify(output)+", "+
                   JSON.stringify(traceTable)+" "+
                   ")";
-        console.log(on_run);
+        console.log(on_run);*/
         
         // New code to handle sophisticated checking
-        /*
-        Sk.builtins.output = Sk.ffi.remapToPy(output);
+        
+        on_run = 'def run_code():\n'+indent(student_code)+'\n'+on_run;
+        
+        console.log(on_run);
+        
+        model.settings.mute_printer(true);
+        
+        var backup = Sk.builtins.print;
+        Sk.builtins.output = new Sk.builtin.func(function() { 
+            Sk.builtin.pyCheckArgs("output", arguments, 0, 0);
+            console.log(Sk.ffi.remapToPy(model.execution.output()));
+        });
+        Sk.builtins.reset_output = new Sk.builtin.func(function() { 
+            Sk.builtin.pyCheckArgs("output", arguments, 0, 0);
+            model.execution.output.removeAll();
+        });
         Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
         Sk.builtins.code = Sk.ffi.remapToPy(student_code);
         Sk.builtins.ast = Sk.ffi.remapToPy(ast);
-        Sk.builtins.give_feedback = new Sk.builtin.func(function(message) {
-            throw new Sk.builtin.SystemExit(message);
-        });
-        */
+        Sk.builtins.set_success = instructor_module('instructor').set_success;
+        Sk.builtins.give_feedback = instructor_module('instructor').give_feedback;
         
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
@@ -208,6 +269,8 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
         executionPromise.then(
             function (module) {
                 Sk.afterSingleExecution = backupExecution;
+                GLOBAL_VALUE = undefined;
+                /*
                 var result = Sk.ffi.remapToJs(module.$d.result);
                 if (result === true) {  
                     server.markSuccess(1.0);
@@ -216,24 +279,30 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
                     server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback(result);
                 }
+                */
+                model.settings.mute_printer(false);
             }, function (error) {
                 Sk.afterSingleExecution = backupExecution;
-                /*
+                
                 Sk.builtins.output = undefined;
                 Sk.builtins.trace = undefined;
                 Sk.builtins.code = undefined;
                 Sk.builtins.ast = undefined;
                 Sk.builtins.give_feedback = undefined;
+                GLOBAL_VALUE = undefined;
                 
-                if (error.tp$name == "SystemExit") {
+                console.log(error.tp$name, error.tp$name == "Success");
+                if (error.tp$name == "Success") {
+                    server.markSuccess(1.0);
+                    engine.main.components.feedback.complete();
+                } else if (error.tp$name == "Feedback") {
+                    server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
                 } else {
                     engine.main.components.feedback.error("Error in instructor's feedback. "+error);
                 }
-                */
-                engine.main.components.feedback.error("Error in instructor's feedback. "+error);
-                console.error("Instructor Feedback Error:", error);
                 //server.logEvent('blockly_instructor_error', error);
+                model.settings.mute_printer(false);
             });
     }
 }

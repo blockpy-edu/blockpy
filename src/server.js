@@ -17,6 +17,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
     model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
+    model.assignment.modules.subscribe(function() { server.saveAssignment(); });
     model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
 };
 

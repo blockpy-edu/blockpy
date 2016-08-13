@@ -16,6 +16,7 @@ BlockPyPrinter.prototype.loadPrinter = function() {
 
 BlockPyPrinter.prototype.resetPrinter = function() {
     this.tag.empty();
+    this.main.model.execution.output.removeAll();
 }
 
 BlockPyPrinter.prototype.getConfiguration = function() {
@@ -47,19 +48,21 @@ BlockPyPrinter.prototype.print = function(lineText) {
     // Perform any necessary cleaning
     if (lineText !== "\n") {
         var encodedText = encodeHTML(lineText);
-        this.main.model.execution.output.push(encodedText);
-        var lineContainer = $("<div class='blockpy-printer-output' >");
-        var lineData = $("<samp></samp>", {
-            'data-toggle': 'tooltip',
-            'data-placement': 'left',
-            'data-step': stepNumber,
-            "html": encodedText,
-            'title': "Step "+stepNumber + ", Line "+lineNumber,
-        })
-        lineContainer.append(lineData);
-        // Append to the current text
-        this.tag.append(lineContainer);
-        lineData.tooltip();
+        this.main.model.execution.output.push(encodedText.trim());
+        if (!(this.main.model.settings.mute_printer())) {
+            var lineContainer = $("<div class='blockpy-printer-output' >");
+            var lineData = $("<samp></samp>", {
+                'data-toggle': 'tooltip',
+                'data-placement': 'left',
+                'data-step': stepNumber,
+                "html": encodedText,
+                'title': "Step "+stepNumber + ", Line "+lineNumber,
+            })
+            lineContainer.append(lineData);
+            // Append to the current text
+            this.tag.append(lineContainer);
+            lineData.tooltip();
+        }
     }
 }
 
@@ -72,15 +75,17 @@ BlockPyPrinter.prototype.printHtml = function(chart, value) {
     var step = this.main.model.execution.step();
     var line = this.main.model.execution.line_number();
     this.main.model.execution.output.push(value);
-    var outerDiv = $(chart[0]);//.parent();
-    outerDiv.parent().show();
-    outerDiv.attr({
-        "data-toggle": 'tooltip',
-        "data-placement": 'left',
-        //"data-container": '#'+chart.attr("id"),
-        "class": "blockpy-printer-output",
-        "data-step": step,
-        "title": "Step "+step+", Line "+line
-    });
-    outerDiv.tooltip();
+    if (!(this.main.model.settings.mute_printer())) {
+        var outerDiv = $(chart[0]);//.parent();
+        outerDiv.parent().show();
+        outerDiv.attr({
+            "data-toggle": 'tooltip',
+            "data-placement": 'left',
+            //"data-container": '#'+chart.attr("id"),
+            "class": "blockpy-printer-output",
+            "data-step": step,
+            "title": "Step "+step+", Line "+line
+        });
+        outerDiv.tooltip();
+    }
 }
