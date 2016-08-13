@@ -53,7 +53,11 @@ BlockPyEditor.prototype.initBlockly = function() {
         editor.updateCodeFromBlocks();
     });
     //this.main.model.program.subscribe(function() {editor.updateBlocks()});
-    this.main.model.settings.filename.subscribe(function() {editor.updateBlocks()});
+    this.main.model.settings.filename.subscribe(function() {
+        if (editor.main.model.settings.editor() == "Blocks") {
+            editor.updateBlocks()
+        }
+    });
     this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
     // Force the proper window size
     this.blockly.resize();
@@ -115,7 +119,7 @@ BlockPyEditor.prototype.initInstructor = function() {
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['font', ['fontname', 'fontsize']],
-            ['insert', ['link', 'table', 'ul', 'ol']],
+            ['insert', ['link', 'table', 'ul', 'ol', 'image']],
             ['misc', ['codeview', 'help']]
         ]
     });
@@ -306,6 +310,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
         try {
             this.setBlocksFromXml(blocklyXml);
         } catch (e) {
+            console.error(e);
             var error_code = this.converter.convertSourceToCodeBlock(python_code);
             var blocklyXml = Blockly.Xml.textToDom(error_code);
             this.setBlocksFromXml(blocklyXml);
@@ -334,7 +339,6 @@ BlockPyEditor.prototype.getBlocksFromXml = function() {
 BlockPyEditor.prototype.setBlocksFromXml = function(xml) {
     this.blockly.clear();
     Blockly.Xml.domToWorkspace(xml, this.blockly);
-    //console.log(xml);
     //console.log(this.blockly.getAllBlocks());
 }
 

@@ -88,6 +88,8 @@
                 'blocklyPath': "blockly/",
                 'attachmentPoint': document.getElementById('blockpy-div'),
                 'instructor': true,
+                'developer': true,
+                'disable_semantic_errors': true,
                 'urls': {
                     'import_datasets': 'http://localhost:8000/test_corgis/',
                     'save_success': 'http://localhost:8000/submit_grade/'
@@ -97,18 +99,22 @@
             {
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
-                'give_feedback': 'def on_run(code, output, properties):\n    return True',
+                'give_feedback': 'output()\nreset_output()\nset_value(27)\nrun_code()\noutput()',
                 'starting_code': '',
-                'initial_view': 'Blocks'
+                'initial_view': 'Text',
+                'modules': {
+                    'added': ['Functions'],
+                    'removed': ['Iteration']
+                }
             },
             // submission
             {},
             // programs
             {
-                '__main__': 'a = 0\nprint(a)',
+                '__main__': 'print(value())'
                     ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
                     //"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
-                'give_feedback': 'def on_run(code, output, properties):\n    return True'
+                //'give_feedback': 'set_success()'
                 //$("#default-body").html()
             }
         )

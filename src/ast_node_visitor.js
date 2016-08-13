@@ -92,6 +92,17 @@ NodeVisitor.prototype.generic_visit = function(node) {
     }
 }
 
+NodeVisitor.prototype.recursive_walk = function(node) {
+    var todo = [node];
+    var result = [];
+    while (todo.length > 0) {
+        node = todo.shift();
+        todo = todo.concat(iter_child_nodes(node))
+        result.push(node);
+    }
+    return result;
+}
+
 /*
 function CodeAnalyzer() {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));

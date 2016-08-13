@@ -676,6 +676,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       // Block is deleted or is in a flyout.
       return;
     }
+    /*
     if (event.type == Blockly.Events.CREATE &&
         event.ids.indexOf(this.id) != -1) {
       // Look for the case where a procedure call was created (usually through
@@ -690,7 +691,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       }
       if (!def) {
         Blockly.Events.setGroup(event.group);
-        /**
+     */  /**
          * Create matching definition block.
          * <xml>
          *   <block type="procedures_defreturn" x="10" y="20">
@@ -701,7 +702,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
          *   </block>
          * </xml>
          */
-        var xml = goog.dom.createDom('xml');
+    /*    var xml = goog.dom.createDom('xml');
         var block = goog.dom.createDom('block');
         block.setAttribute('type', this.defType_);
         var xy = this.getRelativeToSurfaceXY();
@@ -730,7 +731,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         this.dispose(true, false);
         Blockly.Events.setGroup(false);
       }
-    }
+    }*/
   },
   /**
    * Add menu option to find the definition block for this call.
