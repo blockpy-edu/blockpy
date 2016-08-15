@@ -695,11 +695,14 @@ def dist(options):
         else:
             print "Working directory is clean (according to 'git status')"
     else:
+        '''
+        # We don't really use GitPython
         print "+----------------------------------------------------------------------------+"
         print "GitPython is not installed for Python 2.6"
         print "The 'dist' command will not work without it.  Get it using pip or easy_install"
         print "or see:  http://packages.python.org/GitPython/0.3.1/intro.html#getting-started"
         print "+----------------------------------------------------------------------------+"
+        '''
 
     if options.verbose:
         print ". Removing distribution directory, '{0}/'.".format(DIST_DIR)

@@ -39,13 +39,14 @@ var DAYS = [
   ]
 
 var DAYS_MAP = {
-        'MON': 'parking.date("MON")',
-        'TUE': 'parking.tuesday()',
-        'WED': 'parking.wednesday()',
-        'THU': 'parking.thursday()',
-        'FRI': 'parking.friday()',
-        'SAT': 'parking.saturday()',
-        'TODAY': 'parking.today()'
+        'mon': 'parking.Day("MON")',
+        'tue': 'parking.Day("TUE")',
+        'wed': 'parking.Day("WED")',
+        'thu': 'parking.Day("THU")',
+        'fri': 'parking.Day("FRI")',
+        'sat': 'parking.Day("SAT")',
+        'sun': 'parking.Day("SUN")',
+        'tod': 'parking.today()'
     };
 
 
@@ -73,7 +74,7 @@ Blockly.Blocks['datetime_day'] = {
 };
 Blockly.Python['datetime_day'] = function(block) {
     Blockly.Python.definitions_['import_parking'] = 'import parking';
-    var operator = DAYS_MAP[block.getFieldValue('DAY')];
+    var operator = DAYS_MAP[block.getFieldValue('DAY').slice(0, 3).toLowerCase()];
     return [operator, Blockly.Python.ORDER_ATOMIC];
 };
 
@@ -155,26 +156,54 @@ var MERIDIANS_MAP = {
 
 Blockly.Python['datetime_time'] = function(block) {
     Blockly.Python.definitions_['import_parking'] = 'import parking';
-    var hour = HOURS_MAP[block.getFieldValue('HOUR')];
-    var minute = MINUTES_MAP[block.getFieldValue('MINUTE')];
-    var meridian = MERIDIANS_MAP[block.getFieldValue('MERIDIAN')];
-    var code = 'parking.time('+hour+','+minute+','+meridian+')';
+    var hour = block.getFieldValue('HOUR');
+    var code;
+    if (hour == "NOW") {
+        code = "parking.now()";
+    } else {
+        var minute = parseInt(block.getFieldValue('MINUTE'));
+        var meridian = Blockly.Python.quote_(block.getFieldValue('MERIDIAN'));
+        code = 'parking.Time('+hour+','+minute+','+meridian+')';
+    }
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+var convertDate = function(date) {
+    date = date.slice(0, 3).toLowerCase();
+    switch (date) {
+        case "mon": return "Monday";
+        case "tue": return "Tuesday";
+        case "wed": return "Wednesday";
+        case "thu": return "Thursday";
+        case "fri": return "Friday";
+        case "sat": return "Saturday";
+        case "sun": return "Sunday";
+        default: return date;
+    }
+}
+var convertMinute = function(minute) {
+    if (minute < 10) {
+        return "0"+minute;
+    } else {
+        return ""+minute;
+    }
+}
+
 PythonToBlocks.KNOWN_MODULES['parking'] = {
-    "equal_time": ["datetime_check_day", 'LEFT', ['OP', 'IS'], 'VALUE'],
-    "before_time": ["datetime_check_day", 'LEFT', ['OP', 'BEFORE'], 'VALUE'],
-    "after_time": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "before_equal_time": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "after_equal_time": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "not_equal_time": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "equal_day": ["datetime_check_day", 'LEFT', ['OP', 'IS'], 'VALUE'],
-    "before_day": ["datetime_check_day", 'LEFT', ['OP', 'BEFORE'], 'VALUE'],
-    "after_day": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "before_equal_day": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "after_equal_day": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
-    "not_equal_day": ["datetime_check_day", 'LEFT', ['OP', 'AFTER'], 'VALUE'],
+    "today": ["datetime_day", ["DAY", "TODAY"]],
+    "day_compare": ["datetime_check_day", "OP", 
+                            {"type": "variable", "mode": "value", "name": "LEFT"}, 
+                            {"type": "mapper", "name": "VALUE", "method": convertDate}],
+    "Day": ["datetime_day", {"type": "mapper", "name": "DAY", "method": convertDate}],
+    "now": ["datetime_time", ["HOUR", "NOW"]],
+    "Time": ["datetime_time", {"type": "integer", "name": "HOUR", "add_mutation": {"name": "@isnow", "value": "true"}}, 
+                             {"type": "integer_mapper", "name": "MINUTE", "method": convertMinute}, 
+                             "MERIDIAN"],
+    "time_compare": ["datetime_check_time", "OP",
+                            {"type": "variable", "mode": "value", "name": "LEFT"}, 
+                            {"type": "integer", "name": "HOURS"},
+                            {"type": "integer_mapper", "name": "MINUTES", "method": convertMinute},
+                            "MERIDIANS"]
 };
 
 var equalityOperators = [
@@ -205,20 +234,20 @@ Blockly.Blocks['datetime_check_day'] = {
     this.setColour(Blockly.Blocks.logic.HUE);
     this.setOutput(true, 'Boolean');
     this.appendValueInput('LEFT')
-        .setCheck('DatetimeDay');
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(equalityOperators), 'OP')
-        .appendField(new Blockly.FieldDropdown(DAYS), 'VALUE');
-    this.setInputsInline(true);
+        .setCheck('DatetimeDay')
+        .appendField(new Blockly.FieldDropdown(DAYS), 'VALUE')
+        .appendField(new Blockly.FieldDropdown(equalityOperators), 'OP');
+    
+    this.setInputsInline(false);
   }
 };
 
 Blockly.Python['datetime_check_day'] = function(block) {
     Blockly.Python.definitions_['import_parking'] = 'import parking';
-    var value = DAYS_MAP[block.getFieldValue('VALUE')];
-    var operator = equalityOperatorsConversions[block.getFieldValue('OP')];
-    var left = Blockly.Python.valueToCode(block, 'LEFT', Blockly.Python.ORDER_ATOMIC)
-    var code = operator + "(" + left + ',' + value + ")";
+    var value = Blockly.Python.quote_(block.getFieldValue('VALUE'));
+    var operator = Blockly.Python.quote_(block.getFieldValue('OP'));
+    var left = Blockly.Python.valueToCode(block, 'LEFT', Blockly.Python.ORDER_ATOMIC) || "___";
+    var code = "parking.day_compare(" + operator + ", " + left + ', ' + value + ")";
     return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
@@ -244,11 +273,11 @@ Blockly.Blocks['datetime_check_time'] = {
 
 Blockly.Python['datetime_check_time'] = function(block) {
     Blockly.Python.definitions_['import_parking'] = 'import parking';
-    var hour = HOURS_MAP[block.getFieldValue('HOURS')];
-    var minute = MINUTES_MAP[block.getFieldValue('MINUTES')];
-    var meridian = MERIDIANS_MAP[block.getFieldValue('MERIDIANS')];
-    var operator = equalityOperatorsConversions[block.getFieldValue('OP')];
+    var hour = parseInt(block.getFieldValue('HOURS'));
+    var minute = parseInt(block.getFieldValue('MINUTES'));
+    var meridian = Blockly.Python.quote_(block.getFieldValue('MERIDIANS'));
+    var operator = Blockly.Python.quote_(block.getFieldValue('OP'));
     var left = Blockly.Python.valueToCode(block, 'LEFT', Blockly.Python.ORDER_ATOMIC)
-    var code = operator + "(" + left + ',' + hour + ',' + minute + ',' +meridian + ")";
+    var code = "parking.time_compare(" + operator+", "+left + ',' + hour + ',' + minute + ',' +meridian + ")";
     return [code, Blockly.Python.ORDER_ATOMIC];
 };

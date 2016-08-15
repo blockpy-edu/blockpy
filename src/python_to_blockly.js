@@ -1049,20 +1049,42 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             }
             var fields = {};
             var mutations = {};
+            var values = {};
             for (var i = 0; i < args.length; i++) {
                 var argument = definition[1+i];
-                //console.log(argument);
+                console.log(argument);
+                var destination = fields;
                 if (typeof argument ==  "string") {
                     fields[argument] = this.Str_value(args[i]);
                 } else if (typeof argument == "object") {
+                    if (argument.mode == "value") {
+                        destination = values;
+                    }
+                    if (argument.add_mutation !== undefined) {
+                        mutations[argument.add_mutation.name] = argument.add_mutation.value;
+                    }
                     if (argument.type == 'mutation') {
                         if (argument.index == undefined) {
                             mutations[argument.name] = this.Str_value(args[i]);
                         } else {
                             mutations[argument.name] = this.Str_value(args[argument.index+1]);
                         }
+                    } else if (argument.type == "integer") {
+                        destination[argument.name] = this.Num_value(args[i]);
+                    } else if (argument.type == 'variable') {
+                        destination[argument.name] = this.convert(args[i]);
+                    } else if (argument.type == "integer_mapper") {
+                        // Okay we jumped the shark here
+                        var argumentName = argument.name;
+                        var argumentMapper = argument.method;
+                        destination[argumentName] = argumentMapper(this.Num_value(args[i]));
+                    } else if (argument.type == 'mapper') {
+                        var argumentName = argument.name;
+                        var argumentMapper = argument.method;
+                        destination[argumentName] = argumentMapper(this.Str_value(args[i]));
                     }
                 } else {
+                    console.log(typeof argument);
                     var argumentName = argument[0];
                     var argumentMapper = argument[1];
                     fields[argumentName] = argumentMapper(this.Str_value(args[i]));
@@ -1073,10 +1095,13 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                 var second = definition[i][1];
                 fields[first] = second;
             }
+            console.log(mutations);
             if (isExpression) {
-                return block(blockName, func.lineno, fields, [], [], mutations);
+                var k = block(blockName, func.lineno, fields, values, [], mutations);
+                console.log(k);
+                return k;
             } else {
-                return [block(blockName, func.lineno, fields, [], [], mutations)];
+                return [block(blockName, func.lineno, fields, values, [], mutations)];
             }
         }
     } 
@@ -1198,6 +1223,12 @@ PythonToBlocks.prototype.Num = function(node)
 {
     var n = node.n;
     return block("math_number", node.lineno, {"NUM": Sk.ffi.remapToJs(n)});
+}
+
+PythonToBlocks.prototype.Num_value = function(node)
+{
+    var n = node.n;
+    return Sk.ffi.remapToJs(n);
 }
 
 /*
