@@ -101,7 +101,7 @@
                 'name': "#1.2",
                 'give_feedback': 'output()\nreset_output()\nset_value(27)\nrun_code()\noutput()',
                 'starting_code': '',
-                'initial_view': 'Text',
+                'initial_view': 'Blocks',
                 'modules': {
                     'added': ['Functions'],
                     'removed': ['Iteration']
@@ -111,7 +111,8 @@
             {},
             // programs
             {
-                '__main__': 'print(value())'
+                '__main__': 'import parking\ntoday = parking.today()\ntuesday = parking.Day("tuesday")\nprint(parking.day_compare("IS", tuesday, "tue"))\nnow = parking.now()\nnoon = parking.Time(12,0,"pm")\nprint(parking.time_compare("IS", noon, 12, 0, "pm"))',
+                //'import parking\na = parking.today()\nif parking.day_compare("IS", a, "tue"):\n    print("Can park")\nelse:\n    print("Cannot park")'
                     ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
                     //"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"
                 //'give_feedback': 'set_success()'
@@ -156,150 +157,7 @@ function getQueryParams(){
        return {};
     }
 }
-    Blockly.Blocks['assess_suggest'] = {
-        init: function() {
-            this.jsonInit({
-                "id": "assess_suggest",
-                "message0": "assign %1 and suggest %2",
-                "args0": [
-                    {"type": "field_input",
-                     "name": "POINTS"},
-                    {"type": "field_input",
-                     "name": "SUGGESTION"}
-                ],
-                "previousStatement": null,
-                "nextStatement": null,
-                "colour": 330,
-                "tooltip": "Assigns a grade, and adds a suggestion in this case.",
-                "helpUrl": "http://www.example.com/"
-            });
-        }
-    };
-          
-          var UNDO_STACK = Array();
-          var REDO_STACK = Array();
-          var SAVE_UNDO_FLAG = true;
-          var MAXIMUM_UNDOS = 20;
-          
-          function saveUndo() {
-              if (SAVE_UNDO_FLAG) {
-                  if (UNDO_STACK.length >= MAXIMUM_UNDOS) {
-                      UNDO_STACK.shift();
-                  }
-                  UNDO_STACK.push(getXml());
-                  REDO_STACK = Array();
-              } else {
-                  SAVE_UNDO_FLAG = true;
-              }
-          }
-          
-          function loadUndo() {
-              if (UNDO_STACK.length > 0) {
-                  console.log("Popping undo");
-                  SAVE_UNDO_FLAG = false;
-                  var state = UNDO_STACK.pop();
-                  REDO_STACK.push(state);
-                  loadXml(state);
-              }
-          }
-          
-          function loadRedo() {
-              if (REDO_STACK.length > 0) {
-                  console.log("Popping redo");
-                  SAVE_UNDO_FLAG = false;
-                  var state = REDO_STACK.pop();
-                  UNDO_STACK.push(state);
-                  loadXml(state);
-              }
-          }
-          
-          
-          $(document).ready(function() {
-    var params = getQueryParams();
-    var body;
-    if (localStorage) {
-        if (localStorage.getItem('__main__') === null) {
-            body = $("#default-body").text();
-        } else {
-            body = localStorage.getItem('__main__');
-        }
-    }
-    body = $("#default-body").text();
-    var view = "blocks";
-    if ("view" in params) {
-        if (params["view"] == "text") {
-            view = "text";
-        } else if (params["view"] == "blocks") {
-            view = "blocks";
-        } else {
-            console.log("Unknown view:", params["view"]);
-            view = "blocks";
-        }
-    }
-    var mode = "student";
-    if ("mode" in params) {
-        if (params["mode"] == "student") {
-            mode = "student";
-        } else if (params["mode"] == "instructor") {
-            mode = "instructor";
-        }
-    } 
-    var parsons = false;
-    if ("parsons" in params) {
-        if (params["parsons"] == "true") {
-            parsons = true;
-        }
-    }
-    /*
-    blockpy = new BlockPy(document.getElementById('blockpy-div'),
-                        mode, // Instructor mode
-                        $("#problem-presentation").html(), // problem
-                        body, // Current code
-                        $('#default-on-run').html(), // On run code
-                        "def on_step(code, output, properties):\n    pass", // On step code
-                        "alpha = 0", // Starting code
-                        mode == "instructor",
-                        view,
-                        "blockly/",
-                        {'parsons': parsons, 'text_first': view == 'text'},
-                        { 'save_code': false,
-                          'load_code': false,
-                          'save_success': false,
-                          'load_success': false,
-                          'log_event': '',
-                          'server': false},
-                        { 'question_id': 'cw-1-blockly',
-                          'student_id': 1,
-                          'name': '#1.2',
-                          'version': 1,
-                          'book_id': 'compthink'});*/
-    if ("url" in params) {
-        $.get(decodeURIComponent(params["url"]), function(result) { blockpy.setCode(result);});   
-    }
-  });
-  
-        </script>
-<pre id='problem-presentation' style='display:none'>Plot the forecasted temperatures of Miami in Celsius. You'll need to use the "create empty list" and "append" blocks to create a new list of Celsius temperatures from the forecasted temperatures in Blacksburg, and then plot these new temperatures against the old ones.
-</pre>
-<pre id='default-body' style='display:none'>
-a = 0
-a = 5
-#print(a)
-#print("TEST")
-#celsius_temperatures = []
-#for t in weather.get_forecasts("Miami, FL"):
-#    celsius = (t - 32) / 2
-#    celsius_temperatures.append(celsius)
-#plt.plot(celsius_temperatures)
-#plt.title('Temperatures in Miami')
-#plt.show()
-</pre>
-<pre id='default-on-run' style='display:none'>
-def on_run(code, output, properties):
-    return True
-</pre>
 
-<script>
 /*$(document).ready(function() {
     codes = ["#1\na=a", "#2\na=0\na", "#3\na\na=0", "#4\na\na\na=0", "#5\nfor a in [1,2]:\n  pass", "#6\nfor x in a:\n  pass","#7\na=[]", "#8\na=[]\nfor x in a:\n  pass"];
     var t = $("<table>").addClass("table table-condensed table-striped");
