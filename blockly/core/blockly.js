@@ -279,16 +279,7 @@ Blockly.onKeyDown_ = function(e) {
     }
     if (e.keyCode == 86) {
       // 'v' for paste.
-      if (localStorage.getItem('_blockly_clipboardXml_')) {
-        var domText = localStorage.getItem('_blockly_clipboardXml_');
-        Blockly.Events.setGroup(true);
-        Blockly.mainWorkspace.paste(Blockly.Xml.textToDom(domText));
-        Blockly.Events.setGroup(false);
-      } else if (Blockly.clipboardXml_) {
-        Blockly.Events.setGroup(true);
-        Blockly.clipboardSource_.paste(Blockly.clipboardXml_);
-        Blockly.Events.setGroup(false);
-      }
+      Blockly.mainWorkspace.pasteFromClipboard();
     } else if (e.keyCode == 90) {
         // 'z' for undo
         //Blockly.getMainWorkspace().undo();

@@ -102,6 +102,7 @@ function BlockPy(settings, assignment, submission, programs) {
             case 'runtime': return ['label-runtime-error', 'Runtime Error'];
             case 'syntax': return ['label-syntax-error', 'Syntax Error'];
             case 'editor': return ['label-syntax-error', 'Editor Error'];
+            case 'internal': return ['label-internal-error', 'Internal Error'];
             case 'semantic': return ['label-semantic-error', 'Semantic Error'];
             case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
             case 'complete': return ['label-problem-complete', 'Complete'];
@@ -126,11 +127,10 @@ function BlockPy(settings, assignment, submission, programs) {
 }
 
 BlockPy.DEFAULT_MODULES = ['Properties', 'Decisions', 
-                           'Iteration', 'Separator',
+                           'Iteration',
                            'Calculation', 'Output', 
-                           'Separator',  'Values', 
-                           'Lists', 'Dictionaries', 
-                           'Separator']
+                           'Values', 
+                           'Lists', 'Dictionaries']
 
 BlockPy.prototype.initMain = function() {
     this.initInterface();
@@ -179,8 +179,6 @@ BlockPy.prototype.reportError = function(component, original, message, line) {
         this.components.feedback.editorError(original, message, line);
     } else if (component == 'syntax') {
         this.components.feedback.syntaxError(original, message, line);
-    } else if (component == 'semantic') {
-        this.components.feedback.semanticError(name, message, line);
     }
     console.error(component, message)
 }

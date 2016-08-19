@@ -92,6 +92,7 @@
     background-color: white;
 }
 
+.label-internal-error { background-color: black; }
 .label-syntax-error { background-color: darkred; }
 .label-runtime-error { background-color: #d9534f; }
 .label-semantic-error { background-color: orangered; }

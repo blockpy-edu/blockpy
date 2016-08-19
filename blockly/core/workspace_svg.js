@@ -887,6 +887,49 @@ Blockly.WorkspaceSvg.prototype.cleanUp_ = function() {
 };
 
 /**
+ * Copy all the blocks on the current workspace.
+ * @public
+ */
+Blockly.WorkspaceSvg.prototype.copyAll = function() {
+    Blockly.hideChaff();
+    var xmlBlocks = Blockly.Xml.workspaceToDom(this);
+    if (Blockly.dragMode_ != Blockly.DRAG_FREE) {
+        Blockly.Xml.deleteNext(xmlBlocks);
+    }
+    // Encode start position in XML.
+    //var xy = block.getRelativeToSurfaceXY();
+    //xmlBlock.setAttribute('x', block.RTL ? -xy.x : xy.x);
+    //xmlBlock.setAttribute('y', xy.y);
+    Blockly.clipboardXml_ = xmlBlocks;
+    Blockly.clipboardSource_ = this;
+    localStorage.setItem('_blockly_clipboardXml_', Blockly.Xml.domToText(xmlBlocks));
+}
+
+/**
+ * Pastea all blocks on the current workspace.
+ * @public
+ */
+Blockly.WorkspaceSvg.prototype.pasteFromClipboard = function() {
+    var blocks;
+    if (localStorage.getItem('_blockly_clipboardXml_')) {
+        var domText = localStorage.getItem('_blockly_clipboardXml_');
+        blocks = Blockly.Xml.textToDom(domText);
+    } else if (Blockly.clipboardXml_) {
+        blocks = Blockly.clipboardXml_
+    }
+    Blockly.Events.setGroup(true);
+    if (blocks.tagName !== undefined && blocks.tagName.toLowerCase() == "xml") {
+        for (var i = 0, len = blocks.children.length; i < len; i=i+1) {
+            Blockly.mainWorkspace.paste(blocks.children[i]);
+        }
+        this.align();
+    } else {
+        Blockly.mainWorkspace.paste(blocks);
+    }
+    Blockly.Events.setGroup(false);
+}
+      
+/**
  * Show the context menu for the workspace.
  * @param {!Event} e Mouse event.
  * @private
@@ -899,6 +942,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   var topBlocks = this.getTopBlocks(true);
   var eventGroup = Blockly.genUid();
 
+
   // Options to undo/redo previous action.
   var undoOption = {};
   undoOption.text = Blockly.Msg.UNDO;
@@ -910,6 +954,35 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   redoOption.enabled = this.redoStack_.length > 0;
   redoOption.callback = this.undo.bind(this, true);
   menuOptions.push(redoOption);
+  
+  // Options to copy all/paste previous action.
+  var copyAllOption = {};
+  copyAllOption.text = "Copy All Blocks";
+  copyAllOption.enabled = true;
+  copyAllOption.callback = this.copyAll.bind(this);
+  menuOptions.push(copyAllOption);
+  var pasteOption = {};
+  pasteOption.text = "Paste Blocks";
+  var ls_xml = localStorage.getItem('_blockly_clipboardXml_'), 
+      cp_xml = Blockly.clipboardXml_;
+  pasteOption.enabled = false;
+  if (ls_xml) {
+      cp_xml = ls_xml;
+  }
+  if (cp_xml) {
+      if (typeof cp_xml == "string") {
+          cp_xml = Blockly.Xml.textToDom(cp_xml);
+      }
+      if (cp_xml.tagName != undefined) {
+          if (cp_xml.tagName.toLowerCase() == "xml") {
+              pasteOption.enabled = cp_xml.children;
+          } else {
+              pasteOption.enabled = cp_xml.tagName.toLowerCase() == "block";
+          }
+      }
+  }
+  pasteOption.callback = this.pasteFromClipboard.bind(this);
+  menuOptions.push(pasteOption);
 
   // Option to clean up blocks.
   if (this.scrollbar) {
@@ -979,6 +1052,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
                 callback: function() {
                     _instance.align();
   }});
+  /*
   menuOptions.push({enabled: true, 
                 text: "Undo",
                 callback: function() {
@@ -989,18 +1063,10 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
                 callback: function() {
                     _instance.redo();
   }});
+  */
   
-  if (Blockly.captureDialog_ != undefined) {
-    var captureOption = {
-      text: 'Screenshot',
-      enabled: true,
-      callback: function() {
-        Blockly.captureDialog_();
-      }
-    };
-    menuOptions.push(captureOption);
-  }
   
+  /*
   // Option to clear all the blocks.
   var clearOption = {enabled: true};
   clearOption.text = "Clear Blocks";
@@ -1009,6 +1075,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     _instance.clear();
   };
   menuOptions.push(clearOption);
+  */
 
   // Option to delete all blocks.
   // Count the number of blocks that are deletable.
@@ -1054,6 +1121,17 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     }
   };
   menuOptions.push(deleteOption);
+  
+  if (Blockly.captureDialog_ != undefined) {
+    var captureOption = {
+      text: 'Screenshot',
+      enabled: true,
+      callback: function() {
+        Blockly.captureDialog_();
+      }
+    };
+    menuOptions.push(captureOption);
+  }
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };

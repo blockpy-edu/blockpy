@@ -281,7 +281,7 @@ Blockly.Blocks['logic_compare'] = {
       ['<=', 'GTE']
     ];
     var ltrOperators = [
-      ['=', 'EQ'],
+      ['==', 'EQ'],
       ['!=', 'NEQ'],
       ['<', 'LT'],
       ['<=', 'LTE'],
