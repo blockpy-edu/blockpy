@@ -8,6 +8,8 @@ function BlockPyEngine(main) {
     
     this.loadEngine();
     
+    this.instructor_module = instructor_module('instructor')
+    
     //this.main.model.program.subscribe(this.analyze.bind(this))
 }
 
@@ -84,6 +86,8 @@ Question Error
 BlockPyEngine.prototype.analyze = function() {
     this.main.model.execution.status("analyzing");
     
+    var feedback = this.main.components.feedback;
+    
     // Get the code
     var code = this.main.model.programs['__main__']();
     if (code.trim() == "") {
@@ -109,15 +113,15 @@ BlockPyEngine.prototype.analyze = function() {
     // TODO: variables defined AFTER their use
     if (report["Undefined variables"].length >= 1) {
         var variable = report["Undefined variables"][0];
-        this.main.reportError('semantic', "Undefined Property", "The property <code>"+variable.name+"</code> was read on line "+variable.line.split("|")[0]+", but it was not defined on any previous lines. You cannot use a variable until it has been set.", variable.line.split("|")[0])
+        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.line.split("|")[0]+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.line.split("|")[0])
         return false;
     } else if (report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        this.main.reportError('semantic', "Unused Property", "The property <code>"+variable.name+"</code> was created on line "+variable.line.split("|")[0]+", but was never used.", variable.line.split("|")[0])
+        feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was created on line "+variable.line.split("|")[0]+", but was never used.", variable.line.split("|")[0])
         return false;
     } else if (report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
-        this.main.reportError('semantic', "Overwritten Property", "The property <code>"+variable.name+"</code> was set on line "+variable.first_location.split("|")[0]+", but before it could be read it was changed on line "+variable.last_location.split("|")[0]+". It is unnecessary to change an existing variable's value without reading it first.", variable.last_location.split("|")[0])
+        feedback.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set on line "+variable.first_location.split("|")[0]+", but before it could be read it was changed on line "+variable.last_location.split("|")[0]+". It is unnecessary to change an existing variable's value without reading it first.", variable.last_location.split("|")[0])
         return false;
     }
     
@@ -152,7 +156,7 @@ BlockPyEngine.prototype.run = function() {
     var feedback = this.main.components.feedback;
     
     // Get the code
-    var code = this.main.model.program();
+    var code = this.main.model.programs['__main__']();
     if (code.trim() == "") {
         feedback.emptyProgram();
         this.main.model.execution.status("error");
@@ -211,8 +215,8 @@ var instructor_module = function(name) {
         Sk.builtin.Exception.apply(this, arguments);
     };
     Sk.abstr.setUpInheritance("Success", Sk.builtin.Success, Sk.builtin.Exception);
-    mod.give_feedback = new Sk.builtin.func(function(message) {
-        Sk.builtin.pyCheckArgs("give_feedback", arguments, 1, 1);
+    mod.set_feedback = new Sk.builtin.func(function(message) {
+        Sk.builtin.pyCheckArgs("set_feedback", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
         throw new Sk.builtin.Feedback(message.v);
     });
@@ -220,7 +224,101 @@ var instructor_module = function(name) {
         Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
         throw new Sk.builtin.Success();
     });
+    
+    var parses = {};
+    function getParseList(source) {
+        if (!(source in parses)) {
+            var parse = Sk.parse("__main__", source);
+            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
+        }
+        var ast = parses[source];
+        return (new NodeVisitor()).recursive_walk(ast);
+    }
+    
+    mod.calls_function = new Sk.builtin.func(function(source, name) {
+        Sk.builtin.pyCheckArgs("calls_function", arguments, 2, 2);
+        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
+        Sk.builtin.pyCheckType("name", "string", Sk.builtin.checkString(name));
+        
+        source = source.v;
+        name = name.v;
+        
+        var ast_list = getParseList(source);
+        
+        var count = 0;
+        for (var i = 0, len = ast_list.length; i < len; i = i+1) {
+            if (ast_list[i]._astname == 'Call') {
+                if (ast_list[i].func._astname == 'Attribute') {
+                    count += Sk.ffi.remapToJs(ast_list[i].func.attr) == name | 0;
+                } else if (ast_list[i].func._astname == 'Name') {
+                    count += Sk.ffi.remapToJs(ast_list[i].func.id) == name | 0;
+                }   
+            }
+        }
+        
+        return Sk.ffi.remapToPy(count > 0);
+    });
+    
+    mod.count_components = new Sk.builtin.func(function(source, component) {
+        Sk.builtin.pyCheckArgs("count_components", arguments, 2, 2);
+        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
+        Sk.builtin.pyCheckType("component", "string", Sk.builtin.checkString(component));
+        
+        source = source.v;
+        component = component.v;
+        
+        var ast_list = getParseList(source);
+        
+        var count = 0;
+        for (var i = 0, len = ast_list.length; i < len; i = i+1) {
+            if (ast_list[i]._astname == component) {
+                count = count+1;
+            }
+        }
+        
+        return Sk.ffi.remapToPy(count);
+    });
     return mod;
+}
+
+BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, output, ast) {
+    var model = this.main.model;
+    this._backup_execution = Sk.afterSingleExecution;
+    Sk.afterSingleExecution = undefined;
+    Sk.builtins.get_output = new Sk.builtin.func(function() { 
+        Sk.builtin.pyCheckArgs("get_output", arguments, 0, 0);
+        return Sk.ffi.remapToPy(model.execution.output());
+    });
+    Sk.builtins.reset_output = new Sk.builtin.func(function() { 
+        Sk.builtin.pyCheckArgs("reset_output", arguments, 0, 0);
+        model.execution.output.removeAll();
+    });
+    Sk.builtins.log = new Sk.builtin.func(function(data) { 
+        Sk.builtin.pyCheckArgs("output", arguments, 1, 1);
+        console.log(data)
+    });
+    Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
+    Sk.builtins.code = Sk.ffi.remapToPy(student_code);
+    Sk.builtins.set_success = this.instructor_module.set_success;
+    Sk.builtins.set_feedback = this.instructor_module.set_feedback;
+    Sk.builtins.count_components = this.instructor_module.count_components;
+    Sk.builtins.calls_function = this.instructor_module.calls_function;
+    model.settings.mute_printer(true);
+}
+
+BlockPyEngine.prototype.disposeEnvironment = function() {
+    Sk.afterSingleExecution = this._backup_execution;
+    Sk.builtins.get_output = undefined;
+    Sk.builtins.reset_output = undefined;
+    Sk.builtins.log = undefined;
+    Sk.builtins.trace = undefined;
+    Sk.builtins.code = undefined;
+    Sk.builtins.set_success = undefined;
+    Sk.builtins.set_feedback = undefined;
+    Sk.builtins.count_components = undefined;
+    Sk.builtins.calls_function = undefined;
+    GLOBAL_VALUE = undefined;
+    this.main.model.settings.mute_printer(false);
 }
 
 BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) {
@@ -229,68 +327,20 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
     var model = this.main.model;
     var on_run = model.programs['give_feedback']();
     if (on_run !== undefined && on_run.trim() !== "") {
-        var backupExecution = Sk.afterSingleExecution;
-        Sk.afterSingleExecution = undefined;
         
-        // Old code to handle lame checking
-        /*
-        on_run += "\nresult = on_run('''"+student_code+"''', "+
-                  JSON.stringify(output)+", "+
-                  JSON.stringify(traceTable)+" "+
-                  ")";
-        console.log(on_run);*/
-        
-        // New code to handle sophisticated checking
         
         on_run = 'def run_code():\n'+indent(student_code)+'\n'+on_run;
-        
-        console.log(on_run);
-        
-        model.settings.mute_printer(true);
-        
-        var backup = Sk.builtins.print;
-        Sk.builtins.output = new Sk.builtin.func(function() { 
-            Sk.builtin.pyCheckArgs("output", arguments, 0, 0);
-            console.log(Sk.ffi.remapToPy(model.execution.output()));
-        });
-        Sk.builtins.reset_output = new Sk.builtin.func(function() { 
-            Sk.builtin.pyCheckArgs("output", arguments, 0, 0);
-            model.execution.output.removeAll();
-        });
-        Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
-        Sk.builtins.code = Sk.ffi.remapToPy(student_code);
-        Sk.builtins.ast = Sk.ffi.remapToPy(ast);
-        Sk.builtins.set_success = instructor_module('instructor').set_success;
-        Sk.builtins.give_feedback = instructor_module('instructor').give_feedback;
+        this.setupEnvironment(student_code, traceTable, output, ast);
         
         var executionPromise = Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, on_run, true);
         });
         executionPromise.then(
             function (module) {
-                Sk.afterSingleExecution = backupExecution;
-                GLOBAL_VALUE = undefined;
-                /*
-                var result = Sk.ffi.remapToJs(module.$d.result);
-                if (result === true) {  
-                    server.markSuccess(1.0);
-                    engine.main.components.feedback.complete();
-                } else {
-                    server.markSuccess(0.0);
-                    engine.main.components.feedback.instructorFeedback(result);
-                }
-                */
-                model.settings.mute_printer(false);
+                engine.main.components.feedback.noErrors();
+                engine.disposeEnvironment();
             }, function (error) {
-                Sk.afterSingleExecution = backupExecution;
-                
-                Sk.builtins.output = undefined;
-                Sk.builtins.trace = undefined;
-                Sk.builtins.code = undefined;
-                Sk.builtins.ast = undefined;
-                Sk.builtins.give_feedback = undefined;
-                GLOBAL_VALUE = undefined;
-                
+                engine.disposeEnvironment();
                 console.log(error.tp$name, error.tp$name == "Success");
                 if (error.tp$name == "Success") {
                     server.markSuccess(1.0);
@@ -299,10 +349,10 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast) 
                     server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
                 } else {
-                    engine.main.components.feedback.error("Error in instructor's feedback. "+error);
+                    console.error(error);
+                    engine.main.components.feedback.internalError(error, "Feedback Error", "Error in instructor's feedback. Please show the above message to an instructor!");
+                    server.logEvent('blockly_instructor_error', ''+error);
                 }
-                //server.logEvent('blockly_instructor_error', error);
-                model.settings.mute_printer(false);
             });
     }
 }

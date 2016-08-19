@@ -125,10 +125,18 @@ BlockPyEditor.prototype.initInstructor = function() {
     });
     introductionEditor.code(model.assignment.introduction());
     
-    var availableModules = this.instructorTag.find('.blockpy-available-modules');
-    availableModules.multiSelect({ selectableOptgroup: true });
+    this.availableModules = this.instructorTag.find('.blockpy-available-modules');
+    this.availableModules.multiSelect({ selectableOptgroup: true });
+    
     
 }
+
+BlockPyEditor.prototype.addAvailableModule = function(name) {
+    this.availableModules.multiSelect('addOption', { 
+        'value': name, 'text': name
+    });
+    this.availableModules.multiSelect('select', name);
+};
 
 BlockPyEditor.prototype.hideTextMenu = function() {
     this.textTag.css('height', '0%');
@@ -524,6 +532,7 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="dict_get_literal"></block>'+
                     //'<block type="dict_keys"></block>'+
                 '</category>',
+    /*
     'Data - Weather': '<category name="Data - Weather" colour="70">'+
                     '<block type="weather_temperature"></block>'+
                     '<block type="weather_report"></block>'+
@@ -548,7 +557,7 @@ BlockPyEditor.CATEGORY_MAP = {
                 '</category>',
     'Data - Books': '<category name="Data - Books" colour="50">'+
                     '<block type="books_get"></block>'+
-                '</category>',
+                '</category>',*/
     'Data - Parking': '<category name="Data - Parking" colour="45">'+
                     '<block type="datetime_day"></block>'+
                     '<block type="datetime_time"></block>'+
@@ -561,8 +570,23 @@ BlockPyEditor.CATEGORY_MAP = {
 BlockPyEditor.prototype.updateToolbox = function(only_set) {
     var xml = '<xml id="toolbox" style="display: none">';
     var modules = this.main.model.assignment.modules();
+    var started_misc = false,
+        started_values = false,
+        started_data = false;
     for (var i = 0, length = modules.length; i < length; i = i+1) {
         var module = modules[i];
+        if (!started_misc && ['Calculation', 'Output', 'Python'].indexOf(module) != -1) {
+            started_misc = true;
+            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+        }
+        if (!started_values && ['Values', 'Lists', 'Dictionaries'].indexOf(module) != -1) {
+            started_values = true;
+            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+        }
+        if (!started_data && module.slice(0, 6) == 'Data -') {
+            started_data = true;
+            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+        }
         if (typeof module == 'string') {
             xml += BlockPyEditor.CATEGORY_MAP[module];
         } else {

@@ -82,6 +82,15 @@ BlockPyFeedback.prototype.semanticError = function(name, message, line) {
     this.main.components.printer.print("Execution stopped - there was an error!");
 }
 
+BlockPyFeedback.prototype.internalError = function(original, name, message) {
+    original = this.prettyPrintError(original);
+    this.title.html(name);
+    this.original.show().html(original);
+    this.body.html(message);
+    this.main.model.status.error("internal");
+    this.main.components.printer.print("Internal error! Please show this to an instructor!");
+}
+
 BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
     this.title.html(name);
     this.original.hide();
