@@ -494,9 +494,11 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="text_print"></block>'+
                     //'<block type="text_print_multiple"></block>'+
                     '<block type="plot_line"></block>'+
-                    //'<block type="plot_scatter"></block>'+
+                    '<block type="plot_scatter"></block>'+
                     '<block type="plot_show"></block>'+
                     '<block type="plot_title"></block>'+
+                    '<block type="plot_xlabel"></block>'+
+                    '<block type="plot_ylabel"></block>'+
                 '</category>',
     'Values':   '<category name="Values" colour="100">'+
                     '<block type="text"></block>'+

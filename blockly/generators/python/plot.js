@@ -35,6 +35,19 @@ Blockly.Python['plot_title'] = function(block) {
     return code;
 };
 
+Blockly.Python['plot_xlabel'] = function(block) {
+    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
+    var parameter_plot_title = Blockly.Python.quote_(block.getFieldValue('TEXT'))
+    var code = 'plt.xlabel('+parameter_plot_title+')\n';
+    return code;
+};
+Blockly.Python['plot_ylabel'] = function(block) {
+    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
+    var parameter_plot_title = Blockly.Python.quote_(block.getFieldValue('TEXT'))
+    var code = 'plt.ylabel('+parameter_plot_title+')\n';
+    return code;
+};
+
 Blockly.Python['plot_line'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
     var code = 'plt.plot(';

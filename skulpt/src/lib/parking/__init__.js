@@ -1,5 +1,15 @@
 var $builtinmodule = function(name)
 {
+    var convert_day = function(day) {
+        return WEEKDAYS.indexOf(day.name.v);
+    }
+    var convert_day_string = function(day) {
+        return WEEKDAYS.indexOf(day.v.toLowerCase().slice(0, 3));
+    }
+    var convert_time = function(hour, minute, meridian) {
+        return hour*60 + minute + (meridian == "pm" ? 12*60 : 0);
+    }
+    
     var mod = {};
     
     var time = function($gbl, $loc) {
@@ -14,15 +24,52 @@ var $builtinmodule = function(name)
             self.meridian.v = self.meridian.v.toLowerCase();
         });
         $loc.__str__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+self.hour.v+':'+self.minute.v+self.meridian.v+'>');
+            return Sk.ffi.remapToPy('<'+(self.hour.v || 12) +':'+self.minute.v+self.meridian.v+'>');
         });
         $loc.__repr__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+self.hour.v+':'+self.minute.v+self.meridian.v+'>');
+            return Sk.ffi.remapToPy('<'+(self.hour.v || 12)+':'+self.minute.v+self.meridian.v+'>');
         });
-    }
-    
-    var convert_time = function(hour, minute, meridian) {
-        return hour*60 + minute + (meridian == "pm" ? 12*60 : 0);
+        var comparison = function (operation, self, other) {
+            if (Sk.builtin.isinstance(other, mod.Time)) {
+                if (operation(convert_time(self.hour.v % 12, self.minute.v, self.meridian.v), 
+                              convert_time(other.hour.v % 12, other.minute.v, other.meridian.v))) {
+                    return Sk.ffi.remapToPy(true);
+                } else {
+                    return Sk.ffi.remapToPy(false);
+                }
+            } else {
+                return Sk.ffi.remapToPy(false);
+            }
+        }
+        $loc.__eq__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l==r}, self, other);
+        })
+        
+        $loc.__ne__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l!=r}, self, other);
+        });
+        
+        $loc.__lt__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l < r}, self, other);
+        });
+        
+        $loc.__gt__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l > r}, self, other);
+        });
+        
+        $loc.__le__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l <= r}, self, other);
+        });
+        
+        $loc.__ge__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l >= r}, self, other);
+        });
     }
     
     var day = function($gbl, $loc) {
@@ -38,10 +85,9 @@ var $builtinmodule = function(name)
         $loc.__repr__ = new Sk.builtin.func(function (self) {
             return Sk.ffi.remapToPy('<'+self.name.v+'>');
         });
-        $loc.__eq__ = new Sk.builtin.func(function (self, other) {
-            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+        var comparison = function (operation, self, other) {
             if (Sk.builtin.isinstance(other, mod.Day)) {
-                if (self.name.v == other.name.v) {
+                if (operation(convert_day(self), convert_day(other))) {
                     return Sk.ffi.remapToPy(true);
                 } else {
                     return Sk.ffi.remapToPy(false);
@@ -49,18 +95,35 @@ var $builtinmodule = function(name)
             } else {
                 return Sk.ffi.remapToPy(false);
             }
-        });
+        }
+        $loc.__eq__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l==r}, self, other);
+        })
+        
         $loc.__ne__ = new Sk.builtin.func(function (self, other) {
             Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
-            if (Sk.builtin.isinstance(other, mod.Day)) {
-                if (self.name.v == other.name.v) {
-                    return Sk.ffi.remapToPy(false);
-                } else {
-                    return Sk.ffi.remapToPy(true);
-                }
-            } else {
-                return Sk.ffi.remapToPy(true);
-            }
+            return comparison(function(l,r) {return l!=r}, self, other);
+        });
+        
+        $loc.__lt__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l < r}, self, other);
+        });
+        
+        $loc.__gt__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l > r}, self, other);
+        });
+        
+        $loc.__le__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l <= r}, self, other);
+        });
+        
+        $loc.__ge__ = new Sk.builtin.func(function (self, other) {
+            Sk.builtin.pyCheckArgs("__init__", arguments, 2, 2);
+            return comparison(function(l,r) {return l >= r}, self, other);
         });
     }
     
@@ -97,10 +160,8 @@ var $builtinmodule = function(name)
         Sk.builtin.pyCheckType("comparison", "string", Sk.builtin.checkString(comparison));
         Sk.builtin.pyCheckType("value", "Day", Sk.builtin.isinstance(value, mod.Day));
         Sk.builtin.pyCheckType("day", "string", Sk.builtin.checkString(day));
-        var day_v = day.v.toLowerCase().slice(0,3),
-            value_v = value.name.v;
-        var day_n = WEEKDAYS.indexOf(day_v),
-            value_n = WEEKDAYS.indexOf(value_v);
+        var day_n = convert_day_string(day),
+            value_n = convert_day(value);
         switch (comparison.v) {
             case 'IS': return Sk.ffi.remapToPy(value_n == day_n);
             case "BEFORE_EQUAL": return Sk.ffi.remapToPy(value_n <= day_n);

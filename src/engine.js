@@ -102,7 +102,7 @@ BlockPyEngine.prototype.analyze = function() {
     result = analyzer.analyze();
     // Syntax error
     if (result !== true) {
-        this.main.reportError('syntax', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
+        this.main.reportError('editor', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
         return false;
     }
     
@@ -303,6 +303,7 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
     Sk.builtins.set_feedback = this.instructor_module.set_feedback;
     Sk.builtins.count_components = this.instructor_module.count_components;
     Sk.builtins.calls_function = this.instructor_module.calls_function;
+    Sk.skip_drawing = true;
     model.settings.mute_printer(true);
 }
 
@@ -317,6 +318,7 @@ BlockPyEngine.prototype.disposeEnvironment = function() {
     Sk.builtins.set_feedback = undefined;
     Sk.builtins.count_components = undefined;
     Sk.builtins.calls_function = undefined;
+    Sk.skip_drawing = false;
     GLOBAL_VALUE = undefined;
     this.main.model.settings.mute_printer(false);
 }
@@ -455,8 +457,8 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                 };
         default:
             return {'name': property,
-                    'type': value.$r().v,
-                    "value": value.$r().v
+                    'type': value.$r == undefined ? value : value.$r().v,
+                    "value": value.$r == undefined ? value : value.$r().v
                     };
     }
 }

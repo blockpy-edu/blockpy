@@ -15,6 +15,12 @@ function AbstractInterpreter(code, filename) {
 AbstractInterpreter.prototype = new NodeVisitor();
 
 AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'}, 
+                                'sum': {"type": "Num"},
+                                'round': {"type": "Num"},
+                                'range': {"type": "List"},
+                                'xrange': {"type": "List"},
+                                'reversed': {"type": "List"},
+                                'len': {"type": "Num"},
                                 'True': {"type": "Bool"}, 
                                 'False': {"type": "Bool"}, 
                                 'None': {"type": 'None'}}
@@ -514,7 +520,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
 
 /*
 var filename = '__main__.py';
-var python_source = 'total=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
+var python_source = 'sum([1,2])/len([4,5,])\ntotal=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
 var analyzer = new AbstractInterpreter(python_source);
 analyzer.analyze()
 console.log(python_source);

@@ -98,7 +98,7 @@
             {
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
-                'give_feedback': 'output()\nreset_output()\nset_value(27)\nrun_code()\noutput()',
+                'give_feedback': 'get_output()\nreset_output()\nset_value(27)\nrun_code()\nget_output()',
                 'starting_code': '',
                 'initial_view': 'Blocks',
                 'modules': {
@@ -110,7 +110,8 @@
             {},
             // programs
             {
-                '__main__': 'import parking\ntoday = parking.today()\ntuesday = parking.Day("tuesday")\nprint(parking.day_compare("IS", tuesday, "tue"))\nnow = parking.now()\nnoon = parking.Time(12,0,"pm")\nprint(parking.time_compare("IS", noon, 12, 0, "pm"))',
+                '__main__': 'import matplotlib.pyplot as plt\nplt.scatter([10, 20, 30, 40], [40, 30, 40, 50])\nplt.show()'
+                //'__main__': 'import parking\ntoday = parking.today()\ntuesday = parking.Day("tuesday")\nprint(parking.day_compare("IS", tuesday, "tue"))\nnow = parking.now()\nnoon = parking.Time(12,0,"pm")\nprint(parking.time_compare("IS", noon, 12, 0, "pm"))',
                 //'import parking\na = parking.today()\nif parking.day_compare("IS", a, "tue"):\n    print("Can park")\nelse:\n    print("Cannot park")'
                     ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
                     //"import matlotlib.pylot as plt\nplt.hist([1,5,5,8])\nplt.show()"

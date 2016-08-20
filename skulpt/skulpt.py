@@ -1064,7 +1064,7 @@ Sk.misceval.asyncToPromise(function() {{
     except OSError as e:
         print >>sys.stderr, "Execution failed:", e
 
-def run(fn, shell="", opt=False, p3=False, debug_mode=False, dumpJS='false'):
+def run(fn, shell="", opt=False, p3=True, debug_mode=False, dumpJS='false'):
     if not os.path.exists(fn):
         print "%s doesn't exist" % fn
         raise SystemExit()

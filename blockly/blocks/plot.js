@@ -63,6 +63,9 @@ Blockly.Blocks['plot_scatter'] = {
   }
 };
 
+var OPEN_QUOTE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAA0UlEQVQY023QP0oDURSF8e8MImhlUIiCjWKhrUUK3YCIVkq6bMAF2LkCa8ENWLoNS1sLEQKprMQ/GBDks3kDM+Oc8nfPfTxuANQTYBeYAvdJLL4FnAFfwF2ST9Rz27kp5YH/kwrYp50LdaXHAU4rYNYzWAdeenx7AbgF5sAhcARsAkkyVQ+ACbAKjIGqta4+l78udXxc/LiJG+qvet0pV+q7+tHE+iJzdbGz8FhmOzVcqj/qq7rcKI7Ut1Leq70C1oCrJMMk343HB8ADMEzyVOMff72l48gwfqkAAAAASUVORK5CYII=';
+var CLOSED_QUOTE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAAvklEQVQY022PoapCQRRF97lBVDRYhBcEQcP1BwS/QLAqr7xitZn0HzRr8Rts+htmQdCqSbQIwmMZPMIw3lVmZu0zG44UAFSBLdBVBDAFZqFo8eYKtANfBC7AE5h8ZNOHd1FrDnh4VgmDO3ADkujDHPgHfkLZ84bfaLjg/hD6RFLq9z6wBDr+rvuZB1bAEDABY76pA2mGHyWSjvqmIemc4WsCLKOp4nssIj8wD8qS/iSVJK3N7OTeJPV9n72ZbV7iDuSc2BaQBQAAAABJRU5ErkJggg==';
+
 Blockly.Blocks['plot_title'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');
@@ -78,17 +81,61 @@ Blockly.Blocks['plot_title'] = {
     this.setOutput(false);
     this.setTooltip('Sets the plot\'s title');
   },
-  /**
-   * Create an image of an open or closed quote.
-   * @param {boolean} open True if open quote, false if closed.
-   * @return {!Blockly.FieldImage} The field image of the quote.
-   * @private
-   */
   newQuote_: function(open) {
     if (open == this.RTL) {
-      var file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAA0UlEQVQY023QP0oDURSF8e8MImhlUIiCjWKhrUUK3YCIVkq6bMAF2LkCa8ENWLoNS1sLEQKprMQ/GBDks3kDM+Oc8nfPfTxuANQTYBeYAvdJLL4FnAFfwF2ST9Rz27kp5YH/kwrYp50LdaXHAU4rYNYzWAdeenx7AbgF5sAhcARsAkkyVQ+ACbAKjIGqta4+l78udXxc/LiJG+qvet0pV+q7+tHE+iJzdbGz8FhmOzVcqj/qq7rcKI7Ut1Leq70C1oCrJMMk343HB8ADMEzyVOMff72l48gwfqkAAAAASUVORK5CYII=';
+      var file = OPEN_QUOTE;
     } else {
-      var file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAAvklEQVQY022PoapCQRRF97lBVDRYhBcEQcP1BwS/QLAqr7xitZn0HzRr8Rts+htmQdCqSbQIwmMZPMIw3lVmZu0zG44UAFSBLdBVBDAFZqFo8eYKtANfBC7AE5h8ZNOHd1FrDnh4VgmDO3ADkujDHPgHfkLZ84bfaLjg/hD6RFLq9z6wBDr+rvuZB1bAEDABY76pA2mGHyWSjvqmIemc4WsCLKOp4nssIj8wD8qS/iSVJK3N7OTeJPV9n72ZbV7iDuSc2BaQBQAAAABJRU5ErkJggg==';
+      var file = CLOSED_QUOTE;
+    }
+    return new Blockly.FieldImage(file, 12, 12, '"');
+  }
+};
+
+Blockly.Blocks['plot_xlabel'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.plot.HUE);
+    this.appendDummyInput()
+        .appendField("make plot's x-axis label")
+        .appendField(this.newQuote_(true))
+        .appendField(new Blockly.FieldTextInput('title'), 'TEXT')
+        .appendField(this.newQuote_(false));
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setOutput(false);
+    this.setTooltip('Sets the plot\'s x-axis title (horizontal axis)');
+  },
+  newQuote_: function(open) {
+    if (open == this.RTL) {
+      var file = OPEN_QUOTE;
+    } else {
+      var file = CLOSED_QUOTE;
+    }
+    return new Blockly.FieldImage(file, 12, 12, '"');
+  }
+};
+
+Blockly.Blocks['plot_ylabel'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.plot.HUE);
+    this.appendDummyInput()
+        .appendField("make plot's y-axis label")
+        .appendField(this.newQuote_(true))
+        .appendField(new Blockly.FieldTextInput('title'), 'TEXT')
+        .appendField(this.newQuote_(false));
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setOutput(false);
+    this.setTooltip('Sets the plot\'s y-axis title (vertical axis)');
+  },
+  newQuote_: function(open) {
+    if (open == this.RTL) {
+      var file = OPEN_QUOTE;
+    } else {
+      var file = CLOSED_QUOTE;
     }
     return new Blockly.FieldImage(file, 12, 12, '"');
   }

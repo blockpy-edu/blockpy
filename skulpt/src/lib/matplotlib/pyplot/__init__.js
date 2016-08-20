@@ -191,6 +191,8 @@ jsplotlib.Bars = function(ydata, color) {
     return that;
 }
 
+jsplotlib._line_counter = 0;
+
 /** Line2D class for encapsulating all line relevant attributes and methods
         Rebuilds partial matplotlib.Line2D functionality. Does not inherit from
         abstract Artist class. Rather more a data representation.
@@ -202,10 +204,18 @@ jsplotlib.Line2D = function(xdata, ydata, linewidth, linestyle, color, marker,
     drawstyle, markevery, kwargs) {
 
     // "that": completed Line2D object that is returned
-    var that = {};
+    var that = {}, x_values= [], y_values = [];
     // Initialize parameter defaults
-    that._x = xdata;
-    that._y = ydata;
+    var skip = Math.max(1, ydata.length / 500);
+    for (var i = 0, len = ydata.length; i < len; i=i+skip) {
+        var index = Math.floor(i+Math.random()*skip);
+        if (xdata.length == ydata.length) {
+            x_values.push(xdata[index]);
+        }
+        y_values.push(ydata[index]);
+    } 
+    that._x = x_values; //xdata;
+    that._y = y_values; //ydata;
     that._linewidth = linewidth || null;
     that._linestyle = linestyle || null;
     that._color = color || null;
@@ -224,6 +234,8 @@ jsplotlib.Line2D = function(xdata, ydata, linewidth, linestyle, color, marker,
     that._pickradius = pickradius || 5;
     that._drawstyle = drawstyle || null;
     that._markevery = markevery || null;
+    this._line_id = jsplotlib._line_counter;
+    jsplotlib._line_counter += 1;
     //kwargs
 
     // if only y provided, create Array from 1 to N
@@ -1246,7 +1258,7 @@ jsplotlib.get_color = function(cs) {
 jsplotlib.make_chart = function(width, height, console, insert_mode,
     attributes) {
     chart_counter++;
-    var DEFAULT_PADDING = 10;
+    var DEFAULT_PADDING = 30;
     console = console || document.body;
     width = width - 2 * DEFAULT_PADDING || 500;
     height = height - 2 * DEFAULT_PADDING || 200;
@@ -1348,7 +1360,7 @@ jsplotlib.construct_axis = function() {
             } else {
                 this._scale = d3.scale.linear();
             }
-            this._domain = [this._min, this._max];
+            this._domain = [this._min, this._max*1.1];
             return this;
         };
         that._set_formatter = function(formatter) {
@@ -1369,14 +1381,17 @@ jsplotlib.construct_axis = function() {
         that._init = function(chart) {
             var dimension;
             if (this._will_draw_axis) {
+                var proportion_increase = 0;
                 if (this._x_or_y === "x") {
                     dimension = parent_graph._chartheight;
                 } else if (this._x_or_y === "y") {
+                    // Handle digits on the y-axis!
+                    proportion_increase += .015*this._max.toLocaleString().length;
                     dimension = parent_graph._chartwidth;
                 } else {
                     throw "Invalid axis type (must be x or y): " + this._x_or_y;
                 }
-                this._size = dimension * this._proportion;
+                this._size = dimension * (this._proportion+proportion_increase);
                 this._label_offset = this._size * this._label_proportion;
             } else {
                 this._size = 0;
@@ -1391,7 +1406,7 @@ jsplotlib.construct_axis = function() {
                 offset_h = 0;
                 offset_v = parent_graph._height;
                 offset_label_h = parent_graph._yaxis._size + parent_graph._chartwidth /
-                    2;
+                    4;
                 offset_label_v = parent_graph._height + this._size - this._label_offset;
                 this._writing_mode = "lr-tb";
                 this._orientation = "bottom";
@@ -1754,9 +1769,9 @@ var $builtinmodule = function(name) {
 
         if (!chart) {
             //$(Sk.matplotlibCanvas).empty();
+            var width = Sk.console.height * 2;
             var height = Sk.console.height * 1.25;
-            chart = jsplotlib.make_chart(height, height, Sk.console, false);
-            
+            chart = jsplotlib.make_chart(width, height, Sk.console, false);
         }
     };
 
@@ -1842,6 +1857,7 @@ var $builtinmodule = function(name) {
             xdata[0] = [];
         }
         
+        
         if (Sk.skip_drawing !== true) {
 
             // empty canvas from previous plots
@@ -1910,12 +1926,36 @@ var $builtinmodule = function(name) {
                 throw new Sk.builtin.ValueError(
                     "Can not call show without any plot created.");
             }
-            var lines = plot._artists.map(function(elem) { return [elem._x, elem._y] })
+            if (Sk.console.png_mode) {
+                var lines = plot._artists.map(function(elem) { return [elem._x, elem._y] })
+                var xml = new XMLSerializer().serializeToString(chart[0][0]);
+                var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+                var img  = document.createElement("img");
+                img.setAttribute('src', data);
+                img.style.display = 'block';
+                img.onload = function() {
+                    img.onload = null;
+                    //TODO: Make this capture a class descendant. Cross the D3/Jquery barrier!
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Sk.console.height * 2;
+                    canvas.height = Sk.console.height * 1.25;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    var canvasUrl = canvas.toDataURL("image/png");
+                    img.setAttribute('src', canvasUrl);
+                    chart[0][0].parentNode.replaceChild(img, chart[0][0])
+                    Sk.console.printHtml(img, lines);
+                }
+                img.onerror = function() {
+                    
+                }
+            } else {
+                Sk.console.printHtml(chart, lines);
+            }
         } else {
             var lines = plot._artists;
+            Sk.console.printHtml(chart, lines);
         }
-        Sk.console.printHtml(chart, lines);
-        //$(Sk.matplotlibCanvas).show();
     };
     mod.show = new Sk.builtin.func(show_f);
 
@@ -2381,7 +2421,7 @@ var $builtinmodule = function(name) {
         throw new Sk.builtin.NotImplementedError(
             "hexbin is not yet implemented");
     });
-    mod.values = Array();
+    
     var hist_f = function(kwa) {
         // Check kwarg argument
         Sk.builtin.pyCheckArgs("histk", arguments, 1, Infinity, true, false);
@@ -2495,10 +2535,90 @@ var $builtinmodule = function(name) {
         throw new Sk.builtin.NotImplementedError(
             "quiverkey is not yet implemented");
     });
-    mod.scatter = new Sk.builtin.func(function() {
-        throw new Sk.builtin.NotImplementedError(
-            "scatter is not yet implemented");
-    });
+    var scatter_f = function(kwa) {
+        Sk.builtin.pyCheckArgs("scatter", arguments, 1, Infinity, true, false);
+        args = Array.prototype.slice.call(arguments, 1);
+        mod.values.push(args);
+        kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
+        kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
+
+        // try parsing plot args
+        // possible xdata, ydata, stylestring
+        /*
+            plot(x, y, 'bo')  # plot x and y using blue circle markers
+        */
+
+        // variable definitions for args
+        var xdata = [];
+        var ydata = [];
+        var stylestring = []; // we support only one at the moment
+        var i = 0;
+        var lines = 0;
+
+        if (args[0] instanceof Sk.builtin.list) {
+            xdata.push(Sk.ffi.remapToJs(args[0]));
+        } else {
+            throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[0]) +
+                "' is not supported for *args[" + 0 + "].");
+        }
+        if (args[1] instanceof Sk.builtin.list) {
+            ydata.push(Sk.ffi.remapToJs(args[1]));
+        } else {
+            throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[1]) +
+                "' is not supported for *args[" + 1 + "].");
+        }
+        if (args[2] != undefined) {
+            if (Sk.builtin.checkString(args[2])) {
+                stylestring.push(Sk.ffi.remapToJs(args[2]));
+            } else {
+                throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[2]) +
+                    "' is not supported for *args[" + 2 + "].");
+            }
+        } else {
+            stylestring.push('o');
+        }
+        
+        if (Sk.skip_drawing !== true) {
+
+            // empty canvas from previous plots
+            create_chart();
+            // create new plot instance, should be replaced with Line2D and then added to the plot
+            if (!plot) {
+                plot = jsplotlib.plot(chart);
+            }
+
+            // create line objects
+            var line;
+            
+            for (i = 0; i < xdata.length; i++) {
+                line = new jsplotlib.Line2D(xdata[i], ydata[i]);
+                var ftm_tuple = jsplotlib._process_plot_format(stylestring[i]);
+                line.update({
+                    'linestyle': ftm_tuple.linestyle,
+                    'marker': jsplotlib.parse_marker(ftm_tuple.marker),
+                    'color': ftm_tuple.color
+                });
+                plot.add_artist(line);
+            }
+
+            // set kwargs that apply for all lines
+            plot.update(kwargs);
+        } else {
+            if (!plot) {
+                plot = {"_artists":[]};
+            }
+            for (i = 0; i < xdata.length; i++) {
+                plot._artists.push([xdata[i], ydata[i]]);
+            }
+        }
+
+        // result
+        var result = [];
+
+        return new Sk.builtins.tuple(result);
+    };
+    scatter_f.co_kwargs = true;
+    mod.scatter = new Sk.builtin.func(scatter_f);
     mod.semilogx = new Sk.builtin.func(function() {
         throw new Sk.builtin.NotImplementedError(
             "semilogx is not yet implemented");
