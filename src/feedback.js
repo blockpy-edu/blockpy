@@ -129,8 +129,21 @@ BlockPyFeedback.prototype.printError = function(error) {
     original = this.prettyPrintError(error);
     this.title.html(error.tp$name);
     this.original.show().html(original);
-    this.body.html(error.enhanced);
+    if (error.tp$name == "ParseError") {
+        this.body.html("While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ error.args.v[2]+', where it says:<br><code>'+error.args.v[3][2]+'</code>', error.args.v[2]);
+    } else if (error.constructor == Sk.builtin.NameError
+                && error.args.v.length > 0
+                && error.args.v[0].v == "name '___' is not defined") {
+        this.body.html("You have incomplete blocks. Make sure that you do not have any dangling blocks or blocks that are connected incorrectly.<br><br>If you look at the text view of your Python code, you'll see <code>___</code> in the code. The converter will create these <code>___</code> to show that you have a block that's missing a piece.");
+    } else if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
+        this.body.html(EXTENDED_ERROR_EXPLANATION[error.tp$name]);
+    } else {
+        this.body.html(error.enhanced);
+    }
     console.error(error);
+    if (error.stack) {
+        console.error(error.stack);
+    }
     this.main.model.status.error("runtime");
     this.main.components.editor.highlightError(error.traceback[0].lineno-1);
     return;
@@ -160,6 +173,8 @@ BlockPyFeedback.prototype.printError = function(error) {
                 && error.args.v.length > 0
                 && error.args.v[0].v == "name '___' is not defined") {
                 error = "<b>Error: </b> You have incomplete blocks. Make sure that you do not have any dangling blocks.<br><br><b>Extended Error Explanation:</b> If you look at the text view of your Python code, you'll see <code>___</code> in the code. The converter will create these <code>___</code> to show that you have a block that's missing a piece.";
+            }  else if (error.tp$name == "ParseError") {
+                
             } else if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
                 error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
             } else {

@@ -76,7 +76,7 @@ BlockPyPrinter.prototype.printHtml = function(chart, value) {
     var line = this.main.model.execution.line_number();
     this.main.model.execution.output.push(value);
     if (!(this.main.model.settings.mute_printer())) {
-        var outerDiv = $(chart[0]);//.parent();
+        var outerDiv = $(Sk.console.png_mode ? chart : chart[0]);//.parent();
         outerDiv.parent().show();
         outerDiv.attr({
             "data-toggle": 'tooltip',

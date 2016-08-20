@@ -1018,6 +1018,10 @@ PythonToBlocks.KNOWN_MODULES = {
     },
     "plt": {
         "title": ["*plot_title", "TEXT"],
+        "xlabel": ["*plot_xlabel", "TEXT"],
+        "ylabel": ["*plot_ylabel", "TEXT"],
+        "scatter": ["*plot_scatter", {"type": "variable", "mode": "value", "name": "x_values"},
+                                      {"type": "variable", "mode": "value", "name": "y_values"}],
         "show": ["*plot_show"]
     }
 };
@@ -1052,7 +1056,6 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             var values = {};
             for (var i = 0; i < args.length; i++) {
                 var argument = definition[1+i];
-                console.log(argument);
                 var destination = fields;
                 if (typeof argument ==  "string") {
                     fields[argument] = this.Str_value(args[i]);
@@ -1084,7 +1087,6 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                         destination[argumentName] = argumentMapper(this.Str_value(args[i]));
                     }
                 } else {
-                    console.log(typeof argument);
                     var argumentName = argument[0];
                     var argumentMapper = argument[1];
                     fields[argumentName] = argumentMapper(this.Str_value(args[i]));
@@ -1095,10 +1097,8 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                 var second = definition[i][1];
                 fields[first] = second;
             }
-            console.log(mutations);
             if (isExpression) {
                 var k = block(blockName, func.lineno, fields, values, [], mutations);
-                console.log(k);
                 return k;
             } else {
                 return [block(blockName, func.lineno, fields, values, [], mutations)];
