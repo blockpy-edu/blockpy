@@ -6,9 +6,18 @@ function BlockPyFeedback(main, tag) {
     this.title = this.tag.find('.blockpy-feedback-title');
     this.original = this.tag.find('.blockpy-feedback-original');
     this.status = this.tag.find('.blockpy-feedback-status');
+    this.trace = this.tag.find('.blockpy-feedback-trace');
+    
+    this.trace.click(this.buildTraceTable.bind(this));
     
     this.original.hide();
 };
+
+BlockPyFeedback.prototype.buildTraceTable = function() {
+    var execution = this.main.model.execution;
+    execution.show_trace(true);
+    execution.trace_step(execution.last_step());
+}
 
 BlockPyFeedback.prototype.error = function(html) {
     this.tag.html(html);

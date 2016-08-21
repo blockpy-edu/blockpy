@@ -88,4 +88,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tag.find('.blockpy-toolbar-import').click(function() {
         main.components.corgis.openDialog();
     });
+    this.tag.find('.blockpy-toolbar-english').click(function() {
+        main.components.english.openDialog();
+    });
 }

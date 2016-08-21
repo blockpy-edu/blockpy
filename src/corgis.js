@@ -14,7 +14,9 @@ function BlockPyCorgis(main) {
         }
     });
     $.when.apply($, imports).done(function() {
-        main.components.editor.updateBlocks();
+        if (main.model.settings.editor() == "Blocks") {
+            main.components.editor.updateBlocks();
+        }
         main.components.editor.updateToolbox(true);
     }).fail(function(e) {
         console.error(e);
@@ -67,7 +69,9 @@ BlockPyCorgis.prototype.openDialog = function(name) {
             });
             var editor = corgis.main.components.editor;
             corgis.main.components.dialog.show("Import Datasets", body, function() {
-                editor.updateBlocks();
+                if (editor.main.model.settings.editor() == "Blocks") {
+                    editor.updateBlocks();
+                }
             });
         });
     } else {
@@ -93,7 +97,9 @@ BlockPyCorgis.prototype.openDialog = function(name) {
         });
         var editor = this.main.components.editor;
         this.main.components.dialog.show("Import Datasets", body, function() {
-            editor.updateBlocks();
+            if (editor.main.model.settings.editor() == "Blocks") {
+                editor.updateBlocks();
+            }
         });
     }
 };

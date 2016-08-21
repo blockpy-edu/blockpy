@@ -58,12 +58,56 @@
         <div class='blockpy-content-right col-md-6 col-sm-6 bubble'
              style='padding:10px'>
             <div class='blockpy-feedback'>
+                <button type='button' class='btn btn-sm btn-default blockpy-feedback-trace pull-right' 
+                        data-bind="visible: !execution.show_trace() && (status.error() == 'feedback' || status.error() == 'no errors')">
+                    <span class='glyphicon glyphicon-circle-arrow-down'></span> Trace Variables
+                </button>
+                
                 <strong>Feedback: </strong>
                 <span class='label blockpy-feedback-status' data-bind="css: status_feedback_class()[0], text: status_feedback_class()[1]">Runtime Error</span>
                 <br>
                 <pre class='blockpy-feedback-original'></pre>
                 <strong class='blockpy-feedback-title'></strong>
                 <div class='blockpy-feedback-body'><i>Run your code to get feedback.</i></div>
+                <div class='blockpy-code-trace'></div>
+                
+                <div class="blockpy-feedback-traces" 
+                     data-bind="visible: execution.show_trace, foreach: execution.trace">
+                
+                <div data-bind="visible: $index()+1 == $root.execution.trace_step()">
+                <div>
+                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceFirst">
+                        <span class='glyphicon glyphicon-step-backward'></span>
+                    </button>
+                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceBackward">
+                        <span class='glyphicon glyphicon-backward'></span>
+                    </button>
+                    Step <span data-bind='text: step'></span>
+                    / <span data-bind='text: $root.execution.last_step()-1'></span>
+                    (<span data-bind='text: line == -1 ? "The end" : "Line "+line'></span>)
+                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceForward">
+                        <span class='glyphicon glyphicon-forward'></span>
+                    </button>
+                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceLast">
+                        <span class='glyphicon glyphicon-step-forward'></span>
+                    </button>
+                </div>
+                
+                <table class='table table-condensed table-striped table-bordered table-hover'>
+                    <thead>
+                        <tr><th>Name</th><th>Type</th><th>Value</th></tr>
+                    </thead>
+                    <tbody data-bind="foreach: properties">
+                        <tr data-bind="visible: name != '__file__' && name != '__path__'">
+                            <td data-bind="text: name"></td>
+                            <td data-bind="text: type"></td>
+                            <td><code data-bind="html: value"></code></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                
+                </div>
             </div>
         </div>
     </div>
@@ -78,16 +122,19 @@
             </button>
             
             <div class="btn-group" data-toggle="buttons" data-bind="visible: !assignment.upload()">
-                <label class="btn btn-default blockpy-mode-set-blocks active">
+                <label class="btn btn-default blockpy-mode-set-blocks" 
+                       data-bind="css: {active: settings.editor() == 'Blocks'}">
                     <span class='glyphicon glyphicon-th-large'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> Blocks
                 </label>
                 <label class="btn btn-default blockpy-mode-set-instructor"
-                       data-bind="visible: settings.instructor">
+                       data-bind="visible: settings.instructor,
+                                  css: {active: settings.editor() == 'Upload'}">
                     <span class='glyphicon glyphicon-list-alt'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
                 </label>
-                <label class="btn btn-default blockpy-mode-set-text">
+                <label class="btn btn-default blockpy-mode-set-text" 
+                       data-bind="css: {active: settings.editor() == 'Text'}">
                     <span class='glyphicon glyphicon-pencil'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
                 </label>
@@ -101,6 +148,12 @@
             <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload()">
                 <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
             </button>
+
+            <!--
+            <button type='button' class='btn btn-default blockpy-toolbar-english'>
+                <span class='glyphicon glyphicon-list-alt'></span> English
+            </button>
+            -->
             
             <select data-bind="visible: settings.instructor() & !assignment.upload(), value: settings.filename"
                     class="blockpy-toolbar-filename-picker">

@@ -24,6 +24,7 @@ BlockPyPrinter.prototype.getConfiguration = function() {
     return {
         'printHtml': function(html, value) { printer.printHtml(html, value);},
         'width': this.tag.width(),
+        'png_mode': true,
         'height': this.tag.height(),
         'console': this.tag[0]
     }

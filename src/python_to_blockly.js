@@ -1020,6 +1020,7 @@ PythonToBlocks.KNOWN_MODULES = {
         "title": ["*plot_title", "TEXT"],
         "xlabel": ["*plot_xlabel", "TEXT"],
         "ylabel": ["*plot_ylabel", "TEXT"],
+        "hist": ["*plot_hist", {"type": "variable", "mode": "value", "name": "values"}],
         "scatter": ["*plot_scatter", {"type": "variable", "mode": "value", "name": "x_values"},
                                       {"type": "variable", "mode": "value", "name": "y_values"}],
         "show": ["*plot_show"]
