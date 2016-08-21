@@ -156,6 +156,21 @@ Blockly.Blocks['plot_line'] = {
   }
 };
 
+Blockly.Blocks['plot_hist'] = {
+  init: function() {
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(Blockly.Blocks.plot.HUE);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.appendValueInput("values")
+        .appendField("plot histogram ")
+        .setCheck('Array');
+    this.setInputsInline(false);
+    this.setOutput(false);
+    this.setTooltip('Plots a histogram onto the canvas');
+  }
+};
+
 Blockly.Blocks['plot_lineXY'] = {
   init: function() {
     this.setHelpUrl('http://www.example.com/');

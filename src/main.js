@@ -38,20 +38,26 @@ function BlockPy(settings, assignment, submission, programs) {
             'status': ko.observable('waiting'),
             // integer
             'step': ko.observable(0),
+            // integer
+            'last_step': ko.observable(0),
             // list of string/list of int
             'output': ko.observableArray([]),
             // integer
             'line_number': ko.observable(0),            
             // array of simple objects
             'trace': ko.observableArray([]),
+            // integer
+            'trace_step': ko.observable(0),
             // object
-            'ast': {}
+            'ast': {},
+            // boolean
+            'show_trace': ko.observable(false),
         },
         'status': {
             // boolean
             'loaded': ko.observable(false),
-            // 'none', 'runtime', 'syntax', 'semantic', 'feedback', 'complete', 'editor'
             'text': ko.observable("Loading"),
+            // 'none', 'runtime', 'syntax', 'semantic', 'feedback', 'complete', 'editor'
             'error': ko.observable('none'),
             // "Loading", "Saving", "Ready", "Disconnected", "Error"
             'server': ko.observable("Loading")
@@ -123,6 +129,18 @@ function BlockPy(settings, assignment, submission, programs) {
         }
     }, this.model);
     
+    var execution = this.model.execution;
+    this.model.moveTraceFirst = function(index) { 
+        execution.trace_step(1); };
+    this.model.moveTraceBackward = function(index) { 
+        var previous = Math.max(execution.trace_step()-1, 1);
+        execution.trace_step(previous); };
+    this.model.moveTraceForward = function(index) { 
+        var next = Math.min(execution.trace_step()+1, execution.last_step());
+        execution.trace_step(next); };
+    this.model.moveTraceLast = function(index) { 
+        execution.trace_step(execution.last_step()); };
+    
     this.initMain();
 }
 
@@ -164,6 +182,7 @@ BlockPy.prototype.initComponents = function() {
     components.engine = new BlockPyEngine(main);
     components.server = new BlockPyServer(main);
     components.corgis = new BlockPyCorgis(main);
+    components.english = new BlockPyEnglish(main);
     components.editor.setMode();
     main.model.status.server('Loaded')
 }

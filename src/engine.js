@@ -51,8 +51,10 @@ BlockPyEngine.prototype.readFile = function(filename) {
 BlockPyEngine.prototype.reset = function() {
     this.main.model.execution.trace.removeAll();
     this.main.model.execution.step(0);
+    this.main.model.execution.last_step(0);
     this.main.model.execution.line_number(0)
     this.main.components.printer.resetPrinter();
+    this.main.model.execution.show_trace(false);
 }
 
 BlockPyEngine.prototype.step = function(variables, lineNumber, 
@@ -69,6 +71,7 @@ BlockPyEngine.prototype.step = function(variables, lineNumber,
              'properties': globals.properties,
              'modules': globals.modules});
         this.main.model.execution.step(currentStep+1)
+        this.main.model.execution.last_step(currentStep+1);
         this.main.model.execution.line_number(lineNumber)
     }
 }
@@ -431,10 +434,17 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                 "value": value.$r().v
             };
         case Sk.builtin.list:
-            return {'name': property,
-                'type': "List",
-                "value": value.$r().v
-            };
+            if (value.v.length <= 10) {
+                return {'name': property,
+                    'type': "List",
+                    "value": value.$r().v
+                };
+            } else {
+                return {'name': property,
+                    'type': "List",
+                    "value": "[... "+value.v.length+" elements ...]<code>"
+                };
+            }
         case Sk.builtin.dict:
             return {'name': property,
                 'type': "Dictionary",

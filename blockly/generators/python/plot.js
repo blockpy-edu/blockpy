@@ -57,6 +57,15 @@ Blockly.Python['plot_line'] = function(block) {
     return code;
 };
 
+Blockly.Python['plot_hist'] = function(block) {
+    Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
+    var code = 'plt.hist(';
+    var argument1 = Blockly.Python.valueToCode(block, 'values',
+      Blockly.Python.ORDER_NONE) || '___';
+    code += argument1 +')\n';
+    return code;
+};
+
 Blockly.Python['plot_lineXY'] = function(block) {
     Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
     var code = 'plt.line(';

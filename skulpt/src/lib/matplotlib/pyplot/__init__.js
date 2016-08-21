@@ -128,14 +128,14 @@ jsplotlib.Bars = function(ydata, color) {
         // local storage for drawing
         var y = this._y;
         
-        //x.domain([d3.min(y), d3.max(y)]);
-        //var bins = parseInt(mainModel.settings.bins());
-        //tempScale = d3.scale.linear().domain([0, bins]).range(d3.extent(ys));
-        /*tickArray = d3.range(bins).map(tempScale).map(function(e) {
+        x.domain([d3.min(y), d3.max(y)]);
+        var bins = parseInt(8);
+        tempScale = d3.scale.linear().domain([0, bins]).range(d3.extent(ys));
+        tickArray = d3.range(bins).map(tempScale).map(function(e) {
             return e;
-        });*/
-        //var histMapper = d3.layout.histogram().bins(tickArray)(ys);
-        //y.domain([0, d3.max(histMapper, function(d) { return d.y; })]);
+        });
+        var histMapper = d3.layout.histogram().bins(tickArray)(ys);
+        y.domain([0, d3.max(histMapper, function(d) { return d.y; })]);
 
         // create array of point pairs with optional s value
         // from [x1,x2], [y1, y2], [s1, s2]
@@ -166,7 +166,7 @@ jsplotlib.Bars = function(ydata, color) {
         */
 
         // set appropriate line style
-        this._bars = this._bars_containers.append("line")
+        this._bars = this._bars_containers.append("rect")
             .attr("x1", function(d) {
                 return xscale(d[0][0]);
             })
@@ -184,6 +184,25 @@ jsplotlib.Bars = function(ydata, color) {
             .style("stroke-linejoin", this._solid_joinstyle)
             .style("stroke-opacity", this._alpha)
             .style("stroke-width", this._linewidth);
+
+        return this;
+    };
+    
+    /**
+      Updates possible attributes provided as kwargs
+    **/
+    that.update = function(kwargs) {
+        // we assume key value pairs
+        if (kwargs && typeof kwargs === "object") {
+            for (var key in kwargs) {
+                if (kwargs.hasOwnProperty(key)) {
+                    var val = kwargs[key];
+
+                    switch (key) {
+                    }
+                }
+            }
+        }
 
         return this;
     };
@@ -2434,17 +2453,22 @@ var $builtinmodule = function(name) {
         var ydata = [];
         var stylestring = []; // we support only one at the moment
         
-        for (i = 0; i < args.length; i++) {
-            // Not tackling numpy arrays yet
-            if (args[i] instanceof Sk.builtin.list) {
-                _unpacked = Sk.ffi.remapToJs(args[i]);
-                ydata.push(_unpacked);
-            } else if (Sk.builtin.checkString(args[i])) {
-                stylestring.push(Sk.ffi.remapToJs(args[i]));
+        if (args[0] instanceof Sk.builtin.list) {
+            ydata.push(Sk.ffi.remapToJs(args[0]));
+        } else {
+            throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[0]) +
+                    "' is not supported for *args[" + 0 + "].");
+        }
+        
+        if (args[1]) {
+            if (Sk.builtin.checkString(args[1])) {
+                stylestring.push(Sk.ffi.remapToJs(args[1]));
             } else {
-                throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[i]) +
-                    "' is not supported for *args[" + i + "].");
+                throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(args[1]) +
+                    "' is not supported for *args[" + 1 + "].");
             }
+        } else {
+            stylestring.push('');
         }
         
         if (Sk.skip_drawing !== true) {
@@ -2459,7 +2483,7 @@ var $builtinmodule = function(name) {
             // create line objects
             var bar;
 
-            for (i = 0; i < xdata.length; i++) {
+            for (i = 0; i < ydata.length; i++) {
                 bars = new jsplotlib.Bars(ydata[i]);
                 var ftm_tuple = jsplotlib._process_plot_format(stylestring[i]);
                 bars.update({
