@@ -122,7 +122,7 @@ BlockPyServer.prototype.saveCode = function() {
     if (this.main.model.server_is_connected('save_code') && 
         this.main.model.settings.auto_upload()) {
         if (this.saveTimer[filename]) {
-            clearTimeout(this.saveTimer);
+            clearTimeout(this.saveTimer[filename]);
         }
         this.saveTimer[filename] = setTimeout(function() {
             $.post(server.main.model.constants.urls.save_code, data, 
