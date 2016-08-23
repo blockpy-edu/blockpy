@@ -238,6 +238,23 @@ var instructor_module = function(name) {
         return (new NodeVisitor()).recursive_walk(ast);
     }
     
+    mod.get_property = new Sk.builtin.func(function(name) {
+        Sk.builtin.pyCheckArgs("calls_function", arguments, 1, 1);
+        Sk.builtin.pyCheckType("name", "string", Sk.builtin.checkString(name));
+        name = name.v;
+        var trace = Sk.builtins._trace;
+        if (trace.length <= 0) {
+            return Sk.builtin.none.none$;
+        }
+        var properties = trace[trace.length-1]["properties"];
+        for (var i = 0, len = properties.length; i < len; i += 1) {
+            if (properties[i]['name'] == name) {
+                return Sk.ffi.remapToPy(properties[i])
+            }
+        }
+        return Sk.builtin.none.none$;
+    });
+    
     mod.calls_function = new Sk.builtin.func(function(source, name) {
         Sk.builtin.pyCheckArgs("calls_function", arguments, 2, 2);
         Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
@@ -301,11 +318,13 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
         console.log(data)
     });
     Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
+    Sk.builtins._trace = traceTable;
     Sk.builtins.code = Sk.ffi.remapToPy(student_code);
     Sk.builtins.set_success = this.instructor_module.set_success;
     Sk.builtins.set_feedback = this.instructor_module.set_feedback;
     Sk.builtins.count_components = this.instructor_module.count_components;
     Sk.builtins.calls_function = this.instructor_module.calls_function;
+    Sk.builtins.get_property = this.instructor_module.get_property;
     Sk.skip_drawing = true;
     model.settings.mute_printer(true);
 }
@@ -315,12 +334,15 @@ BlockPyEngine.prototype.disposeEnvironment = function() {
     Sk.builtins.get_output = undefined;
     Sk.builtins.reset_output = undefined;
     Sk.builtins.log = undefined;
+    Sk.builtins._trace = undefined;
+    Sk.builtins.trace = undefined;
     Sk.builtins.trace = undefined;
     Sk.builtins.code = undefined;
     Sk.builtins.set_success = undefined;
     Sk.builtins.set_feedback = undefined;
     Sk.builtins.count_components = undefined;
     Sk.builtins.calls_function = undefined;
+    Sk.builtins.get_property = undefined;
     Sk.skip_drawing = false;
     GLOBAL_VALUE = undefined;
     this.main.model.settings.mute_printer(false);
@@ -467,7 +489,7 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                 };
         default:
             return {'name': property,
-                    'type': value.$r == undefined ? value : value.$r().v,
+                    'type': value.tp$name == undefined ? value : value.tp$name,
                     "value": value.$r == undefined ? value : value.$r().v
                     };
     }

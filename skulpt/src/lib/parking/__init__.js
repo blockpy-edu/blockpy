@@ -1,5 +1,12 @@
 var $builtinmodule = function(name)
 {
+    var WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+    var FULL_DAYS = {
+        "mon": "Monday", "tue": "Tuesday", "wed": "Wednesday",
+        "thu": "Thursday", "fri": "Friday", "sat": "Saturday",
+        "sun": "Sunday"
+    }
+    
     var convert_day = function(day) {
         return WEEKDAYS.indexOf(day.name.v);
     }
@@ -24,10 +31,14 @@ var $builtinmodule = function(name)
             self.meridian.v = self.meridian.v.toLowerCase();
         });
         $loc.__str__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+(self.hour.v || 12) +':'+self.minute.v+self.meridian.v+'>');
+            return Sk.ffi.remapToPy('<'+(self.hour.v || 12) +':'+
+                                    (self.minute.v < 10 ? '0'+self.minute.v : self.minute.v)+
+                                    self.meridian.v+'>');
         });
         $loc.__repr__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+(self.hour.v || 12)+':'+self.minute.v+self.meridian.v+'>');
+            return Sk.ffi.remapToPy('<'+(self.hour.v || 12)+':'+
+                                    (self.minute.v < 10 ? '0'+self.minute.v : self.minute.v)+
+                                    self.meridian.v+'>');
         });
         var comparison = function (operation, self, other) {
             if (Sk.builtin.isinstance(other, mod.Time)) {
@@ -80,10 +91,10 @@ var $builtinmodule = function(name)
             self.name.v = self.name.v.toLowerCase().slice(0,3)
         });
         $loc.__str__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+self.name.v+'>');
+            return Sk.ffi.remapToPy('<'+FULL_DAYS[self.name.v]+'>');
         });
         $loc.__repr__ = new Sk.builtin.func(function (self) {
-            return Sk.ffi.remapToPy('<'+self.name.v+'>');
+            return Sk.ffi.remapToPy('<'+FULL_DAYS[self.name.v]+'>');
         });
         var comparison = function (operation, self, other) {
             if (Sk.builtin.isinstance(other, mod.Day)) {
@@ -127,8 +138,6 @@ var $builtinmodule = function(name)
         });
     }
     
-    var WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-    
     mod.Day = Sk.misceval.buildClass(mod, day, 'Day', []);
     mod.Time = Sk.misceval.buildClass(mod, time, 'Time', []);
     
@@ -138,12 +147,11 @@ var $builtinmodule = function(name)
     mod._meridian = undefined;
     
     mod.today = new Sk.builtin.func(function() {
-        var t = ((new Date).getDay() - 1) % 7;
+        var t = ((new Date).getDay() + 6) % 7; // would be -1, but % is broken for negatives in JS
         t = Sk.today || mod._today || Sk.ffi.remapToPy(WEEKDAYS[t]);
         return Sk.misceval.callsim(mod.Day, t);
     });
     
-    mod._hour = undefined;
     mod.now = new Sk.builtin.func(function() {
         var d = new Date();
         var hour = d.getHours() % 12,

@@ -1,5 +1,8 @@
 import parking
 
+print(parking.today().__class__)
+print(parking.now().__class__)
+
 print("Today is", parking.today())
 print("Now is", parking.now())
 
