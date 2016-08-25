@@ -65,6 +65,10 @@ If you make edits to either Blockly or Skulpt, you'll need to rerun their build 
     
 Otherwise, you should be able to edit the ``src/*.js`` files freely. To get a sense of the dependencies, check out the ``blockpy_new.html`` file and then the ``src/main.js`` file. These should be good starting points.
    
+You have to update your blockly and skulpt
+
+    > git subtree pull --prefix=skulpt --squash skulpt master
+    > git subtree pull --prefix=blockly --squash blockly master
 
 Commands
 --------
