@@ -93,12 +93,24 @@ Sk.builtin.checkIterable = function (arg) {
 };
 goog.exportSymbol("Sk.builtin.checkIterable", Sk.builtin.checkIterable);
 
-Sk.builtin.checkCallable = function (arg) {
-    if (typeof arg === "function") {
-        return (!(arg instanceof Sk.builtin.none) && (arg.ob$type !== undefined));
-    } else {
-        return ((arg.tp$call !== undefined) || (arg.__call__ !== undefined));
+Sk.builtin.checkCallable = function (obj) {
+    // takes care of builtin functions and methods, builtins
+    if (typeof obj === "function") {
+        return true;
     }
+    // takes care of python function, methods and lambdas
+    if (obj instanceof Sk.builtin.func) {
+        return true;
+    }
+    // takes care of instances of methods
+    if (obj instanceof Sk.builtin.method) {
+        return true;
+    }
+    // go up the prototype chain to see if the class has a __call__ method
+    if (Sk.abstr.lookupSpecial(obj, "__call__") !== undefined) {
+        return true;
+    } 
+    return false;
 };
 
 Sk.builtin.checkNumber = function (arg) {
@@ -204,7 +216,7 @@ Sk.builtin.func.prototype.tp$descr_get = function (obj, objtype) {
     if (obj == null) {
         return this;
     }
-    return new Sk.builtin.method(this, obj);
+    return new Sk.builtin.method(this, obj, objtype);
 };
 Sk.builtin.func.prototype.tp$call = function (args, kw) {
     var j;
@@ -215,11 +227,21 @@ Sk.builtin.func.prototype.tp$call = function (args, kw) {
     var kwargsarr;
     var expectskw;
     var name;
+    var numargs;
 
     // note: functions expect 'this' to be globals to avoid having to
     // slice/unshift onto the main args
     if (this.func_closure) {
         // todo; OK to modify?
+        if (this.func_code["$defaults"] && this.func_code["co_varnames"]) {
+            // Make sure all default arguments are in args before adding closure
+            numargs = args.length;
+            numvarnames = this.func_code["co_varnames"].length;
+            for (i = numargs; i < numvarnames; i++) {
+                args.push(undefined);
+            }
+        }
+
         args.push(this.func_closure);
     }
 
@@ -244,6 +266,10 @@ Sk.builtin.func.prototype.tp$call = function (args, kw) {
                 }
             }
             if (varnames && j !== numvarnames) {
+                if (j in args) {
+                    name = (this.func_code && this.func_code["co_name"] && this.func_code["co_name"].v) || "<native JS>";
+                    throw new Sk.builtin.TypeError(name + "() got multiple values for keyword argument '" + kw[i] + "'");
+                }
                 args[j] = kw[i + 1];
             } else if (expectskw) {
                 // build kwargs dict

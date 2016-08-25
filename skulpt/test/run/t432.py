@@ -53,12 +53,12 @@ helper('ABC123'.isupper(),True)
 helper('ABC abc'.isupper(),False)
 helper(''.isupper(),False)
 
-#print "\nstr.isnumeric"
-#helper('123'.isnumeric(),True)
-#helper('abc123'.isnumeric(),False)
-#helper('1 2 3'.isnumeric(),False)
-#helper('123.4'.isnumeric(),False)
-#helper(''.isnumeric(),False)
+print "\nstr.isnumeric"
+helper('123'.isnumeric(),True)
+helper('abc123'.isnumeric(),False)
+helper('1 2 3'.isnumeric(),False)
+helper('123.4'.isnumeric(),False)
+helper(''.isnumeric(),False)
 
 print "\nstr.join"
 helper('-'.join('1234'),'1-2-3-4')

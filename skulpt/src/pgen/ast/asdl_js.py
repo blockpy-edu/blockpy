@@ -228,9 +228,6 @@ class FunctionVisitor(PrototypeVisitor):
     """Visitor to generate constructor functions for AST."""
 
     def emit_function(self, name, ctype, args, attrs, union=1):
-        # Feature for storing end of line/column
-        if attrs:
-            attrs += [("int", 'endlineno', 0), ("int", 'col_endoffset', 0)]
         def emit(s, depth=0, reflow=1):
             self.emit(s, depth, reflow)
         argstr = ", ".join(["/* {%s} */ %s" % (atype, aname)

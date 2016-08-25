@@ -9,9 +9,7 @@ var $builtinmodule = function (name) {
     }
     sys.argv = new Sk.builtins["list"](args);
 
-    sys.copyright = Sk.builtin['str']("Copyright 2009-2010 Scott Graham.\nAll Rights Reserved.\n");
-    
-    sys.version_info = Sk.builtin['tuple']([2, 7, 6, 'final', 0]);
+    sys.copyright = Sk.builtin["str"]("Copyright 2009-2010 Scott Graham.\nAll Rights Reserved.\n");
 
     sys.maxint = new Sk.builtin.int_(Math.pow(2,53)-1);
 
@@ -63,8 +61,14 @@ var $builtinmodule = function (name) {
     });
 
     sys.debug = new Sk.builtin.func(function () {
-        debugger;
+        return Sk.builtin.none.none$;
     });
+
+    sys.__stdout__ = new Sk.builtin.file(new Sk.builtin.str("/dev/stdout"), "w");
+    sys.__stdin__ = new Sk.builtin.file(new Sk.builtin.str("/dev/stdin"), "r");
+
+    sys.stdout = sys.__stdout__;
+    sys.stdin = sys.__stdin__;
 
     return sys;
 };

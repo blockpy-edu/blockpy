@@ -12,7 +12,7 @@
  *         break
  * root = p.rootnode
  *
- * can throw ParseError
+ * can throw SyntaxError
  */
 function Parser (filename, grammar) {
     this.filename = filename;
@@ -153,12 +153,12 @@ Parser.prototype.addtoken = function (type, value, context) {
             //print("WAA");
             this.pop();
             if (this.stack.length === 0) {
-                throw new Sk.builtin.ParseError("too much input", this.filename);
+                throw new Sk.builtin.SyntaxError("too much input", this.filename);
             }
         } else {
             // no transition
             errline = context[0][0];
-            throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
+            throw new Sk.builtin.SyntaxError("bad input", this.filename, errline, context);
         }
     }
 };
@@ -182,10 +182,10 @@ Parser.prototype.classify = function (type, value, context) {
     }
     ilabel = this.grammar.tokens.hasOwnProperty(type) && this.grammar.tokens[type];
     if (!ilabel) {
-        // throw new Sk.builtin.ParseError("bad token", type, value, context);
+        // throw new Sk.builtin.SyntaxError("bad token", type, value, context);
         // Questionable modification to put line number in position 2
         // like everywhere else and filename in position 1.
-        throw new Sk.builtin.ParseError("bad token", this.filename, context[0][0], context);
+        throw new Sk.builtin.SyntaxError("bad token", this.filename, context[0][0], context);
     }
     return ilabel;
 };
@@ -334,7 +334,7 @@ function makeParser(filename, style) {
         //print("tok:"+ret);
         if (ret) {
             if (ret !== "done") {
-                throw new Sk.builtin.ParseError("incomplete input", this.filename);
+                throw new Sk.builtin.SyntaxError("incomplete input", this.filename);
             }
             return p.rootnode;
         }
