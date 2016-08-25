@@ -65,8 +65,7 @@ Sk.builtin.set.prototype.ob$eq = function (other) {
         return Sk.builtin.bool.false$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) !==
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() !== other.sq$length()) {
         return Sk.builtin.bool.false$;
     }
 
@@ -83,8 +82,7 @@ Sk.builtin.set.prototype.ob$ne = function (other) {
         return Sk.builtin.bool.true$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) !==
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() !== other.sq$length()) {
         return Sk.builtin.bool.true$;
     }
 
@@ -101,8 +99,7 @@ Sk.builtin.set.prototype.ob$lt = function (other) {
         return Sk.builtin.bool.false$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) >=
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() >= other.sq$length()) {
         return Sk.builtin.bool.false$;
     }
 
@@ -115,8 +112,7 @@ Sk.builtin.set.prototype.ob$le = function (other) {
         return Sk.builtin.bool.true$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) >
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() > other.sq$length()) {
         return Sk.builtin.bool.false$;
     }
 
@@ -129,8 +125,7 @@ Sk.builtin.set.prototype.ob$gt = function (other) {
         return Sk.builtin.bool.false$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) <=
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() <= other.sq$length()) {
         return Sk.builtin.bool.false$;
     }
 
@@ -143,8 +138,7 @@ Sk.builtin.set.prototype.ob$ge = function (other) {
         return Sk.builtin.bool.true$;
     }
 
-    if (Sk.builtin.set.prototype.sq$length.call(this) <
-        Sk.builtin.set.prototype.sq$length.call(other)) {
+    if (this.sq$length() < other.sq$length()) {
         return Sk.builtin.bool.false$;
     }
 
@@ -155,7 +149,7 @@ Sk.builtin.set.prototype["__iter__"] = new Sk.builtin.func(function(self) {
 
     Sk.builtin.pyCheckArgs("__iter__", arguments, 0, 0, false, true);
 
-    return Sk.builtin.set.prototype.tp$iter.call(self);
+    return self.tp$iter();
 
 });
 

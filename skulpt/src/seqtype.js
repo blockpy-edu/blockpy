@@ -17,8 +17,6 @@ Sk.builtin.seqtype = function () {
 
 Sk.abstr.setUpInheritance("SequenceType", Sk.builtin.seqtype, Sk.builtin.object);
 
-Sk.builtin.seqtype.sk$abstract = true;
-
 /**
  * Python wrapper of `__len__` method.
  *
@@ -131,3 +129,7 @@ Sk.builtin.seqtype.prototype["__rmul__"] = new Sk.builtin.func(function (self, n
     return self.sq$repeat(n);    
 
 });
+
+Sk.abstr.registerPythonFunctions(Sk.builtin.seqtype, 
+    ["__len__", "__iter__", "__contains__", "__getitem__", "__add__",
+     "__mul__", "__rmul__"]);

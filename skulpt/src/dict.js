@@ -187,7 +187,7 @@ Sk.builtin.dict.prototype.tp$iter = function () {
     for (k in this) {
         if (this.hasOwnProperty(k)) {
             bucket = this[k];
-            if (bucket && bucket.$hash !== undefined && bucket.items !== undefined) {
+            if (bucket && bucket.$hash !== undefined) {
                 // skip internal stuff. todo; merge pyobj and this
                 for (i = 0; i < bucket.items.length; i++) {
                     allkeys.push(bucket.items[i].lhs);
@@ -217,6 +217,12 @@ Sk.builtin.dict.prototype.tp$iter = function () {
     };
     return ret;
 };
+
+Sk.builtin.dict.prototype["__iter__"] = new Sk.builtin.func(function (self) {
+    Sk.builtin.pyCheckArgs("__iter__", arguments, 1, 1);
+
+    return self.tp$iter();
+});
 
 Sk.builtin.dict.prototype["$r"] = function () {
     var v;
@@ -481,14 +487,13 @@ Sk.builtin.dict.prototype.__len__ = new Sk.builtin.func(function (self) {
 
 Sk.builtin.dict.prototype.__getattr__ = new Sk.builtin.func(function (self, attr) {
     Sk.builtin.pyCheckArgs("__getattr__", arguments, 1, 1, false, true);
-    if (!Sk.builtin.checkString(attr)) { throw new Sk.builtin.TypeError("__getattr__ requires a string"); }
-    return Sk.builtin.dict.prototype.tp$getattr.call(self, Sk.ffi.remapToJs(attr));
+    return Sk.builtin.dict.prototype.tp$getattr.call(self, attr);
 });
 
 Sk.builtin.dict.prototype.__iter__ = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("__iter__", arguments, 0, 0, false, true);
 
-    return Sk.builtin.dict.prototype.tp$iter.call(self);
+    return self.tp$iter();
 });
 
 Sk.builtin.dict.prototype.__repr__ = new Sk.builtin.func(function (self) {

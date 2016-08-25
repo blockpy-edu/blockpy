@@ -1,47 +1,48 @@
 Sk.builtin.structseq_types = {};
 
-Sk.builtin.make_structseq = function (module, name, fields, doc) {
+Sk.builtin.make_structseq = function (module, name, fields) {
     var nm = module + "." + name;
-    var flds = [];
-    var docs = [];
-    var i;
-    for (var key in fields) {
-        flds.push(key);
-        docs.push(fields[key]);
-    }
+    var flds = fields;
 
-    var cons = function structseq_constructor(arg) {
+    var cons = function structseq_constructor(args) {
         Sk.builtin.pyCheckArgs(nm, arguments, 1, 1);
         var o;
-        var it, i, v;
         if (!(this instanceof Sk.builtin.structseq_types[nm])) {
             o = Object.create(Sk.builtin.structseq_types[nm].prototype);
             o.constructor.apply(o, arguments);
             return o;
         }
-
-        if (Object.prototype.toString.apply(arg) === "[object Array]") {
-            v = arg;
+        var it, i;
+        if (Object.prototype.toString.apply(args) === "[object Array]") {
+            this.v = args;
         } else {
-            v = [];
-            for (it = Sk.abstr.iter(arg), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
-                v.push(i);
-            }
-            if (v.length != flds.length) {
-                throw new Sk.builtin.TypeError(nm + "() takes a " + flds.length + "-sequence (" + v.length + "-sequence given)");
-            }
+            this.v = [];
+            if (args.tp$iter) {
+                var cnt = 0;
+                for (it = args.tp$iter(), i = it.tp$iternext(); i !== undefined && cnt < flds.length; i = it.tp$iternext()) {
+                    this.v.push(i);
+                    cnt++;
+                }
+                if (cnt < flds.length) {
+                    throw new Sk.builtin.TypeError(nm + "() takes a " + flds.length + "-sequence (" + cnt + "-sequence given)");
+                }
+            } else if (args.__getitem__) {
+                for(var idx=0; idx<=flds.length; idx++) {
+                    Sk.misceval.apply(args.__getitem__, undefined, undefined, undefined, [Sk.builtin.asnum$(idx)]);
+                }
+            }  else {
+                throw new Sk.builtin.TypeError("constructor requires a sequence");
+            } 
         }
 
-        Sk.builtin.tuple.call(this, v);
+        Sk.builtin.tuple.apply(this, arguments);
 
         this.__class__ = Sk.builtin.structseq_types[nm];
     };
+    cons["co_kwargs"] = true;
     Sk.builtin.structseq_types[nm] = cons;
 
     goog.inherits(cons, Sk.builtin.tuple);
-    if (doc) {
-        cons.prototype.__doc__ = doc;
-    }
     cons.prototype.tp$name = nm;
     cons.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj(nm, Sk.builtin.structseq_types[nm]);
     cons.prototype.ob$type["$d"] = new Sk.builtin.dict([]);
@@ -52,9 +53,15 @@ Sk.builtin.make_structseq = function (module, name, fields, doc) {
     cons.prototype.__getitem__ = new Sk.builtin.func(function (self, index) {
         return Sk.builtin.tuple.prototype.mp$subscript.call(self, index);
     });
-    cons.prototype.__reduce__ = new Sk.builtin.func(function (self) {
-        throw new Sk.builtin.Exception("__reduce__ is not implemented");
-    });
+
+    function makeGetter(i) {
+        return function() {
+            return this.v[i];
+        };
+    }
+    for(var i=0; i<flds.length; i++) {
+        cons.prototype[flds[i]] = makeGetter;
+    }
 
     cons.prototype["$r"] = function () {
         var ret;
@@ -74,15 +81,9 @@ Sk.builtin.make_structseq = function (module, name, fields, doc) {
         return new Sk.builtin.str(nm + "(" + ret + ")");
     };
     cons.prototype.tp$setattr = function (name, value) {
-        throw new Sk.builtin.AttributeError("readonly property");
-    };
-
-    cons.prototype.tp$getattr = function (name) {
         var i = flds.indexOf(name);
         if (i >= 0) {
-            return this.v[i];
-        } else {
-            return  Sk.builtin.object.prototype.GenericGetAttr(name);
+            this.v[i] = value;
         }
     };
 

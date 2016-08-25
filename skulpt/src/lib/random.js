@@ -224,7 +224,6 @@ var $builtinmodule = function (name) {
     var mod = {};
 
     var myGenerator = new MersenneTwister();
-    var nextNormalSample = undefined;
 
     mod.seed = new Sk.builtin.func(function (x) {
         Sk.builtin.pyCheckArgs("seed", arguments, 0, 1);
@@ -341,99 +340,6 @@ var $builtinmodule = function (name) {
         return new Sk.builtin.float_(c);
     });
 
-    mod.triangular = new Sk.builtin.func(function (low, high, mode) {
-        Sk.builtin.pyCheckArgs("triangular", arguments, 2, 3);
-        Sk.builtin.pyCheckType("low", "number", Sk.builtin.checkNumber(low));
-        Sk.builtin.pyCheckType("high", "number", Sk.builtin.checkNumber(high));
-
-        var rnd, sample, swap;
-
-        low = Sk.builtin.asnum$(low);
-        high = Sk.builtin.asnum$(high);
-        if (low > high) {
-            swap = low;
-            low = high;
-            high = swap;
-        }
-        if ((mode === undefined) || (mode instanceof Sk.builtin.none)) {
-            mode = (high - low)/2.0;
-        } else {
-            Sk.builtin.pyCheckType("mode", "number", Sk.builtin.checkNumber(mode));
-            mode = Sk.builtin.asnum$(mode);
-        }
-
-        // https://en.wikipedia.org/wiki/Triangular_distribution
-        rnd = myGenerator.genrand_res53();
-        if (rnd < (mode - low)/(high - low)) {
-            sample = low + Math.sqrt(rnd * (high - low) * (mode - low));
-        } else {
-            sample = high - Math.sqrt((1 - rnd) * (high - low) * (high - mode));
-        }
-
-        return new Sk.builtin.float_(sample);
-    });
-
-    var normalSample = function(mu, sigma) {
-        var r1, r2, u, v, s;
-
-        // Box-Muller transform
-        // (https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform)
-        // generates two independent samples from a Gaussian
-        // distribution. Return one of them and store the another one
-        // and return it next time.
-
-        if (nextNormalSample !== undefined) {
-            s = nextNormalSample;
-            nextNormalSample = undefined;
-        } else {
-            r1 = myGenerator.genrand_res53();
-            r2 = myGenerator.genrand_res53();
-            u = Math.sqrt(-2*Math.log(r1));
-            v = 2*Math.PI*r2;
-            s = u * Math.cos(v);
-            nextNormalSample = u * Math.sin(v);
-        }
-
-        return mu + sigma*s;
-    };
-    
-    mod.gauss = new Sk.builtin.func(function (mu, sigma) {
-        Sk.builtin.pyCheckArgs("gauss", arguments, 2, 2);
-        Sk.builtin.pyCheckType("mu", "number", Sk.builtin.checkNumber(mu));
-        Sk.builtin.pyCheckType("sigma", "number", Sk.builtin.checkNumber(sigma));
-
-        mu = Sk.builtin.asnum$(mu);
-        sigma = Sk.builtin.asnum$(sigma);
-
-        return new Sk.builtin.float_(normalSample(mu, sigma));
-    });
-
-    // CPython uses a different (slower but thread-safe) algorithm for
-    // normalvariate. We use the same algorithm for normalvariate and
-    // gauss.
-    mod.normalvariate = mod.gauss;
-
-    mod.lognormvariate = new Sk.builtin.func(function (mu, sigma) {
-        Sk.builtin.pyCheckArgs("lognormvariate", arguments, 2, 2);
-        Sk.builtin.pyCheckType("mu", "number", Sk.builtin.checkNumber(mu));
-        Sk.builtin.pyCheckType("sigma", "number", Sk.builtin.checkNumber(sigma));
-
-        mu = Sk.builtin.asnum$(mu);
-        sigma = Sk.builtin.asnum$(sigma);
-
-        return new Sk.builtin.float_(Math.exp(normalSample(mu, sigma)));
-    });
-
-    mod.expovariate = new Sk.builtin.func(function (lambd) {
-        Sk.builtin.pyCheckArgs("expovariate", arguments, 1, 1);
-        Sk.builtin.pyCheckType("lambd", "number", Sk.builtin.checkNumber(lambd));
-
-        lambd = Sk.builtin.asnum$(lambd);
-
-        var rnd = myGenerator.genrand_res53();
-        return new Sk.builtin.float_(-Math.log(rnd)/lambd);
-    });
-
     mod.choice = new Sk.builtin.func(function (seq) {
         Sk.builtin.pyCheckArgs("choice", arguments, 1, 1);
         Sk.builtin.pyCheckType("seq", "sequence", Sk.builtin.checkSequence(seq));
@@ -469,56 +375,6 @@ var $builtinmodule = function (name) {
         ;
 
         return Sk.builtin.none.none$;
-    });
-
-    mod.sample = new Sk.builtin.func(function (population, k) {
-        var i, j, iter, elem, reservoir;
-
-        Sk.builtin.pyCheckArgs("sample", arguments, 2, 2);
-        Sk.builtin.pyCheckType("population", "iterable", Sk.builtin.checkIterable(population));
-        Sk.builtin.pyCheckType("k", "integer", Sk.builtin.checkInt(k));
-        k = Sk.builtin.asnum$(k);
-        
-        // "Algorithm R" in
-        // https://en.wikipedia.org/wiki/Reservoir_sampling
-        //
-        // This algorithm guarantees that each element has
-        // equal probability of being included in the
-        // resulting list. See the Wikipedia page for a proof.
-        //
-        // This requires no extra space but the runtime is
-        // proportional to len(population). CPython implements a fast
-        // path for the case when k is much smaller than
-        // len(population). A similar optimization could be
-        // implemented here.
-        reservoir = [];
-        iter = Sk.abstr.iter(population);
-        for (i = 0, elem = iter.tp$iternext();
-             elem !== undefined;
-             i++, elem = iter.tp$iternext()) {
-            j = Math.floor(myGenerator.genrand_res53() * (i + 1));
-            if (i < k) {
-                // Fill the reservoir
-                if (j < i) {
-                    // Shuffle the existing elements to ensure that
-                    // subslices are valid random samples
-                    reservoir[i] = reservoir[j];
-                }
-                reservoir[j] = elem;
-            } else {
-                // Replace elements with a probability that decreases
-                // the further we get
-                if (j < k) {
-                    reservoir[j] = elem;
-                }
-            }
-        }
-        
-        if (i < k) {
-            throw new Sk.builtin.ValueError("sample larger than population");
-        }
-
-        return Sk.builtin.list(reservoir);
     });
 
     return mod;

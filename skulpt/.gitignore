@@ -1,9 +1,7 @@
 support/tmp/
 doc/static/skulpt-stdlib.js
 doc/static/skulpt.min.js
-doc/static/debugger/debugger.js
 doc/static/dist/*
-doc/ProgMan/
 vendor/
 dist/*
 node_modules/
@@ -16,4 +14,3 @@ test/namedtests.js
 .settings
 /.c9revisions
 Vagrantfile
-v8.log

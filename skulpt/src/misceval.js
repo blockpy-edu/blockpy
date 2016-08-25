@@ -211,13 +211,8 @@ Sk.misceval.swappedOp_ = {
     "NotIn": "In_"
 };
 
-/**
-* @param{*} v
-* @param{*} w
-* @param{string} op
-* @param{boolean=} canSuspend
- */
-Sk.misceval.richCompareBool = function (v, w, op, canSuspend) {
+
+Sk.misceval.richCompareBool = function (v, w, op) {
     // v and w must be Python objects. will return Javascript true or false for internal use only
     // if you want to return a value from richCompareBool to Python you must wrap as Sk.builtin.bool first
     var wname,
@@ -225,12 +220,7 @@ Sk.misceval.richCompareBool = function (v, w, op, canSuspend) {
         ret,
         swapped_method,
         method,
-        swapped_shortcut,
-        shortcut,
-        v_has_shortcut,
-        w_has_shortcut,
         op2method,
-        op2shortcut,
         vcmp,
         wcmp,
         w_seq_type,
@@ -368,40 +358,12 @@ Sk.misceval.richCompareBool = function (v, w, op, canSuspend) {
     }
 
     if (op === "In") {
-        return Sk.misceval.chain(Sk.abstr.sequenceContains(w, v, canSuspend), Sk.misceval.isTrue);
+        return Sk.abstr.sequenceContains(w, v);
     }
     if (op === "NotIn") {
-        return Sk.misceval.chain(Sk.abstr.sequenceContains(w, v, canSuspend),
-                                 function(x) { return !Sk.misceval.isTrue(x); });
+        return !Sk.abstr.sequenceContains(w, v);
     }
 
-    // Call Javascript shortcut method if exists for either object
-
-    op2shortcut = {
-        "Eq"   : "ob$eq",
-        "NotEq": "ob$ne",
-        "Gt"   : "ob$gt",
-        "GtE"  : "ob$ge",
-        "Lt"   : "ob$lt",
-        "LtE"  : "ob$le"
-    };
-
-    shortcut = op2shortcut[op];
-    v_has_shortcut = v.constructor.prototype.hasOwnProperty(shortcut);
-    if (v_has_shortcut) {
-        if ((ret = v[shortcut](w)) !== Sk.builtin.NotImplemented.NotImplemented$) {
-            return Sk.misceval.isTrue(ret);
-        }
-    }
-
-    swapped_shortcut = op2shortcut[Sk.misceval.swappedOp_[op]];
-    w_has_shortcut = w.constructor.prototype.hasOwnProperty(swapped_shortcut);
-    if (w_has_shortcut) {
-
-        if ((ret = w[swapped_shortcut](v)) !== Sk.builtin.NotImplemented.NotImplemented$) {
-            return Sk.misceval.isTrue(ret);
-        }
-    }
 
     // use comparison methods if they are given for either object
     if (v.tp$richcompare && (ret = v.tp$richcompare(w, op)) !== undefined) {
@@ -430,7 +392,7 @@ Sk.misceval.richCompareBool = function (v, w, op, canSuspend) {
     };
 
     method = Sk.abstr.lookupSpecial(v, op2method[op]);
-    if (method && !v_has_shortcut) {
+    if (method) {
         ret = Sk.misceval.callsim(method, v, w);
         if (ret != Sk.builtin.NotImplemented.NotImplemented$) {
             return Sk.misceval.isTrue(ret);
@@ -438,7 +400,7 @@ Sk.misceval.richCompareBool = function (v, w, op, canSuspend) {
     }
 
     swapped_method = Sk.abstr.lookupSpecial(w, op2method[Sk.misceval.swappedOp_[op]]);
-    if (swapped_method && !w_has_shortcut) {
+    if (swapped_method) {
         ret = Sk.misceval.callsim(swapped_method, w, v);
         if (ret != Sk.builtin.NotImplemented.NotImplemented$) {
             return Sk.misceval.isTrue(ret);
@@ -630,6 +592,12 @@ Sk.misceval.isTrue = function (x) {
     if (x.constructor === Sk.builtin.float_) {
         return x.v !== 0;
     }
+    if (x.mp$length) {
+        return x.mp$length() !== 0;
+    }
+    if (x.sq$length) {
+        return x.sq$length() !== 0;
+    }
     if (x["__nonzero__"]) {
         ret = Sk.misceval.callsim(x["__nonzero__"], x);
         if (!Sk.builtin.checkInt(ret)) {
@@ -643,12 +611,6 @@ Sk.misceval.isTrue = function (x) {
             throw new Sk.builtin.TypeError("__len__ should return an int");
         }
         return Sk.builtin.asnum$(ret) !== 0;
-    }
-    if (x.mp$length) {
-        return Sk.builtin.asnum$(x.mp$length()) !== 0;
-    }
-    if (x.sq$length) {
-        return Sk.builtin.asnum$(x.sq$length()) !== 0;
     }
     return true;
 };
@@ -666,8 +628,7 @@ Sk.misceval.print_ = function (x) {
         Sk.misceval.softspace_ = false;
     }
     s = new Sk.builtin.str(x);
-    var sys = Sk.importModule("sys");
-    Sk.misceval.apply(sys["$d"]["stdout"]["write"], undefined, undefined, undefined, [sys["$d"]["stdout"], s]);
+    Sk.output(s.v);
     isspace = function (c) {
         return c === "\n" || c === "\t" || c === "\r";
     };
@@ -930,10 +891,8 @@ Sk.misceval.asyncToPromise = function(suspendablefn, suspHandlers) {
                             r.data["promise"].then(resumeWithData, resumeWithError);
                             return;
 
-                        } else if (r.data["type"] == "Sk.yield") {
-                            // Assumes all yields are optional, as Sk.setTimeout might
-                            // not be able to yield.
-                            Sk.setTimeout(resume, 0);
+                        } else if (r.data["type"] == "Sk.yield" && typeof setTimeout === "function") {
+                            setTimeout(resume, 0);
                             return;
 
                         } else if (r.optional) {
@@ -989,15 +948,7 @@ goog.exportSymbol("Sk.misceval.applyAsync", Sk.misceval.applyAsync);
  */
 
 Sk.misceval.chain = function (initialValue, chainedFns) {
-    // as per the discussion here: https://github.com/skulpt/skulpt/pull/552
-    // this is here for performance reasons. array.slice doesn't get optimized
-    var fs = new Array(arguments.length), i = 1;
-
-    for (i = 1; i < arguments.length; i++) {
-        fs[i] = arguments[i];
-    }
-
-    i = 1;
+    var fs = arguments, i = 1;
 
     return (function nextStep(r) {
         while (i < fs.length) {
@@ -1013,104 +964,6 @@ Sk.misceval.chain = function (initialValue, chainedFns) {
     })(initialValue);
 };
 goog.exportSymbol("Sk.misceval.chain", Sk.misceval.chain);
-
-
-/**
- * Catch any exceptions thrown by a function, or by resuming any suspension it
- * returns.
- *
- *     var result = Sk.misceval.tryCatch(asyncFunc, function(err) {
- *       console.log(err);
- *     });
- *
- * Because exceptions are returned asynchronously aswell you can't catch them
- * with a try/catch. That's what this function is for.
- */
-Sk.misceval.tryCatch = function (tryFn, catchFn) {
-    var r;
-
-    try {
-        r = tryFn();
-    } catch(e) {
-        return catchFn(e);
-    }
-
-    if (r instanceof Sk.misceval.Suspension) {
-        var susp = new Sk.misceval.Suspension(undefined, r);
-        susp.resume = function() { return Sk.misceval.tryCatch(r.resume, catchFn); };
-        return susp;
-    } else {
-        return r;
-    }
-};
-goog.exportSymbol("Sk.misceval.tryCatch", Sk.misceval.tryCatch);
-
-/**
- * Perform a suspension-aware for-each on an iterator, without
- * blowing up the stack.
- * forFn() is called for each element in the iterator, with two
- * arguments: the current element and the previous return value
- * of forFn() (or initialValue on the first call). In this way,
- * iterFor() can be used as a simple for loop, or alternatively
- * as a 'reduce' operation. The return value of the final call to
- * forFn() will be the return value of iterFor() (after all
- * suspensions are resumed, that is; if the iterator is empty then
- * initialValue will be returned.)
- *
- * The iteration can be terminated early, by returning
- * an instance of Sk.misceval.Break. If an argument is given to
- * the Sk.misceval.Break() constructor, that value will be
- * returned from iterFor(). It is therefore possible to use
- * iterFor() on infinite iterators.
- *
- * @param {*} iter
- * @param {function(*,*=)} forFn
- * @param {*=} initialValue
- */
-Sk.misceval.iterFor = function (iter, forFn, initialValue) {
-    var prevValue = initialValue;
-
-    var breakOrIterNext = function(r) {
-        prevValue = r;
-        return (r instanceof Sk.misceval.Break) ? r : iter.tp$iternext(true);
-    };
-
-    return (function nextStep(i) {
-        while (i !== undefined) {
-            if (i instanceof Sk.misceval.Suspension) {
-                return new Sk.misceval.Suspension(nextStep, i);
-            }
-
-            if (i === Sk.misceval.Break || i instanceof Sk.misceval.Break) {
-                return i.brValue;
-            }
-
-            i = Sk.misceval.chain(
-                forFn(i, prevValue),
-                breakOrIterNext
-            );
-        }
-        return prevValue;
-    })(iter.tp$iternext(true));
-};
-goog.exportSymbol("Sk.misceval.iterFor", Sk.misceval.iterFor);
-
-/**
- * A special value to return from an iterFor() function,
- * to abort the iteration. Optionally supply a value for iterFor() to return
- * (defaults to 'undefined')
- *
- * @constructor
- * @param {*=}  brValue
- */
-Sk.misceval.Break = function(brValue) {
-    if (!(this instanceof Sk.misceval.Break)) {
-        return new Sk.misceval.Break(brValue);
-    }
-
-    this.brValue = brValue;
-};
-goog.exportSymbol("Sk.misceval.Break", Sk.misceval.Break);
 
 /**
  * same as Sk.misceval.call except args is an actual array, rather than
@@ -1149,15 +1002,8 @@ Sk.misceval.applyOrSuspend = function (func, kwdict, varargseq, kws, args) {
         }
 
         if (kwdict) {
-            for (it = Sk.abstr.iter(kwdict), i = it.tp$iternext(); i!== undefined; i = it.tp$iternext()) {
-                if (!Sk.builtin.checkString(i)) {
-                    throw new Sk.builtin.TypeError("Function keywords must be strings");
-                }
-                kws.push(i.v);
-                kws.push(Sk.abstr.objectGetItem(kwdict, i, false));
-            }
+            goog.asserts.fail("kwdict not implemented;");
         }
-
         //goog.asserts.assert(((kws === undefined) || (kws.length === 0)));
         //print('kw args location: '+ kws + ' args ' + args.length)
         if (kws !== undefined && kws.length > 0) {
@@ -1196,15 +1042,8 @@ Sk.misceval.applyOrSuspend = function (func, kwdict, varargseq, kws, args) {
                     args.push(i);
                 }
             }
-
             if (kwdict) {
-                for (it = Sk.abstr.iter(kwdict), i = it.tp$iternext(); i!== undefined; i = it.tp$iternext()) {
-                    if (!Sk.builtin.checkString(i)) {
-                        throw new Sk.builtin.TypeError("Function keywords must be strings");
-                    }
-                    kws.push(i.v);
-                    kws.push(Sk.abstr.objectGetItem(kwdict, i, false));
-                }
+                goog.asserts.fail("kwdict not implemented;");
             }
             return fcall.call(func, args, kws, kwdict);
         }
@@ -1216,7 +1055,7 @@ Sk.misceval.applyOrSuspend = function (func, kwdict, varargseq, kws, args) {
             // func is actually the object here because we got __call__
             // from it. todo; should probably use descr_get here
             args.unshift(func);
-            return Sk.misceval.apply(fcall, kwdict, varargseq, kws, args);
+            return Sk.misceval.apply(fcall, kws, args, kwdict, varargseq);
         }
         throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(func) + "' object is not callable");
     }

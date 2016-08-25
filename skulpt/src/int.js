@@ -231,13 +231,6 @@ Sk.builtin.int_.prototype.nb$add = function (other) {
 };
 
 /** @override */
-Sk.builtin.int_.prototype.nb$reflected_add = function (other) {
-    // Should not automatically call this.nb$add, as nb$add may have
-    // been overridden by a subclass
-    return Sk.builtin.int_.prototype.nb$add.call(this, other);
-};
-
-/** @override */
 Sk.builtin.int_.prototype.nb$subtract = function (other) {
     var thisAsLong, thisAsFloat;
 
@@ -256,14 +249,6 @@ Sk.builtin.int_.prototype.nb$subtract = function (other) {
     }
 
     return Sk.builtin.NotImplemented.NotImplemented$;
-};
-
-/** @override */
-Sk.builtin.int_.prototype.nb$reflected_subtract = function (other) {
-    // Should not automatically call this.nb$add, as nb$add may have
-    // been overridden by a subclass
-    var negative_this = this.nb$negative();
-    return Sk.builtin.int_.prototype.nb$add.call(negative_this, other);
 };
 
 /** @override */
@@ -296,35 +281,8 @@ Sk.builtin.int_.prototype.nb$multiply = function (other) {
 };
 
 /** @override */
-Sk.builtin.int_.prototype.nb$reflected_multiply = function (other) {
-    // Should not automatically call this.nb$multiply, as nb$multiply may have
-    // been overridden by a subclass
-    return Sk.builtin.int_.prototype.nb$multiply.call(this, other);
-};
-
-/** @override */
 Sk.builtin.int_.prototype.nb$divide = function (other) {
-    var thisAsLong, thisAsFloat;
-    if (Sk.python3) {
-        thisAsFloat = new Sk.builtin.float_(this.v);
-        return thisAsFloat.nb$divide(other);
-    }
-
-    if (other instanceof Sk.builtin.int_) {
-        return this.nb$floor_divide(other);
-    }
-
-    if (other instanceof Sk.builtin.lng) {
-        thisAsLong = new Sk.builtin.lng(this.v);
-        return thisAsLong.nb$divide(other);
-    }
-
-    if (other instanceof Sk.builtin.float_) {
-        thisAsFloat = new Sk.builtin.float_(this.v);
-        return thisAsFloat.nb$divide(other);
-    }
-
-    return Sk.builtin.NotImplemented.NotImplemented$;
+    return this.nb$floor_divide(other);
 };
 
 /** @override */
@@ -347,12 +305,12 @@ Sk.builtin.int_.prototype.nb$floor_divide = function (other) {
 
     if (other instanceof Sk.builtin.lng) {
         thisAsLong = new Sk.builtin.lng(this.v);
-        return thisAsLong.nb$floor_divide(other);
+        return thisAsLong.nb$divide(other);
     }
 
     if (other instanceof Sk.builtin.float_) {
         thisAsFloat = new Sk.builtin.float_(this.v);
-        return thisAsFloat.nb$floor_divide(other);
+        return thisAsFloat.nb$divide(other);
     }
 
     return Sk.builtin.NotImplemented.NotImplemented$;
@@ -371,14 +329,21 @@ Sk.builtin.int_.prototype.nb$reflected_floor_divide = function (other) {
 Sk.builtin.int_.prototype.nb$remainder = function (other) {
     var thisAsLong, thisAsFloat;
     var tmp;
-    var divResult;
 
     if (other instanceof Sk.builtin.int_) {
+
         //  Javacript logic on negatives doesn't work for Python... do this instead
-        divResult = Sk.abstr.numberBinOp(this, other, "FloorDiv");
-        tmp = Sk.abstr.numberBinOp(divResult, other, "Mult");
-        tmp = Sk.abstr.numberBinOp(this, tmp, "Sub");
-        tmp = tmp.v;
+        tmp = this.v % other.v;
+
+        if (this.v < 0) {
+            if (other.v > 0 && tmp < 0) {
+                tmp = tmp + other.v;
+            }
+        } else {
+            if (other.v < 0 && tmp !== 0) {
+                tmp = tmp + other.v;
+            }
+        }
 
         if (other.v < 0 && tmp === 0) {
             tmp = -0.0; // otherwise the sign gets lost by javascript modulo
@@ -823,11 +788,7 @@ Sk.builtin.int_.prototype.nb$inplace_lshift = Sk.builtin.int_.prototype.nb$lshif
  */
 Sk.builtin.int_.prototype.nb$inplace_rshift = Sk.builtin.int_.prototype.nb$rshift;
 
-/**
- * @override
- *
- * @return {Sk.builtin.int_} A copy of this instance with the value negated.
- */
+/** @override */
 Sk.builtin.int_.prototype.nb$negative = function () {
     return new Sk.builtin.int_(-this.v);
 };
@@ -977,10 +938,6 @@ Sk.builtin.int_.prototype.__round__ = function (self, ndigits) {
 
     return new Sk.builtin.int_(result);
 };
-
-Sk.builtin.int_.prototype.conjugate = new Sk.builtin.func(function (self) {
-    return new Sk.builtin.int_(self.v);
-});
 
 /** @override */
 Sk.builtin.int_.prototype["$r"] = function () {

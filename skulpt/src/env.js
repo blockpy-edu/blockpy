@@ -48,7 +48,7 @@ Sk.configure = function (options) {
 
     Sk.inputfun = options["inputfun"] || Sk.inputfun;
     goog.asserts.assert(typeof Sk.inputfun === "function");
-    
+
     Sk.retainGlobals = options["retainglobals"] || false;
     goog.asserts.assert(typeof Sk.retainGlobals === "boolean");
 
@@ -57,16 +57,6 @@ Sk.configure = function (options) {
 
     Sk.breakpoints = options["breakpoints"] || function() { return true; };
     goog.asserts.assert(typeof Sk.breakpoints === "function");
-
-    Sk.setTimeout = options["setTimeout"];
-    if (Sk.setTimeout === undefined) {
-        if (typeof setTimeout === "function") {
-            Sk.setTimeout = function(func, delay) { setTimeout(func, delay); };
-        } else {
-            Sk.setTimeout = function(func, delay) { func(); };
-        }
-    }
-    goog.asserts.assert(typeof Sk.setTimeout === "function");
 
     if ("execLimit" in options) {
         Sk.execLimit = options["execLimit"];
