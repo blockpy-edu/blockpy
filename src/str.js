@@ -1,4 +1,4 @@
-var interned = {};
+Sk.builtin.interned = {};
 
 /**
  * @constructor
@@ -51,16 +51,14 @@ Sk.builtin.str = function (x) {
     }
 
     // interning required for strings in py
-    if (Object.prototype.hasOwnProperty.call(interned, "1" + ret)) {
-        // note, have to use Object to avoid __proto__, etc.
-        // failing
-        return interned["1" + ret];
+    if (Sk.builtin.interned["1" + ret]) {
+        return Sk.builtin.interned["1" + ret];
     }
 
     this.__class__ = Sk.builtin.str;
     this.v = ret;
     this["v"] = this.v;
-    interned["1" + ret] = this;
+    Sk.builtin.interned["1" + ret] = this;
     return this;
 
 };
@@ -141,24 +139,12 @@ Sk.builtin.str.prototype.sq$contains = function (ob) {
     return this.v.indexOf(ob.v) != -1;
 };
 
+Sk.builtin.str.prototype.__iter__ = new Sk.builtin.func(function (self) {
+    return new Sk.builtin.str_iter_(self);
+});
+
 Sk.builtin.str.prototype.tp$iter = function () {
-    var ret =
-    {
-        tp$iter    : function () {
-            return ret;
-        },
-        $obj       : this,
-        $index     : 0,
-        tp$iternext: function () {
-            // todo; StopIteration
-            if (ret.$index >= ret.$obj.v.length) {
-                return undefined;
-            }
-            return new Sk.builtin.str(ret.$obj.v.substr(ret.$index++, 1));
-        },
-        tp$name    : "str_iterator"
-    };
-    return ret;
+    return new Sk.builtin.str_iter_(this);
 };
 
 Sk.builtin.str.prototype.tp$richcompare = function (other, op) {
@@ -430,6 +416,7 @@ Sk.builtin.str.prototype["rpartition"] = new Sk.builtin.func(function (self, sep
 });
 
 Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, start, end) {
+    var normaltext;
     var ctl;
     var slice;
     var m;
@@ -458,7 +445,8 @@ Sk.builtin.str.prototype["count"] = new Sk.builtin.func(function (self, pat, sta
         end = end >= 0 ? end : self.v.length + end;
     }
 
-    m = new RegExp(pat.v, "g");
+    normaltext = pat.v.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    m = new RegExp(normaltext, "g");
     slice = self.v.slice(start, end);
     ctl = slice.match(m);
     if (!ctl) {
@@ -1137,3 +1125,44 @@ Sk.builtin.str.prototype.nb$remainder = function (rhs) {
     ret = this.v.replace(regex, replFunc);
     return new Sk.builtin.str(ret);
 };
+
+/**
+ * @constructor
+ * @param {Object} obj
+ */
+Sk.builtin.str_iter_ = function (obj) {
+    if (!(this instanceof Sk.builtin.str_iter_)) {
+        return new Sk.builtin.str_iter_(obj);
+    }
+    this.$index = 0;
+    this.$obj = obj.v.slice();
+    this.sq$length = this.$obj.length;
+    this.tp$iter = this;
+    this.tp$iternext = function () {
+        if (this.$index >= this.sq$length) {
+            return undefined;
+        }
+        return new Sk.builtin.str(this.$obj.substr(this.$index++, 1));
+    };
+    this.$r = function () {
+        return new Sk.builtin.str("iterator");
+    };
+    return this;
+};
+
+Sk.abstr.setUpInheritance("iterator", Sk.builtin.str_iter_, Sk.builtin.object);
+
+Sk.builtin.str_iter_.prototype.__class__ = Sk.builtin.str_iter_;
+
+Sk.builtin.str_iter_.prototype.__iter__ = new Sk.builtin.func(function (self) {
+    Sk.builtin.pyCheckArgs("__iter__", arguments, 0, 0, true, false);
+    return self;
+});
+
+Sk.builtin.str_iter_.prototype["next"] = new Sk.builtin.func(function (self) {
+    var ret = self.tp$iternext();
+    if (ret === undefined) {
+        throw new Sk.builtin.StopIteration();
+    }
+    return ret;
+});

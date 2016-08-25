@@ -393,6 +393,73 @@ class IntTestCases(unittest.TestCase):
       self.assertRaises(ValueError, check, '123\ud800', None)
       self.assertRaises(ValueError, check, '123\ud800', 10)
 
+    def test_conjugate(self):
+        self.assertEqual(int(3).conjugate(), 3)
+        self.assertEqual(int(-3).conjugate(), -3)
+        self.assertEqual(bool(True).conjugate(), 1)
+        self.assertEqual(bool(False).conjugate(), 0)
+
+    def test_modulo(self):
+        # helper
+        def mod(a, b):
+            return a % b
+
+        self.assertRaises(ZeroDivisionError, mod, 5, 0)
+        self.assertEqual(mod(5, 1), 0)
+        self.assertEqual(mod(5, 2), 1)
+        self.assertEqual(mod(5, 4), 1)
+        self.assertEqual(mod(5, 5), 0)
+        self.assertEqual(mod(5, 6), 5)
+        self.assertEqual(mod(0, 1), 0)
+        self.assertEqual(mod(-5, 6), 1)
+        self.assertEqual(mod(-5, -2), -1)
+
+    def test_division(self):
+        self.assertEqual(3/2, 1)
+        self.assertEqual(3//2, 1)
+        self.assertEqual(3/2.0, 1.5)
+        self.assertEqual(3//2.0, 1.0)
+        self.assertEqual(-3/2, -2)
+        self.assertEqual(-3//2, -2)
+        self.assertEqual(-3/2.0, -1.5)
+        self.assertEqual(-3//2.0, -2.0)
+
+    def test_lshift_type(self):
+        # Bug #620: lshift of 0 should not become long
+        # 0 << 0
+        x = 0 << 0
+        self.assertEqual(x, 0)
+        self.assertIsInstance(x, int)
+
+        x = 0L << 0
+        self.assertEqual(x, 0L)
+        self.assertIsInstance(x, long)
+
+        # 0 <<        
+        x = 0 << 1
+        self.assertEqual(x, 0)
+        self.assertIsInstance(x, int)
+        x = 0 << 1000
+        self.assertEqual(x, 0)
+        self.assertIsInstance(x, int)
+
+        x = 0L << 1
+        self.assertEqual(x, 0L)
+        self.assertIsInstance(x, long)
+        x = 0L << 1000
+        self.assertEqual(x, 0L)
+        self.assertIsInstance(x, long)
+
+        # << 0
+        x = 1 << 0
+        self.assertEqual(x, 1)
+        self.assertIsInstance(x, int)
+
+        x = 1L << 0
+        self.assertEqual(x, 1L)
+        self.assertIsInstance(x, long)
+        
+
 class IntTest(unittest.TestCase):
     def test_int_inherited(self):
         class c:

@@ -13,12 +13,18 @@ Sk.builtin.object = function () {
         return new Sk.builtin.object();
     }
 
-
     return this;
 };
 
 
 
+var _tryGetSubscript = function(dict, pyName) {
+    try {
+        return dict.mp$subscript(pyName);
+    } catch (x) {
+        return undefined;
+    }
+};
 
 /**
  * @return {undefined}
@@ -28,52 +34,47 @@ Sk.builtin.object.prototype.GenericGetAttr = function (name) {
     var f;
     var descr;
     var tp;
+    var dict;
     var pyName = new Sk.builtin.str(name);
     goog.asserts.assert(typeof name === "string");
 
     tp = this.ob$type;
     goog.asserts.assert(tp !== undefined, "object has no ob$type!");
 
-    //print("getattr", tp.tp$name, name);
+    dict = this["$d"] || this.constructor["$d"];
+
+    // todo; assert? force?
+    if (dict) {
+        if (dict.mp$lookup) {
+            res = dict.mp$lookup(pyName);
+        } else if (dict.mp$subscript) {
+            res = _tryGetSubscript(dict, pyName);
+        } else if (typeof dict === "object") {
+            // todo; definitely the wrong place for this. other custom tp$getattr won't work on object -- bnm -- implemented custom __getattr__ in abstract.js
+            res = dict[name];
+        }
+        if (res !== undefined) {
+            return res;
+        }
+    }
 
     descr = Sk.builtin.type.typeLookup(tp, name);
 
     // otherwise, look in the type for a descr
     if (descr !== undefined && descr !== null && descr.ob$type !== undefined) {
         f = descr.ob$type.tp$descr_get;
+        if (!(f) && descr["__get__"]) {
+            f = descr["__get__"];
+            return Sk.misceval.callsimOrSuspend(f, descr, this, Sk.builtin.none.none$);
+        }
         // todo;
-        //if (f && descr.tp$descr_set) // is a data descriptor if it has a set
-        //return f.call(descr, this, this.ob$type);
-    }
+        // if (f && descr.tp$descr_set) // is a data descriptor if it has a set
+        // return f.call(descr, this, this.ob$type);
 
-    // todo; assert? force?
-    if (this["$d"]) {
-        if (this["$d"].mp$lookup) {
-            res = this["$d"].mp$lookup(pyName);
-        } else if (this["$d"].mp$subscript) {
-            try {
-                res = this["$d"].mp$subscript(pyName);
-            } catch (x) {
-                res = undefined;
-            }
-        } else if (typeof this["$d"] === "object") {
-            // todo; definitely the wrong place for this. other custom tp$getattr won't work on object -- bnm -- implemented custom __getattr__ in abstract.js
-            res = this["$d"][name];
+        if (f) {
+            // non-data descriptor
+            return f.call(descr, this, this.ob$type);
         }
-        if (res !== undefined) {
-            return res;
-        }
-    } else if (this instanceof Sk.builtin.object) {
-        // Initialize inner dictionary for builtin types
-        // This is not done upon instantiation to improve performance
-        this["$d"] = {
-            "Sk.builtin.object": true   // Indicates this is a builtin object
-        };
-    }
-
-    if (f) {
-        // non-data descriptor
-        return f.call(descr, this, this.ob$type);
     }
 
     if (descr !== undefined) {
@@ -91,26 +92,43 @@ goog.exportSymbol("Sk.builtin.object.prototype.GenericPythonGetAttr", Sk.builtin
 
 Sk.builtin.object.prototype.GenericSetAttr = function (name, value) {
     var objname = Sk.abstr.typeName(this);
-    goog.asserts.assert(typeof name === "string");
-    // todo; lots o' stuff
+    var pyname;
+    var dict;
+    var tp = this.ob$type;
+    var descr;
+    var f;
 
-    if (this["$d"] === undefined && this instanceof Sk.builtin.object) {
-        // Initialize inner dictionary for builtin types
-        // This is not done upon instantiation to improve performance
-        this["$d"] = {
-            "Sk.builtin.object": true   // Indicates this is a builtin object
-        };
+    goog.asserts.assert(typeof name === "string");
+    goog.asserts.assert(tp !== undefined, "object has no ob$type!");
+
+    dict = this["$d"] || this.constructor["$d"];
+
+    descr = Sk.builtin.type.typeLookup(tp, name);
+
+    // otherwise, look in the type for a descr
+    if (descr !== undefined && descr !== null && descr.ob$type !== undefined) {
+        //f = descr.ob$type.tp$descr_set;
+        if (descr["__set__"]) {
+            f = descr["__set__"];
+            Sk.misceval.callsimOrSuspend(f, descr, this, value);
+            return;
+        }
+        // todo;
+        //if (f && descr.tp$descr_set) // is a data descriptor if it has a set
+        //return f.call(descr, this, this.ob$type);
     }
 
-    if (this["$d"].mp$ass_subscript) {
-        this["$d"].mp$ass_subscript(new Sk.builtin.str(name), value);
-    } else if (typeof this["$d"] === "object") {
-        // Cannot add new attributes to a builtin object
-        if (this["$d"]["Sk.builtin.object"] && this["$d"][name] === undefined) {
+    if (dict.mp$ass_subscript) {
+        pyname = new Sk.builtin.str(name);
+
+        if (this instanceof Sk.builtin.object && !(this.ob$type.sk$klass) &&
+            dict.mp$lookup(pyname) === undefined) {
+            // Cannot add new attributes to a builtin object
             throw new Sk.builtin.AttributeError("'" + objname + "' object has no attribute '" + name + "'");
         }
-
-        this["$d"][name] = value;
+        dict.mp$ass_subscript(new Sk.builtin.str(name), value);
+    } else if (typeof dict === "object") {
+        dict[name] = value;
     }
 };
 goog.exportSymbol("Sk.builtin.object.prototype.GenericSetAttr", Sk.builtin.object.prototype.GenericSetAttr);
@@ -143,6 +161,7 @@ Sk.builtin.object.prototype.tp$name = "object";
  * @type {Sk.builtin.type}
  */
 Sk.builtin.object.prototype.ob$type = Sk.builtin.type.makeIntoTypeObj("object", Sk.builtin.object);
+Sk.builtin.object.prototype.ob$type.sk$klass = undefined;   // Nonsense for closure compiler
 
 /** Default implementations of dunder methods found in all Python objects */
 
@@ -270,6 +289,7 @@ Sk.builtin.object.prototype["$r"] = function () {
 };
 
 Sk.builtin.hashCount = 1;
+Sk.builtin.idCount = 1;
 
 /**
  * Return the hash value of this instance.
@@ -383,7 +403,7 @@ Sk.builtin.object.prototype.ob$ge = function (other) {
  * Array of all the Python functions which are methods of this class.
  * @type {Array}
  */
-Sk.builtin.object.prototype.pythonFunctions = ["__repr__", "__str__", "__hash__",
+Sk.builtin.object.pythonFunctions = ["__repr__", "__str__", "__hash__",
 "__eq__", "__ne__", "__lt__", "__le__", "__gt__", "__ge__", "__getattr__", "__setattr__"];
 
 /**

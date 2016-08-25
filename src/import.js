@@ -113,8 +113,9 @@ Sk.loadExternalLibrary = function (name) {
  * @param {string} ext extension to use (.py or .js)
  * @param {boolean=} failok will throw if not true
  * @param {boolean=} canSuspend can we suspend?
+ * @param {string=} currentDir if any
  */
-Sk.importSearchPathForName = function (name, ext, failok, canSuspend) {
+Sk.importSearchPathForName = function (name, ext, failok, canSuspend, currentDir) {
     var fn;
     var j;
     var fns = [];
@@ -126,6 +127,9 @@ Sk.importSearchPathForName = function (name, ext, failok, canSuspend) {
         fns.push(i.v + "/" + nameAsPath + ext);                 // module
         fns.push(i.v + "/" + nameAsPath + "/__init__" + ext);   // package
     }
+
+    fns.push(currentDir + "/" + nameAsPath + ext);
+    fns.push(currentDir + "/" + nameAsPath + "/__init__" + ext);
 
     j = 0;
 
@@ -175,23 +179,54 @@ Sk.importSearchPathForName = function (name, ext, failok, canSuspend) {
     })();
 };
 
+/**
+ * Complete any initialization of Python classes which relies on internal
+ * dependencies.
+ *
+ * This includes making Python classes subclassable and ensuring that the
+ * {@link Sk.builtin.object} magic methods are wrapped inside Python functions.
+ *
+ * @return {undefined}
+ */
 Sk.doOneTimeInitialization = function () {
-    var proto, name, i;
+    var proto, name, i, x, func;
+    var builtins = [];
 
     // can't fill these out when making the type because tuple/dict aren't
     // defined yet.
     Sk.builtin.type.basesStr_ = new Sk.builtin.str("__bases__");
     Sk.builtin.type.mroStr_ = new Sk.builtin.str("__mro__");
-    Sk.builtin.object["$d"] = new Sk.builtin.dict([]);
-    Sk.builtin.object["$d"].mp$ass_subscript(Sk.builtin.type.basesStr_, new Sk.builtin.tuple([]));
-    Sk.builtin.object["$d"].mp$ass_subscript(Sk.builtin.type.mroStr_, new Sk.builtin.tuple([Sk.builtin.object]));
+
+    // Register a Python class with an internal dictionary, which allows it to
+    // be subclassed
+    var setUpClass = function (child) {
+        var parent = child.tp$base;
+        var bases = [];
+        var base;
+
+        for (base = parent; base !== undefined; base = base.tp$base) {
+            bases.push(base);
+        }
+
+        child["$d"] = new Sk.builtin.dict([]);
+        child["$d"].mp$ass_subscript(Sk.builtin.type.basesStr_, new Sk.builtin.tuple(bases));
+        child["$d"].mp$ass_subscript(Sk.builtin.type.mroStr_, new Sk.builtin.tuple([child]));
+    };
+
+    for (x in Sk.builtin) {
+        func = Sk.builtin[x];
+        if ((func.prototype instanceof Sk.builtin.object ||
+             func === Sk.builtin.object) && !func.sk$abstract) {
+            setUpClass(func);
+        }
+    }
 
     // Wrap the inner Javascript code of Sk.builtin.object's Python methods inside
     // Sk.builtin.func, as that class was undefined when these functions were declared
     proto = Sk.builtin.object.prototype;
 
-    for (i = 0; i < proto.pythonFunctions.length; i++) {
-        name = proto.pythonFunctions[i];
+    for (i = 0; i < Sk.builtin.object.pythonFunctions.length; i++) {
+        name = Sk.builtin.object.pythonFunctions[i];
 
         if (proto[name] instanceof Sk.builtin.func) {
             // If functions have already been initialized, do not wrap again.
@@ -199,6 +234,14 @@ Sk.doOneTimeInitialization = function () {
         }
 
         proto[name] = new Sk.builtin.func(proto[name]);
+    }
+
+    // compile internal python files and add them to the __builtin__ module
+    for (var file in Sk.internalPy.files) {
+        var fileWithoutExtension = file.split(".")[0].split("/")[1];
+        var mod = Sk.importBuiltinWithBody(fileWithoutExtension, false, Sk.internalPy.files[file], false);
+        goog.asserts.assert(mod["$d"][fileWithoutExtension] !== undefined, "Should have imported name " + fileWithoutExtension);
+        Sk.builtins[fileWithoutExtension] = mod["$d"][fileWithoutExtension];
     }
 };
 
@@ -221,7 +264,6 @@ Sk.importSetUpPath = function () {
         Sk.realsyspath = new Sk.builtin.list(paths);
 
         Sk.doOneTimeInitialization();
-
     }
 };
 
@@ -239,8 +281,9 @@ if (COMPILED) {
  * @param {string=} suppliedPyBody use as the body of the text for the module
  * rather than Sk.read'ing it.
  * @param {boolean=} canSuspend whether we may return a Suspension object
+ * @param {string=} currentDir directory to import from
  */
-Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canSuspend) {
+Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canSuspend, currentDir) {
     //dumpJS = true;
     var parentModule;
     var modlocs;
@@ -283,7 +326,7 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
         // all parent packages. so, here we're importing 'a.b', which will in
         // turn import 'a', and then return 'a' eventually.
         parentModName = modNameSplit.slice(0, modNameSplit.length - 1).join(".");
-        toReturn = Sk.importModuleInternal_(parentModName, dumpJS, undefined, undefined, canSuspend);
+        toReturn = Sk.importModuleInternal_(parentModName, dumpJS, undefined, undefined, canSuspend, currentDir);
 
         // If this suspends, we suspend. When that suspension is done, we can just
         // repeat this whole function call
@@ -298,7 +341,7 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
                     // They're done!
                     // Re-call ourselves, and this time "toReturn = Sk.importModuleInternal_(...)"
                     // will hit the cache and complete immediately.
-                    return Sk.importModuleInternal_(name, dumpJS, modname, suppliedPyBody, canSuspend);
+                    return Sk.importModuleInternal_(name, dumpJS, modname, suppliedPyBody, canSuspend, currentDir);
                 }
             })(toReturn);
         }
@@ -333,9 +376,15 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
         external = Sk.loadExternalLibrary(name);
         if (external) {
             co = external;
+            if (Sk.externalLibraries) {
+                filename = Sk.externalLibraries[name].path; // get path from config
+            } else {
+                filename = "unknown";
+            }
+            // ToDo: check if this is a dotted name or import from ...
         } else {
             // Try loading as a builtin (i.e. already in JS) module, then try .py files
-            codeAndPath = Sk.importSearchPathForName(name, ".js", true, canSuspend);
+            codeAndPath = Sk.importSearchPathForName(name, ".js", true, canSuspend, currentDir);
 
             co = (function compileReadCode(codeAndPath) {
                 if (codeAndPath instanceof Sk.misceval.Suspension) {
@@ -343,8 +392,9 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
                 } else if (!codeAndPath) {
                     goog.asserts.assert(!isPy, "Sk.importReadFileFromPath did not throw when loading Python file failed");
                     isPy = true;
-                    return compileReadCode(Sk.importSearchPathForName(name, ".py", false, canSuspend));
+                    return compileReadCode(Sk.importSearchPathForName(name, ".py", false, canSuspend, currentDir));
                 } else {
+                    filename = codeAndPath.filename;
                     return isPy ? Sk.compile(codeAndPath.code, codeAndPath.filename, "exec", canSuspend)
                         : { funcname: "$builtinmodule", code: codeAndPath.code };
                 }
@@ -360,6 +410,11 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
 
         module.$js = co.code; // todo; only in DEBUG?
         finalcode = co.code;
+
+        if (filename == null) {
+            filename = co.filename;
+        }
+
         if (Sk.dateSet == null || !Sk.dateSet) {
             finalcode = "Sk.execStart = Sk.lastYield = new Date();\n" + co.code;
             Sk.dateSet = true;
@@ -413,8 +468,10 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
                 modlocs["__name__"] = new Sk.builtin.str(modname);
             }
 
+            modlocs["__path__"] = new Sk.builtin.str(filename);
+
             module["$d"] = modlocs;
-            
+
             // doc string is None, when not present
             if (!modlocs["__doc__"]) {
                 modlocs["__doc__"] = Sk.builtin.none.none$;
@@ -490,11 +547,31 @@ Sk.importMainWithBody = function (name, dumpJS, body, canSuspend) {
     return Sk.importModuleInternal_(name, dumpJS, "__main__", body, canSuspend);
 };
 
+/**
+ * Imports internal python files into the `__builin__` module. Used during startup 
+ * to compile and import all *.py files from the src/ directory. 
+ * 
+ * @param name {string}  File name to use for messages related to this run
+ * @param dumpJS {boolean} print out the compiled javascript
+ * @param body {string} Python Code
+ * @param canSuspend {boolean}  Use Suspensions for async execution
+ *
+ */
+Sk.importBuiltinWithBody = function (name, dumpJS, body, canSuspend) {
+    return Sk.importModuleInternal_(name, dumpJS, "__builtin__", body, canSuspend);
+};
+
 Sk.builtin.__import__ = function (name, globals, locals, fromlist) {
     // Save the Sk.globals variable importModuleInternal_ may replace it when it compiles
     // a Python language module.  for some reason, __name__ gets overwritten.
     var saveSk = Sk.globals;
-    var ret = Sk.importModuleInternal_(name, undefined, undefined, undefined, true);
+
+    var currentDir =
+        locals["__file__"] === undefined ?
+            undefined :
+            locals["__file__"].v.substring(0, locals["__file__"].v.lastIndexOf("/"));
+
+    var ret = Sk.importModuleInternal_(name, undefined, undefined, undefined, true, currentDir);
 
     return (function finalizeImport(ret) {
         if (ret instanceof Sk.misceval.Suspension) {
@@ -504,9 +581,40 @@ Sk.builtin.__import__ = function (name, globals, locals, fromlist) {
         if (saveSk !== Sk.globals) {
             Sk.globals = saveSk;
         }
+
+        // There is no fromlist, so we have reached the end of the lookup, return
         if (!fromlist || fromlist.length === 0) {
             return ret;
+        } else {
+            // try to load the module from the file system if it is not present on the module itself
+            var i;
+            var fromName; // name of current module for fromlist
+            var fromImportName; // dotted name
+            var dottedName = name.split("."); // get last module in dotted path
+            var lastDottedName = dottedName[dottedName.length-1];
+            
+            var found; // Contains sysmodules the "name"
+            var foundFromName; // Contains the sysmodules[name] the current item from the fromList
+
+            for (i = 0; i < fromlist.length; i++) {
+                fromName = fromlist[i];
+
+                foundFromName = false;
+                found = Sk.sysmodules.sq$contains(name); // Check if "name" is inside sysmodules
+                if (found) {
+                    // Check if the current fromName is already in the "name" module
+                    foundFromName = Sk.sysmodules.mp$subscript(name)["$d"][fromName] != null;
+                }
+
+                // Only import from file system if we have not found the fromName in the current module
+                if (!foundFromName && fromName != "*" && ret.$d[fromName] == null && (ret.$d[lastDottedName] != null || ret.$d.__name__.v == lastDottedName)) {
+                    // add the module name to our requiredImport list
+                    fromImportName = "" + name + "." + fromName;
+                    Sk.importModuleInternal_(fromImportName, undefined, undefined, undefined, false, currentDir);
+                }
+            }
         }
+
         // if there's a fromlist we want to return the actual module, not the
         // toplevel namespace
         ret = Sk.sysmodules.mp$subscript(name);
@@ -531,5 +639,6 @@ Sk.importStar = function (module, loc, global) {
 
 goog.exportSymbol("Sk.importMain", Sk.importMain);
 goog.exportSymbol("Sk.importMainWithBody", Sk.importMainWithBody);
+goog.exportSymbol("Sk.importBuiltinWithBody", Sk.importBuiltinWithBody);
 goog.exportSymbol("Sk.builtin.__import__", Sk.builtin.__import__);
 goog.exportSymbol("Sk.importStar", Sk.importStar);

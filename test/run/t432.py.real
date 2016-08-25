@@ -50,6 +50,13 @@ True
 True
 True
 
+str.isnumeric
+True
+True
+True
+True
+True
+
 str.join
 True
 True

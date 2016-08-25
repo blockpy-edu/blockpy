@@ -308,6 +308,12 @@ var $builtinmodule = function (name) {
         return Sk.builtin.dict.prototype.mp$del_subscript.call(this, key);
     }
 
+    mod.OrderedDict.prototype.__iter__ = new Sk.builtin.func(function (self) {
+        Sk.builtin.pyCheckArgs("__iter__", arguments, 0, 0, false, true);
+
+        return mod.OrderedDict.prototype.tp$iter.call(self);
+    });
+
     mod.OrderedDict.prototype.tp$iter = function()
     {
         var ret;
@@ -523,9 +529,8 @@ var $builtinmodule = function (name) {
                 o.constructor.apply(o, arguments);
                 return o;
             }
-
-            this.v = arguments;
             this.__class__ = mod.namedtuples[nm];
+            this.v = Array.prototype.slice.call(arguments);
         };
         mod.namedtuples[nm] = cons;
 
