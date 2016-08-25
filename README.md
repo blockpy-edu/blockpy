@@ -48,27 +48,15 @@ And add the relevant subtree information to your .git/config:
     > vi .git/config
 
 Replace the contents of that file with the information found here: http://pastebin.com/raw/QWpJjgU3 (TODO: show the actual commands used to set this)
-   
-You have to update your blockly and skulpt to our forks.
-
-    > git subtree pull --prefix=blockly --squash skulpt_upstream master
-    > git add .
-    > git commit -a -m "Get latest skulpt upstream"
-    > git subtree pull --prefix=skulpt --squash skulpt master
-    > git add .
-    > git commit -a -m "Get latest skulpt fork"
-    > git subtree pull --prefix=blockly --squash blockly_upstream master
-    > git add .
-    > git commit -a -m "Get latest blockly upstream"
-    > git subtree pull --prefix=blockly --squash blockly master
-    > git add .
-    > git commit -a -m "Get latest blockly fork"
 
 Next, you'll need to build Blockly:
 
+    > cp blockly/msg/en.js en.js
     > cd blockly
     > python build.py
     > cd ..
+    > mv en.js blockly/msg/en.js
+    
 
 And then you'll build Skulpt:
 
