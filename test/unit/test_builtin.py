@@ -235,29 +235,6 @@ class BuiltinTest(unittest.TestCase):
             raise RuntimeError
         self.assertRaises(RuntimeError, map, badfunc, range(5))
 
-    def test_abs(self):
-        class TestAbs:
-
-            def __init__(self):
-                self.foo = -3
-
-            def __abs__(self):
-                return -self.foo
-
-        bar = TestAbs()
-        self.assertEqual(abs(bar), 3)
-        self.assertEqual(abs(-3), 3)
-
-    def test_reversed(self):
-        class TestReversed:
-            def __reversed__(self):
-                return [5, 4, 3, 2, 1]
-
-        self.assertEqual(list(reversed([1, 2, 3])), [3, 2, 1])
-
-        obj = TestReversed()
-        self.assertEqual(reversed(obj), [5, 4, 3, 2, 1])
-
     def test_reduce(self):
         add = lambda x, y: x+y
         self.assertEqual(reduce(add, ['a', 'b', 'c'], ''), 'abc')

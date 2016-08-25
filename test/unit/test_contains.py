@@ -1,5 +1,4 @@
 import unittest
-from time import sleep
 
 class base_set:
     def __init__(self, el):
@@ -100,14 +99,6 @@ class TestContains(unittest.TestCase):
         except TypeError:
             pass
 
-
-    def test_suspending_generator(self):
-        def gen():
-            sleep(0.0001)
-            yield 42
-
-        self.assertIn(42, gen())
-        self.assertNotIn(43, gen())
 
 
 if __name__ == '__main__':

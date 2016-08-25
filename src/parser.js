@@ -17,6 +17,7 @@
 function Parser (filename, grammar) {
     this.filename = filename;
     this.grammar = grammar;
+    this.comments = [];
     this.p_flags = 0;
     return this;
 }
@@ -67,6 +68,11 @@ function findInDfa (a, obj) {
     }
     return false;
 }
+
+// Add a comment
+Parser.prototype.addcomment = function(value, start, end, line) {
+    this.comments.push([value, start, end, line]);
+};
 
 
 // Add a token; return true if we're done
@@ -195,6 +201,8 @@ Parser.prototype.shift = function (type, value, newstate, context) {
         value     : value,
         lineno    : context[0][0],         // throwing away end here to match cpython
         col_offset: context[0][1],
+        endlineno : context[1][0],
+        col_endoffset: context[1][1],
         children  : null
     };
     if (newnode) {
@@ -216,6 +224,8 @@ Parser.prototype.push = function (type, newdfa, newstate, context) {
         value     : null,
         lineno    : context[0][0],      // throwing away end here to match cpython
         col_offset: context[0][1],
+        endlineno : context[1][0],
+        col_endoffset: context[1][1],
         children  : []
     };
     this.stack[this.stack.length - 1] = {
@@ -262,7 +272,7 @@ Parser.prototype.pop = function () {
  * @param {string} filename
  * @param {string=} style root of parse tree (optional)
  */
-function makeParser (filename, style) {
+function makeParser(filename, style) {
     var tokenizer;
     var T_OP;
     var T_NL;
@@ -304,6 +314,9 @@ function makeParser (filename, style) {
                 lineno += 1;
                 column = 0;
             }
+            if (type === T_COMMENT) {
+                p.addcomment(value, start, end, line);
+            }
             //print("  not calling addtoken");
             return undefined;
         }
@@ -330,12 +343,13 @@ function makeParser (filename, style) {
 
     // set flags, and return
     parseFunc.p_flags = p.p_flags;
+    parseFunc.comments = p.comments;
     return parseFunc;
 }
 
-Sk.parse = function parse (filename, input) {
+Sk.parse = function parse(filename, input) {
     var i;
-    var ret;
+    var ret
     var lines;
     var parseFunc = makeParser(filename);
     if (input.substr(input.length - 1, 1) !== "\n") {
@@ -350,10 +364,10 @@ Sk.parse = function parse (filename, input) {
     /*
      * Small adjustments here in order to return th flags and the cst
      */
-    return {"cst": ret, "flags": parseFunc.p_flags};
+    return {"cst": ret, "flags": parseFunc.p_flags, "comments": parseFunc.comments};
 };
 
-Sk.parseTreeDump = function parseTreeDump (n, indent) {
+Sk.parseTreeDump = function parseTreeDump(n, indent) {
     //return JSON.stringify(n, null, 2);
     var i;
     var ret;

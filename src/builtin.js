@@ -54,10 +54,10 @@ Sk.builtin.asnum$ = function (a) {
     if (a === null) {
         return a;
     }
-    if (a instanceof Sk.builtin.none) {
+    if (a.constructor === Sk.builtin.none) {
         return null;
     }
-    if (a instanceof Sk.builtin.bool) {
+    if (a.constructor === Sk.builtin.bool) {
         if (a.v) {
             return 1;
         }
@@ -69,13 +69,13 @@ Sk.builtin.asnum$ = function (a) {
     if (typeof a === "string") {
         return a;
     }
-    if (a instanceof Sk.builtin.int_) {
+    if (a.constructor === Sk.builtin.int_) {
         return a.v;
     }
-    if (a instanceof Sk.builtin.float_) {
+    if (a.constructor === Sk.builtin.float_) {
         return a.v;
     }
-    if (a instanceof Sk.builtin.lng) {
+    if (a.constructor === Sk.builtin.lng) {
         if (a.cantBeInt()) {
             return a.str$(10, true);
         }
@@ -438,12 +438,6 @@ Sk.builtin.abs = function abs (x) {
         return Sk.misceval.callsim(x.__abs__, x);
     }
 
-    // call custom __abs__ methods
-    if (x.tp$getattr) {
-        var f = x.tp$getattr("__abs__");
-        return Sk.misceval.callsim(f);
-    }
-
     throw new TypeError("bad operand type for abs(): '" + Sk.abstr.typeName(x) + "'");
 };
 
@@ -471,24 +465,6 @@ Sk.builtin.chr = function chr (x) {
     }
 
     return new Sk.builtin.str(String.fromCharCode(x));
-};
-
-Sk.builtin.unichr = function unichr (x) {
-    Sk.builtin.pyCheckArgs("chr", arguments, 1, 1);
-    if (!Sk.builtin.checkInt(x)) {
-        throw new Sk.builtin.TypeError("an integer is required");
-    }
-    x = Sk.builtin.asnum$(x);
-
-    try {
-        return new Sk.builtin.str(String.fromCodePoint(x));
-    }
-    catch (err) {
-        if (err instanceof RangeError) {
-            throw new Sk.builtin.ValueError(err.message);
-        }
-        throw err;
-    }
 };
 
 Sk.builtin.int2str_ = function helper_ (x, radix, prefix) {
@@ -554,10 +530,7 @@ Sk.builtin.dir = function dir (x) {
 
     getName = function (k) {
         var s = null;
-        var internal = [
-            "__bases__", "__mro__", "__class__", "__name__", "GenericGetAttr",
-            "GenericSetAttr", "GenericPythonGetAttr", "GenericPythonSetAttr",
-            "pythonFunctions", "HashNotImplemented", "constructor"];
+        var internal = ["__bases__", "__mro__", "__class__", "__name__"];
         if (internal.indexOf(k) !== -1) {
             return null;
         }
@@ -670,7 +643,9 @@ Sk.builtin.open = function open (filename, mode, bufsize) {
     if (mode === undefined) {
         mode = new Sk.builtin.str("r");
     }
-
+    if (mode.v !== "r" && mode.v !== "rb") {
+        throw "todo; haven't implemented non-read opens";
+    }
     return new Sk.builtin.file(filename, mode, bufsize);
 };
 
@@ -731,7 +706,6 @@ Sk.builtin.isinstance = function isinstance (obj, type) {
 
     return issubclass(obj.ob$type, type);
 };
-
 Sk.builtin.hash = function hash (value) {
     var junk;
     Sk.builtin.pyCheckArgs("hash", arguments, 1, 1);
@@ -741,23 +715,32 @@ Sk.builtin.hash = function hash (value) {
         return 0;
     }};
 
-    if (value instanceof Object) {
-        if (Sk.builtin.checkNone(value.tp$hash)) {
-            // python sets the hash function to None , so we have to catch this case here
-            throw new Sk.builtin.TypeError(new Sk.builtin.str("unhashable type: '" + Sk.abstr.typeName(value) + "'"));
-        } else if (value.tp$hash !== undefined) {
-            if (value.$savedHash_) {
-                return value.$savedHash_;
-            }
-            value.$savedHash_ = value.tp$hash();
+    if ((value instanceof Object) && Sk.builtin.checkNone(value.tp$hash)) {
+        // python sets the hash function to None , so we have to catch this case here
+        throw new Sk.builtin.TypeError(new Sk.builtin.str("unhashable type: '" + Sk.abstr.typeName(value) + "'"));
+    }
+
+    if ((value instanceof Object) && (value.tp$hash !== undefined)) {
+        if (value.$savedHash_) {
             return value.$savedHash_;
-        } else {
-            if (value.__id === undefined) {
-                Sk.builtin.hashCount += 1;
-                value.__id = Sk.builtin.hashCount;
-            }
-            return new Sk.builtin.int_(value.__id);
         }
+        value.$savedHash_ = value.tp$hash();
+        return value.$savedHash_;
+    } else if ((value instanceof Object) && (value.__hash__ !== undefined)) {
+        return Sk.misceval.callsim(value.__hash__, value);
+    } else if (value instanceof Sk.builtin.bool) {
+        if (value.v) {
+            return new Sk.builtin.int_(1);
+        }
+        return new Sk.builtin.int_(0);
+    } else if (value instanceof Sk.builtin.none) {
+        return new Sk.builtin.int_(0);
+    } else if (value instanceof Object) {
+        if (value.__id === undefined) {
+            Sk.builtin.hashCount += 1;
+            value.__id = Sk.builtin.hashCount;
+        }
+        return new Sk.builtin.int_(value.__id);
     } else if (typeof value === "number" || value === null ||
         value === true || value === false) {
         throw new Sk.builtin.TypeError("unsupported Javascript type");
@@ -801,11 +784,33 @@ Sk.builtin.setattr = function setattr (obj, name, value) {
 };
 
 Sk.builtin.raw_input = function (prompt) {
-    var sys = Sk.importModule("sys");
-    if (prompt) {
-        Sk.misceval.callsimOrSuspend(sys["$d"]["stdout"]["write"], sys["$d"]["stdout"], new Sk.builtin.str(prompt));
+    var x, resolution, susp;
+
+    prompt = prompt ? prompt.v : "";
+    x = Sk.inputfun(prompt);
+
+    if (x instanceof Promise) {
+        susp = new Sk.misceval.Suspension();
+
+        susp.resume = function() {
+            return new Sk.builtin.str(resolution);
+        };
+
+        susp.data = {
+            type: "Sk.promise",
+            promise: x.then(function(value) {
+                resolution = value;
+                return value;
+            }, function(err) {
+                resolution = "";
+                return err;
+            })
+        };
+
+        return susp;
+    } else {
+        return new Sk.builtin.str(x);
     }
-    return Sk.misceval.callsimOrSuspend(sys["$d"]["stdin"]["readline"], sys["$d"]["stdin"]);
 };
 
 Sk.builtin.input = Sk.builtin.raw_input;
@@ -1154,54 +1159,6 @@ Sk.builtin.format = function format (value, format_spec) {
     return Sk.abstr.objectFormat(value, format_spec);
 };
 
-Sk.builtin.reversed = function reversed (seq) {
-    Sk.builtin.pyCheckArgs("reversed", arguments, 1, 1);
-
-    var special = Sk.abstr.lookupSpecial(seq, "__reversed__");
-    if (special != null) {
-        return Sk.misceval.callsim(special, seq);
-    } else {
-        if (!Sk.builtin.checkSequence(seq)) {
-            throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(seq) + "' object is not a sequence");
-        }
-
-        /**
-         * Builds an iterator that outputs the items form last to first.
-         *
-         * @constructor
-         */
-        var reverseIter = function (obj) {
-            this.idx = obj.sq$length() - 1;
-            this.myobj = obj;
-            this.getitem = Sk.abstr.lookupSpecial(obj, "__getitem__");
-            this.tp$iter = function() {
-                return this;
-            },
-            this.tp$iternext = function () {
-                var ret;
-
-                if (this.idx < 0) {
-                    return undefined;
-                }
-
-                try {
-                    ret = Sk.misceval.callsim(this.getitem, this.myobj, Sk.ffi.remapToPy(this.idx));
-                } catch (e) {
-                    if (e instanceof Sk.builtin.IndexError) {
-                        return undefined;
-                    } else {
-                        throw e;
-                    }
-                }
-                this.idx--;
-                return ret;
-            };
-        };
-
-        return new reverseIter(seq);
-    }
-};
-
 Sk.builtin.bytearray = function bytearray () {
     throw new Sk.builtin.NotImplementedError("bytearray is not yet implemented");
 };
@@ -1240,6 +1197,12 @@ Sk.builtin.property = function property () {
 };
 Sk.builtin.reload = function reload () {
     throw new Sk.builtin.NotImplementedError("reload is not yet implemented");
+};
+Sk.builtin.reversed = function reversed () {
+    throw new Sk.builtin.NotImplementedError("reversed is not yet implemented");
+};
+Sk.builtin.unichr = function unichr () {
+    throw new Sk.builtin.NotImplementedError("unichr is not yet implemented");
 };
 Sk.builtin.vars = function vars () {
     throw new Sk.builtin.NotImplementedError("vars is not yet implemented");

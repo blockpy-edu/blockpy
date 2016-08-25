@@ -94,7 +94,7 @@ Compiler.prototype.getSourceLine = function (lineno) {
     return this.source[lineno - 1];
 };
 
-Compiler.prototype.annotateSource = function (ast) {
+Compiler.prototype.annotateSource = function (ast, shouldStep) {
     var i;
     var col_offset;
     var lineno;
@@ -106,7 +106,15 @@ Compiler.prototype.annotateSource = function (ast) {
             out(" ");
         }
         out("^\n//\n");
+        
+        //Sk.debugout(JSON.stringify(ast, null, 2));
+        //Sk.debugout(ast.constructor.name);
 
+		out("\nSk.currLineNo = ",lineno, ";\nSk.currColNo = ",col_offset,";\n\n");	//	Added by RNL
+		out("\nSk.currFilename = '",this.filename,"';\n\n");	//	Added by RNL
+        if (shouldStep) {
+            out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename, '"+ast.constructor.name+"', "+JSON.stringify(ast)+");\n}\n");
+        }
         out("currLineNo = ", lineno, ";\ncurrColNo = ", col_offset, ";\n\n");
     }
 };
@@ -475,10 +483,9 @@ Compiler.prototype.ccompare = function (e) {
 
     for (i = 0; i < n; ++i) {
         rhs = this.vexpr(e.comparators[i]);
-        out("$ret = Sk.builtin.bool(Sk.misceval.richCompareBool(", cur, ",", rhs, ",'", e.ops[i].prototype._astname, "', true));");
-        this._checkSuspension(e);
-        out(fres, "=$ret;");
-        this._jumpfalse("$ret", done);
+        res = this._gr("compare", "Sk.builtin.bool(Sk.misceval.richCompareBool(", cur, ",", rhs, ",'", e.ops[i].prototype._astname, "'))");
+        out(fres, "=", res, ";");
+        this._jumpfalse(res, done);
         cur = rhs;
     }
     this._jump(done);
@@ -674,7 +681,7 @@ Compiler.prototype.vexpr = function (e, data, augvar, augsubs) {
         case Call:
             result = this.ccall(e);
             // After the function call, we've returned to this line
-            this.annotateSource(e);
+            this.annotateSource(e, false);
             return result;
         case Num:
             if (typeof e.n === "number") {
@@ -807,7 +814,7 @@ Compiler.prototype.caugassign = function (s) {
     switch (e.constructor) {
         case Attribute:
             to = this.vexpr(e.value);
-            auge = new Attribute(e.value, e.attr, AugLoad, e.lineno, e.col_offset);
+            auge = new Attribute(e.value, e.attr, AugLoad, e.lineno, e.col_offset, e.endlineno, e.col_endoffset);
             aug = this.vexpr(auge, undefined, to);
             val = this.vexpr(s.value);
             res = this._gr("inplbinopattr", "Sk.abstr.numberInplaceBinOp(", aug, ",", val, ",'", s.op.prototype._astname, "')");
@@ -817,7 +824,7 @@ Compiler.prototype.caugassign = function (s) {
             // Only compile the subscript value once
             to = this.vexpr(e.value);
             augsub = this.vslicesub(e.slice);
-            auge = new Subscript(e.value, augsub, AugLoad, e.lineno, e.col_offset);
+            auge = new Subscript(e.value, augsub, AugLoad, e.lineno, e.col_offset, e.endlineno, e.col_endoffset);
             aug = this.vexpr(auge, undefined, to, augsub);
             val = this.vexpr(s.value);
             res = this._gr("inplbinopsubscr", "Sk.abstr.numberInplaceBinOp(", aug, ",", val, ",'", s.op.prototype._astname, "')");
@@ -1083,7 +1090,7 @@ Compiler.prototype.cwhile = function (s) {
         orelse = s.orelse.length > 0 ? this.newBlock("while orelse") : null;
         body = this.newBlock("while body");
 
-        this.annotateSource(s);
+        this.annotateSource(s, true);
         this._jumpfalse(this.vexpr(s.test), orelse ? orelse : next);
         this._jump(body);
 
@@ -1162,32 +1169,42 @@ Compiler.prototype.cfor = function (s) {
 };
 
 Compiler.prototype.craise = function (s) {
-    var inst = "", exc;
-    if (s.inst) {
-        // handles: raise Error, arguments
-        inst = this.vexpr(s.inst);
-        out("throw ", this.vexpr(s.type), "(", inst, ");");
-    }
-    else if (s.type) {
-        if (s.type.func) {
-            // handles: raise Error(arguments)
-            out("throw ", this.vexpr(s.type), ";");
-        }
-        else {
-            // handles: raise Error OR raise someinstance
-            exc = this._gr("err", this.vexpr(s.type));
-            out("if(",exc," instanceof Sk.builtin.type) {",
-                "throw Sk.misceval.callsim(", exc, ");",
-                "} else if(typeof(",exc,") === 'function') {",
-                "throw ",exc,"();",
-                "} else {",
-                "throw ", exc, ";",
-                "}");
-        }
+    var inst, exc;
+    if (s && s.type && s.type.id && (s.type.id.v === "StopIteration")) {
+        // currently, we only handle StopIteration, and all it does it return
+        // undefined which is what our iterator protocol requires.
+        //
+        // totally hacky, but good enough for now.
+        out("return undefined;");
     }
     else {
-        // re-raise
-        out("throw $err;");
+        inst = "";
+        if (s.inst) {
+            // handles: raise Error, arguments
+            inst = this.vexpr(s.inst);
+            out("throw ", this.vexpr(s.type), "(", inst, ");");
+        }
+        else if (s.type) {
+            if (s.type.func) {
+                // handles: raise Error(arguments)
+                out("throw ", this.vexpr(s.type), ";");
+            }
+            else {
+                // handles: raise Error OR raise someinstance
+                exc = this._gr("err", this.vexpr(s.type));
+                out("if(",exc," instanceof Sk.builtin.type) {",
+                    "throw Sk.misceval.callsim(", exc, ");",
+                    "} else if(typeof(",exc,") === 'function') {",
+                    "throw ",exc,"();",
+                    "} else {",
+                    "throw ", exc, ";",
+                    "}");
+            }
+        }
+        else {
+            // re-raise
+            out("throw $err;");
+        }
     }
 };
 
@@ -1760,21 +1777,13 @@ Compiler.prototype.cgenexpgen = function (generators, genIndex, elt) {
     this._jump(start);
     this.setBlock(start);
 
-    this.annotateSource(elt);
-
     // load targets
-    out ("$ret = Sk.abstr.iternext(", iter,(this.u.canSuspend?", true":", false"),");");
-
-    this._checkSuspension(elt);
-
-    nexti = this._gr("next", "$ret");
+    nexti = this._gr("next", "Sk.abstr.iternext(", iter, ")");
     this._jumpundef(nexti, end); // todo; this should be handled by StopIteration
     target = this.vexpr(ge.target, nexti);
 
     n = ge.ifs.length;
     for (i = 0; i < n; ++i) {
-        this.annotateSource(ge.ifs[i]);
-
         ifres = this.vexpr(ge.ifs[i]);
         this._jumpfalse(ifres, start);
     }
@@ -1784,8 +1793,6 @@ Compiler.prototype.cgenexpgen = function (generators, genIndex, elt) {
     }
 
     if (genIndex >= generators.length) {
-        this.annotateSource(elt);
-
         velt = this.vexpr(elt);
         out("return [", skip, "/*resume*/,", velt, "/*ret*/];");
         this.setBlock(skip);
@@ -1835,7 +1842,7 @@ Compiler.prototype.cclass = function (s) {
     entryBlock = this.newBlock("class entry");
 
     this.u.prefixCode = "var " + scopename + "=(function $" + s.name.v + "$class_outer($globals,$locals,$rest){var $gbl=$globals,$loc=$locals;";
-    this.u.switchCode += "(function $" + s.name.v + "$_closure(){";
+    this.u.switchCode += "return(function $" + s.name.v + "$_closure(){";
     this.u.switchCode += "var $blk=" + entryBlock + ",$exc=[],$ret=undefined,currLineNo=undefined,currColNo=undefined;"
     if (Sk.execLimit !== null) {
         this.u.switchCode += "if (typeof Sk.execStart === 'undefined') {Sk.execStart = Date.now()}";
@@ -1843,17 +1850,15 @@ Compiler.prototype.cclass = function (s) {
     if (Sk.yieldLimit !== null && this.u.canSuspend) {
         this.u.switchCode += "if (typeof Sk.lastYield === 'undefined') {Sk.lastYield = Date.now()}";
     }
-
-    this.u.switchCode += "while(true){try{";
+    this.u.switchCode += "while(true){";
     this.u.switchCode += this.outputInterruptTest();
     this.u.switchCode += "switch($blk){";
-    this.u.suffixCode = "}}catch(err){ if (!(err instanceof Sk.builtin.BaseException)) { err = new Sk.builtin.ExternalError(err); } err.traceback.push({lineno: currLineNo, colno: currColNo, filename: '"+this.filename+"'}); if ($exc.length>0) { $err = err; $blk=$exc.pop(); continue; } else { throw err; }}}"
-    this.u.suffixCode += "}).apply(null,$rest);});";
+    this.u.suffixCode = "}break;}}).apply(null,$rest);});";
 
     this.u.private_ = s.name;
 
     this.cbody(s.body);
-    out("return;");
+    out("break;");
 
     // build class
 
@@ -1901,7 +1906,7 @@ Compiler.prototype.vstmt = function (s) {
         this.u.doesSuspend = true;
     }
 
-    this.annotateSource(s);
+    this.annotateSource(s, true);
 
     switch (s.constructor) {
         case FunctionDef:
@@ -2238,15 +2243,10 @@ Compiler.prototype.cmod = function (mod) {
 
     var entryBlock = this.newBlock("module entry");
     this.u.prefixCode = "var " + modf + "=(function($modname){";
-    this.u.varDeclsCode =
-        "var $gbl = {}, $blk=" + entryBlock +
-        ",$exc=[],$loc=$gbl,$err=undefined;$gbl.__name__=$modname;$loc.__file__=new Sk.builtins.str('" + this.filename +
-        "');var $ret=undefined,currLineNo=undefined,currColNo=undefined;";
-
+    this.u.varDeclsCode = "var $gbl = {}, $blk=" + entryBlock + ",$exc=[],$loc=$gbl,$err=undefined;$gbl.__name__=$modname,$ret=undefined,currLineNo=undefined,currColNo=undefined;";
     if (Sk.execLimit !== null) {
         this.u.varDeclsCode += "if (typeof Sk.execStart === 'undefined') {Sk.execStart = Date.now()}";
     }
-
     if (Sk.yieldLimit !== null && this.u.canSuspend) {
         this.u.varDeclsCode += "if (typeof Sk.lastYield === 'undefined') {Sk.lastYield = Date.now()}";
     }
@@ -2309,6 +2309,7 @@ Sk.compile = function (source, filename, mode, canSuspend) {
     //print("FILE:", filename);
     var parse = Sk.parse(filename, source);
     var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+    print(JSON.stringify(ast, null, 2));
 
     // compilers flags, later we can add other ones too
     var flags = {};

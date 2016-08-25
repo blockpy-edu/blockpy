@@ -1615,7 +1615,7 @@ function astForExprStmt (c, n) {
         else {
             expression = astForExpr(c, value);
         }
-        return new Assign(targets, expression, n.lineno, n.col_offset);
+        return new Assign(targets, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 }
 
@@ -1626,7 +1626,7 @@ function astForIfexpr (c, n) {
         astForExpr(c, CHILD(n, 2)),
         astForExpr(c, CHILD(n, 0)),
         astForExpr(c, CHILD(n, 4)),
-        n.lineno, n.col_offset);
+        n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 /**
@@ -1885,7 +1885,7 @@ function astForSlice (c, n) {
     if (ch.type === SYM.sliceop) {
         if (NCH(ch) === 1) {
             ch = CHILD(ch, 0);
-            step = new Name(strobj("None"), Load, ch.lineno, ch.col_offset);
+            step = new Name(strobj("None"), Load, ch.lineno, ch.col_offset, ch.endlineno, ch.col_endoffset);
         }
         else {
             ch = CHILD(ch, 1);
@@ -1913,15 +1913,15 @@ function astForAtom(c, n) {
     switch (ch.type) {
         case TOK.T_NAME:
             // All names start in Load context, but may be changed later
-            return new Name(strobj(ch.value), Load, n.lineno, n.col_offset);
+            return new Name(strobj(ch.value), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_STRING:
-            return new Str(parsestrplus(c, n), n.lineno, n.col_offset);
+            return new Str(parsestrplus(c, n), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_NUMBER:
-            return new Num(parsenumber(c, ch.value, n.lineno), n.lineno, n.col_offset);
+            return new Num(parsenumber(c, ch.value, n.lineno), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_LPAR: // various uses for parens
             ch = CHILD(n, 1);
             if (ch.type === TOK.T_RPAR) {
-                return new Tuple([], Load, n.lineno, n.col_offset);
+                return new Tuple([], Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             if (ch.type === SYM.yield_expr) {
                 return astForExpr(c, ch);
@@ -1933,11 +1933,11 @@ function astForAtom(c, n) {
         case TOK.T_LSQB: // list or listcomp
             ch = CHILD(n, 1);
             if (ch.type === TOK.T_RSQB) {
-                return new List([], Load, n.lineno, n.col_offset);
+                return new List([], Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             REQ(ch, SYM.listmaker);
             if (NCH(ch) === 1 || CHILD(ch, 1).type === TOK.T_COMMA) {
-                return new List(seqForTestlist(c, ch), Load, n.lineno, n.col_offset);
+                return new List(seqForTestlist(c, ch), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             return astForListcomp(c, ch);
             
@@ -1951,7 +1951,7 @@ function astForAtom(c, n) {
             ch = CHILD(n, 1);
             if (n.type === TOK.T_RBRACE) {
                 //it's an empty dict
-                return new Dict([], null, n.lineno, n.col_offset);
+                return new Dict([], null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             else if (NCH(ch) === 1 || (NCH(ch) !== 0 && CHILD(ch, 1).type === TOK.T_COMMA)) {
                 //it's a simple set
@@ -1961,7 +1961,7 @@ function astForAtom(c, n) {
                     var expression = astForExpr(c, CHILD(ch, i));
                     elts[i / 2] = expression;
                 }
-                return new Set(elts, n.lineno, n.col_offset);
+                return new Set(elts, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             else if (NCH(ch) !== 0 && CHILD(ch, 1).type == SYM.comp_for) {
                 //it's a set comprehension
@@ -1977,11 +1977,11 @@ function astForAtom(c, n) {
                     keys[i / 4] = astForExpr(c, CHILD(ch, i));
                     values[i / 4] = astForExpr(c, CHILD(ch, i + 2));
                 }
-                return new Dict(keys, values, n.lineno, n.col_offset);
+                return new Dict(keys, values, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
         case TOK.T_BACKQUOTE:
             //throw new Sk.builtin.SyntaxError("backquote not supported, use repr()", c.c_filename, n.lineno);
-            return new Repr(astForTestlist(c, CHILD(n, 1)), n.lineno, n.col_offset);
+            return new Repr(astForTestlist(c, CHILD(n, 1)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         default:
             goog.asserts.fail("unhandled atom", ch.type);
 
@@ -2009,11 +2009,13 @@ function astForPower (c, n) {
         tmp = astForTrailer(c, ch, e);
         tmp.lineno = e.lineno;
         tmp.col_offset = e.col_offset;
+        tmp.endlineno = e.endlineno;
+        tmp.col_endoffset = e.col_endoffset;
         e = tmp;
     }
     if (CHILD(n, NCH(n) - 1).type === SYM.factor) {
         f = astForExpr(c, CHILD(n, NCH(n) - 1));
-        e = new BinOp(e, Pow, f, n.lineno, n.col_offset);
+        e = new BinOp(e, Pow, f, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     return e;
 }
@@ -2071,17 +2073,17 @@ function astForExpr (c, n) {
                     seq[i / 2] = astForExpr(c, CHILD(n, i));
                 }
                 if (CHILD(n, 1).value === "and") {
-                    return new BoolOp(And, seq, n.lineno, n.col_offset);
+                    return new BoolOp(And, seq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 goog.asserts.assert(CHILD(n, 1).value === "or");
-                return new BoolOp(Or, seq, n.lineno, n.col_offset);
+                return new BoolOp(Or, seq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.not_test:
                 if (NCH(n) === 1) {
                     n = CHILD(n, 0);
                     continue LOOP;
                 }
                 else {
-                    return new UnaryOp(Not, astForExpr(c, CHILD(n, 1)), n.lineno, n.col_offset);
+                    return new UnaryOp(Not, astForExpr(c, CHILD(n, 1)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 break;
             case SYM.comparison:
@@ -2096,7 +2098,7 @@ function astForExpr (c, n) {
                         ops[(i - 1) / 2] = astForCompOp(c, CHILD(n, i));
                         cmps[(i - 1) / 2] = astForExpr(c, CHILD(n, i + 1));
                     }
-                    return new Compare(astForExpr(c, CHILD(n, 0)), ops, cmps, n.lineno, n.col_offset);
+                    return new Compare(astForExpr(c, CHILD(n, 0)), ops, cmps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 break;
             case SYM.expr:
@@ -2115,7 +2117,7 @@ function astForExpr (c, n) {
                 if (NCH(n) === 2) {
                     exp = astForTestlist(c, CHILD(n, 1));
                 }
-                return new Yield(exp, n.lineno, n.col_offset);
+                return new Yield(exp, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.factor:
                 if (NCH(n) === 1) {
                     n = CHILD(n, 0);
@@ -2150,10 +2152,10 @@ function astForPrintStmt (c, n) {
         seq[j] = astForExpr(c, CHILD(n, i));
     }
     nl = (CHILD(n, NCH(n) - 1)).type === TOK.T_COMMA ? false : true;
-    return new Print(dest, seq, nl, n.lineno, n.col_offset);
+    return new Print(dest, seq, nl, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
-function astForStmt (c, n) {
+function astForStmt(c, n) {
     var ch;
     if (n.type === SYM.stmt) {
         goog.asserts.assert(NCH(n) === 1);
@@ -2178,7 +2180,7 @@ function astForStmt (c, n) {
             case SYM.del_stmt:
                 return astForDelStmt(c, n);
             case SYM.pass_stmt:
-                return new Pass(n.lineno, n.col_offset);
+                return new Pass(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.flow_stmt:
                 return astForFlowStmt(c, n);
             case SYM.import_stmt:
@@ -2190,7 +2192,7 @@ function astForStmt (c, n) {
             case SYM.assert_stmt:
                 return astForAssertStmt(c, n);
             case SYM.debugger_stmt:
-                return new Debugger_(n.lineno, n.col_offset);
+                return new Debugger_(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             default:
                 goog.asserts.fail("unhandled small_stmt");
         }

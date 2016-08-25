@@ -14,6 +14,11 @@ Sk.builtin.bool.true$ = /** @type {Sk.builtin.bool} */ (Object.create(Sk.builtin
  */
 Sk.builtin.bool.false$ = /** @type {Sk.builtin.bool} */ (Object.create(Sk.builtin.bool.prototype, {v: {value: 0, enumerable: true}}));
 
+// Manually call super constructors on boolean singletons
+Sk.abstr.setUpObject(Sk.builtin.bool.true$);
+Sk.abstr.setUpObject(Sk.builtin.bool.false$);
+
+
 /* Constants used for kwargs */
 
 // Sk.builtin.int_
@@ -29,4 +34,5 @@ Sk.builtin.lng.$defaults = [ new Sk.builtin.int_(10) ];
 // Sk.builtin.sorted
 Sk.builtin.sorted.co_varnames = ["cmp", "key", "reverse"];
 Sk.builtin.sorted.co_numargs = 4;
-Sk.builtin.sorted.$defaults = [Sk.builtin.none.none$, Sk.builtin.none.none$, Sk.builtin.bool.false$];
+Sk.builtin.sorted.$defaults = [Sk.builtin.none.none$, Sk.builtin.none.none$, false];
+
