@@ -476,6 +476,13 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
     this.generic_visit(node);
 }
 
+AbstractInterpreter.prototype.visit_If = function(node) {
+    this.inside_if = true;
+    console.log(node);
+    //this.visit(node);
+    this.inside_if = false;
+}
+
 AbstractInterpreter.prototype.visit_For = function(node) {
     this.visit(node.iter);
     this.addFrame();
