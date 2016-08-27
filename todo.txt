@@ -95,8 +95,6 @@ Using color heatmaps to teach students about iteration and decision- can we demo
 
 Color code (site creations) and (site overwrites)
 
-http://moralmachine.mit.edu/results/-56948692
-
 For testing:
 airlines.get_all(testing=True)
 
