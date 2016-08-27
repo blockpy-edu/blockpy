@@ -101,6 +101,7 @@ AbstractInterpreter.prototype.analyze = function() {
     this.rootFrame = this.newFrame(null);
     this.currentFrame = this.rootFrame;
     this.report = this.newReport();
+    this.ifStack = [];
     
     for (var name in this.BUILTINS) {
         this.addVariable(name);
@@ -476,10 +477,26 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
     this.generic_visit(node);
 }
 
+var ifStackId = 0;
 AbstractInterpreter.prototype.visit_If = function(node) {
-    this.inside_if = true;
-    console.log(node);
-    //this.visit(node);
+    //this.ifStack.push(ifStackId);
+    var me = ifStackId;
+    console.log(node.lineno, "Entered IF", me)
+    ifStackId += 1;
+    this.visit(node.test);
+    for (var i = 0, len = node.body.length; i < len; i++) {
+        this.visit(node.body[i]);
+    }
+    //var ifs = this.ifStack.pop();
+    console.log(node.lineno, "Left IF", me, "Exploring the", node.orelse.length, "elsebodies")
+    for (var i = 0, len = node.orelse.length; i < len; i++) {
+        //this.ifStack.push(ifStackId);
+        console.log(node.lineno, "Entered Else", me)
+        //ifStackId += 1;
+        this.visit(node.orelse[i]);
+        //var ifs = this.ifStack.pop();
+        console.log(node.lineno, "Left Else",  me)
+    }
     this.inside_if = false;
 }
 
@@ -525,13 +542,13 @@ AbstractInterpreter.prototype.visit_For = function(node) {
 }
 
 
-/*
+
 var filename = '__main__.py';
-var python_source = 'sum([1,2])/len([4,5,])\ntotal=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
+//var python_source = 'sum([1,2])/len([4,5,])\ntotal=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
+var python_source = 'if 5:\n    a = 0\n    b = 0\n    c = 0\nelif "yes":\n    a = 3\n    b = 3\nelse:\n    a = 5\n    if True:\n        b = 7\n    else:\n        b = 3\nprint(a)\nprint(b)';
 var analyzer = new AbstractInterpreter(python_source);
 analyzer.analyze()
 console.log(python_source);
-console.log(analyzer.ast);
-console.log(analyzer.rootFrame);
-console.log(analyzer.report);
-*/
+console.log("AST:", analyzer.ast);
+console.log("Frames:", analyzer.rootFrame);
+console.log("Report:",analyzer.report);
