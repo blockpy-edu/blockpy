@@ -39,28 +39,32 @@ You'll need to build Skulpt and Blockly. Both of these depend on the Closure Com
     > wget https://github.com/google/closure-library/zipball/master -O closure.zip
     > unzip closure.zip
     
-And add the relevant subtrees:
+CD into the new blockpy directory
 
-http://pastebin.com/raw/QWpJjgU3
-   
-You have to update your blockly and skulpt to our forks.
+    > cd blockpy/
 
-    > git subtree pull --prefix=skulpt --squash skulpt master
-    > git subtree pull --prefix=blockly --squash blockly master
-    
-That's from memory - if anyone can submit a PR or correction for this, that'd be amazing. The crucial thing is that you want to make sure that you have a folder named `closure` and a folder named `third-party` one layer below the top folder, and that you don't have multiple `closure-library` folders. This may be much easier to do by hand.
+And add the relevant subtree information to your .git/config:
+
+    > vi .git/config
+
+Replace the contents of that file with the information found here: http://pastebin.com/raw/QWpJjgU3 (TODO: show the actual commands used to set this)
 
 Next, you'll need to build Blockly:
 
+    > cp blockly/msg/en.js en.js
     > cd blockly
     > python build.py
     > cd ..
+    > mv en.js blockly/msg/en.js
+    
 
 And then you'll build Skulpt:
 
     > cd skulpt
     > python skulpt.py dist
     > cd ..
+    
+If you are on windows, you may encounter the message "No gzip executable", you can safely ignore this.
     
 And now you should be able to try out the example file!
 
