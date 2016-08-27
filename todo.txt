@@ -95,19 +95,7 @@ Using color heatmaps to teach students about iteration and decision- can we demo
 
 Color code (site creations) and (site overwrites)
 
-songbird25
-
-
 http://moralmachine.mit.edu/results/-56948692
-
-
-What is everyone's thoughts on the value of different SIGCSE submission types? Obviously, papers are the best thing to have accepted (full publication in a top-tier CS Ed conference), and the Student Research Competition is great if you're a student (pay for travel, get some attention to your work, possibility to win). But what about the rest? Is it worth investing time in putting together a BoF, Special Session, or Lightning Talk? What makes it worthwhile?
-
-Paper, Panel, Special Session, Workshop
-Student Research Competition
-Birds of a Feather, Demo, Lightning Talk, Poster
-
-
 
 For testing:
 airlines.get_all(testing=True)
