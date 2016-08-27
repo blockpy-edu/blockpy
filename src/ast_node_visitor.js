@@ -82,11 +82,11 @@ NodeVisitor.prototype.generic_visit = function(node) {
         if (Array === value.constructor) {
             for (var j = 0; j < value.length; j += 1) {
                 var subvalue = value[j];
-                if ("_astname" in subvalue) {
+                if (subvalue instanceof Object && "_astname" in subvalue) {
                     this.visit(subvalue);
                 }
             }
-        } else if ("_astname" in value) {
+        } else if (value instanceof Object && "_astname" in value) {
             this.visit(value);
         }
     }

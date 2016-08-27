@@ -1303,6 +1303,8 @@ PythonToBlocks.prototype.Name = function(node)
             return block("logic_boolean", node.lineno, {"BOOL": "TRUE"});
         case "False":
             return block("logic_boolean", node.lineno, {"BOOL": "FALSE"});
+        case "None":
+            return block("logic_null", node.lineno);
         case "___":
             return null;
         default:

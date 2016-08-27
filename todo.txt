@@ -18,12 +18,7 @@ Call friend
     Identifies students in the cohort who are on the same problem
     Signals to the TA that the student has an issue
     Emails a question to the TA
-Dramatically improve weather et al API naming conventions
-    Fix the crime dataset
 Default provide if, if/else, if/elif/else blocks
-Static analysis
-Upload images so they can be reported to the user
-    Or rather, map programs to stored block images; generate images on demand, or via some kind of an API? Can we generate images on the server side?
 Popup question dialog
     Fill in the blank
     Multiple choice
@@ -35,7 +30,6 @@ If then else - logic for instructor API
     Allowed to write python snippets
     Should the whole thing translate to python?
     
-Put examples on the left of the canvas, to make suggestions as you type.
 Input block
 Turn off name wrangler? It might be better to let them make mistakes and then point them out.
 Highlight parser error line in the code block!
@@ -53,17 +47,6 @@ Slowmode - when you run, it executes the code but "plays" its results slightly s
 Multiple levels of blocks (Block sets)
 
 URL shortened forms
-
-CT-server
-    Datasets
-    Blockpy
-    Maze
-    
-    
-Quick look - this seems really nice! One question that this raises in my mind is the equivalent of NetLogo's "info" tab - the description of the data, what the data fields are, what questions could be asked.  It seems very labor intensive to create this kind of information (and some expertise as well in some cases), but maybe this is was a highly curated data set needs?
-
-As a tactical matter, we have to be in a position to "guide" students toward "interesting" questions to convey the idea that this is not just random graphing of data - but that something can be learned from it.
-
 
 NameError
     Have they defined the variable after use? (differentiate between an update and an initialization)
