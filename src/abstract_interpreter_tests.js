@@ -23,6 +23,32 @@
         ['a = 0\nprint(a)', ['Undefined variables'], []],
         ['a = 0\na = 5', [], ['Overwritten variables']],
         ['a = 0\nb = 5', ['Overwritten variables'], ['Unread variables']],
+        // Update without read
+        ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
+        // Update and read
+        ['a = 0\na+= 1\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to empty list
+        ['a = []\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to non-empty list
+        ['a = [1]\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to undefined
+        ['a.append(1)\nprint(a)', ['Unread variables'], ['Undefined variables']],
+        // Append to unread
+        ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
+        // Append to number
+        ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
+        // Iterate through non-existing list
+        ['for x in y:\n\tpass', ['Unread variables'], ['Undefined variables']],
+        // Iterate through list
+        ['y = [1,2,3]\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], []],
+        // Iterate through empty list
+        ['y = []\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Empty iterations']],
+        // Iterate through number
+        ['y = 5\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Non-list iterations']],
+        // Created a new list but didn't read it
+        ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
+        // Created a new list but didn't initialize it
+        ['old = [1,2,3]\nfor x in old:\n\tnew.append(x)\nprint(new)', [], ['Undefined variables']],
         // Type change
         ['a = 0\nprint(a)\na="T"\nprint(a)', [], ['Type changes']],
         // Defined in IF root branch but not the other
