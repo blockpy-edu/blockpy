@@ -232,7 +232,7 @@ AbstractInterpreter.prototype.postProcess = function() {
                         }
                         //console.log(ifResult, elseResult, result)
                     } else {
-                        if (node["method"] == "set") {
+                        if (node["method"] == "set" || node["method"] == "set_iterate") {
                             if (previousType == null) {
                                 previousType = node.type;
                             } else {
@@ -249,15 +249,29 @@ AbstractInterpreter.prototype.postProcess = function() {
                                 }
                             } else {
                                 result["was set"] = "yes"
-                                result["was read"] = "no"
+                                if (node["method"] == "set") {
+                                    result["was read"] = "no"
+                                } else {
+                                    result["was read"] = "yes"
+                                }
                             }
-                        } else if (node["method"] == "read") {
+                        } else if (node["method"] == "read" || node["method"] == "iterate") {
                             if (result["was set"] == "no") {
                                 report['Undefined variables'].push({"name": name, "position": node.position});
                             } else if (result["was set"] == "maybe") {
                                 report['Possibly undefined variables'].push({"name": name, "position": node.position});
                             }
                             result["was read"] = "yes"
+                        } else if (node["method"] == "update" || node["method"] == "append") {
+                            if (node["method"] == "append" && previousType != null && previousType.type != "List") {
+                                report["Append to non-list"].push({"name": name, "position": node.position, "type": node.type})
+                            }
+                            if (result["was set"] == "no") {
+                                report['Undefined variables'].push({"name": name, "position": node.position});
+                            } else if (result["was set"] == "maybe") {
+                                report['Possibly undefined variables'].push({"name": name, "position": node.position});
+                            }
+                            result["was set"] = "yes"
                         }
                     }
                 }
@@ -316,80 +330,6 @@ AbstractInterpreter.prototype.isTypeEmptyList = function(name) {
 AbstractInterpreter.prototype.isTypeList = function(name) {
     var type = this.getType(name);
     return (type !== null && type.type === "List");
-}
-
-AbstractInterpreter.prototype.checkUnreadVariables = function(frame) {
-    //TODO: Make it check EVERYWHERE before deciding to report unread
-    for (var name in frame.variables) {
-        if (!(name in this.BUILTINS)) {
-            var is_read = false
-            for (var i = 0, len = frame.variables[name].behavior.length;
-                 i < len; i++) {
-                is_read = is_read || frame.variables[name].behavior[i].mode == "read";
-            }
-            if (!is_read) {
-                var typeInfo = this.getType(name);
-                //console.log(frame.variables[name].behavior[0])
-                /*this.report["Unread variables"].push({
-                    'name': name, 
-                    'type': typeInfo == null ? null : typeInfo.type,
-                    'line': frame.variables[name].behavior[0].location
-                });*/
-            }
-        }
-    }
-    for (var i = 0, len = frame.children.length; i < len; i++) {
-        this.checkUnreadVariables(frame.children[i])
-    }
-}
-
-AbstractInterpreter.prototype.checkUnusedSingular = function(frame) {
-    for (var i = 0, len = frame.singulars.length; i < len; i++) {
-        if (!(this.walkFramesForUse(frame, frame.singulars[i], "reads"))) {
-            this.report["Unused iteration variable"].push(frame.singulars[i])
-        }
-    }
-    for (var i = 0, len = frame.children.length; i < len; i++) {
-        this.checkUnusedSingular(frame.children[i])
-    }
-}
-AbstractInterpreter.prototype.checkUsedPlural = function(frame) {
-    for (var i = 0, len = frame.plurals.length; i < len; i++) {
-        if (this.walkFramesForUse(frame, frame.plurals[i], "both")) {
-            this.report["Used iteration list"].push(frame.plurals[i])
-        }
-    }
-    for (var i = 0, len = frame.children.length; i < len; i++) {
-        this.checkUsedPlural(frame.children[i])
-    }
-}
-AbstractInterpreter.prototype.checkSingularIsPlural = function(frame) {
-    for (var i = 0, len = frame.plurals.length; i < len; i++) {
-        for (var j = 0, len = frame.singulars.length; j < len; j++) {
-            if (frame.plurals[i] == frame.singulars[j]) {
-                this.report["Iteration variable is iteration list"].push(frame.singulars[j]);
-            }
-        }
-    }
-    for (var i = 0, len = frame.children.length; i < len; i++) {
-        this.checkSingularIsPlural(frame.children[i])
-    }
-}
-AbstractInterpreter.prototype.walkFramesForUse = function(frame, name, type) {
-    if (type === undefined) {
-        type = "both";
-    }
-    if ((type == "both" || type == "reads") && arrayContains(name, frame.reads)) {
-        return true;
-    }
-    if ((type == "both" || type == "writes") && arrayContains(name, frame.writes)) {
-        return true;
-    }
-    var result = false;
-    for (var i = 0, len = frame.children.length; i < len; i++) {
-        result = result || this.walkFramesForUse(frame.children[i], name, type);
-    }
-    return result;
 }
 
 AbstractInterpreter.prototype.visit = function(node) {
@@ -495,7 +435,6 @@ AbstractInterpreter.prototype.visit_AugAssign = function(node) {
 }
 
 AbstractInterpreter.prototype.visit_Call = function(node) {
-    this.generic_visit(node);
     if (node.func._astname == "Attribute") {
         if (node.func.attr.v == "append") {
             if (node.args.length >= 1) {
@@ -503,9 +442,25 @@ AbstractInterpreter.prototype.visit_Call = function(node) {
                 if (node.func.value._astname == "Name") {
                     var target = node.func.value.id.v;
                     this.appendVariable(target, valueType, this.getLocation(node));
+                    this.visitList(node.keywords);
+                    this.visitList(node.args);
+                    if (node.kwargs != null) {
+                        this.visit(node.kwargs);
+                    }
+                    if (node.starargs != null) {
+                        this.visit(node.starargs);
+                    }
+                } else {
+                    this.generic_visit(node);
                 }
+            } else {
+                this.generic_visit(node);
             }
+        } else {
+            this.generic_visit(node);
         }
+    } else {
+        this.generic_visit(node);
     }
 }
 AbstractInterpreter.prototype.visit_Assign = function(node) {
