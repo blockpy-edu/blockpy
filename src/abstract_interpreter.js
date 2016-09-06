@@ -100,6 +100,7 @@ AbstractInterpreter.MODULES = {
 AbstractInterpreter.prototype.newReport = function(parentFrame) {
     return {
             "error": false,
+            "Unconnected blocks": [],
             "Unread variables": [],
             "Undefined variables": [],
             "Possibly undefined variables": [],
@@ -172,6 +173,9 @@ AbstractInterpreter.prototype.postProcess = function() {
     for (var name in this.variables) {
         if (!(name in this.BUILTINS)) {
             var trace = this.variables[name];
+            if (name == "___") {
+                this.report["Unconnected blocks"].push({"position": trace[0].position})
+            }
             /*console.log(name, trace.map(function(e, i) { 
                 return e.method +(e.type == null ? "" : "["+e.type.type+"]")
                                 +("_"+e.parentName);
@@ -236,7 +240,7 @@ AbstractInterpreter.prototype.postProcess = function() {
                             if (previousType == null) {
                                 previousType = node.type;
                             } else {
-                                if (testTypeEquality(previousType, node.type)) {
+                                if (node.type != null && testTypeEquality(previousType, node.type)) {
                                     previousType = node.type;
                                 } else {
                                     report['Type changes'].push({"name": name, "position": node.position});
@@ -385,7 +389,7 @@ AbstractInterpreter.prototype.typecheck = function(value) {
             if (left === null || right === null) {
                 return null;
             } else if (left.type != right.type) {
-                this.report["Incompatible types"].push(value.lineno);
+                this.report["Incompatible types"].push({"left": left, "right": right, "operation": value.op.name, "position": this.getLocation(value)});
             } else {
                 return left;
             }
@@ -402,14 +406,14 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
         } else if (attribute.attr.v in result) {
             return result[attribute.attr.v];
         } else {
-            this.report["Unknown functions"].push(attribute.attr.v);
+            this.report["Unknown functions"].push({"name": attribute.attr.v, "position": this.getLocation(attribute)});
             return null;
         }
     } else if (attribute._astname == "Name") {
         if (attribute.id.v in AbstractInterpreter.MODULES) {
             return AbstractInterpreter.MODULES[attribute.id.v];
         } else {
-            this.report["Unknown functions"].push(attribute.attr);
+            this.report["Unknown functions"].push({"name": attribute.attr, "position": this.getLocation(attribute)});
             return null;
         }
     }
@@ -536,19 +540,21 @@ AbstractInterpreter.prototype.visit_If = function(node) {
 AbstractInterpreter.prototype.visit_For = function(node) {
     this.loopStackId += 1;
     // Handle the iteration list
-    var walked = this.walk(node.iter);
+    var walked = this.walk(node.iter),
+        iterationList = null;
     for (var i = 0, len = walked.length; i < len; i++) {
         var child = walked[i];
         if (child._astname === "Name" && child.ctx.name === "Load") {
+            iterationList = child.id.v;
             if (this.isTypeEmptyList(child.id.v)) {
-                this.report["Empty iterations"].push(child.id.v);
+                this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
             }
             if (!(this.isTypeList(child.id.v))) {
-                this.report["Non-list iterations"].push(child.id.v);
+                this.report["Non-list iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
             }
             this.iterateVariable(child.id.v, this.getLocation(node));
         } else if (child._astname === "List" && child.elts.length === 0) {
-            this.report["Empty iterations"].push(child.lineno);
+            this.report["Empty iterations"].push({"name": child.lineno, "position": this.getLocation(node)});
         } else {
             this.visit(child);
         }
@@ -561,13 +567,19 @@ AbstractInterpreter.prototype.visit_For = function(node) {
     
     // Handle the iteration variable
     walked = this.walk(node.target);
+    var iterationVariable = null;
     for (var i = 0, len = walked.length; i < len; i++) {
         var child = walked[i];
         if (child._astname === "Name" && child.ctx.name === "Store") {
+            iterationVariable = node.target.id.v;
             this.setIterVariable(node.target.id.v, iterSubtype, this.getLocation(node));
         } else {
             this.visit(child);
         }
+    }
+    
+    if (iterationVariable && iterationList && iterationList == iterationVariable) {
+        this.report["Iteration variable is iteration list"].push({"name": iterationList, "position": this.getLocation(node)});
     }
 
     // Handle the bodies

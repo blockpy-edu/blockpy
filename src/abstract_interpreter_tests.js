@@ -23,6 +23,11 @@
         ['a = 0\nprint(a)', ['Undefined variables'], []],
         ['a = 0\na = 5', [], ['Overwritten variables']],
         ['a = 0\nb = 5', ['Overwritten variables'], ['Unread variables']],
+        // Unconnected blocks
+        ['a = ___', [], ['Unconnected blocks']],
+        ['print(___)', [], ['Unconnected blocks']],
+        // Incompatible types
+        ['a = 5 + "ERROR"', [], ['Incompatible types']],
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
@@ -45,6 +50,8 @@
         ['y = []\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Empty iterations']],
         // Iterate through number
         ['y = 5\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Non-list iterations']],
+        // Iterate over iteration variable
+        ['y = [1,2,3]\nfor y in y:\n\tpass', [], ['Iteration variable is iteration list']],
         // Created a new list but didn't read it
         ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
         // Created a new list but didn't initialize it
