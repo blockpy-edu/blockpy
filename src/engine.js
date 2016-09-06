@@ -102,29 +102,29 @@ BlockPyEngine.prototype.analyze = function() {
     var analyzer = new AbstractInterpreter(code);
     this.main.model.execution.ast = analyzer.ast;
     
-    result = analyzer.analyze();
+    report = analyzer.report;
     // Syntax error
-    if (result !== true) {
-        this.main.reportError('editor', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
+    if (report.error !== false) {
+        this.main.reportError('editor', report.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+', where it says:<br><code>'+report.error.args.v[3][2]+'</code>', report.error.args.v[2]);
         return false;
     }
-    
-    var report = analyzer.report;
-    // Semantic error
-    //console.log(report);
-    
+        
     // TODO: variables defined AFTER their use
     if (report["Undefined variables"].length >= 1) {
         var variable = report["Undefined variables"][0];
-        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.line.split("|")[0]+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.line.split("|")[0])
+        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.position.line)
+        return false;
+    } else if (report["Possibly undefined variables"].length >= 1) {
+        var variable = report["Possibly undefined variables"][0];
+        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
         return false;
     } else if (report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was created on line "+variable.line.split("|")[0]+", but was never used.", variable.line.split("|")[0])
+        feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was created, but was never used.", null)
         return false;
     } else if (report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
-        feedback.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set on line "+variable.first_location.split("|")[0]+", but before it could be read it was changed on line "+variable.last_location.split("|")[0]+". It is unnecessary to change an existing variable's value without reading it first.", variable.last_location.split("|")[0])
+        feedback.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set, but before it could be read it was changed on line "+variable.position.line+". It is unnecessary to change an existing variable's value without reading it first.", variable.position.line)
         return false;
     }
     

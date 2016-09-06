@@ -87,7 +87,9 @@ BlockPyFeedback.prototype.semanticError = function(name, message, line) {
     this.original.hide();
     this.body.html(message);
     this.main.model.status.error("semantic");
-    this.main.components.editor.highlightError(line-1);
+    if (line !== null) {
+        this.main.components.editor.highlightError(line-1);
+    }
     this.main.components.printer.print("Execution stopped - there was an error!");
 }
 
