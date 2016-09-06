@@ -1,0 +1,133 @@
+I have a sequence of items with a label 
+
+I need to process these items in a particular recursive manner:
+
+
+O(V) + O(B)
+V = number of variables
+B = number of branches
+
+
+[
+    S[b/i], R, R, S,
+    {
+        "if": [R, S],
+        "else": [S]
+    },
+    R
+]
+
+x = 0
+if 1:
+    if 2:
+        pass
+    else:
+        x = 1
+        if 3:
+            pass
+        else:
+            x = 2
+            x = 3
+        x = 4
+    if 4:
+        x = 5
+else:
+    x = 6
+
+A_null, B_2e, C_3e, D_3e, E_2e, F4_i, G_1e
+
+null: [
+    1: 
+        "if": [
+            2: 
+                "if": []
+                "else": [
+                    3:
+                        "if": []
+                        "else": []
+                ]
+            4:
+                "if": []
+                "else": []
+        ]
+        "else":
+]
+
+
+
+SEQUENCE = []
+SKELETON = ...
+TRACE = ...
+A node is
+    null
+    dictionary with "if" and "else"
+(function buildTraceTree(node) {
+    var sequence = [];
+    while (TRACE.length && node.id == TRACE[0].id) {
+        sequence.push(TRACE.unshift());
+    }
+    for child in node {
+        buildTraceTree(child);
+        sequence.push({
+            "if": buildTraceTree(child["if"]),
+            "else": buildTraceTree(child["else"])
+        })
+        // Equality in this case means what?
+        while (TRACE.length && node.name == TRACE[0].location) {
+            sequence.push(TRACE.unshift());
+        }
+    }
+    return sequence;
+})(SKELETON[null])
+
+null:
+    1i
+        2i
+        2e
+            3i
+            3e
+        4i
+        4e
+    1e
+
+
+Make the tree skeleton
+For each Behavior:
+    pop it out of the list
+    Put it in the appropriate place in the tree skeleton
+    
+Recursively walk through the tree skeleton: (sequence, previous)
+(function walkSkeleton(sequence, previous) {
+    if (previous == null) {
+        result = copy(previous)
+    } else {
+        result = {"was set": "no", "was read": "no", "was overwritten": "no"}
+    }
+    foreach element of the current level:
+        if (element is dictionary) {
+            var ifbranch = recurse(element["if"], result)
+            var elsebranch = recurse(element["else"], result)
+            for setting in ["was set", "was read", "was overwritten"]:
+                if (ifbranch[setting] == "yes" && elsebranch[setting] == "yes")
+                    result[setting] = "yes"
+                else if (ifbranch[setting] == "no" && elsebranch[setting] == "no")
+                    result[setting] = "no"
+                else
+                    result[setting] = "maybe"
+        } else {
+            if (element["method"] == "set")
+                if (previous["was set"] == "yes" && previous["was read"] == "no")
+                    THROW OVERWRITTEN ERROR
+                else
+                    result["was set"] = "yes"
+                    result["was read"] = "no"
+            else if (element["method"] == "read")
+                if (previous["was set"] != "yes") {
+                    THROW UNDEFINED ERROR
+                }
+                result["was read"] = "yes"
+        }
+    return result
+result = recurse(root, null)
+if result["was read"] == "no"
+    THROW UNREAD ERROR
