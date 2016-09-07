@@ -23,6 +23,8 @@
         ['a = 0\nprint(a)', ['Undefined variables'], []],
         ['a = 0\na = 5', [], ['Overwritten variables']],
         ['a = 0\nb = 5', ['Overwritten variables'], ['Unread variables']],
+        // Iterating over the result of a builtin
+        ['x = xrange(100)\nprint(x)', ['Non-list iterations'], []],
         // Unconnected blocks
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
