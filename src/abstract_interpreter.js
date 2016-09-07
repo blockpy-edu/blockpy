@@ -382,7 +382,8 @@ AbstractInterpreter.prototype.typecheck = function(value) {
                 return {"type": "List", "empty": false, "subtypes": this.typecheck(value.elts[0])};
             }
         case "Call":
-            return this.walkAttributeChain(value.func);
+            var funcType = this.walkAttributeChain(value.func);
+            return funcType;
         case "BinOp":
             var left = this.typecheck(value.left),
                 right = this.typecheck(value.right);
@@ -412,6 +413,8 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
     } else if (attribute._astname == "Name") {
         if (attribute.id.v in AbstractInterpreter.MODULES) {
             return AbstractInterpreter.MODULES[attribute.id.v];
+        } else if (attribute.id.v in this.BUILTINS) {
+            return this.BUILTINS[attribute.id.v];
         } else {
             this.report["Unknown functions"].push({"name": attribute.attr, "position": this.getLocation(attribute)});
             return null;
@@ -464,6 +467,7 @@ AbstractInterpreter.prototype.visit_Call = function(node) {
             this.generic_visit(node);
         }
     } else {
+        console.log(node);
         this.generic_visit(node);
     }
 }
