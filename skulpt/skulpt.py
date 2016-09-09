@@ -872,7 +872,7 @@ def run_in_browser(fn, options):
 
     with open('support/run_template.html') as tpfile:
         page = tpfile.read()
-        page = page % dict(code=prog,scripts=scripts)
+        page = page % dict(code=prog,scripts=scripts, root='', debug_mode='true')
 
     with open("{0}/run.html".format(RUN_DIR),"w") as htmlfile:
         htmlfile.write(page)

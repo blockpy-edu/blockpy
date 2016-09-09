@@ -495,6 +495,7 @@ BlockPyEditor.CATEGORY_MAP = {
                     //'<block type="text_print_multiple"></block>'+
                     '<block type="plot_line"></block>'+
                     '<block type="plot_scatter"></block>'+
+                    '<block type="plot_hist"></block>'+
                     '<block type="plot_show"></block>'+
                     '<block type="plot_title"></block>'+
                     '<block type="plot_xlabel"></block>'+

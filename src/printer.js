@@ -23,10 +23,11 @@ BlockPyPrinter.prototype.getConfiguration = function() {
     var printer = this;
     return {
         'printHtml': function(html, value) { printer.printHtml(html, value);},
-        'width': this.tag.width(),
-        'png_mode': true,
-        'height': this.tag.height(),
-        'console': this.tag[0]
+        'width': this.tag.width()-40,
+        'pngMode': true,
+        'skipDrawing': false,
+        'height': this.tag.height()+40,
+        'container': this.tag[0]
     }
 }
 
