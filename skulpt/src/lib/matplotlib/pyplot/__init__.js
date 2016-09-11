@@ -184,11 +184,11 @@ var $builtinmodule = function(name) {
             chart.xAxis = d3.svg.axis()
                                 .scale(chart.xScale)
                                 .orient("bottom");
-            var bins = 10;
+            var bins = plots[0]['bins'];
             var tempScale = d3.scale.linear()
                                     .domain([0, bins])
                                     .range([extents['xMin'], extents['xMax']]);
-            var tickArray = d3.range(bins)
+            var tickArray = d3.range(bins+1)
                               .map(tempScale).map(function(e) {
                                 return e;
                               });
@@ -408,6 +408,11 @@ var $builtinmodule = function(name) {
         kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
         kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
         
+        var bins = 10;
+        if ("bins" in kwargs) {
+            bins = kwargs["bins"];
+        }
+        
         // Keep a backup of the arguments for checker
         mod.values.push(args);
         
@@ -446,6 +451,7 @@ var $builtinmodule = function(name) {
         plots.push({
             "data": data, 
             "type": 'hist',
+            "bins": bins,
             'style': {
                 'linestyle': linestyle,
                 'marker': marker,
