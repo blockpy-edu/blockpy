@@ -17,6 +17,7 @@ BlockPyFeedback.prototype.buildTraceTable = function() {
     var execution = this.main.model.execution;
     execution.show_trace(true);
     execution.trace_step(execution.last_step());
+    main.components.server.logEvent('editor', 'trace')
 }
 
 BlockPyFeedback.prototype.error = function(html) {
@@ -44,6 +45,7 @@ BlockPyFeedback.prototype.clearEditorErrors = function() {
 BlockPyFeedback.prototype.success = function() {
     this.tag.html("<span class='label label-success'><span class='glyphicon glyphicon-ok'></span> Success!</span>");
     this.tag.removeClass("alert-warning");
+    this.main.components.server.logEvent('feedback', "Success");
 }
 
 BlockPyFeedback.prototype.editorError = function(original, message, line) {
@@ -54,6 +56,7 @@ BlockPyFeedback.prototype.editorError = function(original, message, line) {
     this.main.model.status.error("editor");
     this.main.components.editor.highlightError(line-1);
     this.main.components.printer.print("Editor error - could not make blocks!");
+    this.main.components.server.logEvent('feedback', "Editor Error", original+"\n|\n"+message);
 }
 
 BlockPyFeedback.prototype.complete = function() {
@@ -62,6 +65,7 @@ BlockPyFeedback.prototype.complete = function() {
     this.body.html("Great work!");
     this.main.model.status.error("complete");
     this.main.components.editor.unhighlightLines();
+    this.main.components.server.logEvent('feedback', "Success");
 }
 
 BlockPyFeedback.prototype.noErrors = function() {
@@ -70,6 +74,7 @@ BlockPyFeedback.prototype.noErrors = function() {
     this.body.html("No errors reported. View your output on the left.");
     this.main.model.status.error("no errors");
     this.main.components.editor.unhighlightLines();
+    this.main.components.server.logEvent('feedback', "No Errors", '');
 }
 
 BlockPyFeedback.prototype.syntaxError = function(original, message, line) {
@@ -80,6 +85,7 @@ BlockPyFeedback.prototype.syntaxError = function(original, message, line) {
     this.main.model.status.error("syntax");
     this.main.components.editor.highlightError(line-1);
     this.main.components.printer.print("Execution stopped - there was an error!");
+    this.main.components.server.logEvent('feedback', "Syntax Error", original+"\n|\n"+message);
 }
 
 BlockPyFeedback.prototype.semanticError = function(name, message, line) {
@@ -91,6 +97,7 @@ BlockPyFeedback.prototype.semanticError = function(name, message, line) {
         this.main.components.editor.highlightError(line-1);
     }
     this.main.components.printer.print("Execution stopped - there was an error!");
+    this.main.components.server.logEvent('feedback', "Semantic Error", name+"\n|\n"+message);
 }
 
 BlockPyFeedback.prototype.internalError = function(original, name, message) {
@@ -100,6 +107,7 @@ BlockPyFeedback.prototype.internalError = function(original, name, message) {
     this.body.html(message);
     this.main.model.status.error("internal");
     this.main.components.printer.print("Internal error! Please show this to an instructor!");
+    this.main.components.server.logEvent('feedback', "Internal Error", name+"\n|\n"+original+"\n|\n"+message);
 }
 
 BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
@@ -110,6 +118,7 @@ BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
     if (line !== undefined) {
         this.main.components.editor.highlightError(line-1);
     }
+    this.main.components.server.logEvent('feedback', "Instructor Feedback", name+"\n|\n"+"\n|\n"+message);
 }
 
 BlockPyFeedback.prototype.emptyProgram = function() {
@@ -117,6 +126,7 @@ BlockPyFeedback.prototype.emptyProgram = function() {
     this.original.hide().html("");
     this.body.html("You have not written any code yet.");
     this.main.model.status.error("runtime");
+    this.main.components.server.logEvent('feedback', "Empty Program");
 }
 
 BlockPyFeedback.prototype.prettyPrintError = function(error) {
@@ -157,48 +167,7 @@ BlockPyFeedback.prototype.printError = function(error) {
     }
     this.main.model.status.error("runtime");
     this.main.components.editor.highlightError(error.traceback[0].lineno-1);
-    return;
-    // Is it a string?
-    if (typeof error !== "string") {
-        // A weird skulpt thing?
-        if (error.tp$str !== undefined) {
-            try {
-                this.editor.highlightError(error.traceback[0].lineno-1);
-            } catch (e) {
-            }
-            
-            var all_blocks = Blockly.mainWorkspace.getAllBlocks();
-            blockMap = {};
-            all_blocks.forEach(function(elem) {
-                if (elem.lineNumber in blockMap) {
-                    blockMap[elem.lineNumber].push(elem);
-                } else {
-                    blockMap[elem.lineNumber] = [elem];
-                }
-            });
-            var hblocks = blockMap[""+error.traceback[0].lineno];
-            Blockly.mainWorkspace.highlightBlock(hblocks[0].id);
-            //hblocks[0].addSelect();
-            
-            if (error.constructor == Sk.builtin.NameError
-                && error.args.v.length > 0
-                && error.args.v[0].v == "name '___' is not defined") {
-                error = "<b>Error: </b> You have incomplete blocks. Make sure that you do not have any dangling blocks.<br><br><b>Extended Error Explanation:</b> If you look at the text view of your Python code, you'll see <code>___</code> in the code. The converter will create these <code>___</code> to show that you have a block that's missing a piece.";
-            }  else if (error.tp$name == "ParseError") {
-                
-            } else if (error.tp$name in EXTENDED_ERROR_EXPLANATION) {
-                error = "<b>Error: </b>"+error.tp$str().v + "<br><br>"+EXTENDED_ERROR_EXPLANATION[error.tp$name];
-            } else {
-                error = error.tp$str().v;
-            }
-        } else {
-            // An error?
-            error = ""+error.name + ": " + error.message;
-            printer.log("Unknown Error"+error.stack);
-        }
-    }
-    // Perform any necessary cleaning
-    this.explorer.tags.errors_body.html(error);
+    this.main.components.server.logEvent('feedback', "Runtime", original);
 }
 
 

@@ -16,6 +16,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.name.subscribe(function() { server.saveAssignment();});
     model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
     model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
+    model.assignment.importable.subscribe(function() { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
     model.assignment.modules.subscribe(function() { server.saveAssignment(); });
     model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
@@ -51,10 +52,15 @@ BlockPyServer.prototype.defaultFailure = function() {
     this.setStatus('Disconnected');
 }
 
-BlockPyServer.prototype.logEvent = function(event_name, action) {
+BlockPyServer.prototype.logEvent = function(event_name, action, body) {
     var data = this.createServerData();
     data['event'] = event_name;
     data['action'] = action;
+    if (body === undefined) {
+        data['body'] = '';
+    } else {
+        data['body'] = body;
+    }
     
     this.setStatus('Logging');
     if (this.main.model.server_is_connected('log_event')) {
@@ -92,6 +98,7 @@ BlockPyServer.prototype.saveAssignment = function() {
     data['introduction'] = model.assignment.introduction();
     data['parsons'] = model.assignment.parsons();
     data['initial'] = model.assignment.initial_view();
+    data['importable'] = model.assignment.importable();
     data['name'] = model.assignment.name();
     //data['disabled'] = disabled;
     data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name

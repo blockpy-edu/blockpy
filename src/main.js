@@ -87,6 +87,7 @@ function BlockPy(settings, assignment, submission, programs) {
             "initial_view": ko.observable(assignment.initial_view || 'Blocks'),
             'parsons': ko.observable(assignment.parsons),
             'upload': ko.observable(assignment.initial_view == 'Upload'),
+            'importable': ko.observable(assignment.importable),
         },
         "programs": {
             "__main__": ko.observable(programs.__main__),
@@ -140,6 +141,12 @@ function BlockPy(settings, assignment, submission, programs) {
         execution.trace_step(next); };
     this.model.moveTraceLast = function(index) { 
         execution.trace_step(execution.last_step()); };
+    
+    // For performance reasons, batch notifications for execution handling.
+    execution.trace.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.last_step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.line_number.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
     
     this.initMain();
 }

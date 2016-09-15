@@ -34,6 +34,9 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.console = printer.getConfiguration();
     // Stepper!
     Sk.afterSingleExecution = this.step.bind(this);
+    
+    //
+    this.executionBuffer = {};
 }
 
 BlockPyEngine.prototype.loadCode = function(code) {
@@ -49,6 +52,12 @@ BlockPyEngine.prototype.readFile = function(filename) {
 }
 
 BlockPyEngine.prototype.reset = function() {
+    this.executionBuffer = {
+        'trace': [],
+        'step': 0,
+        'last_step': 0,
+        'line_number': 0,
+    };
     this.main.model.execution.trace.removeAll();
     this.main.model.execution.step(0);
     this.main.model.execution.last_step(0);
@@ -60,9 +69,9 @@ BlockPyEngine.prototype.reset = function() {
 BlockPyEngine.prototype.step = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
     if (filename == '<stdin>.py') {
-        var currentStep = this.main.model.execution.step();
+        var currentStep = this.executionBuffer.step;
         var globals = this.parseGlobals(variables);
-        this.main.model.execution.trace.push(
+        this.executionBuffer.trace.push(
             {'step': currentStep,
              'filename': filename,
              //'block': highlightMap[lineNumber-1],
@@ -70,10 +79,19 @@ BlockPyEngine.prototype.step = function(variables, lineNumber,
              'column': columnNumber,
              'properties': globals.properties,
              'modules': globals.modules});
-        this.main.model.execution.step(currentStep+1)
-        this.main.model.execution.last_step(currentStep+1);
-        this.main.model.execution.line_number(lineNumber)
+        this.executionBuffer.step = currentStep+1;
+        this.executionBuffer.last_step = currentStep+1;
+        this.executionBuffer.line_number = lineNumber;
     }
+}
+
+BlockPyEngine.prototype.lastStep = function() {
+    var execution = this.main.model.execution;
+    execution.trace(this.executionBuffer.trace);
+    this.main.model.execution.step(this.executionBuffer.step)
+    this.main.model.execution.last_step(this.executionBuffer.last_step)
+    this.main.model.execution.line_number(this.executionBuffer.line_number)
+    this.executionBuffer = undefined;
 }
 
 /*
@@ -196,6 +214,7 @@ BlockPyEngine.prototype.run = function() {
         function (module) {
             // Run the afterSingleExecution one extra time for final state
             Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
+            engine.lastStep();
             // Handle checks
             feedback.noErrors()
             engine.check(code, execution.trace(), execution.output(), execution.ast, module.$d);
@@ -362,10 +381,10 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
         model.execution.output.removeAll();
     });
     Sk.builtins.log = new Sk.builtin.func(function(data) { 
-        Sk.builtin.pyCheckArgs("output", arguments, 1, 1);
+        Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
         console.log(data)
     });
-    Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
+    //Sk.builtins.trace = Sk.ffi.remapToPy(traceTable);
     Sk.builtins._trace = traceTable;
     Sk.builtins._final_values = final_values;
     Sk.builtins.code = Sk.ffi.remapToPy(student_code);

@@ -71,24 +71,31 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     var elements = this.elements;
     this.tag.find('.blockpy-run').click(function() {
         main.components.engine.run();
+        main.components.server.logEvent('editor', 'run')
     });
     this.tags.mode_set_text.click(function() {
         main.model.settings.editor("Text");
+        main.components.server.logEvent('editor', 'text')
     });
     this.tag.find('.blockpy-toolbar-reset').click(function() {
         main.model.programs['__main__'](main.model.programs['starting_code']());
         main.components.editor.updateBlocks();
+        main.components.server.logEvent('editor', 'reset');
     });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {
         main.model.settings.editor("Blocks");
+        main.components.server.logEvent('editor', 'blocks')
     });
     this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");
+        main.components.server.logEvent('editor', 'instructor')
     });
     this.tag.find('.blockpy-toolbar-import').click(function() {
         main.components.corgis.openDialog();
+        main.components.server.logEvent('editor', 'import')
     });
     this.tag.find('.blockpy-toolbar-english').click(function() {
         main.components.english.openDialog();
+        main.components.server.logEvent('editor', 'english')
     });
 }

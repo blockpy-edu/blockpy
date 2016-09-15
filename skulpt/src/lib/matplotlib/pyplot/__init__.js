@@ -46,7 +46,7 @@ var $builtinmodule = function(name) {
             chartCounter += 1;
             chart = {};
             
-            chart.margin = {'top': 20, 'right': 20, 'bottom': 50, 'left': 40};
+            chart.margin = {'top': 20, 'right': 30, 'bottom': 50, 'left': 40};
             chart.width = Sk.console.width - chart.margin.left - chart.margin.right;
             chart.height = Sk.console.height - chart.margin.top - chart.margin.bottom;
             chart.id = 'chart' + chartCounter;
@@ -61,16 +61,27 @@ var $builtinmodule = function(name) {
     };
     
     function updateMinMax(attr, array) {
-        if (extents[attr+"Min"] === undefined) {
+        if (extents[attr+"Min"] === null) {
             extents[attr+"Min"] = d3.min(array);
         } else {
             extents[attr+"Min"] = Math.min(d3.min(array), extents[attr+"Min"])
         }
-        if (extents[attr+"Max"] === undefined) {
+        if (extents[attr+"Max"] === null) {
             extents[attr+"Max"] = d3.max(array);
         } else {
             extents[attr+"Max"] = Math.max(d3.max(array), extents[attr+"Max"])
         }
+    }
+    
+    function getRandomSubarray(arr, size) {
+        var shuffled = arr.slice(0), i = arr.length, temp, index;
+        while (i--) {
+            index = Math.floor((i + 1) * Math.random());
+            temp = shuffled[index];
+            shuffled[index] = shuffled[i];
+            shuffled[i] = temp;
+        }
+        return shuffled.slice(0, size);
     }
 
     // Main plotting function
@@ -163,6 +174,9 @@ var $builtinmodule = function(name) {
             resetChart();
             return;
         }
+        if (extents['xMin'] === undefined) {
+            return;
+        }
         var yAxisBuffer;
         
         // Establish x/y scalers and axes
@@ -186,14 +200,19 @@ var $builtinmodule = function(name) {
                                 .orient("bottom");
             var bins = plots[0]['bins'];
             var tempScale = d3.scale.linear()
-                                    .domain([0, bins])
+                                    .domain([
+                                        0, bins
+                                    ])
                                     .range([extents['xMin'], extents['xMax']]);
             var tickArray = d3.range(bins+1)
                               .map(tempScale).map(function(e) {
                                 return e;
                               });
             // TODO: support multiple histograms
-            var histMapper = d3.layout.histogram().bins(tickArray)(plots[0]['data']);
+            var histMapper = d3.layout.histogram().bins(
+            tickArray
+            //chart.xScale.ticks(bins)
+            )(plots[0]['data']);
         } else if (chart.type == 'bar') {
             yAxisBuffer = 5*Math.max(extents['yMin'].toLocaleString().length, 
                                    extents['yMax'].toLocaleString().length);
@@ -325,6 +344,7 @@ var $builtinmodule = function(name) {
             img.style.display = 'block';
             var oldChart = chart;
             var oldPlots = plots;
+            Sk.console.printHtml(img, oldPlots);
             resetChart();
             img.onload = function() {
                 img.onload = null;
@@ -337,7 +357,6 @@ var $builtinmodule = function(name) {
                 var canvasUrl = canvas.toDataURL("image/png");
                 img.setAttribute('src', canvasUrl);
                 oldChart.svg[0][0].parentNode.replaceChild(img, oldChart.svg[0][0])
-                Sk.console.printHtml(img, oldPlots);
                 // Snip off this chart, we can now start a new one.
             }
             img.onerror = function() {

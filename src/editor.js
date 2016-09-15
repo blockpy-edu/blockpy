@@ -509,13 +509,13 @@ BlockPyEditor.CATEGORY_MAP = {
     'Lists':    '<category name="Lists" colour="30">'+
                     '<block type="lists_create_with">'+
                         '<value name="ADD0">'+
-                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                          '<block type="math_number"><field name="NUM">0</field></block>'+
                         '</value>'+
                         '<value name="ADD1">'+
-                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                          '<block type="math_number"><field name="NUM">0</field></block>'+
                         '</value>'+
                         '<value name="ADD2">'+
-                          '<shadow type="math_number"><field name="NUM">0</field></shadow>'+
+                          '<block type="math_number"><field name="NUM">0</field></block>'+
                         '</value>'+
                     '</block>'+
                     '<block type="lists_create_with"></block>'+
