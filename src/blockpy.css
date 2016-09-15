@@ -111,6 +111,14 @@
     width: 100%;
 }
 
+.blockpy-popup .modal-body {
+    overflow-y: auto;
+}
+
+.blockpy-popup .modal-body table {
+    width: 100%;
+}
+
 
 /*
 .col-md-1 { padding-left: 0px; padding-right: 0px; }

@@ -63,8 +63,9 @@ BlockPyCorgis.prototype.openDialog = function(name) {
                     });
                 }
                 $("<tr></tr>")
-                    .append($("<td>"+title_name+"</td>"))
-                    .append($("<td></td>").append(btn))
+                    .append($("<td class='col-md-4'>"+title_name+"</td>"))
+                    .append($("<td>"+datasets[title_name]['short']+"</td>"))
+                    .append($("<td class='col-md-2'></td>").append(btn))
                     .appendTo(body);
             });
             var editor = corgis.main.components.editor;
@@ -73,33 +74,6 @@ BlockPyCorgis.prototype.openDialog = function(name) {
                     editor.updateBlocks();
                 }
             });
-        });
-    } else {
-        var datasets = {"Classics": "", "Weather": "", "Global Development": "", "Tate": ""};
-        var body = $('<table></table>', {'class': 'table-bordered table-condensed table-striped'});
-        var loadedDatasets = this.loadedDatasets;
-        Object.keys(datasets).map(function(name) {
-            var title_name = name;
-            name = name.replace(/\s/g, '_').toLowerCase();
-            var btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');
-            if (loadedDatasets.indexOf(name) > -1) {
-                set_button_loaded(btn);
-            } else {
-                btn.click(function() {
-                    corgis.importDataset(name.toLowerCase(), title_name);
-                    set_button_loaded(btn);
-                });
-            }
-            $("<tr></tr>")
-                .append($("<td>"+title_name+"</td>"))
-                .append($("<td></td>").append(btn))
-                .appendTo(body);
-        });
-        var editor = this.main.components.editor;
-        this.main.components.dialog.show("Import Datasets", body, function() {
-            if (editor.main.model.settings.editor() == "Blocks") {
-                editor.updateBlocks();
-            }
         });
     }
 };

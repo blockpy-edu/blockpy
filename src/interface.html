@@ -71,6 +71,7 @@
                 <div class='blockpy-feedback-body'><i>Run your code to get feedback.</i></div>
                 <div class='blockpy-code-trace'></div>
                 
+                <!-- ko if: execution.trace().length < 200 -->
                 <div class="blockpy-feedback-traces" 
                      data-bind="visible: execution.show_trace, foreach: execution.trace">
                 
@@ -108,6 +109,14 @@
                 </div>
                 
                 </div>
+                <!-- /ko -->
+                <!-- ko if: execution.trace().length >= 200 -->
+                <div class="blockpy-feedback-traces" data-bind="visible: execution.show_trace">
+                <hr>
+                Your program ran for <span data-bind='text: execution.trace().length'></span> steps. That's too many for me to show!
+                </div>
+                <!-- /ko -->
+                
             </div>
         </div>
     </div>
@@ -145,7 +154,7 @@
             <!--<button type='button' class='btn btn-default blockpy-toolbar-capture'>
                 <span class='glyphicon glyphicon-picture'></span> Capture
             </button>-->
-            <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload()">
+            <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
             </button>
 
@@ -205,6 +214,13 @@
                 <label class='blockpy-presentation-parsons-check'>
                 Parsons:
                 <input type='checkbox' class='form-control' data-bind="checked:assignment.parsons">
+                </label> 
+                <br>
+                
+                <!-- Parsons -->
+                <label class='blockpy-presentation-importable-check'>
+                Able to import datasets:
+                <input type='checkbox' class='form-control' data-bind="checked:assignment.importable">
                 </label> 
                 <br>
                 
