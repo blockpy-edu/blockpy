@@ -27,6 +27,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name) {
     var url_retrievals = [];
     if (this.main.model.server_is_connected('import_datasets')) {
         var root = this.main.model.constants.urls.import_datasets+'blockpy/'+slug+'/'+slug;
+        this.main.model.status.dataset_loading.push(name);
         var get_dataset = $.getScript(root+'_dataset.js');
         var get_skulpt = $.get(root+'_skulpt.js', function(data) {
             Sk.builtinFiles['files']['src/lib/'+slug+'/__init__.js'] = data;
@@ -37,6 +38,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name) {
             corgis.loadedDatasets.push(slug);
             corgis.main.model.assignment.modules.push(name);
             corgis.main.components.editor.addAvailableModule(name);
+            corgis.main.model.status.dataset_loading.pop();
         });
         url_retrievals.push(get_dataset, get_skulpt, get_blockly);
     }

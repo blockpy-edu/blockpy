@@ -6,6 +6,7 @@
 function BlockPyPrinter(main, tag) {
     this.main = main;
     this.tag = tag;
+    this.printerSettings = {};
     
     this.loadPrinter();
 };
@@ -17,18 +18,19 @@ BlockPyPrinter.prototype.loadPrinter = function() {
 BlockPyPrinter.prototype.resetPrinter = function() {
     this.tag.empty();
     this.main.model.execution.output.removeAll();
+    this.printerSettings['width'] = Math.min(500, this.tag.width()-40);
+    this.printerSettings['height'] = Math.min(500, this.tag.height()+40);
 }
 
 BlockPyPrinter.prototype.getConfiguration = function() {
     var printer = this;
-    return {
-        'printHtml': function(html, value) { printer.printHtml(html, value);},
-        'width': this.tag.width()-40,
-        'pngMode': true,
-        'skipDrawing': false,
-        'height': this.tag.height()+40,
-        'container': this.tag[0]
-    }
+    this.printerSettings['printHtml']= function(html, value) { printer.printHtml(html, value);};
+    this.printerSettings['width']= Math.min(500, this.tag.width()-40);
+    this.printerSettings['pngMode']= true;
+    this.printerSettings['skipDrawing']= false;
+    this.printerSettings['height']= Math.min(500, this.tag.height()+40);
+    this.printerSettings['container']= this.tag[0];
+    return this.printerSettings;
 }
 
 BlockPyPrinter.prototype.stepPrinter = function(step, page) {

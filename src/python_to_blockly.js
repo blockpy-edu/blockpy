@@ -739,15 +739,19 @@ PythonToBlocks.prototype.booleanOperator = function(op) {
 PythonToBlocks.prototype.BoolOp = function(node) {
     var op = node.op;
     var values = node.values;
-    // TODO: is there ever a case where it's != 2 values?
-    return block("logic_operation", node.lineno, {
-        "OP": this.booleanOperator(op)
-    }, {
-        "A": this.convert(values[0]),
-        "B": this.convert(values[1])
-    }, {
-        "inline": "true"
-    });
+    // TODO: is there ever a case where it's < 1 values?
+    var result_block = this.convert(values[0]);
+    for (var i = 1; i < values.length; i+= 1) {
+        result_block = block("logic_operation", node.lineno, {
+            "OP": this.booleanOperator(op)
+        }, {
+            "A": result_block,
+            "B": this.convert(values[i])
+        }, {
+            "inline": "true"
+        });
+    }
+    return result_block;
 }
 
 PythonToBlocks.prototype.binaryOperator = function(op) {

@@ -17,7 +17,7 @@ BlockPyFeedback.prototype.buildTraceTable = function() {
     var execution = this.main.model.execution;
     execution.show_trace(true);
     execution.trace_step(execution.last_step());
-    main.components.server.logEvent('editor', 'trace')
+    this.main.components.server.logEvent('editor', 'trace')
 }
 
 BlockPyFeedback.prototype.error = function(html) {
