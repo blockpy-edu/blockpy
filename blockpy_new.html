@@ -92,8 +92,8 @@
                 'developer': true,
                 'disable_semantic_errors': false,
                 'urls': {
-                    /*'import_datasets': 'http://localhost:8000/test_corgis/',
-                    'save_code': 'http://localhost:8000/save_code/',
+                    'import_datasets': 'http://localhost:8000/test_corgis/',
+                    /*'save_code': 'http://localhost:8000/save_code/',
                     'save_success': 'http://localhost:8000/submit_grade/',
                     'log_event': 'http://localhost:8000/save_events/'*/
                 }
@@ -118,8 +118,9 @@
             // programs
             {
             
-                '__main__': "\nx = range(1000)\ntotal = 0\nfor y in x:\n    total = total + y\nprint(total)"
-                //'import matplotlib.pyplot as plt\na = xrange(1000)\nnew= []\nfor b in a:\n    if b > 5:\n        new.append(b)\nplt.hist(new)\nplt.show()'
+                //'__main__': "x and y and z"
+                //"\nx = range(1000)\ntotal = 0\nfor y in x:\n    total = total + y\nprint(total)"
+                '__main__': 'import matplotlib.pyplot as plt\na = xrange(1000)\nnew= []\nfor b in a:\n    if b > 5:\n        new.append(b)\nplt.hist(new)\nplt.show()'
                 //'a = [1,2,3]\nb=[4,5]\na,b',
                 //'__main__': 'import parking\ntoday = parking.today()\nif today == parking.Day("Tuesay"):\n    print("Can park")\nelse:\n    print("Cannot park!")',
                 //'__main__': 'import matplotlib.pyplot as plt\nplt.scatter([10, 20, 30, 40], [40, 30, 40, 50])\nplt.show()'

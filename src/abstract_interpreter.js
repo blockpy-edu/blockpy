@@ -357,6 +357,7 @@ AbstractInterpreter.prototype.typecheck = function(value) {
         case "Dict":
             var literals = true;
             for (var i = 0, len = value.keys.length; i < len; i++) {
+                var key_type = this.typecheck(value.keys[i]);
                 literals = literals && (key_type.type == "Str");
             }
             if (literals) {
@@ -364,7 +365,7 @@ AbstractInterpreter.prototype.typecheck = function(value) {
                 for (var i = 0, len = value.keys.length; i < len; i++) {
                     var key_type = this.typecheck(value.keys[i]);
                     var value_type = this.typecheck(value.values[i]);
-                    components[value.keys[i].id.v] = {"key": key_type, "value": value_type};
+                    components[value.keys[i].s.v] = {"key": key_type, "value": value_type};
                 }
                 return {"type": "Dict", "literals": true, "subtypes": components};
             } else {
@@ -558,7 +559,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
             }
             this.iterateVariable(child.id.v, this.getLocation(node));
         } else if (child._astname === "List" && child.elts.length === 0) {
-            this.report["Empty iterations"].push({"name": child.lineno, "position": this.getLocation(node)});
+            this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
         } else {
             this.visit(child);
         }

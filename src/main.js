@@ -60,7 +60,9 @@ function BlockPy(settings, assignment, submission, programs) {
             // 'none', 'runtime', 'syntax', 'semantic', 'feedback', 'complete', 'editor'
             'error': ko.observable('none'),
             // "Loading", "Saving", "Ready", "Disconnected", "Error"
-            'server': ko.observable("Loading")
+            'server': ko.observable("Loading"),
+            // Dataset loading
+            'dataset_loading': ko.observableArray()
         },
         'constants': {
             // string
@@ -132,15 +134,28 @@ function BlockPy(settings, assignment, submission, programs) {
     
     var execution = this.model.execution;
     this.model.moveTraceFirst = function(index) { 
-        execution.trace_step(1); };
+        execution.trace_step(0); };
     this.model.moveTraceBackward = function(index) { 
-        var previous = Math.max(execution.trace_step()-1, 1);
+        var previous = Math.max(execution.trace_step()-1, 0);
         execution.trace_step(previous); };
     this.model.moveTraceForward = function(index) { 
         var next = Math.min(execution.trace_step()+1, execution.last_step());
         execution.trace_step(next); };
     this.model.moveTraceLast = function(index) { 
         execution.trace_step(execution.last_step()); };
+    this.model.current_trace = ko.pureComputed(function() {
+        return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
+    });
+    
+    this.model.viewExactValue = function(type, exact_value) {
+        return function() {
+            if (type == "List") {
+                var output = exact_value.$r().v;
+                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
+                window.open('data:application/json;' + result);
+            }
+        }
+    }
     
     // For performance reasons, batch notifications for execution handling.
     execution.trace.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });

@@ -1,26 +1,12 @@
 import matplotlib.pyplot as plt
 import random
 
-def freq(values):
-    counts = {}
-    for v in values:
-      if v in counts:
-        counts[v] += 1
-      else:
-        counts[v] = 1
-    return counts
 
-values = range(100, 200, 10)
-plt.hist(values, bins=5)
-plt.show()
-print(len(set(values)))
-print(freq(values))
+xs = [random.randint(0, 100) for x in xrange(1000)]
+ys = [random.randint(0, 100) for x in xrange(1000)]
 
-values = [random.randint(0, 9) for x in range(1000)]
-plt.hist(values)
+plt.scatter(xs, ys)
 plt.show()
-print(len(set(values)))
-print(freq(values))
 
 
 '''

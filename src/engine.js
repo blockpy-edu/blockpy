@@ -531,12 +531,14 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
             if (value.v.length <= 20) {
                 return {'name': property,
                     'type': "List",
-                    "value": value.$r().v
+                    "value": value.$r().v,
+                    'exact_value': value
                 };
             } else {
                 return {'name': property,
                     'type': "List",
-                    "value": "[... "+value.v.length+" elements ...]"
+                    "value": "[... "+value.v.length+" elements ...]",
+                    "exact_value": value
                 };
             }
         case Sk.builtin.dict:

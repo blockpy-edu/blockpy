@@ -25,6 +25,7 @@
             </div>
         </div>
         <div class='blockpy-content-topright col-md-3 col-sm-3'>
+            <span class='text-muted' data-bind="visible: status.dataset_loading().length">Loading Dataset!</span>
             <span class='pull-right label label-default'
                   data-bind="css: status_server_class()[0],
                              text: status_server_class()[1]">Loading</span>
@@ -71,25 +72,23 @@
                 <div class='blockpy-feedback-body'><i>Run your code to get feedback.</i></div>
                 <div class='blockpy-code-trace'></div>
                 
-                <!-- ko if: execution.trace().length < 200 -->
-                <div class="blockpy-feedback-traces" 
-                     data-bind="visible: execution.show_trace, foreach: execution.trace">
+                <!-- ko if: execution.show_trace -->
+                <div class="blockpy-feedback-traces">
                 
-                <div data-bind="visible: $index()+1 == $root.execution.trace_step()">
                 <div>
-                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceFirst">
+                    <button type='button' class='btn btn-default' data-bind="click: moveTraceFirst">
                         <span class='glyphicon glyphicon-step-backward'></span>
                     </button>
-                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceBackward">
+                    <button type='button' class='btn btn-default' data-bind="click: moveTraceBackward">
                         <span class='glyphicon glyphicon-backward'></span>
                     </button>
-                    Step <span data-bind='text: step'></span>
-                    / <span data-bind='text: $root.execution.last_step()-1'></span>
-                    (<span data-bind='text: line == -1 ? "The end" : "Line "+line'></span>)
-                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceForward">
+                    Step <span data-bind='text: execution.trace_step()'></span>
+                    / <span data-bind='text: execution.last_step()-1'></span>
+                    (<span data-bind='text: current_trace().line == -1 ? "The end" : "Line "+current_trace().line'></span>)
+                    <button type='button' class='btn btn-default' data-bind="click: moveTraceForward">
                         <span class='glyphicon glyphicon-forward'></span>
                     </button>
-                    <button type='button' class='btn btn-default' data-bind="click: $root.moveTraceLast">
+                    <button type='button' class='btn btn-default' data-bind="click: moveTraceLast">
                         <span class='glyphicon glyphicon-step-forward'></span>
                     </button>
                 </div>
@@ -98,22 +97,22 @@
                     <thead>
                         <tr><th>Name</th><th>Type</th><th>Value</th></tr>
                     </thead>
-                    <tbody data-bind="foreach: properties">
+                    <tbody data-bind="foreach: current_trace().properties">
                         <tr data-bind="visible: name != '__file__' && name != '__path__'">
                             <td data-bind="text: name"></td>
                             <td data-bind="text: type"></td>
-                            <td><code data-bind="text: value"></code></td>
+                            <td>
+                                <code data-bind="text: value"></code>
+                                <!-- ko if: type == "List" -->
+                                <a href="" data-bind="click: $root.viewExactValue(type, exact_value)">
+                                <span class='glyphicon glyphicon-new-window'></span>
+                                </a>
+                                <!-- /ko -->
+                            </td>
                         </tr>
                     </tbody>
                 </table>
-                </div>
                 
-                </div>
-                <!-- /ko -->
-                <!-- ko if: execution.trace().length >= 200 -->
-                <div class="blockpy-feedback-traces" data-bind="visible: execution.show_trace">
-                <hr>
-                Your program ran for <span data-bind='text: execution.trace().length'></span> steps. That's too many for me to show!
                 </div>
                 <!-- /ko -->
                 

@@ -293,6 +293,12 @@ var $builtinmodule = function(name) {
                     .attr("text-anchor", "middle")  
                     .style("font-size", "14px") 
                     .style("text-decoration", "underline");
+        chart.canvas.append("text")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .text("BlockPy")
+                    .style("stroke", "#FDFDFD")
+                    .style("font-size", "8px");
         chart.svg.insert('defs', ":first-child")
                     .append('style')
                     .attr("type", "text/css")
@@ -350,8 +356,8 @@ var $builtinmodule = function(name) {
                 img.onload = null;
                 //TODO: Make this capture a class descendant. Cross the D3/Jquery barrier!
                 var canvas = document.createElement('canvas');
-                canvas.width = Sk.console.height * 2;
-                canvas.height = Sk.console.height * 1.25;
+                canvas.width = Sk.console.width;
+                canvas.height = Sk.console.height;
                 var ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
                 var canvasUrl = canvas.toDataURL("image/png");
@@ -489,6 +495,11 @@ var $builtinmodule = function(name) {
         kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
         kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
         
+        var dot_limit = 256;
+        if ("dot_limit" in kwargs) {
+            dot_limit = kwargs["dot_limit"];
+        }
+        
         // Keep a backup of the arguments for checker
         mod.values.push(args);
         
@@ -506,6 +517,16 @@ var $builtinmodule = function(name) {
             ydata = Sk.ffi.remapToJs(args[1]);
             stylestring = Sk.ffi.remapToJs(args[2]);
         }
+        
+        var xdataSampled = [], ydataSampled = [];
+        var LENGTH = xdata.length, RATE = LENGTH / dot_limit;
+        for (var i = 0; i < dot_limit; i+= 1) {
+            var index = Math.floor((i+Math.random())*RATE);
+            xdataSampled.push(xdata[index])
+            ydataSampled.push(ydata[index]);
+        }
+        xdata = xdataSampled;
+        ydata = ydataSampled;
         
         if (Sk.console.skipDrawing) {
             return;

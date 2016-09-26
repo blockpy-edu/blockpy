@@ -672,8 +672,18 @@ BlockPyEditor.prototype.copyImage = function() {
         img.onload = function() {
             var span = document.createElement('span');
             span.textContent = "Right-click and copy the image below."
+            var newWindow = document.createElement('button');
+            var newWindowInner = document.createElement('span');
+            newWindow.className += "btn btn-default btn-xs";
+            newWindowInner.className += "glyphicon glyphicon-new-window";
+            newWindow.onclick = function() {
+                var output = img.src;
+                window.open(img.src);
+            }
+            newWindow.appendChild(newWindowInner);
             var div = document.createElement('div');
             div.appendChild(span);
+            div.appendChild(newWindow);
             div.appendChild(img);
             dialog.show("Blocks as Image", div);
         };
