@@ -123,7 +123,12 @@ BlockPyEngine.prototype.analyze = function() {
     report = analyzer.report;
     // Syntax error
     if (report.error !== false) {
-        this.main.reportError('editor', report.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+', where it says:<br><code>'+report.error.args.v[3][2]+'</code>', report.error.args.v[2]);
+        console.log(report.error.args.v)
+        var codeLine = '.';
+        if (report.error.args.v.length > 3) {
+            codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
+        }
+        this.main.reportError('editor', report.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+codeLine, report.error.args.v[2]);
         return false;
     }
         

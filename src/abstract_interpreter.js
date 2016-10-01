@@ -208,7 +208,7 @@ AbstractInterpreter.prototype.postProcess = function() {
             var SETTINGS = ["was set", "was read", "was overwritten"],
                 report = this.report,
                 previousType = null,
-                testTypeEquality = this.testTypeEquality,
+                testTypeEquality = this.testTypeEquality.bind(this),
                 overwrittenLine = null;
             var finalState = (function walkState(nodes, previous) {
                 var result;
