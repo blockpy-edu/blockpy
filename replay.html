@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Blockpy/Kennel/Silicon</title>
+    
+    <link rel="stylesheet" href="libs/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/codemirror/codemirror.css">
+    <link rel="stylesheet" href="libs/font-awesome.min.css">
+    <link rel="stylesheet" href="libs/summernote/summernote.css">
+    <link rel="stylesheet" href="libs/multi-select.css">
+    <link rel="stylesheet" href="src/blockpy.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
+    
+    <!-- JQuery, D3, Math.js, Bootstrap -->
+    <script type="text/javascript" src="libs/jquery.js"></script>
+    <script type="text/javascript" src="libs/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="libs/jquery.multi-select.js"></script>
+    <script type="text/javascript" src="libs/d3.min.js"></script>
+    <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap-wysiwyg.js"></script>
+    <script type="text/javascript" src="libs/mindmup-editabletable.js"></script>
+    <script type="text/javascript" src="libs/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="libs/codemirror/python.js"></script>
+    <script type="text/javascript" src="libs/codemirror/htmlmixed.js"></script>
+    <script type="text/javascript" src="libs/codemirror/xml.js"></script>
+    <script type="text/javascript" src="libs/knockout-3.4.0.js"></script>
+    
+    <!-- Summernote, a rich text editor -->
+    <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-hint.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
+  
+    <!-- Datasets -->
+    <script type="text/javascript" src="libs/crime_data.js"></script>
+    
+    <!-- Blockly -->
+    <script type="text/javascript" src="blockly/blockly_uncompressed.js"></script>
+    <script type="text/javascript" src="blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="blockly/python_compressed.js"></script>
+    <script type="text/javascript" src="blockly/pseudo_compressed.js"></script>
+    <script type="text/javascript" src="blockly/javascript_compressed.js"></script>
+    <script type="text/javascript" src="blockly/msg/js/en.js"></script>
+    
+    <!-- Skulpt -->
+    <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
+    <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
+    
+    
+    <!-- Source Code -->
+    <script type="text/javascript" src="src/python_errors.js"></script>
+    <script type="text/javascript" src="src/ast_node_visitor.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>
+    <script type="text/javascript" src="src/python_to_blockly.js"></script>
+    <script type="text/javascript" src="src/imported.js"></script>
+    <script type="text/javascript" src="src/util.js"></script>
+    <script type="text/javascript" src="src/dialog.js"></script>
+    <script type="text/javascript" src="src/storage.js"></script>
+    <script type="text/javascript" src="src/printer.js"></script>
+    <script type="text/javascript" src="src/interface.js"></script>
+    <script type="text/javascript" src="src/server.js"></script>
+    <script type="text/javascript" src="src/english.js"></script>
+    <script type="text/javascript" src="src/corgis.js"></script>
+    <script type="text/javascript" src="src/presentation.js"></script>
+    <script type="text/javascript" src="src/property_explorer.js"></script>
+    <script type="text/javascript" src="src/editor.js"></script>
+    <script type="text/javascript" src="src/feedback.js"></script>
+    <script type="text/javascript" src="src/toolbar.js"></script>
+    <script type="text/javascript" src="src/engine.js"></script>
+    <script type="text/javascript" src="src/main.js"></script>
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
+    
+    <style>
+
+    </style>
+    
+    <script>
+    $(document).ready(function() {
+        blockpy = new BlockPy(
+            // settings
+            {
+                'editor': 'Blocks',
+                'blocklyPath': "blockly/",
+                'attachmentPoint': document.getElementById('blockpy-div'),
+                'instructor': true,
+                'developer': true,
+                'disable_semantic_errors': false,
+                'urls': {
+                    'import_datasets': 'http://localhost:8000/test_corgis/',
+                    /*'save_code': 'http://localhost:8000/save_code/',
+                    'save_success': 'http://localhost:8000/submit_grade/',
+                    'log_event': 'http://localhost:8000/save_events/'*/
+                }
+            },
+            // assignment
+            {
+                'introduction': "Welcome to BlockPy. Try running the code below.",
+                'name': "#1.2",
+                'give_feedback': "set_feedback('TEST')",
+                //'give_feedback': 'v = get_value_by_name("b")\nif v == None:\n\tset_feedback("You must declare a variable named b")\nif not isinstance(v, list):\n\tset_feedback("B should be a list.")\nif sum(v) > 10:\n\tset_feedback("Your list is too big.")\nset_success()',
+                //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
+                'starting_code': '',
+                'importable': true,
+                'initial_view': 'Blocks',
+                'modules': {
+                    'added': ['Functions', 'Data - Parking'],
+                    'removed': ['Iteration']
+                }
+            },
+            // submission
+            {},
+            // programs
+            {
+            
+                //'__main__': "x and y and z"
+                //"\nx = range(1000)\ntotal = 0\nfor y in x:\n    total = total + y\nprint(total)"
+                '__main__': 'import matplotlib.pyplot as plt\na = xrange(1000)\nnew= []\nfor b in a:\n    if b > 5:\n        new.append(b)\nplt.hist(new)\nplt.show()'
+                //'a = [1,2,3]\nb=[4,5]\na,b',
+                //'__main__': 'import parking\ntoday = parking.today()\nif today == parking.Day("Tuesay"):\n    print("Can park")\nelse:\n    print("Cannot park!")',
+                //'__main__': 'import matplotlib.pyplot as plt\nplt.scatter([10, 20, 30, 40], [40, 30, 40, 50])\nplt.show()'
+                //'__main__': 'import parking\ntoday = parking.today()\ntuesday = parking.Day("tuesday")\nprint(parking.day_compare("IS", tuesday, "tue"))\nnow = parking.now()\nnoon = parking.Time(12,0,"pm")\nprint(parking.time_compare("IS", noon, 12, 0, "pm"))',
+                //'import parking\na = parking.today()\nif parking.day_compare("IS", a, "tue"):\n    print("Can park")\nelse:\n    print("Cannot park")'
+                    ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
+                //'__main__': "import matplotlib.pyplot as plt\nplt.hist([1,2,2,2,2,5,5,8, 9, 9])\nplt.show()"
+                //'give_feedback': 'set_success()'
+                //$("#default-body").html()
+            }
+        )
+        
+        function inIframe () {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+        if (inIframe()) {
+            $("#blockpy-container").width("100%");
+        }
+        
+        $('#replay-button').click(function() {
+            var records = $('#replay-data').val().split(/\r?\n/);
+            var previousTime = null;
+            function processAnother(recordsLeft) {
+                if (recordsLeft.length > 0){
+                    var record = JSON.parse(recordsLeft.shift());
+                    switch (record.event.toLowerCase()) {
+                        case "code": switch (record.action.toLowerCase()) {
+                            case "set":
+                                blockpy.model.programs['__main__'](record.body);
+                                blockpy.components.editor.updateBlocks()
+                                break;
+                        } break;
+                        case "feedback": switch (record.action.toLowerCase()) {
+                            case "success":
+                                blockpy.components.feedback.success();
+                                break;
+                            // ...
+                        } break;
+                    }
+                    var gap = previousTime != null ? record.time - previousTime : 0;
+                    gap = gap > 2000 ? 2000 : gap;
+                    previousTime = record.time;
+                    console.log(gap);
+                    setTimeout(function() {processAnother(recordsLeft)}, gap);
+                }
+            }
+            processAnother(records);
+        });
+    });
+    </script>
+  
+</head>
+<body>
+<div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
+    <!-- Replay stuff -->
+    <textarea class="form-control" rows="3" id='replay-data'></textarea>
+    <button type='button' class='btn btn-submit' id='replay-button'>Replay</button>
+    <div id="blockpy-div" style='height:100%'></div>
+</div>
+
+<script>
+
+</script>
+
+</body>
+</html>
