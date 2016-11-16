@@ -42,12 +42,6 @@ BlockPyFeedback.prototype.clearEditorErrors = function() {
     }
 }
 
-BlockPyFeedback.prototype.success = function() {
-    this.tag.html("<span class='label label-success'><span class='glyphicon glyphicon-ok'></span> Success!</span>");
-    this.tag.removeClass("alert-warning");
-    this.main.components.server.logEvent('feedback', "Success");
-}
-
 BlockPyFeedback.prototype.editorError = function(original, message, line) {
     original = this.prettyPrintError(original);
     this.title.html("Editor Error");
