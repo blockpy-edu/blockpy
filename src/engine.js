@@ -94,12 +94,17 @@ BlockPyEngine.prototype.lastStep = function() {
     this.executionBuffer = undefined;
 }
 
-/*
-Syntax Error
-Runtime Error
-Semantic Error
-Question Error
-*/
+BlockPyEngine.prototype.analyzeVariables = function() {
+    // Get the code
+    var code = this.main.model.programs['__main__']();
+    if (code.trim() == "") {
+        return {};
+    }
+    
+    var analyzer = new AbstractInterpreter(code);
+    report = analyzer.report;
+    return analyzer.variableTypes;
+}
 
 /*
  * Gives suggestions on the given code

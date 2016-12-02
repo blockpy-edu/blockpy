@@ -65,6 +65,29 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.blocklyToolboxWidth = this.blockly.toolbox_.width;
     
     Blockly.captureDialog_ = this.copyImage.bind(this);
+    
+    // Enable static type checking! 
+    this.blockly.addChangeListener(function() {
+        var variables = editor.main.components.engine.analyzeVariables()
+        editor.blockly.getAllBlocks().filter(function(r) {return r.type == 'variables_get'}).forEach(function(block) { 
+            var name = block.inputList[0].fieldRow[0].value_;
+            if (name in variables) {
+                var type = variables[name];
+
+                if (type.type == "Num") {
+                    block.setOutput(true, "Number");
+                } else if (type.type == "List") {
+                    block.setOutput(true, "Array");
+                } else if (type.type == "Str") {
+                    block.setOutput(true, "String");
+                } else {
+                    block.setOutput(true, null);
+                }
+            }
+        })
+    });
+
+
 };
 
 BlockPyEditor.prototype.initText = function() {
