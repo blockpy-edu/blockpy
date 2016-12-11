@@ -1,7 +1,22 @@
+/**
+ * An object that manages the various editors, where users can edit their program. Also manages the
+ * movement between editors.
+ * There are currently four editors:
+ *  - Blocks: A Blockly instance
+ *  - Text: A CodeMirror instance
+ *  - Instructor: Features for changing the assignment and environment settings
+ *  - Upload: (Incomplete) A menu for uploading and running code from a desktop file.
+ *
+ * @constructor
+ * @this {BlockPyEditor}
+ * @param {Object} main - The main BlockPy instance
+ * @param {HTMLElement} tag - The HTML object this is attached to.
+ */
 function BlockPyEditor(main, tag) {
     this.main = main;
     this.tag = tag;
     
+    // This tool is what actually converts text to blocks!
     this.converter = new PythonToBlocks();
     
     // HTML DOM accessors
@@ -14,6 +29,7 @@ function BlockPyEditor(main, tag) {
     // Blockly and CodeMirror instances
     this.blockly = null;
     this.codeMirror = null;
+    // The updateStack keeps track of whether an update is percolating, to prevent duplicate update events.
     this.updateStack = [];
     this.blocksFailed = false;
     
@@ -34,6 +50,11 @@ function BlockPyEditor(main, tag) {
     this.main.model.settings.level.subscribe(function() {editor.setLevel()});
 }
 
+/**
+ * Initializes the Blockly instance (handles all the blocks). This includes
+ * attaching a number of ChangeListeners that can keep the internal code
+ * representation updated and enforce type checking.
+ */
 BlockPyEditor.prototype.initBlockly = function() {
     var blocklyDiv = this.blockTag.find('.blockly-div')[0];
     this.blockly = Blockly.inject(blocklyDiv,
@@ -90,6 +111,10 @@ BlockPyEditor.prototype.initBlockly = function() {
 
 };
 
+/**
+ * Initializes the CodeMirror instance. This handles text editing (with syntax highlighting)
+ * and also attaches a listener for change events to update the internal code represntation.
+ */
 BlockPyEditor.prototype.initText = function() {
     var codeMirrorDiv = this.textTag.find('.codemirror-div')[0];
     this.codeMirror = CodeMirror.fromTextArea(codeMirrorDiv, {
@@ -117,6 +142,7 @@ BlockPyEditor.prototype.initText = function() {
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
     
+    // Was toying with buttons for injecting code. These are deprecated now.
     this.tag.find('.blockpy-text-insert-if').click(function() {
         var line_number = blockpy.components.editor.codeMirror.getCursor().line;
         var line = blockpy.components.editor.codeMirror.getLine(line_number);
@@ -131,6 +157,11 @@ BlockPyEditor.prototype.initText = function() {
     });
 };
 
+/**
+ * Initializes the Instructor tab, which has a number of buttons and menus for
+ * manipulating assignments and the environment. One important job is to register the
+ * SummerNote instance used for editing the Introduction of the assignment.
+ */
 BlockPyEditor.prototype.initInstructor = function() {
     var introductionEditor = this.instructorTag.find('.blockpy-presentation-body-editor');
     var model = this.main.model;
@@ -154,6 +185,12 @@ BlockPyEditor.prototype.initInstructor = function() {
     
 }
 
+/**
+ * Makes the module available in the availableModules multi-select menu by adding
+ * it to the list.
+ * 
+ * @param {String} name - The name of the module (human-friendly version, as opposed to the slug) to be added.
+ */
 BlockPyEditor.prototype.addAvailableModule = function(name) {
     this.availableModules.multiSelect('addOption', { 
         'value': name, 'text': name
@@ -161,18 +198,27 @@ BlockPyEditor.prototype.addAvailableModule = function(name) {
     this.availableModules.multiSelect('select', name);
 };
 
+/**
+ * Hides the Text tab, which involves shrinking it and hiding its CodeMirror too.
+ */
 BlockPyEditor.prototype.hideTextMenu = function() {
     this.textTag.css('height', '0%');
     $(this.codeMirror.getWrapperElement()).hide();
     this.textSidebarTag.hide();
     this.textTag.hide();
 }
+
+/**
+ * Shows the Text tab, which requires restoring its height, showing AND refreshing
+ * the CodeMirror instance.
+ */
 BlockPyEditor.prototype.showTextMenu = function() {
     this.textTag.show();
     // Adjust height
     this.textTag.css('height', '100%');
     // Show CodeMirror
     $(this.codeMirror.getWrapperElement()).show();
+    // CodeMirror doesn't know its changed size
     this.codeMirror.refresh();
     
     // Resize sidebar
@@ -182,34 +228,60 @@ BlockPyEditor.prototype.showTextMenu = function() {
     this.textSidebarTag.show();
 }
 
+/**
+ * Hides the Block tab, which involves shrinking it and hiding the Blockly instance.
+ */
 BlockPyEditor.prototype.hideBlockMenu = function() {
     this.blocklyToolboxWidth = this.blockly.toolbox_.width;
     this.blockTag.css('height', '0%');
     this.blockly.setVisible(false);
 }
 
+/**
+ * Shows the Block tab, which involves restoring its height and showing the Blockly instance.
+ */
 BlockPyEditor.prototype.showBlockMenu = function() {
     this.blockTag.css('height', '100%');
     this.blockly.resize();
     this.blockly.setVisible(true);
 }
-BlockPyEditor.prototype.showUploadMenu = function() {
-    this.uploadTag.css('height', '100%');
-    this.uploadTag.show();
-}
+
+/**
+ * Hides the Upload tab, which shrinking it.
+ */
 BlockPyEditor.prototype.hideUploadMenu = function() {
     this.uploadTag.hide();
     this.uploadTag.css('height', '0%');
 }
-BlockPyEditor.prototype.showInstructorMenu = function() {
-    this.instructorTag.css('height', '100%');
-    this.instructorTag.show();
+
+/**
+ * Shows the Upload tab, which involves restoring its height.
+ */
+BlockPyEditor.prototype.showUploadMenu = function() {
+    this.uploadTag.css('height', '100%');
+    this.uploadTag.show();
 }
+
+/**
+ * Hides the Instructor tab, which shrinking it.
+ */
 BlockPyEditor.prototype.hideInstructorMenu = function() {
     this.instructorTag.hide();
     this.instructorTag.css('height', '0%');
 }
 
+/**
+ * Shows the Instructor tab, which involves restoring its height.
+ */
+BlockPyEditor.prototype.showInstructorMenu = function() {
+    this.instructorTag.css('height', '100%');
+    this.instructorTag.show();
+}
+
+/**
+ * Sets the current editor mode to Text, hiding the other menus.
+ * Also forces the text side to update.
+ */
 BlockPyEditor.prototype.setModeToText = function() {
     this.hideBlockMenu();
     this.hideUploadMenu();
@@ -219,6 +291,12 @@ BlockPyEditor.prototype.setModeToText = function() {
     this.updateText(); //TODO: is this necessary?
 }
 
+/**
+ * Sets the current editor mode to Blocks, hiding the other menus.
+ * Also forces the block side to update.
+ * There is a chance this could fail, if the text side is irredeemably
+ * awful. So then the editor bounces back to the text side.
+ */
 BlockPyEditor.prototype.setModeToBlocks = function() {
     this.hideTextMenu();
     this.hideUploadMenu();
@@ -236,6 +314,9 @@ BlockPyEditor.prototype.setModeToBlocks = function() {
     }
 }
 
+/**
+ * Sets the current editor mode to Upload mode, hiding the other menus.
+ */
 BlockPyEditor.prototype.setModeToUpload = function() {
     this.hideTextMenu();
     this.hideInstructorMenu();
@@ -244,6 +325,9 @@ BlockPyEditor.prototype.setModeToUpload = function() {
     //TODO: finish upload mode
 }
 
+/**
+ * Sets the current editor mode to the Instructor mode, hiding the other menus.
+ */
 BlockPyEditor.prototype.setModeToInstructor = function() {
     this.hideTextMenu();
     this.hideBlockMenu();
@@ -261,6 +345,12 @@ BlockPyEditor.prototype.changeMode = function() {
     }
 }
 
+/**
+ * Dispatch method to set the mode to the given argument.
+ * If the mode is invalid, an editor error is reported. If the 
+ *
+ * @param {String} mode - The new mode to set to ("Blocks", "Text", "Upload", or "Instructor")
+ */
 BlockPyEditor.prototype.setMode = function(mode) {
     // Either update the model, or go with the model's
     if (mode === undefined) {
@@ -280,10 +370,15 @@ BlockPyEditor.prototype.setMode = function(mode) {
     } else if (mode == 'Instructor') {
         this.setModeToInstructor();
     } else {
-        this.main.reportError("editor", "Invalid Mode: "+mode);
+        this.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.")
     }
 }
 
+/**
+ * Attempts to update the model for the current code file from the 
+ * block workspace. Might be prevented if an update event was already
+ * percolating.
+ */
 BlockPyEditor.prototype.updateCodeFromBlocks = function() {
     if (this.updateStack.slice(-1).pop() !== undefined) {
         return;
@@ -293,6 +388,12 @@ BlockPyEditor.prototype.updateCodeFromBlocks = function() {
     this.main.setCode(newCode);
     this.updateStack.pop();
 }
+
+/**
+ * Attempts to update the model for the current code file from the 
+ * text editor. Might be prevented if an update event was already
+ * percolating. Also unhighlights any lines.
+ */
 BlockPyEditor.prototype.updateCodeFromText = function() {
     if (this.updateStack.slice(-1).pop() !== undefined) {
         return;
@@ -306,6 +407,11 @@ BlockPyEditor.prototype.updateCodeFromText = function() {
     // Ensure that we maintain proper highlighting
 }
 
+/**
+ * Updates the text editor from the current code file in the
+ * model. Might be prevented if an update event was already
+ * percolating.
+ */
 BlockPyEditor.prototype.updateText = function() {
     if (this.updateStack.slice(-1).pop() == 'text') {
         return;
@@ -321,6 +427,13 @@ BlockPyEditor.prototype.updateText = function() {
     this.updateStack.pop();
 }
 
+/**
+ * Updates the block editor from the current code file in the
+ * model. Might be prevented if an update event was already
+ * percolating. This can also report an error if one occurs.
+ *
+ * @returns {Boolean} Returns true upon success.
+ */
 BlockPyEditor.prototype.updateBlocks = function() {
     if (this.updateStack.slice(-1).pop() == 'blocks') {
         return;
@@ -331,7 +444,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
         xml_code = result.xml;
         if (result.error !== null) {
             this.blocksFailed = true;
-            this.main.reportError('editor', result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
+            this.components.feedback.editorError(result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
             return false;
         }
     }
@@ -363,22 +476,48 @@ BlockPyEditor.prototype.updateBlocks = function() {
     return true;
 }
 
+/**
+ * Helper function for retrieving the current Blockly workspace as
+ * an XML DOM object.
+ *
+ * @returns {XMLDom} The blocks in the current workspace.
+ */
 BlockPyEditor.prototype.getBlocksFromXml = function() {
     return Blockly.Xml.workspaceToDom(this.blockly);
 }
           
+/**
+ * Helper function for setting the current Blockly workspace to
+ * whatever XML DOM is given. This clears out any existing blocks.
+ */
 BlockPyEditor.prototype.setBlocksFromXml = function(xml) {
     this.blockly.clear();
     Blockly.Xml.domToWorkspace(xml, this.blockly);
     //console.log(this.blockly.getAllBlocks());
 }
 
+/** 
+ * @property {Number} previousLine - Keeps track of the previously highlighted line.
+ */
 BlockPyEditor.prototype.previousLine = null;
+
+/**
+ * Assuming that a line has been highlighted previously, this will set the
+ * line to be highlighted again. Used when we need to restore a highlight.
+ */
 BlockPyEditor.prototype.refreshHighlight = function() {
     if (this.previousLine !== null) {
         this.codeMirror.addLineClass(this.previousLine, 'text', 'editor-error-line');
     }
+    // TODO: Shouldn't this refresh the highlight in the block side too?
 }
+
+/**
+ * Highlights a line of code in the CodeMirror instance. This applies the "active" style
+ * which is meant to bring attention to a line, but not suggest it is wrong.
+ *
+ * @param {Number} line - The line of code to highlight. I think this is zero indexed?
+ */
 BlockPyEditor.prototype.highlightLine = function(line) {
     if (this.previousLine !== null) {
         this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
@@ -387,6 +526,13 @@ BlockPyEditor.prototype.highlightLine = function(line) {
     this.codeMirror.addLineClass(line, 'text', 'editor-active-line');
     this.previousLine = line;
 }
+
+/**
+ * Highlights a line of code in the CodeMirror instance. This applies the "error" style
+ * which is meant to suggest that a line is wrong.
+ *
+ * @param {Number} line - The line of code to highlight. I think this is zero indexed?
+ */
 BlockPyEditor.prototype.highlightError = function(line) {
     if (this.previousLine !== null) {
         this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
@@ -396,10 +542,25 @@ BlockPyEditor.prototype.highlightError = function(line) {
     this.refreshBlockHighlight(line);
     this.previousLine = line;
 }
+
+/**
+ * Highlights a block in Blockly. Unfortunately, this is the same as selecting it.
+ *
+ * @param {Number} block - The ID of the block object to highlight.
+ */
 BlockPyEditor.prototype.highlightBlock = function(block) {
     this.blockly.highlightBlock(block);
 }
 
+/**
+ * Used to restore a block's highlight when travelling from the code tab. This
+ * uses a mapping between the blocks and text that is generated from the parser.
+ * The parser has stored the relevant line numbers for each block in the XML of the
+ * block. Very sophisticated, and sadly fairly fragile.
+ * TODO: I believe there's some kind of off-by-one error here...
+ *
+ * @param {Number} line - The line of code to highlight. I think this is zero indexed?
+ */
 BlockPyEditor.prototype.refreshBlockHighlight = function(line) {
     if (this.blocksFailed) {
         this.blocksFailed = false;
@@ -429,9 +590,18 @@ BlockPyEditor.prototype.refreshBlockHighlight = function(line) {
         }
     }
 }
+
+/**
+ * Removes the outline around a block. Currently unused.
+ */
 BlockPyEditor.prototype.unhighlightBlock = function() {
     // TODO:
 }
+
+/**
+ * Removes any highlight in the text code editor.
+ *
+ */
 BlockPyEditor.prototype.unhighlightLines = function() {
     if (this.previousLine !== null) {
         this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
@@ -440,14 +610,15 @@ BlockPyEditor.prototype.unhighlightLines = function() {
     this.previousLine = null;
 }
 
-/*
+/**
  * DEPRECATED, thankfully
  * Builds up an array indicating the relevant block ID for a given step.
  * Operates on the current this.blockly instance
  * It works by injecting __HIGHLIGHT__(id); at the start of every line of code
  *  and then extracting that with regular expressions. This makes it vulnerable
  *  if someone decides to use __HIGHLIGHT__ in their code. I'm betting on that
- *  never being a problem, though.
+ *  never being a problem, though. Still, this was a miserable way of accomplishing
+ *  the desired behavior.
  */
 BlockPyEditor.prototype.getHighlightMap = function() {
     // Protect the current STATEMENT_PREFIX
@@ -471,7 +642,11 @@ BlockPyEditor.prototype.getHighlightMap = function() {
     return highlightMap;
 }
 
-
+/**
+ * Updates the current file being edited in the editors.
+ *
+ * @param {String} name - The name of the file being edited (e.g, "__main__", "starting_code")
+ */
 BlockPyEditor.prototype.changeProgram = function(name) {
     this.silentChange_ = true;
     this.model.settings.filename = name;
@@ -479,10 +654,20 @@ BlockPyEditor.prototype.changeProgram = function(name) {
     this.toolbar.elements.programs.find("[data-name="+name+"]").click();
 }
 
+/**
+ * Eventually will be used to update "levels" of sophistication of the code interface.
+ * Currently unimplemented and unused.
+ */
 BlockPyEditor.prototype.setLevel = function() {
     var level = this.main.model.settings.level();
 }
 
+/**
+ * Maps short category names in the toolbox to the full XML used to
+ * represent that category as usual. This is kind of a clunky mechanism
+ * for managing the different categories, and doesn't allow us to specify
+ * individual blocks.
+ */
 BlockPyEditor.CATEGORY_MAP = {
     'Properties': '<category name="Properties" custom="VARIABLE" colour="240">'+
                   '</category>',
@@ -612,6 +797,14 @@ BlockPyEditor.CATEGORY_MAP = {
     'Separator': '<sep></sep>'
 };
 
+/**
+ * Creates an updated representation of the Toolboxes XML as currently specified in the
+ * model, using whatever modules have been added or removed. This method can either set it
+ * or just retrieve it for future use.
+ *
+ * @param {Boolean} only_set - Whether to return the XML string or to actually set the XML. False means that it will not update the toolbox!
+ * @returns {String?} Possibly returns the XML of the toolbox as a string.
+ */
 BlockPyEditor.prototype.updateToolbox = function(only_set) {
     var xml = '<xml id="toolbox" style="display: none">';
     var modules = this.main.model.assignment.modules();
