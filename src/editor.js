@@ -845,6 +845,14 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     }
 };
 
+/**
+ * Generates a PNG version of the current workspace. This PNG is stored in a Base-64 encoded
+ * string as part of a data URL (e.g., "data:image/png;base64,...").
+ * TODO: There seems to be some problems capturing blocks that don't start with
+ * statement level blocks (e.g., expression blocks).
+ * 
+ * @param {Function} callback - A function to be called with the results. This function should take two parameters, the URL (as a string) of the generated base64-encoded PNG and the IMG tag.
+ */
 BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
     var blocks = this.blockly.svgBlockCanvas_.cloneNode(true);
     blocks.removeAttribute("width");
@@ -881,7 +889,10 @@ BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
     }
 }
 
-
+/**
+ * Shows a dialog window with the current block workspace encoded as a
+ * downloadable PNG image.
+ */
 BlockPyEditor.prototype.copyImage = function() {
     var dialog = this.main.components.dialog;
     this.getPngFromBlocks(function(canvasUrl, img) {

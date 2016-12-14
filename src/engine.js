@@ -1,18 +1,24 @@
 /**
- * Printer
- * Responsible for executing code and cleaning the results
+ * An object for executing Python code and passing the results along to interested components.
+ *
+ * @constructor
+ * @this {BlockPyEditor}
+ * @param {Object} main - The main BlockPy instance
+ * @param {HTMLElement} tag - The HTML object this is attached to.
  */
-
 function BlockPyEngine(main) {
     this.main = main;
     
     this.loadEngine();
     
-    this.instructor_module = instructor_module('instructor')
+    this.instructor_module = instructor_module('instructor');
     
     //this.main.model.program.subscribe(this.analyze.bind(this))
 }
 
+/**
+ * Initializes the Python Execution engine and the Printer (console).
+ */
 BlockPyEngine.prototype.loadEngine = function() {
     var engine = this;
     var printer = this.main.components.printer;
@@ -32,17 +38,21 @@ BlockPyEngine.prototype.loadEngine = function() {
     });
     // Identify the location to put new charts
     Sk.console = printer.getConfiguration();
-    // Stepper!
+    // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
     
-    //
+    // Keeps track of the tracing while the program is executing; destroyed afterwards.
     this.executionBuffer = {};
 }
 
-BlockPyEngine.prototype.loadCode = function(code) {
-    // Create parse
-}
-
+/**
+ * Used to access Skulpt built-ins. This is pretty generic, taken
+ * almost directly from the Skulpt docs.
+ *
+ * @param {String} filename - The python filename (e.g., "os" or "pprint") that will be loaded.
+ * @returns {String} The JavaScript source code of the file (weird, right?)
+ * @throws Will throw an error if the file isn't found.
+ */
 BlockPyEngine.prototype.readFile = function(filename) {
     if (Sk.builtinFiles === undefined ||
         Sk.builtinFiles["files"][filename] === undefined) {
@@ -51,6 +61,12 @@ BlockPyEngine.prototype.readFile = function(filename) {
     return Sk.builtinFiles["files"][filename];
 }
 
+/**
+ * Resets the state of the execution engine, including reinitailizing
+ * the execution buffer (trace, step, etc.), reseting the printer, and
+ * hiding the trace button.
+ *
+ */
 BlockPyEngine.prototype.reset = function() {
     this.executionBuffer = {
         'trace': [],
@@ -66,6 +82,17 @@ BlockPyEngine.prototype.reset = function() {
     this.main.model.execution.show_trace(false);
 }
 
+/**
+ * "Steps" the execution of the code, meant to be used as a callback to the Skulpt
+ * environment.
+ * 
+ * @param {Object} variables - Hash that maps the names of variables (Strings) to their Skulpt representation.
+ * @param {Number} lineNumber - The corresponding line number in the source code that is being executed.
+ * @param {Number} columnNumber - The corresponding column number in the source code that is being executed. Think of it as the "X" position to the lineNumber's "Y" position.
+ * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
+ * @param {String} astType - Unused? TODO: What is this?
+ * @param {String} ast - String-encoded JSON representation of the AST node associated with this element.
+ */
 BlockPyEngine.prototype.step = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
     if (filename == '<stdin>.py') {
@@ -85,6 +112,10 @@ BlockPyEngine.prototype.step = function(variables, lineNumber,
     }
 }
 
+/**
+ * Called at the end of the Skulpt execution to terminate the executionBuffer
+ * and hand it off to the execution trace in the model.
+ */
 BlockPyEngine.prototype.lastStep = function() {
     var execution = this.main.model.execution;
     execution.trace(this.executionBuffer.trace);
@@ -94,6 +125,12 @@ BlockPyEngine.prototype.lastStep = function() {
     this.executionBuffer = undefined;
 }
 
+/**
+ * Runs the AbstractInterpreter to get some static information about the code,
+ * in particular the variables' types. This is needed for type checking.
+ *
+ * @returns {Object<String, AIType>} Maps variable names (as Strings) to types as constructed by the AbstractIntepreter.
+ */
 BlockPyEngine.prototype.analyzeVariables = function() {
     // Get the code
     var code = this.main.model.programs['__main__']();
@@ -106,8 +143,12 @@ BlockPyEngine.prototype.analyzeVariables = function() {
     return analyzer.variableTypes;
 }
 
-/*
- * Gives suggestions on the given code
+/**
+ * Runs the AbstractInterpreter to get some static information about the code,
+ * including potential semantic errors. It then parses that information to give
+ * feedback.
+ *
+ * @returns {Boolean} Whether the code was successfully analyzed.
  */
 BlockPyEngine.prototype.analyze = function() {
     this.main.model.execution.status("analyzing");
