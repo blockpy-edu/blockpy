@@ -49,6 +49,8 @@ function BlockPy(settings, assignment, submission, programs) {
             // boolean
             'disable_semantic_errors': ko.observable(settings.disable_semantic_errors),
             // boolean
+            'disable_variable_types': ko.observable(settings.disable_variable_types || false),
+            // boolean
             'auto_upload': ko.observable(true),
             // boolean
             'developer': ko.observable(settings.developer || false),
