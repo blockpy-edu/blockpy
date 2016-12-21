@@ -353,11 +353,23 @@ PythonToBlocks.prototype.FunctionDef = function(node)
  */
 PythonToBlocks.prototype.ClassDef = function(node)
 {
-    this.name = name;
-    this.bases = bases;
-    this.body = body;
-    this.decorator_list = decorator_list;
-    throw new Error("Not implemented");
+    var name = node.name;
+    var bases = node.bases;
+    var body = node.body;
+    var decorator_list = node.decorator_list;
+    if (decorator_list.length > 0) {
+        throw new Error("Decorators are not implemented.");
+    }
+    return block("class_creation", node.lineno, {
+        "CLASS": this.identifier(name)
+    }, {
+    }, {
+        "inline": "false"
+    }, {
+        //"arg": this.arguments_(args)
+    }, {
+        "BODY": this.convertBody(body)
+    });
 }
 
 /*
@@ -871,7 +883,8 @@ PythonToBlocks.prototype.ListComp = function(node)
 {
     var elt = node.elt;
     var generators = node.generators;
-    throw new Error("List Comprehensions are not implemented"); 
+    
+    // TODO
 }
 
 /*

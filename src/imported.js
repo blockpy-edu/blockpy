@@ -333,3 +333,62 @@ Blockly.Python['controls_forEach'] = function(block) {
   var code = 'for ' + variable0 + ' in ' + argument0 + ':\n' + branch;
   return code;
 };
+
+Blockly.Blocks['class_creation'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Create class")
+        .appendField(new Blockly.FieldVariable("new class"), "CLASS");
+    /*
+    this.appendDummyInput()
+        .appendField("Inherits from")
+        .appendField(new Blockly.FieldVariable("j"), "NAME")
+        .appendField(",")
+        .appendField(new Blockly.FieldVariable("k"), "NAME");
+    */
+    this.appendStatementInput("BODY")
+        .setCheck(null);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+Blockly.Python['class_creation'] = function(block) {
+  var class_name = Blockly.Python.variableDB_.getName(block.getFieldValue('CLASS'), Blockly.Variables.NAME_TYPE) || '___';
+  var body = Blockly.Python.statementToCode(block, 'BODY') ||
+      Blockly.Python.PASS;
+  // TODO: Assemble Python into code variable.
+  var code = 'class ' + class_name + ':\n' + body;
+  return code;
+};
+
+Blockly.Blocks['list_comprehension'] = {
+  init: function() {
+    this.appendValueInput("body")
+        .setCheck(null)
+        .appendField("[");
+    this.appendValueInput("var")
+        .setCheck(null)
+        .appendField("for");
+    this.appendValueInput("list")
+        .setCheck(null)
+        .appendField("in");
+    this.appendDummyInput()
+        .appendField("]");
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+Blockly.Python['list_comprehension'] = function(block) {
+  var value_body = Blockly.Python.valueToCode(block, 'body', Blockly.Python.ORDER_ATOMIC) || '___';
+  var value_var = Blockly.Python.valueToCode(block, 'var', Blockly.Python.ORDER_ATOMIC) || '___';
+  var value_list = Blockly.Python.valueToCode(block, 'list', Blockly.Python.ORDER_ATOMIC) || '___';
+  // TODO: Assemble Python into code variable.
+  var code = '['+value_body+' for '+value_var+' in '+value_list+']';
+  // TODO: Change ORDER_NONE to the correct strength.
+  return [code, Blockly.Python.ORDER_NONE];
+};
