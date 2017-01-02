@@ -26,7 +26,7 @@ Blockly.Msg.COLOUR_RGB_BLUE = "파랑";
 Blockly.Msg.COLOUR_RGB_GREEN = "초록";
 Blockly.Msg.COLOUR_RGB_HELPURL = "http://www.december.com/html/spec/colorper.html";
 Blockly.Msg.COLOUR_RGB_RED = "빨강";
-Blockly.Msg.COLOUR_RGB_TITLE = "RGB 색";
+Blockly.Msg.COLOUR_RGB_TITLE = "색";
 Blockly.Msg.COLOUR_RGB_TOOLTIP = "빨강,파랑,초록의 값을 이용하여 색을 만드십시오. 모든 값은 0과 100 사이에 있어야 합니다.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_HELPURL = "https://ko.wikipedia.org/wiki/%EC%A0%9C%EC%96%B4_%ED%9D%90%EB%A6%84";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK = "반복 중단";
@@ -62,6 +62,7 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "값이 거짓일 때, 몇 가�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "값이 참일 때, 몇 가지 선언을 합니다.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "모든 블록 %1개를 삭제하겠습니까?";
 Blockly.Msg.DELETE_BLOCK = "블록 삭제";
+<<<<<<< HEAD
 Blockly.Msg.DELETE_X_BLOCKS = "블록 %1 삭제";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -75,6 +76,11 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "of";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+Blockly.Msg.DELETE_VARIABLE = "'%1' 변수를 삭제합니다";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "'%2' 변수에서 %1을(를) 삭제하시겠습니까?";
+Blockly.Msg.DELETE_X_BLOCKS = "블록 %1개 삭제";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.DISABLE_BLOCK = "블록 비활성화";
 Blockly.Msg.DUPLICATE_BLOCK = "중복됨";
 Blockly.Msg.ENABLE_BLOCK = "블록 활성화";
@@ -278,7 +284,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "어떤 수에 대한, atan(arctangent) 값
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "각도의 코사인을 반환합니다. (라디안 아님)";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "각도의 사인을 반환합니다. (라디안 아님)";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "각도의 탄젠트를 반환합니다. (라디안 아님)";
-Blockly.Msg.NEW_VARIABLE = "새 변수";
+Blockly.Msg.NEW_VARIABLE = "변수 만들기...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "새 변수 이름:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "서술 허가";
@@ -307,7 +313,7 @@ Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "매개 변수:";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "함수에 값을 더합니다.";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "매개 변수들";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "이 함수를 추가, 삭제, 혹은 재정렬합니다.";
-Blockly.Msg.REDO = "다시 시도";
+Blockly.Msg.REDO = "다시 실행";
 Blockly.Msg.REMOVE_COMMENT = "내용 제거";
 Blockly.Msg.RENAME_VARIABLE = "변수 이름 바꾸기:";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "'%1' 변수 이름을 바꾸기:";
@@ -374,8 +380,12 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "왼쪽의 공백 문자 제거";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "오른쪽의 공백 문자 제거";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "문장의 왼쪽/오른쪽/양쪽에서 스페이스 문자를 제거해 돌려줍니다.";
 Blockly.Msg.TODAY = "오늘";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.UNDO = "끄르다";
+=======
+Blockly.Msg.UNDO = "실행 취소";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "항목";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "'집합 %1' 생성";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://ko.wikipedia.org/wiki/%EB%B3%80%EC%88%98_(%EC%BB%B4%ED%93%A8%ED%84%B0_%EA%B3%BC%ED%95%99)";
@@ -386,7 +396,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://ko.wikipedia.org/wiki/%EB%B3%80%EC%
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "변수의 값을 입력한 값으로 변경해 줍니다.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "'%1' 변수는 이미 존재합니다.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

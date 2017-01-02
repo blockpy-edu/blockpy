@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Udfør nogle kommandoer, sålæ
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Udfør nogle kommandoer, sålænge en værdi er sand.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Slet alle %1 blokke?";
 Blockly.Msg.DELETE_BLOCK = "Slet blok";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Slet %1 blokke";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sætter denne variabel til at være lig med input.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Selagi nilainya salah, maka lak
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Selagi nilainya benar, maka lakukan beberapa perintah.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Hapus semua %1 blok?";
 Blockly.Msg.DELETE_BLOCK = "Hapus Blok";
+Blockly.Msg.DELETE_VARIABLE = "Hapus variabel '%1'";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Hapus %1 yang digunakan pada variabel '%2'?";
 Blockly.Msg.DELETE_X_BLOCKS = "Hapus %1 Blok";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Kembalikan atan dari angka.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Kembalikan cosinus dari derajat (bukan radian).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Kembalikan sinus dari derajat (bukan radian).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Kembalikan tangen dari derajat (bukan radian).";
-Blockly.Msg.NEW_VARIABLE = "Variabel baru...";
+Blockly.Msg.NEW_VARIABLE = "Buat variabel...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Nama variabel baru:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "memungkinkan pernyataan";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "tetapkan variabel ini dengan input yang sama.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Sebuah variabel dengan nama '%1' sudah ada.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

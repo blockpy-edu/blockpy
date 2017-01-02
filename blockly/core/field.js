@@ -153,7 +153,8 @@ Blockly.Field.prototype.init = function() {
   this.updateEditable();
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
   this.mouseUpWrapper_ =
-      Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
+      Blockly.bindEventWithChecks_(this.fieldGroup_, 'mouseup', this,
+      this.onMouseUp_);
   // Force a render.
   this.updateTextNode_();
 };
@@ -178,20 +179,17 @@ Blockly.Field.prototype.dispose = function() {
  * Add or remove the UI indicating if this field is editable or not.
  */
 Blockly.Field.prototype.updateEditable = function() {
-  if (!this.EDITABLE || !this.fieldGroup_) {
+  var group = this.fieldGroup_;
+  if (!this.EDITABLE || !group) {
     return;
   }
   if (this.sourceBlock_.isEditable()) {
-    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-                      'blocklyEditableText');
-    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-                         'blocklyNonEditableText');
+    Blockly.addClass_(group, 'blocklyEditableText');
+    Blockly.removeClass_(group, 'blocklyNonEditableText');
     this.fieldGroup_.style.cursor = this.CURSOR;
   } else {
-    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-                      'blocklyNonEditableText');
-    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-                         'blocklyEditableText');
+    Blockly.addClass_(group, 'blocklyNonEditableText');
+    Blockly.removeClass_(group, 'blocklyEditableText');
     this.fieldGroup_.style.cursor = '';
   }
 };
@@ -405,8 +403,6 @@ Blockly.Field.prototype.updateTextNode_ = function() {
     // Truncate displayed string and add an ellipsis ('...').
     text = text.substring(0, this.maxDisplayLength - 2) + '\u2026';
   }
-  // Empty the text element.
-  goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
   text = text.replace(/\s/g, Blockly.Field.NBSP);
   if (this.sourceBlock_.RTL && text) {
@@ -417,6 +413,9 @@ Blockly.Field.prototype.updateTextNode_ = function() {
     // Prevent the field from disappearing if empty.
     text = Blockly.Field.NBSP;
   }
+
+  // Replace the text.
+  goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   var textNode = document.createTextNode(text);
   this.textElement_.appendChild(textNode);
 
@@ -475,6 +474,9 @@ Blockly.Field.prototype.onMouseUp_ = function(e) {
   } else if (this.sourceBlock_.isEditable()) {
     // Non-abstract sub-classes must define a showEditor_ method.
     this.showEditor_();
+    // The field is handling the touch, but we also want the blockSvg onMouseUp
+    // handler to fire, so we will leave the touch identifier as it is.
+    // The next onMouseUp is responsible for nulling it out.
   }
 };
 

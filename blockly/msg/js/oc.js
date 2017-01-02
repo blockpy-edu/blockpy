@@ -8,7 +8,7 @@ goog.require('Blockly.Msg');
 
 Blockly.Msg.ADD_COMMENT = "Apondre un comentari";
 Blockly.Msg.CHANGE_VALUE_TITLE = "Modificar la valor :";
-Blockly.Msg.CLEAN_UP = "Clean up Blocks";  // untranslated
+Blockly.Msg.CLEAN_UP = "Netejar los blòts";
 Blockly.Msg.COLLAPSE_ALL = "Redusir los blòts";
 Blockly.Msg.COLLAPSE_BLOCK = "Redusir lo blòt";
 Blockly.Msg.COLOUR_BLEND_COLOUR1 = "color 1";
@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "While a value is false, then do
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "While a value is true, then do some statements.";  // untranslated
 Blockly.Msg.DELETE_ALL_BLOCKS = "Suprimir totes los %1 blòts ?";
 Blockly.Msg.DELETE_BLOCK = "Suprimir lo blòt";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Suprimir %1 blòts";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -155,13 +157,13 @@ Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FROM = "Sets the item at the specified p
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_LAST = "Sets the last item in a list.";  // untranslated
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_RANDOM = "Sets a random item in a list.";  // untranslated
 Blockly.Msg.LISTS_SORT_HELPURL = "https://github.com/google/blockly/wiki/Lists#sorting-a-list";  // untranslated
-Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = "ascending";  // untranslated
-Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "descending";  // untranslated
+Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = "creissent";
+Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "descreissent";
 Blockly.Msg.LISTS_SORT_TITLE = "sort %1 %2 %3";  // untranslated
 Blockly.Msg.LISTS_SORT_TOOLTIP = "Sort a copy of a list.";  // untranslated
 Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE = "alphabetic, ignore case";  // untranslated
-Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "numeric";  // untranslated
-Blockly.Msg.LISTS_SORT_TYPE_TEXT = "alphabetic";  // untranslated
+Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "numeric";
+Blockly.Msg.LISTS_SORT_TYPE_TEXT = "alfabetic";
 Blockly.Msg.LISTS_SPLIT_HELPURL = "https://github.com/google/blockly/wiki/Lists#splitting-strings-and-joining-lists";  // untranslated
 Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "make list from text";  // untranslated
 Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "make text from list";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Return the arctangent of a number.";  // u
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Return the cosine of a degree (not radian).";  // untranslated
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Return the sine of a degree (not radian).";  // untranslated
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Return the tangent of a degree (not radian).";  // untranslated
-Blockly.Msg.NEW_VARIABLE = "Variabla novèla…";
+Blockly.Msg.NEW_VARIABLE = "Crear una variabla...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Nom de la novèla variabla :";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "allow statements";  // untranslated
@@ -307,10 +309,14 @@ Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "nom de l’entrada :";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "entradas";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";  // untranslated
-Blockly.Msg.REDO = "Redo";  // untranslated
+Blockly.Msg.REDO = "Refar";
 Blockly.Msg.REMOVE_COMMENT = "Suprimir un comentari";
 Blockly.Msg.RENAME_VARIABLE = "Renomenar la variabla…";
+<<<<<<< HEAD
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Rename all '%1' properties to:";  // untranslated
+=======
+Blockly.Msg.RENAME_VARIABLE_TITLE = "Renomenar totas las variablas '%1' a :";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.TEXT_APPEND_APPENDTEXT = "apondre lo tèxte";
 Blockly.Msg.TEXT_APPEND_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
 Blockly.Msg.TEXT_APPEND_TO = "a";
@@ -330,7 +336,7 @@ Blockly.Msg.TEXT_CHARAT_RANDOM = "obténer una letra a l'azard";
 Blockly.Msg.TEXT_CHARAT_TAIL = "";  // untranslated
 Blockly.Msg.TEXT_CHARAT_TOOLTIP = "Renvia la letra a la posicion indicada.";
 Blockly.Msg.TEXT_CREATE_JOIN_ITEM_TOOLTIP = "Add an item to the text.";  // untranslated
-Blockly.Msg.TEXT_CREATE_JOIN_TITLE_JOIN = "join";  // untranslated
+Blockly.Msg.TEXT_CREATE_JOIN_TITLE_JOIN = "jónher";
 Blockly.Msg.TEXT_CREATE_JOIN_TOOLTIP = "Add, remove, or reorder sections to reconfigure this text block.";  // untranslated
 Blockly.Msg.TEXT_GET_SUBSTRING_END_FROM_END = "to letter # from end";  // untranslated
 Blockly.Msg.TEXT_GET_SUBSTRING_END_FROM_START = "fins a la letra #";
@@ -373,9 +379,14 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "trim spaces from both sides of";  // untr
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "trim spaces from left side of";  // untranslated
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "trim spaces from right side of";  // untranslated
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Return a copy of the text with spaces removed from one or both ends.";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.TODAY = "Today";  // untranslated
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.UNDO = "Undo";  // untranslated
+=======
+Blockly.Msg.TODAY = "Uèi";
+Blockly.Msg.UNDO = "Anullar";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "element";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Crear 'fixar %1'";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -386,7 +397,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

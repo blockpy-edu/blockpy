@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Gdy wartość jest nieprawdziwa
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Gdy wartość jest prawdziwa, wykonaj kilka instrukcji.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Usunąć wszystkie %1 bloki(ów)?";
 Blockly.Msg.DELETE_BLOCK = "Usuń blok";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Usuń %1 bloki(ów)";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Zwróć arcus tangens danej liczby.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Zwróć wartość cosinusa o stopniu (nie w radianach).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Zwróć wartość sinusa o stopniu (nie w radianach).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Zwróć tangens o stopniu (nie w radianach).";
-Blockly.Msg.NEW_VARIABLE = "Nowa zmienna...";
+Blockly.Msg.NEW_VARIABLE = "Stwórz zmienną...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Nowa nazwa zmiennej:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "zezwól na instrukcje";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Nadaj tej zmiennej wartość.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Zmienna o nazwie '%1' już istnieje.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

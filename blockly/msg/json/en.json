@@ -1,7 +1,7 @@
 {
 	"@metadata": {
 		"author": "Ellen Spertus <ellen.spertus@gmail.com>",
-		"lastupdated": "2016-08-06 11:16:23.504000",
+		"lastupdated": "2016-11-11 17:20:20.186308",
 		"locale": "en",
 		"messagedocumentation" : "qqq"
 	},
@@ -26,10 +26,13 @@
 	"UNDO": "Undo",
 	"REDO": "Redo",
 	"CHANGE_VALUE_TITLE": "Change value:",
-	"NEW_VARIABLE": "New property...",
-	"NEW_VARIABLE_TITLE": "New property name:",
 	"RENAME_VARIABLE": "Rename property...",
 	"RENAME_VARIABLE_TITLE": "Rename all '%1' properties to:",
+	"NEW_VARIABLE": "Create property...",
+	"NEW_VARIABLE_TITLE": "New property name:",
+	"VARIABLE_ALREADY_EXISTS": "A property named '%1' already exists.",
+	"DELETE_VARIABLE_CONFIRMATION": "Delete %1 uses of the '%2' property?",
+	"DELETE_VARIABLE": "Delete the '%1' property",
 	"COLOUR_PICKER_HELPURL": "https://en.wikipedia.org/wiki/Color",
 	"COLOUR_PICKER_TOOLTIP": "Choose a colour from the palette.",
 	"COLOUR_RANDOM_HELPURL": "http://randomcolour.com",

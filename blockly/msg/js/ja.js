@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "値は false のあいだ、い
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "値は true のあいだ、いくつかのステートメントを行います。";
 Blockly.Msg.DELETE_ALL_BLOCKS = "%1件のすべてのブロックを消しますか？";
 Blockly.Msg.DELETE_BLOCK = "ブロックを消す";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "%1 個のブロックを消す";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -221,7 +223,7 @@ Blockly.Msg.MATH_IS_TOOLTIP = "数字が、偶数、奇数、素数、整数、�
 Blockly.Msg.MATH_IS_WHOLE = "は整数";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "残りの %1 ÷ %2";
-Blockly.Msg.MATH_MODULO_TOOLTIP = "2 つの数値を除算した残りを返します。";
+Blockly.Msg.MATH_MODULO_TOOLTIP = "2つの数値を除算した余りを返します。";
 Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://ja.wikipedia.org/wiki/数";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "数です。";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "この入力を変数と等しくなるように設定します。";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

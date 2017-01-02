@@ -77,8 +77,8 @@ function start() {
   // Create main workspace.
   workspace = Blockly.inject('blocklyDiv',
           {comments: true,
-           disable: true,
            collapse: true,
+           disable: true,
            grid:
              {spacing: 25,
               length: 3,
@@ -87,6 +87,7 @@ function start() {
            horizontalLayout: side == 'top' || side == 'bottom',
            maxBlocks: Infinity,
            media: '../media/',
+           oneBasedIndex: true,
            readOnly: false,
            rtl: rtl,
            scrollbars: true,
@@ -469,13 +470,6 @@ h1 {
         <value name="NUMBER_TO_CHECK">
           <shadow type="math_number">
             <field name="NUM">0</field>
-          </shadow>
-        </value>
-      </block>
-      <block type="math_change">
-        <value name="DELTA">
-          <shadow type="math_number">
-            <field name="NUM">1</field>
           </shadow>
         </value>
       </block>

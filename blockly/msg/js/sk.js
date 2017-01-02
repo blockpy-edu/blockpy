@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Kým je hodnota nepravdivá, vy
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Kým je hodnota pravdivá, vykonávaj príkazy.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Zmazať všetkých %1 dielcov?";
 Blockly.Msg.DELETE_BLOCK = "Odstrániť blok";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Odstrániť %1 blokov";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Vráť arkus tangens čísla.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Vráť kosínus uhla (v stupňoch).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Vráť sínus uhla (v stupňoch).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Vráť tangens uhla (v stupňoch).";
-Blockly.Msg.NEW_VARIABLE = "Nová premenná...";
+Blockly.Msg.NEW_VARIABLE = "Vytvoriť premennú...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Názov novej premennej:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "povoliť príkazy";
@@ -307,7 +309,7 @@ Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "názov vstupu:";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Pridať vstup do funkcie.";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "vstupy";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Pridať, odstrániť alebo zmeniť poradie vstupov tejto funkcie.";
-Blockly.Msg.REDO = "Redo";  // untranslated
+Blockly.Msg.REDO = "Znova";
 Blockly.Msg.REMOVE_COMMENT = "Odstrániť komentár";
 Blockly.Msg.RENAME_VARIABLE = "Premenovať premennú...";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Premenovať všetky premenné '%1' na:";
@@ -374,8 +376,12 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "odstráň medzery z ľavej strany";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "odstráň medzery z pravej strany";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Vráť kópiu textu bez medzier na jednom alebo oboch koncoch.";
 Blockly.Msg.TODAY = "Dnes";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.UNDO = "Undo";  // untranslated
+=======
+Blockly.Msg.UNDO = "Späť";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "prvok";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Vytvoriť \"nastaviť %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -386,7 +392,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Nastaví túto premennú, aby sa rovnala vstupu.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Premenná s názvom %1 už existuje.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

@@ -29,6 +29,7 @@ goog.provide('Blockly.FieldVariable');
 goog.require('Blockly.FieldDropdown');
 goog.require('Blockly.Msg');
 goog.require('Blockly.Variables');
+goog.require('goog.asserts');
 goog.require('goog.string');
 
 
@@ -49,6 +50,19 @@ Blockly.FieldVariable = function(varname, opt_validator) {
 goog.inherits(Blockly.FieldVariable, Blockly.FieldDropdown);
 
 /**
+ * The menu item index for the rename variable option.
+ * @type {number}
+ */
+Blockly.FieldVariable.prototype.renameVarItemIndex_ = -1;
+
+/**
+ * The menu item index for the delete variable option.
+ * @type {number}
+ */
+Blockly.FieldVariable.prototype.deleteVarItemIndex_ = -1;
+
+
+/**
  * Install this dropdown on a block.
  */
 Blockly.FieldVariable.prototype.init = function() {
@@ -65,6 +79,22 @@ Blockly.FieldVariable.prototype.init = function() {
             this.sourceBlock_.workspace;
     this.setValue(Blockly.Variables.generateUniqueName(workspace));
   }
+  // If the selected variable doesn't exist yet, create it.
+  // For instance, some blocks in the toolbox have variable dropdowns filled
+  // in by default.
+  if (!this.sourceBlock_.isInFlyout) {
+    this.sourceBlock_.workspace.createVariable(this.getValue());
+  }
+};
+
+/**
+ * Attach this field to a block.
+ * @param {!Blockly.Block} block The block containing this field.
+ */
+Blockly.FieldVariable.prototype.setSourceBlock = function(block) {
+  goog.asserts.assert(!block.isShadow(),
+      'Variable fields are not allowed to exist on shadow blocks.');
+  Blockly.FieldVariable.superClass_.setSourceBlock.call(this, block);
 };
 
 /**
@@ -97,8 +127,9 @@ Blockly.FieldVariable.prototype.setValue = function(newValue) {
  */
 Blockly.FieldVariable.dropdownCreate = function() {
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
-    var variableList =
-        Blockly.Variables.allVariables(this.sourceBlock_.workspace);
+    // Get a copy of the list, so that adding rename and new variable options
+    // doesn't modify the workspace's list.
+    var variableList = this.sourceBlock_.workspace.variableList.slice(0);
   } else {
     var variableList = [];
   }
@@ -108,8 +139,12 @@ Blockly.FieldVariable.dropdownCreate = function() {
     variableList.push(name);
   }
   variableList.sort(goog.string.caseInsensitiveCompare);
+
+  this.renameVarItemIndex_ = variableList.length;
   variableList.push(Blockly.Msg.RENAME_VARIABLE);
-  variableList.push(Blockly.Msg.NEW_VARIABLE);
+
+  this.deleteVarItemIndex_ = variableList.length;
+  variableList.push(Blockly.Msg.DELETE_VARIABLE.replace('%1', name));
   // Variables are not language-specific, use the name as both the user-facing
   // text and the internal representation.
   var options = [];
@@ -120,48 +155,41 @@ Blockly.FieldVariable.dropdownCreate = function() {
 };
 
 /**
- * Event handler for a change in variable name.
- * Special case the 'New variable...' and 'Rename variable...' options.
- * In both of these special cases, prompt the user for a new name.
- * @param {string} text The selected dropdown menu option.
- * @return {null|undefined|string} An acceptable new variable name, or null if
- *     change is to be either aborted (cancel button) or has been already
- *     handled (rename), or undefined if an existing variable was chosen.
+ * Handle the selection of an item in the variable dropdown menu.
+ * Special case the 'Rename variable...' and 'Delete variable...' options.
+ * In the rename case, prompt the user for a new name.
+ * @param {!goog.ui.Menu} menu The Menu component clicked.
+ * @param {!goog.ui.MenuItem} menuItem The MenuItem selected within menu.
  */
-Blockly.FieldVariable.prototype.classValidator = function(text) {
-  function promptName(promptText, defaultText) {
-    Blockly.hideChaff();
-    var newVar = window.prompt(promptText, defaultText);
-    // Merge runs of whitespace.  Strip leading and trailing whitespace.
-    // Beyond this, all names are legal.
-    if (newVar) {
-      newVar = newVar.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
-      if (newVar == Blockly.Msg.RENAME_VARIABLE ||
-          newVar == Blockly.Msg.NEW_VARIABLE) {
-        // Ok, not ALL names are legal...
-        newVar = null;
-      }
+Blockly.FieldVariable.prototype.onItemSelected = function(menu, menuItem) {
+  var menuLength = menu.getChildCount();
+  var itemText = menuItem.getValue();
+  if (this.sourceBlock_) {
+    var workspace = this.sourceBlock_.workspace;
+    if (this.renameVarItemIndex_ >= 0 &&
+        menu.getChildAt(this.renameVarItemIndex_) === menuItem) {
+      // Rename variable.
+      var oldName = this.getText();
+      Blockly.hideChaff();
+      Blockly.Variables.promptName(
+          Blockly.Msg.RENAME_VARIABLE_TITLE.replace('%1', oldName), oldName,
+          function(newName) {
+            if (newName) {
+              workspace.renameVariable(oldName, newName);
+            }
+          });
+      return;
+    } else if (this.deleteVarItemIndex_ >= 0 &&
+        menu.getChildAt(this.deleteVarItemIndex_) === menuItem) {
+      // Delete variable.
+      workspace.deleteVariable(this.getText());
+      return;
     }
-    return newVar;
+
+    // Call any validation function, and allow it to override.
+    itemText = this.callValidator(itemText);
   }
-  var workspace = this.sourceBlock_.workspace;
-  if (text == Blockly.Msg.RENAME_VARIABLE) {
-    var oldVar = this.getText();
-    text = promptName(Blockly.Msg.RENAME_VARIABLE_TITLE.replace('%1', oldVar),
-                      oldVar);
-    if (text) {
-      Blockly.Variables.renameVariable(oldVar, text, workspace);
-    }
-    return null;
-  } else if (text == Blockly.Msg.NEW_VARIABLE) {
-    text = promptName(Blockly.Msg.NEW_VARIABLE_TITLE, '');
-    // Since variables are case-insensitive, ensure that if the new variable
-    // matches with an existing variable, the new case prevails throughout.
-    if (text) {
-      Blockly.Variables.renameVariable(text, text, workspace);
-      return text;
-    }
-    return null;
+  if (itemText !== null) {
+    this.setValue(itemText);
   }
-  return undefined;
 };

@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Kartoja veiksmus, kol bus pasie
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Kartoja veiksmus, kol sąlyga tenkinama.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Ištrinti visus %1 blokus?";
 Blockly.Msg.DELETE_BLOCK = "Ištrinti bloką";
+Blockly.Msg.DELETE_VARIABLE = "Ištrinti „%1“ kintamąjį";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Ištrinti %1 blokus";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -167,7 +169,7 @@ Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "make list from text";  // untranslated
 Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "make text from list";  // untranslated
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN = "Join a list of texts into one text, separated by a delimiter.";  // untranslated
 Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT = "Split text into a list of texts, breaking at each delimiter.";  // untranslated
-Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "with delimiter";  // untranslated
+Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER = "su dalikliu";
 Blockly.Msg.LOGIC_BOOLEAN_FALSE = "klaidinga";
 Blockly.Msg.LOGIC_BOOLEAN_HELPURL = "https://github.com/google/blockly/wiki/Logic#values";  // untranslated
 Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP = "Reikšmė gali būti \"teisinga\"/\"Taip\" arba \"klaidinga\"/\"Ne\".";
@@ -205,7 +207,7 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "Grąžina pirmą skaičių pakeltą
 Blockly.Msg.MATH_CHANGE_HELPURL = "https://en.wikipedia.org/wiki/Programming_idiom#Incrementing_a_counter";
 Blockly.Msg.MATH_CHANGE_TITLE = "padidink %1 (emptypage) %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "Prideda skaičių prie kintamojo '%1'. Kai skaičius neigiamas - gaunasi atimtis.";
-Blockly.Msg.MATH_CONSTANT_HELPURL = "https://lt.wikipedia.org/wiki/Matematin%C4%97_konstanta";
+Blockly.Msg.MATH_CONSTANT_HELPURL = "https://en.wikipedia.org/wiki/Mathematical_constant";
 Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Return one of the common constants: π (3.141…), e (2.718…), φ (1.618…), sqrt(2) (1.414…), sqrt(½) (0.707…), or ∞ (infinity).";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "apribok %1 tarp %2 ir %3";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

@@ -146,8 +146,9 @@ Blockly.Python.init = function(workspace) {
   }
 
   // Removed, because we shouldn't teach students to do this.
-  /*var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace);
+  /*
+  var defvars = [];
+  var variables = workspace.variableList;
   for (var i = 0; i < variables.length; i++) {
     defvars[i] = Blockly.Python.variableDB_.getName(variables[i],
         Blockly.Variables.NAME_TYPE) + ' = None';
@@ -265,10 +266,10 @@ Blockly.Python.scrub_ = function(block, code) {
  */
 Blockly.Python.getAdjustedInt = function(block, atId, opt_delta, opt_negate) {
   var delta = opt_delta || 0;
-  if (Blockly.Python.ONE_BASED_INDEXING) {
+  if (block.workspace.options.oneBasedIndex) {
     delta--;
   }
-  var defaultAtIndex = Blockly.Python.ONE_BASED_INDEXING ? '1' : '0';
+  var defaultAtIndex = block.workspace.options.oneBasedIndex ? '1' : '0';
   var atOrder = delta ? Blockly.Python.ORDER_ADDITIVE :
       Blockly.Python.ORDER_NONE;
   var at = Blockly.Python.valueToCode(block, atId, atOrder) || defaultAtIndex;
@@ -294,4 +295,3 @@ Blockly.Python.getAdjustedInt = function(block, atId, opt_delta, opt_negate) {
   }
   return at;
 };
-

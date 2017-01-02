@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "當值為否時，執行一些�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "當值為真時，執行一些語句";
 Blockly.Msg.DELETE_ALL_BLOCKS = "刪除共 %1 塊積木？";
 Blockly.Msg.DELETE_BLOCK = "刪除積木";
+Blockly.Msg.DELETE_VARIABLE = "刪除%1變數";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "刪除%1使用的%2變數？";
 Blockly.Msg.DELETE_X_BLOCKS = "刪除 %1 塊積木";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "返回指定角度的反正切值。";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "返回指定角度的餘弦值(非弧度）。";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "返回指定角度的正弦值(非弧度）。";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "返回指定角度的正切值(非弧度）。";
-Blockly.Msg.NEW_VARIABLE = "新變數...";
+Blockly.Msg.NEW_VARIABLE = "建立變數...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "新變數名稱:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "允許語句";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "設定此變數，好和輸入值相等。";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "一個名為%1的變數已存在。";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

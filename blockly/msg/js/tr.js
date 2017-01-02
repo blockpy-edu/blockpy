@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Bir değer yanlış olduğunda 
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Bir değer doğru olduğunda bazı beyanlarda bulun.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Tüm %1 blok silinsin mi?";
 Blockly.Msg.DELETE_BLOCK = "Bloğu Sil";
+Blockly.Msg.DELETE_VARIABLE = "'%1' değişkenini silmek istiyor musunuz?";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "'%2' değişkeninin %1 kullanımını silmek istiyor musunuz?";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 Blokları Sil";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -158,8 +160,8 @@ Blockly.Msg.LISTS_SORT_HELPURL = "https://github.com/google/blockly/wiki/Lists#s
 Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = "artan";
 Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "azalan";
 Blockly.Msg.LISTS_SORT_TITLE = "kısa %1 %2 %3";
-Blockly.Msg.LISTS_SORT_TOOLTIP = "Sort a copy of a list.";  // untranslated
-Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE = "alphabetic, ignore case";  // untranslated
+Blockly.Msg.LISTS_SORT_TOOLTIP = "Listenin kısa bir kopyası.";
+Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE = "alfabetik, gözardı et";
 Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "sayısal";
 Blockly.Msg.LISTS_SORT_TYPE_TEXT = "alfabetik";
 Blockly.Msg.LISTS_SPLIT_HELPURL = "https://github.com/google/blockly/wiki/Lists#splitting-strings-and-joining-lists";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Bir sayının ters tanjantını döndür .
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Bir açının kosinüsünü döndür(radyan olarak değil).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Bir açının sinüsünü döndür(radyan olarak değil).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Bir açının tanjantını döndür(radyan olarak değil).";
-Blockly.Msg.NEW_VARIABLE = "Yeni değişken...";
+Blockly.Msg.NEW_VARIABLE = "Değişken oluştur...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Yeni değişken ismi :";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "Eğer ifadelerine izin ver";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Bu değişkeni girilen değere eşitler.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "'%1' isimli değişken adı zaten var.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

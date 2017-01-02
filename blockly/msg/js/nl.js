@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Terwijl een waarde onwaar is de
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Terwijl een waarde waar is de volgende opdrachten uitvoeren.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Alle %1 blokken verwijderen?";
 Blockly.Msg.DELETE_BLOCK = "Blok verwijderen";
+Blockly.Msg.DELETE_VARIABLE = "Verwijder de variabele \"%1\"";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "%1 gebruiken van de variabele \"%2\" verwijderen?";
 Blockly.Msg.DELETE_X_BLOCKS = "%1 blokken verwijderen";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Geeft de arctangens van een getal.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Geeft de cosinus van een graad (geen radialen).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Geeft de sinus van een graad (geen radialen).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Geeft de tangens van een graad (geen radialen).";
-Blockly.Msg.NEW_VARIABLE = "Nieuwe variabele...";
+Blockly.Msg.NEW_VARIABLE = "Variabele maken...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Nieuwe variabelenaam:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "statements toestaan";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Verandert de waarde van de variabele naar de waarde van de invoer.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Er bestaat al een variabele met de naam \"%1\".";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

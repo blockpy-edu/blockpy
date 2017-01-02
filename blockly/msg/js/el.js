@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Ενόσω μια τιμή εί
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Ενόσω μια τιμή είναι αληθής, τότε εκτελεί κάποιες εντολές.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Να διαγραφούν και τα %1 μπλοκ?";
 Blockly.Msg.DELETE_BLOCK = "Διέγραψε Το Μπλοκ";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Διέγραψε %1 Μπλοκ";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -155,13 +157,18 @@ Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FROM = "Ορίζει το στοιχεί
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_LAST = "Ορίζει το τελευταίο στοιχείο σε μια λίστα.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_RANDOM = "Ορίζει ένα τυχαίο στοιχείο σε μια λίστα.";
 Blockly.Msg.LISTS_SORT_HELPURL = "https://github.com/google/blockly/wiki/Lists#sorting-a-list";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = "ascending";  // untranslated
 Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "descending";  // untranslated
+=======
+Blockly.Msg.LISTS_SORT_ORDER_ASCENDING = "Αύξουσα";
+Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "Φθίνουσα";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.LISTS_SORT_TITLE = "sort %1 %2 %3";  // untranslated
 Blockly.Msg.LISTS_SORT_TOOLTIP = "Sort a copy of a list.";  // untranslated
 Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE = "alphabetic, ignore case";  // untranslated
-Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "numeric";  // untranslated
-Blockly.Msg.LISTS_SORT_TYPE_TEXT = "alphabetic";  // untranslated
+Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "αριθμητικό";
+Blockly.Msg.LISTS_SORT_TYPE_TEXT = "Αλφαβητικά";
 Blockly.Msg.LISTS_SPLIT_HELPURL = "https://github.com/google/blockly/wiki/Lists#splitting-strings-and-joining-lists";  // untranslated
 Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "κάνετε λίστα από το κείμενο";
 Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "κάνετε κείμενο από τη λίστα";
@@ -307,7 +314,7 @@ Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "όνομα εισόδου:";
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Πρόσθεσε μια είσοδος στη συνάρτηση";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "είσοδοι";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Προσθέτει, αφαιρεί ή αναδιατάσσει εισόδους σε αυτήν τη λειτουργία";
-Blockly.Msg.REDO = "Redo";  // untranslated
+Blockly.Msg.REDO = "Ακύρωση αναίρεσης";
 Blockly.Msg.REMOVE_COMMENT = "Αφαίρεσε Το Σχόλιο";
 Blockly.Msg.RENAME_VARIABLE = "Μετονόμασε τη μεταβλητή...";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Μετονόμασε όλες τις μεταβλητές «%1» σε:";
@@ -374,8 +381,12 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "περίκοψε τα κενά από τ�
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "περίκοψε τα κενά από την δεξιά πλευρά του";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Επιστρέφει ένα αντίγραφο του κειμένου με αφαιρεμένα τα κενά από το ένα ή και τα δύο άκρα.";
 Blockly.Msg.TODAY = "Σήμερα";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.UNDO = "Undo";  // untranslated
+=======
+Blockly.Msg.UNDO = "Αναίρεση";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "αντικείμενο";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Δημιούργησε «όρισε %1»";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -386,7 +397,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Ορίζει αυτή τη μεταβλητή να είναι ίση με την είσοδο.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

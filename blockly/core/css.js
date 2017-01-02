@@ -84,9 +84,10 @@ Blockly.Css.inject = function(hasCss, pathToMedia) {
   // Strip off any trailing slash (either Unix or Windows).
   Blockly.Css.mediaPath_ = pathToMedia.replace(/[\\\/]$/, '');
   text = text.replace(/<<<PATH>>>/g, Blockly.Css.mediaPath_);
-  // Inject CSS tag.
+  // Inject CSS tag at start of head.
   var cssNode = document.createElement('style');
-  document.head.appendChild(cssNode);
+  document.head.insertBefore(cssNode, document.head.firstChild);
+
   var cssTextNode = document.createTextNode(text);
   cssNode.appendChild(cssTextNode);
   Blockly.Css.styleSheet_ = cssNode.sheet;
@@ -135,12 +136,25 @@ Blockly.Css.CONTENT = [
     'background-color: #fff;',
     'outline: none;',
     'overflow: hidden;',  /* IE overflows by default. */
+    'display: block;',
   '}',
 
   '.blocklyWidgetDiv {',
     'display: none;',
     'position: absolute;',
-    'z-index: 999;',
+    'z-index: 99999;', /* big value for bootstrap3 compatibility */
+  '}',
+
+  '.injectionDiv {',
+    'height: 100%;',
+    'position: relative;',
+  '}',
+
+  '.blocklyNonSelectable {',
+    'user-select: none;',
+    '-moz-user-select: none;',
+    '-webkit-user-select: none;',
+    '-ms-user-select: none;',
   '}',
 
   '.blocklyTooltipDiv {',
@@ -154,7 +168,7 @@ Blockly.Css.CONTENT = [
     'opacity: 0.9;',
     'padding: 2px;',
     'position: absolute;',
-    'z-index: 1000;',
+    'z-index: 100000;', /* big value for bootstrap3 compatibility */
   '}',
 
   '.blocklyResizeSE {',
@@ -246,6 +260,35 @@ Blockly.Css.CONTENT = [
 
   '.blocklyBubbleText {',
     'fill: #000;',
+  '}',
+
+  '.blocklyFlyoutButton {',
+    'fill: #888;',
+    'cursor: default;',
+  '}',
+
+  '.blocklyFlyoutButtonShadow {',
+    'fill: #666;',
+  '}',
+
+  '.blocklyFlyoutButton:hover {',
+    'fill: #aaa;',
+  '}',
+
+  '.blocklyFlyoutLabel {',
+    'cursor: default;',
+  '}',
+
+  '.blocklyFlyoutLabelBackground {',
+    'opacity: 0;',
+  '}',
+
+  '.blocklyFlyoutLabelText {',
+    'fill: #000;',
+  '}',
+
+  '.blocklyFlyoutLabelText:hover {',
+    'fill: #aaa;',
   '}',
 
   /*

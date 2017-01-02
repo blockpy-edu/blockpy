@@ -29,16 +29,27 @@ Blockly.Msg.COLOUR_RGB_RED = "punasest";
 Blockly.Msg.COLOUR_RGB_TITLE = "segu";
 Blockly.Msg.COLOUR_RGB_TOOLTIP = "Tekitab värvi määratud hulgast punasest, rohelisest ja sinisest. Kõik väärtused peavad olema 0 ja 100 vahel.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_HELPURL = "https://github.com/google/blockly/wiki/Loops#loop-termination-blocks";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK = "katkesta kordus";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "liigu järgmisele kordusele";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Katkestab korduse ja liigub edasi korduse järel oleva koodi käivitamisele.";
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Katkestab korduse sees oleva koodi käivitamise ja käivitab järgmise korduse.";
+=======
+Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK = "välju kordusest";
+Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE = "katkesta see kordus ja liigu järgmisele";
+Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK = "Väljub kordusest ja liigub edasi korduse järel oleva koodi käivitamisele.";
+Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE = "Katkestab korduses oleva koodi käivitamise ja käivitab järgmise korduse.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING = "Hoiatus: Seda plokki saab kasutada ainult korduse sees.";
 Blockly.Msg.CONTROLS_FOREACH_HELPURL = "https://github.com/google/blockly/wiki/Loops#for-each";  // untranslated
 Blockly.Msg.CONTROLS_FOREACH_TITLE = "iga elemendiga %1 loendis %2";
 Blockly.Msg.CONTROLS_FOREACH_TOOLTIP = "Iga elemendiga loendis anna muutujale '%1' elemendi väärtus ja kõivita plokis olevad käsud.";
 Blockly.Msg.CONTROLS_FOR_HELPURL = "https://github.com/google/blockly/wiki/Loops#count-with";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.CONTROLS_FOR_TITLE = "loenda muutujaga %1 alates %2 kuni %3 %4 kaupa";
+=======
+Blockly.Msg.CONTROLS_FOR_TITLE = "loendus muutujaga %1 alates %2 kuni %3, %4 kaupa";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.CONTROLS_FOR_TOOLTIP = "Annab muutujale '%1' väärtused ühest numbrist teiseni, muutes seda intervalli kaupa ja käivitab igal muudatusel ploki sees oleva koodi.";
 Blockly.Msg.CONTROLS_IF_ELSEIF_TOOLTIP = "Lisab „kui“ plokile tingimuse.";
 Blockly.Msg.CONTROLS_IF_ELSE_TOOLTIP = "Lisab „kui“ plokile lõpliku tingimuseta koodiploki.";
@@ -53,6 +64,7 @@ Blockly.Msg.CONTROLS_IF_TOOLTIP_3 = "Kui esimene avaldis on tõene, käivita kä
 Blockly.Msg.CONTROLS_IF_TOOLTIP_4 = "Kui esimene avaldis on tõene, käivita käsud esimesest plokist. Vastasel juhul, kui teine avaldis on tõene, käivita käsud teisest plokist. Kui ükski avaldistest pole tõene, käivita käsud viimasest plokist.";
 Blockly.Msg.CONTROLS_REPEAT_HELPURL = "https://en.wikipedia.org/wiki/For_loop";
 Blockly.Msg.CONTROLS_REPEAT_INPUT_DO = "käivita";
+<<<<<<< HEAD
 Blockly.Msg.CONTROLS_REPEAT_TITLE = "kordus %1 korda";
 Blockly.Msg.CONTROLS_REPEAT_TOOLTIP = "Plokis olevate käskude käivitamine mitu korda.";
 Blockly.Msg.CONTROLS_WHILEUNTIL_HELPURL = "https://github.com/google/blockly/wiki/Loops#repeat";  // untranslated
@@ -75,6 +87,20 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "of";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
+=======
+Blockly.Msg.CONTROLS_REPEAT_TITLE = "%1 korda";
+Blockly.Msg.CONTROLS_REPEAT_TOOLTIP = "Plokis olevate käskude käivitamine määratud arv kordi.";
+Blockly.Msg.CONTROLS_WHILEUNTIL_HELPURL = "https://github.com/google/blockly/wiki/Loops#repeat";  // untranslated
+Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_UNTIL = "seni kuni pole";
+Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_WHILE = "seni kuni on";
+Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Plokis olevaid käske korratakse seni kui avaldis pole tõene.";
+Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Plokis olevaid käske korratakse seni kui avaldis on tõene.";
+Blockly.Msg.DELETE_ALL_BLOCKS = "Kas kustutada kõik %1 plokki?";
+Blockly.Msg.DELETE_BLOCK = "Kustuta plokk";
+Blockly.Msg.DELETE_VARIABLE = "Kustuta muutuja '%1'";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Kas kustutada %1 kohas kasutatav muutuja '%2'?";
+Blockly.Msg.DELETE_X_BLOCKS = "Kustuta %1 plokki";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.DISABLE_BLOCK = "Keela ploki kasutamine";
 Blockly.Msg.DUPLICATE_BLOCK = "Tekita duplikaat";
 Blockly.Msg.ENABLE_BLOCK = "Luba ploki kasutamine";
@@ -83,16 +109,20 @@ Blockly.Msg.EXPAND_BLOCK = "Laota plokk laiali";
 Blockly.Msg.EXTERNAL_INPUTS = "Sisendid ploki taga";
 Blockly.Msg.HELP = "Abi";
 Blockly.Msg.INLINE_INPUTS = "Sisendid ploki sees";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_APPEND = "append item";  // untranslated
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";  // untranslated
 Blockly.Msg.LISTS_APPEND_TO = "to list";  // untranslated
 Blockly.Msg.LISTS_APPEND_TOOLTIP = "Append an element to a list";  // untranslated
+=======
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.LISTS_CREATE_EMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-empty-list";  // untranslated
 Blockly.Msg.LISTS_CREATE_EMPTY_TITLE = "tühi loend";
 Blockly.Msg.LISTS_CREATE_EMPTY_TOOLTIP = "Tagastab loendi, mille pikkus on 0 ja milles pole ühtegi elementi.";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD = "loend";
 Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TOOLTIP = "Loendiploki elementide lisamine, eemaldamine või järjestuse muutmine.";
 Blockly.Msg.LISTS_CREATE_WITH_HELPURL = "https://github.com/google/blockly/wiki/Lists#create-list-with";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH = "loend elementidest";
 Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP = "Elemendi lisamine loendisse.";
 Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP = "Tekitab mistahes arvust elementidest loendi.";
@@ -101,6 +131,16 @@ Blockly.Msg.LISTS_GET_INDEX_FROM_END = "# lõpust";
 Blockly.Msg.LISTS_GET_INDEX_FROM_START = "#";  // untranslated
 Blockly.Msg.LISTS_GET_INDEX_GET = "võta";
 Blockly.Msg.LISTS_GET_INDEX_GET_REMOVE = "võta ja eemalda";
+=======
+Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH = "uus loend";
+Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP = "Elemendi lisamine loendisse.";
+Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP = "Tekitab mistahes arvust elementidest loendi.";
+Blockly.Msg.LISTS_GET_INDEX_FIRST = "esimene element";
+Blockly.Msg.LISTS_GET_INDEX_FROM_END = "element # (lõpust)";
+Blockly.Msg.LISTS_GET_INDEX_FROM_START = "element #";
+Blockly.Msg.LISTS_GET_INDEX_GET = "võetud";
+Blockly.Msg.LISTS_GET_INDEX_GET_REMOVE = "võetud ja eemaldatud";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.LISTS_GET_INDEX_LAST = "viimane element";
 Blockly.Msg.LISTS_GET_INDEX_RANDOM = "juhuslik element";
 Blockly.Msg.LISTS_GET_INDEX_REMOVE = "eemalda";
@@ -128,10 +168,17 @@ Blockly.Msg.LISTS_GET_SUBLIST_TAIL = "";  // untranslated
 Blockly.Msg.LISTS_GET_SUBLIST_TOOLTIP = "Tekitab loendi määratud osast koopia.";
 Blockly.Msg.LISTS_INDEX_FROM_END_TOOLTIP = "Viimane element on %1.";
 Blockly.Msg.LISTS_INDEX_FROM_START_TOOLTIP = "Esimene element on %1.";
+<<<<<<< HEAD
 Blockly.Msg.LISTS_INDEX_OF_FIRST = "esimene leitud element";
 Blockly.Msg.LISTS_INDEX_OF_HELPURL = "https://github.com/google/blockly/wiki/Lists#getting-items-from-a-list";  // untranslated
 Blockly.Msg.LISTS_INDEX_OF_LAST = "viimane leitud element";
 Blockly.Msg.LISTS_INDEX_OF_TOOLTIP = "Tagastab esimese/viimase loendist leitud elemendi asukoha (järjekorranumbri). Kui elementi ei leita, tagastab %1.";
+=======
+Blockly.Msg.LISTS_INDEX_OF_FIRST = "esimene leitud";
+Blockly.Msg.LISTS_INDEX_OF_HELPURL = "https://github.com/google/blockly/wiki/Lists#getting-items-from-a-list";  // untranslated
+Blockly.Msg.LISTS_INDEX_OF_LAST = "viimase leitud";
+Blockly.Msg.LISTS_INDEX_OF_TOOLTIP = "Tagastab esimese/viimase loendist leitud objekti asukoha (objekti järjekorranumbri loendis). Kui objekti ei leita, tagastab %1.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.LISTS_INLIST = "loendis";
 Blockly.Msg.LISTS_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Lists#is-empty";  // untranslated
 Blockly.Msg.LISTS_ISEMPTY_TITLE = "%1 on tühi";
@@ -143,7 +190,11 @@ Blockly.Msg.LISTS_REPEAT_HELPURL = "https://github.com/google/blockly/wiki/Lists
 Blockly.Msg.LISTS_REPEAT_TITLE = "loend pikkusega %2 elemendist %1";
 Blockly.Msg.LISTS_REPEAT_TOOLTIP = "Tekitab uue loendi, millesse lisatakse ühte elementi pikkusega määratud arv kordi.";
 Blockly.Msg.LISTS_SET_INDEX_HELPURL = "https://github.com/google/blockly/wiki/Lists#in-list--set";  // untranslated
+<<<<<<< HEAD
 Blockly.Msg.LISTS_SET_INDEX_INPUT_TO = "väärtus:";
+=======
+Blockly.Msg.LISTS_SET_INDEX_INPUT_TO = ", väärtus";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.LISTS_SET_INDEX_INSERT = "lisa asukohale";
 Blockly.Msg.LISTS_SET_INDEX_SET = "asenda";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_INSERT_FIRST = "Lisab loendi algusesse uue elemendi.";
@@ -210,7 +261,11 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Tagastab ühe konstantidest: π (3,141…),
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "%1 piirang %2 ja %3 vahele";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Piirab arvu väärtuse toodud piiridesse (piirarvud kaasa arvatud).";
+<<<<<<< HEAD
 Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+=======
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "jagub arvuga";
 Blockly.Msg.MATH_IS_EVEN = "on paarisarv";
 Blockly.Msg.MATH_IS_NEGATIVE = "on negatiivne arv";
@@ -222,7 +277,11 @@ Blockly.Msg.MATH_IS_WHOLE = "on täisarv";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "%1 ÷ %2 jääk";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Tagastab esimese numbri teisega jagamisel tekkiva jäägi.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+=======
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://et.wikipedia.org/wiki/Arv";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Arv.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -359,7 +418,10 @@ Blockly.Msg.TEXT_LENGTH_TITLE = "%1 pikkus";
 Blockly.Msg.TEXT_LENGTH_TOOLTIP = "Tagastab sümbolite aru (ka tühikud) toodud tekstis.";
 Blockly.Msg.TEXT_PRINT_HELPURL = "https://github.com/google/blockly/wiki/Text#printing-text";  // untranslated
 Blockly.Msg.TEXT_PRINT_TITLE = "trüki %1";
+<<<<<<< HEAD
 Blockly.Msg.TEXT_PRINT_TITLE_PRINT = "print";  // untranslated
+=======
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.TEXT_PRINT_TOOLTIP = "Trükib määratud teksti, numbri või mõne muu objekti väärtuse.";
 Blockly.Msg.TEXT_PROMPT_HELPURL = "https://github.com/google/blockly/wiki/Text#getting-input-from-the-user";  // untranslated
 Blockly.Msg.TEXT_PROMPT_TOOLTIP_NUMBER = "Küsib kasutajalt teadet näidates mingit arvu.";
@@ -374,12 +436,16 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "algusest eemaldatud tühikutega";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "lõpust eemaldatud tühikutega";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Tagastab koopia tekstist, millel on tühikud ühelt või mõlemalt poolt eemaldatud.";
 Blockly.Msg.TODAY = "Täna";
+<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
+=======
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.UNDO = "Võta tagasi";
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "objekt";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Tekita 'määra „%1“ väärtuseks' plokk";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
 Blockly.Msg.VARIABLES_GET_TOOLTIP = "Tagastab selle muutuja väärtuse.";
+<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET = "\"määra %1 väärtuseks %2";
 Blockly.Msg.VARIABLES_SET_CREATE_GET = "Tekita '„%1“ väärtus' plokk";
 Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
@@ -387,6 +453,13 @@ Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Määrab selle muutuja väärtuse võrdseks sisendi väärtusega.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLES_SET = "määra %1 väärtuseks %2";
+Blockly.Msg.VARIABLES_SET_CREATE_GET = "Tekita '„%1“ väärtus' plokk";
+Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Variables#set";  // untranslated
+Blockly.Msg.VARIABLES_SET_TOOLTIP = "Määrab selle muutuja väärtuse võrdseks sisendi väärtusega.";
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "'%1'-nimeline muutuja on juba olemas.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
@@ -395,7 +468,11 @@ Blockly.Msg.CONTROLS_IF_ELSE_TITLE_ELSE = Blockly.Msg.CONTROLS_IF_MSG_ELSE;
 Blockly.Msg.PROCEDURES_DEFRETURN_PROCEDURE = Blockly.Msg.PROCEDURES_DEFNORETURN_PROCEDURE;
 Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.LISTS_GET_INDEX_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
+<<<<<<< HEAD
 Blockly.Msg.VARIABLES_SET_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_DO = Blockly.Msg.PROCEDURES_DEFNORETURN_DO;
 Blockly.Msg.CONTROLS_IF_ELSEIF_TITLE_ELSEIF = Blockly.Msg.CONTROLS_IF_MSG_ELSEIF;
 Blockly.Msg.LISTS_GET_INDEX_HELPURL = Blockly.Msg.LISTS_INDEX_OF_HELPURL;

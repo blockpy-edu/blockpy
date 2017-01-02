@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Kocke se izvajajo dokler je vre
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Kocke se izvajajo dokler je vrednost resnična.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Izbrišem vseh %1 kock?";
 Blockly.Msg.DELETE_BLOCK = "Izbriši kocko";
+Blockly.Msg.DELETE_VARIABLE = "Izbriši spremenljivko »%1«";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Izbrišem %1 uporab spremenljivke »%2«?";
 Blockly.Msg.DELETE_X_BLOCKS = "Izbriši kocke";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Vrne arkus tangens števila.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Vrne kosinus kota v stopinjah (ne radianih).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Vrne sinus kota v stopinjah (ne radianih).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Vrne tangens kota v stopinjah (ne radianih).";
-Blockly.Msg.NEW_VARIABLE = "Nova spremenljivka...";
+Blockly.Msg.NEW_VARIABLE = "Ustvari spremenljivko ...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Ime nove spremenljivke:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "dovoli korake";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Nastavi, da je vrednost spremenljivke enaka vnosu.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Spremenljivka »%1« že obstaja.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

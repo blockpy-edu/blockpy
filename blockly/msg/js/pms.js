@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Cand un valor a l'é fàuss, es
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Cand un valor a l'é ver, eseguì chèiche anstrussion.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Scancelé tuti ij %1 blòch?";
 Blockly.Msg.DELETE_BLOCK = "Scancelé ël blòch";
+Blockly.Msg.DELETE_VARIABLE = "Eliminé la variàbil '%1'";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Eliminé %1 utilisassion ëd la variàbil '%2'?";
 Blockly.Msg.DELETE_X_BLOCKS = "Scancelé %1 blòch";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "A smon l'arch-tangenta d'un nùmer.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "A smon ël cosen ëd n'àngol an gré (pa an radiant).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "A smon ël sen ëd n'àngol an gré (pa an radiant).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "A smon la tangenta ëd n'àngol an gré (pa an radiant).";
-Blockly.Msg.NEW_VARIABLE = "Neuva variàbil...";
+Blockly.Msg.NEW_VARIABLE = "Creé na variàbil...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Nòm ëd la neuva variàbil:";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "përmëtte le diciairassion";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Fissé costa variàbil ugual al valor d'imission.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Na variàbil con ël nòm '%1' a esist già.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

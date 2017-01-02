@@ -62,6 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Keit ha ma vez faos un dalvoude
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Keit ha ma vez gwir un dalvoudenn, seveniñ urzhioù zo neuze.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Diverkañ an holl vloc'hoù %1 ?";
 Blockly.Msg.DELETE_BLOCK = "Dilemel ar bloc'h";
+Blockly.Msg.DELETE_VARIABLE = "Lemel an argemm '%1'";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Lemel %1 implij eus an argemm '%2' ?";
 Blockly.Msg.DELETE_X_BLOCKS = "Dilemel %1 bloc'h";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -278,7 +280,7 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Distreiñ ark tangent un niver";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Distreiñ kosinuz ur c'horn (ket e radianoù)";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Distreiñ sinuz ur c'horn (ket e radianoù)";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Distreiñ tangent ur c'horn (ket e radianoù).";
-Blockly.Msg.NEW_VARIABLE = "Argemmenn nevez...";
+Blockly.Msg.NEW_VARIABLE = "Krouiñ un argemm nevez...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "Anv an argemmenn nevez :";
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";  // untranslated
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "aotren an disklêriadurioù";
@@ -386,7 +388,11 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Termenañ a ra argemm-mañ evit ma vo par da dalvoudenn ar moned.";
+<<<<<<< HEAD
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
+=======
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Un argemm anvet '%1' zo anezhañ dija.";
+>>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

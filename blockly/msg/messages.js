@@ -54,7 +54,6 @@ goog.require('Blockly.Msg');
 /// [[Translating:Blockly#infrequent_message_types]].\n{{Identical|Item}}
 Blockly.Msg.VARIABLES_DEFAULT_NAME = 'property_name';
 /// button text - Button that sets a calendar to today's date.\n{{Identical|Today}}
->>>>>>> ae83207510f4d9e3abe4108670fab04bf2f50ae7
 Blockly.Msg.TODAY = 'Today';
 
 // Context menus.
@@ -98,14 +97,32 @@ Blockly.Msg.REDO = 'Redo';
 // Variable renaming.
 /// prompt - This message is only seen in the Opera browser.  With most browsers, users can edit numeric values in blocks by just clicking and typing.  Opera does not allows this, so we have to open a new window and prompt users with this message to chanage a value.
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
+
 /// dropdown choice - When the user clicks on a variable block, this is one of the dropdown menu choices.  It is used to define a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
 Blockly.Msg.NEW_VARIABLE = 'New property...';
 /// prompt - Prompts the user to enter the name for a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
 Blockly.Msg.NEW_VARIABLE_TITLE = 'New property name:';
+
 /// dropdown choice - When the user clicks on a variable block, this is one of the dropdown menu choices.  It is used to rename the current variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
 Blockly.Msg.RENAME_VARIABLE = 'Rename property...';
 /// prompt - Prompts the user to enter the new name for the selected variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].\n\nParameters:\n* %1 - the name of the variable to be renamed.
 Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" properties to:';
+
+// Variable creation
+/// button text - Text on the button used to launch the variable creation dialogue.
+Blockly.Msg.NEW_VARIABLE = 'Create property...';
+/// prompt - Prompts the user to enter the name for a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
+Blockly.Msg.NEW_VARIABLE_TITLE = 'New property name:';
+/// alert - Tells the user that the name they entered is already in use.
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = 'A property named "%1" already exists.'
+
+// Variable deletion.
+/// confirm -  Ask the user to confirm their deletion of multiple uses of a variable.
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = 'Delete %1 uses of the "%2" property?';
+/// alert - Tell the user that they can't delete a variable because it's part of the definition of a procedure.
+Blockly.Msg.CANNOT_DELETE_VARIABLE_PROCEDURE = 'Can\'t delete the property "%1" because it is part of the definition of the procedure "%2"';
+/// dropdown choice - Delete the currently selected variable.
+Blockly.Msg.DELETE_VARIABLE = 'Delete the "%1" property';
 
 // Colour Blocks.
 /// url - Information about colour.
