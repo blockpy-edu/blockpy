@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Мәғәнә ялған бул�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Мәғәнә дөрөҫ булғанда, командаларҙы ҡабатлай.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Бөтә %1 блоктарҙы юйырғамы?";
 Blockly.Msg.DELETE_BLOCK = "Блокты юйҙырырға";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = " %1 блокты юйҙырырға";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Таралған константаның �
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "сикләргә %1 аҫтан %2 өҫтән %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Һанды аҫтан һәм өҫтән сикләй (сиктәгеләрен индереп).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "бүленә";
 Blockly.Msg.MATH_IS_EVEN = "тағы";
 Blockly.Msg.MATH_IS_NEGATIVE = "тиҫкәре";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "бөтөн";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://ba.wikipedia.org/wiki/Ҡалдыҡ_менән_бүлеү";
 Blockly.Msg.MATH_MODULO_TITLE = "ҡалдыҡ %1 : %2 араһында";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Ике һанды бүлеү ҡалдығын күрһәтә.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://ba.wikipedia.org/wiki/Һан";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Рәт.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";  // untranslated
-<<<<<<< HEAD
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A property named '%1' already exists.";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

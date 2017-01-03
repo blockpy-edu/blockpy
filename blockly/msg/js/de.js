@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Mathematische Konstanten wie: π (3.141…)
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "begrenze %1 zwischen %2 und %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Begrenzt eine Zahl auf den Wertebereich zwischen zwei anderen Zahlen (inklusiv).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "ist teilbar durch";
 Blockly.Msg.MATH_IS_EVEN = "ist gerade";
 Blockly.Msg.MATH_IS_NEGATIVE = "ist negativ";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "ist eine ganze Zahl";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://de.wikipedia.org/wiki/Modulo";
 Blockly.Msg.MATH_MODULO_TITLE = "Rest von %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Der Rest nach einer Division.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://de.wikipedia.org/wiki/Zahl";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Eine Zahl.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "http://www.sysplus.ch/einstieg.php?links=menu&seite=4125&grad=Crash&prog=Excel";
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://de.wikipedia.org/wiki/Variable_%28P
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Setzt den Wert einer Variable.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Eine Variable namens „%1“ ist bereits vorhanden.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

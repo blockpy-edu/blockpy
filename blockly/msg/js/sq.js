@@ -375,14 +375,9 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_BOTH = "prit hapesirat nga te dyja anet";
 Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "prit hapesirat nga ana e majte";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "prit hapesirat nga ana e djathte";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Pergjigju me nje kopje te tekstit me hapesira te fshira nga njera ane ose te dyja anet.";
-<<<<<<< HEAD
-Blockly.Msg.TODAY = "Today";  // untranslated
-Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-Blockly.Msg.UNDO = "Undo";  // untranslated
-=======
 Blockly.Msg.TODAY = "Sot";
+Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
 Blockly.Msg.UNDO = "Zhbëj";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "send";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Krijo 'vendos %1";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -393,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Vendos kete variable te jete e barabarte me te dhenat ne hyrje.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Një variabël e quajtur '%1' tashmë ekziston.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

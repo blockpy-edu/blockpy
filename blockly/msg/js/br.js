@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Distreiñ unan eus  digemmennoù red : π (
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "destrizhañ %1 etre %2 ha %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Destrizhañ un niver da vezañ etre ar bevennoù spisaet (enlakaet)";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "a zo rannadus dre";
 Blockly.Msg.MATH_IS_EVEN = "zo par";
 Blockly.Msg.MATH_IS_NEGATIVE = "a zo negativel";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "zo anterin";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "rest eus %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Distreiñ dilerc'h rannadur an div niver";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://br.wikipedia.org/wiki/Niver";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Un niver.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Termenañ a ra argemm-mañ evit ma vo par da dalvoudenn ar moned.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Un argemm anvet '%1' zo anezhañ dija.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

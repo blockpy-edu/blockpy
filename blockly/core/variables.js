@@ -128,6 +128,7 @@ Blockly.Variables.flyoutCategory = function(workspace) {
       block.appendChild(field);
       xmlList.push(block);
     }
+    /*
     if (Blockly.Blocks['math_change']) {
       // <block type="math_change">
       //   <value name="DELTA">
@@ -158,7 +159,7 @@ Blockly.Variables.flyoutCategory = function(workspace) {
       shadowBlock.appendChild(numberField);
 
       xmlList.push(block);
-    }
+    }*/
 
     for (var i = 0; i < variableList.length; i++) {
       if (Blockly.Blocks['variables_get']) {

@@ -153,7 +153,7 @@ Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_INSERT_FROM = "Voegt het item op een opgegev
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_INSERT_LAST = "Voeg het item aan het einde van een lijst toe.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_INSERT_RANDOM = "Voegt het item op een willekeurige positie in de lijst in.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FIRST = "Stelt het eerste item in een lijst in.";
-Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FROM = "Stelt het item op de opgegeven positie in de lijst in.";
+Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_FROM = "Zet het item op de opgegeven positie in de lijst.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_LAST = "Stelt het laatste item van een lijst in.";
 Blockly.Msg.LISTS_SET_INDEX_TOOLTIP_SET_RANDOM = "Stelt een willekeurig item uit de lijst in.";
 Blockly.Msg.LISTS_SORT_HELPURL = "https://github.com/google/blockly/wiki/Lists#sorting-a-list";
@@ -162,8 +162,8 @@ Blockly.Msg.LISTS_SORT_ORDER_DESCENDING = "aflopend";
 Blockly.Msg.LISTS_SORT_TITLE = "sorteer %1 %2 %3";
 Blockly.Msg.LISTS_SORT_TOOLTIP = "Sorteer een kopie van een lijst.";
 Blockly.Msg.LISTS_SORT_TYPE_IGNORECASE = "alfabetisch, negeer hoofd-/kleine letters";
-Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "numerieke";
-Blockly.Msg.LISTS_SORT_TYPE_TEXT = "in alfabetische volgorde";
+Blockly.Msg.LISTS_SORT_TYPE_NUMERIC = "numeriek";
+Blockly.Msg.LISTS_SORT_TYPE_TEXT = "alfabetisch";
 Blockly.Msg.LISTS_SPLIT_HELPURL = "https://github.com/google/blockly/wiki/Lists#splitting-strings-and-joining-lists";  // untranslated
 Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT = "lijst maken van tekst";
 Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST = "tekst maken van lijst";
@@ -349,7 +349,7 @@ Blockly.Msg.TEXT_INDEXOF_INPUT_INTEXT = "in tekst";
 Blockly.Msg.TEXT_INDEXOF_OPERATOR_FIRST = "zoek eerste voorkomen van tekst";
 Blockly.Msg.TEXT_INDEXOF_OPERATOR_LAST = "zoek het laatste voorkomen van tekst";
 Blockly.Msg.TEXT_INDEXOF_TAIL = "";  // untranslated
-Blockly.Msg.TEXT_INDEXOF_TOOLTIP = "Geeft de index terug van de eerste/laatste aanwezigheid van de eerste tekst in de tweede tekst. Geeft %1 terug als de tekst niet gevonden is.";
+Blockly.Msg.TEXT_INDEXOF_TOOLTIP = "Geeft de index terug van het eerste of laatste voorkomen van de eerste tekst in de tweede tekst. Geeft %1 terug als de tekst niet gevonden is.";
 Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#checking-for-empty-text";
 Blockly.Msg.TEXT_ISEMPTY_TITLE = "%1 is leeg";
 Blockly.Msg.TEXT_ISEMPTY_TOOLTIP = "Geeft \"waar\" terug, als de opgegeven tekst leeg is.";
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Verandert de waarde van de variabele naar de waarde van de invoer.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Er bestaat al een variabele met de naam \"%1\".";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

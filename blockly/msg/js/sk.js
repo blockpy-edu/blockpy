@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Kým je hodnota nepravdivá, vy
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Kým je hodnota pravdivá, vykonávaj príkazy.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Zmazať všetkých %1 dielcov?";
 Blockly.Msg.DELETE_BLOCK = "Odstrániť blok";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Odstrániť %1 blokov";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Vráť jednu zo zvyčajných konštánt: π
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "obmedz %1 od %2 do %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Obmedzí číslo do zadaných hraníc (vrátane).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "je deliteľné";
 Blockly.Msg.MATH_IS_EVEN = "je párne";
 Blockly.Msg.MATH_IS_NEGATIVE = "je záporné";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "je celé číslo";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "zvyšok po delení %1 + %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Vráť zvyšok po delení jedného čísla druhým.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://en.wikipedia.org/wiki/Number";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Číslo.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -376,12 +376,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "odstráň medzery z ľavej strany";
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "odstráň medzery z pravej strany";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Vráť kópiu textu bez medzier na jednom alebo oboch koncoch.";
 Blockly.Msg.TODAY = "Dnes";
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-Blockly.Msg.UNDO = "Undo";  // untranslated
-=======
 Blockly.Msg.UNDO = "Späť";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "prvok";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Vytvoriť \"nastaviť %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -392,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Nastaví túto premennú, aby sa rovnala vstupu.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Premenná s názvom %1 už existuje.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

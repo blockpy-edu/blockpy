@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "返回一個的常見常量： π (3.141...
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "限制數字 %1 介於 (低) %2 到 (高) %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "限制數字介於兩個指定的數字之間";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "可被整除";
 Blockly.Msg.MATH_IS_EVEN = "是偶數";
 Blockly.Msg.MATH_IS_NEGATIVE = "是負值";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "是非負整數";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://zh.wikipedia.org/wiki/模除";
 Blockly.Msg.MATH_MODULO_TITLE = "取餘數自 %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "回傳兩個數字相除的餘數";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://zh.wikipedia.org/wiki/數";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "一個數字。";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "設定此變數，好和輸入值相等。";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "一個名為%1的變數已存在。";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

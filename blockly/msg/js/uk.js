@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Повертає одну з поширен
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "обмежити %1 від %2 до %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Обмежує число вказаними межами (включно).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "ділиться на";
 Blockly.Msg.MATH_IS_EVEN = "парне";
 Blockly.Msg.MATH_IS_NEGATIVE = "від'ємне";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "ціле";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://uk.wikipedia.org/wiki/Ділення_з_остачею";
 Blockly.Msg.MATH_MODULO_TITLE = "остача від %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Повертає остачу від ділення двох чисел.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://uk.wikipedia.org/wiki/Число";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Число.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "http://www.mapleprimes.com/questions/100441-Applying-Function-To-List-Of-Numbers";
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Задає цю змінну рівною входу.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Змінна з назвою '%1' вже існує.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

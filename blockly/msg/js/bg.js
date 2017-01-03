@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Връща една от често сре�
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "ограничи %1 между %2 и %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Ограничи число да бъде в определените граници (включително).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "се дели на";
 Blockly.Msg.MATH_IS_EVEN = "е четно";
 Blockly.Msg.MATH_IS_NEGATIVE = "е отрицателно";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "е цяло";
 Blockly.Msg.MATH_MODULO_HELPURL = "http://bg.wikipedia.org/wiki/Остатък";
 Blockly.Msg.MATH_MODULO_TITLE = "остатъка от делението на %1 на %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Върни остатъка от деление на две числа.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://bg.wikipedia.org/wiki/Число";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Число.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -376,12 +376,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "премахни интервалите �
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "премахни интервалите отдясно";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "Върни копие на текста с пемахнати интервали от диния или двата края.";
 Blockly.Msg.TODAY = "Днес";
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-Blockly.Msg.UNDO = "Undo";  // untranslated
-=======
 Blockly.Msg.UNDO = "Отмяна";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "елемент";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "Създай \"промени стойността на %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -392,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Задава тази променлива да бъде равен на входа.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Променлива с име '%1' вече съществува.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

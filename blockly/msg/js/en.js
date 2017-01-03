@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "While a value is false, then do
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "While a value is true, then do some statements.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Delete all %1 blocks?";
 Blockly.Msg.DELETE_BLOCK = "Delete Block";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";
 Blockly.Msg.DELETE_X_BLOCKS = "Delete %1 Blocks";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";
@@ -82,9 +82,9 @@ Blockly.Msg.DUPLICATE_BLOCK = "Duplicate";
 Blockly.Msg.ENABLE_BLOCK = "Enable Block";
 Blockly.Msg.EXPAND_ALL = "Expand Blocks";
 Blockly.Msg.EXPAND_BLOCK = "Expand Block";
-Blockly.Msg.EXTERNAL_INPUTS = "Change to Vertical";
+Blockly.Msg.EXTERNAL_INPUTS = "Change to External Inputs";
 Blockly.Msg.HELP = "Help";
-Blockly.Msg.INLINE_INPUTS = "Change to Horizontal";
+Blockly.Msg.INLINE_INPUTS = "Change to Inline Inputs";
 Blockly.Msg.LISTS_APPEND = "append item";
 Blockly.Msg.LISTS_APPEND_HELPURL = "http://google.com";
 Blockly.Msg.LISTS_APPEND_TO = "to list";
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Return one of the common constants: π (3.1
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "constrain %1 low %2 high %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Constrain a number to be between the specified limits (inclusive).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "is divisible by";
 Blockly.Msg.MATH_IS_EVEN = "is even";
 Blockly.Msg.MATH_IS_NEGATIVE = "is negative";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "is whole";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "remainder of %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Return the remainder from dividing the two numbers.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://en.wikipedia.org/wiki/Number";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "A number.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";
@@ -280,13 +280,8 @@ Blockly.Msg.MATH_TRIG_TOOLTIP_ATAN = "Return the arctangent of a number.";
 Blockly.Msg.MATH_TRIG_TOOLTIP_COS = "Return the cosine of a degree (not radian).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_SIN = "Return the sine of a degree (not radian).";
 Blockly.Msg.MATH_TRIG_TOOLTIP_TAN = "Return the tangent of a degree (not radian).";
-<<<<<<< HEAD
-Blockly.Msg.NEW_VARIABLE = "New property...";
+Blockly.Msg.NEW_VARIABLE = "Create property...";
 Blockly.Msg.NEW_VARIABLE_TITLE = "New property name:";
-=======
-Blockly.Msg.NEW_VARIABLE = "Create variable...";
-Blockly.Msg.NEW_VARIABLE_TITLE = "New variable name:";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.ORDINAL_NUMBER_SUFFIX = "";
 Blockly.Msg.PROCEDURES_ALLOW_STATEMENTS = "allow statements";
 Blockly.Msg.PROCEDURES_BEFORE_PARAMS = "with:";
@@ -393,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";
 Blockly.Msg.VARIABLES_SET_TITLE = "set";
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Sets this variable to be equal to the input.";
-<<<<<<< HEAD
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A property named '%1' already exists.";
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

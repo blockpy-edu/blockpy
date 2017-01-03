@@ -50,6 +50,12 @@ Blockly.FieldVariable = function(varname, opt_validator) {
 goog.inherits(Blockly.FieldVariable, Blockly.FieldDropdown);
 
 /**
+ * The menu item index for the new variable option.
+ * @type {number}
+ */
+Blockly.FieldVariable.prototype.newVarItemIndex_ = -1;
+
+/**
  * The menu item index for the rename variable option.
  * @type {number}
  */
@@ -139,6 +145,9 @@ Blockly.FieldVariable.dropdownCreate = function() {
     variableList.push(name);
   }
   variableList.sort(goog.string.caseInsensitiveCompare);
+  
+  this.newVarItemIndex_ = variableList.length;
+  variableList.push(Blockly.Msg.NEW_VARIABLE);
 
   this.renameVarItemIndex_ = variableList.length;
   variableList.push(Blockly.Msg.RENAME_VARIABLE);
@@ -178,6 +187,11 @@ Blockly.FieldVariable.prototype.onItemSelected = function(menu, menuItem) {
               workspace.renameVariable(oldName, newName);
             }
           });
+      return;
+    } else if (this.newVarItemIndex_ >= 0 &&
+               menu.getChildAt(this.newVarItemIndex_) == menuItem) {
+      Blockly.Variables.createVariable(workspace);
+      
       return;
     } else if (this.deleteVarItemIndex_ >= 0 &&
         menu.getChildAt(this.deleteVarItemIndex_) === menuItem) {

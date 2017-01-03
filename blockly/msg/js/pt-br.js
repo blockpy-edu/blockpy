@@ -60,10 +60,11 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_UNTIL = "repita até";
 Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_WHILE = "repita enquanto";
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Enquanto um valor for falso, então faça algumas instruções.";
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Enquanto um valor for verdadeiro, então faça algumas instruções.";
-<<<<<<< HEAD
-Blockly.Msg.DELETE_ALL_BLOCKS = "Apagar todos os %1 blocos?";
-Blockly.Msg.DELETE_BLOCK = "Remover bloco";
-Blockly.Msg.DELETE_X_BLOCKS = "Remover %1 blocos";
+Blockly.Msg.DELETE_ALL_BLOCKS = "Deletar todos os blocos %1?";
+Blockly.Msg.DELETE_BLOCK = "Deletar bloco";
+Blockly.Msg.DELETE_VARIABLE = "Deletar a variável '%1'";
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Deletar %1 usos da variável '%2'?";
+Blockly.Msg.DELETE_X_BLOCKS = "Deletar %1 blocos";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TOOLTIP = "";  // untranslated
@@ -76,13 +77,6 @@ Blockly.Msg.DICTS_CREATE_WITH_TOOLTIP = "";  // untranslated
 Blockly.Msg.DICT_GET = "get key";  // untranslated
 Blockly.Msg.DICT_GET_TO = "of";  // untranslated
 Blockly.Msg.DICT_KEYS = "get all keys from";  // untranslated
-=======
-Blockly.Msg.DELETE_ALL_BLOCKS = "Deletar todos os blocos %1?";
-Blockly.Msg.DELETE_BLOCK = "Deletar bloco";
-Blockly.Msg.DELETE_VARIABLE = "Deletar a variável '%1'";
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Deletar %1 usos da variável '%2'?";
-Blockly.Msg.DELETE_X_BLOCKS = "Deletar %1 blocos";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.DISABLE_BLOCK = "Desabilitar bloco";
 Blockly.Msg.DUPLICATE_BLOCK = "Duplicar";
 Blockly.Msg.ENABLE_BLOCK = "Habilitar bloco";
@@ -218,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Retorna uma das constantes comuns: π (3.14
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "restringe %1 inferior %2 superior %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Restringe um número entre os limites especificados (inclusivo).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "é divisível por";
 Blockly.Msg.MATH_IS_EVEN = "é par";
 Blockly.Msg.MATH_IS_NEGATIVE = "é negativo";
@@ -230,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "é inteiro";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://pt.wikipedia.org/wiki/Opera%C3%A7%C3%A3o_m%C3%B3dulo";
 Blockly.Msg.MATH_MODULO_TITLE = "resto da divisão de %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Retorna o resto da divisão de dois números.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://pt.wikipedia.org/wiki/N%C3%BAmero";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Um número.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -394,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Define esta variável para o valor da entrada.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variável chamada '%1' já existe.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

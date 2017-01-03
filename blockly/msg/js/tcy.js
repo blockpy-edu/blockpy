@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "ಈ ತಿರ್ತ್‍ದ �
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "ಈ ತಿರ್ತ್‌ದ ಸರಿ ಇತ್ತ್ಂಡಲಾ, ಬುಕ್ಕೊದ ಕೆಲವು ಹೇಳಿಕೆಲೆನ್ ಮಲ್ಪುಲ";
 Blockly.Msg.DELETE_ALL_BLOCKS = "ಮಾತ %1 ನಿರ್ಬಂದೊಲೆನ್ ದೆತ್ತ್ ಪಾಡ್ಲೆ ?";
 Blockly.Msg.DELETE_BLOCK = "ಮಾಜಯರ ತಡೆಯಾತ್ಂಡ್";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "ಮಾಜಯರ ಶೇಕಡಾ ೧ ತಡೆಯಾತ್ಂಡ್";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "ಸಾಮಾನ್ಯವಾದ್ ಒಂಜ
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = " %1 ಕಮ್ಮಿ %2 ಜಾಸ್ತಿ %3 ಕಡ್ಡಾಯ ಮಲ್ಪು";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "ನಿಗದಿತ ನಿಯಮೊಗು ನಡುಟು ದಿಂಜ ನಿರ್ಬಂದೊ(ಸೇರ್‍ನಂಚ)";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "ಭಾಗಿಸವೊಲಿಯ";
 Blockly.Msg.MATH_IS_EVEN = "ಸಮೊ ಆತ್ಂಡ್";
 Blockly.Msg.MATH_IS_NEGATIVE = "ರುನೊ ಆತ್ಂಡ್";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "ಮಾಂತ ಆತ್ಂಡ್";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/ಮೋಡ್ಯುಲೊ_ಒಪರೇಶನ್";
 Blockly.Msg.MATH_MODULO_TITLE = " %1 ÷ %2 ಒರಿನ ಬಾಗೊ";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "ರಡ್ಡ್ ಸಂಖ್ಯೆದ ಇಬಾಗೊಡ್ದು ಒರಿನ ಬಾಗೊನು ಪಿರಕೊರು";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://en.wikipedia.org/wiki/ಸಂಖ್ಯೆ";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "ಅ ನಂಬ್ರೊ";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "ಉಲಯಿ ಬರ್ಪುನವು ಸಮಪಾಲ್ ಇಪ್ಪುನಂಚ ವ್ಯತ್ಯಾಸೊ ಮಾಲ್ಪು";
-<<<<<<< HEAD
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A property named '%1' already exists.";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Restituisce una delle costanti comuniː π 
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "costringi %1 da %2 a %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Costringe un numero all'interno dei limiti indicati (compresi).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "è divisibile per";
 Blockly.Msg.MATH_IS_EVEN = "è pari";
 Blockly.Msg.MATH_IS_NEGATIVE = "è negativo";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "è intero";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://it.wikipedia.org/wiki/Resto";
 Blockly.Msg.MATH_MODULO_TITLE = "resto di %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Restituisce il resto della divisione di due numeri.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://it.wikipedia.org/wiki/Numero";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Un numero.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Imposta questa variabile ad essere pari all'input.";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "Una variabile denominata '%1' esiste già.";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

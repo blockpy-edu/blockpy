@@ -204,7 +204,7 @@ Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_DIVIDE = "返回两个数字的商。";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MINUS = "返回两个数字的区别。";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_MULTIPLY = "返回两个数字的乘积。";
 Blockly.Msg.MATH_ARITHMETIC_TOOLTIP_POWER = "返回第一个数的第二个数次幂。";
-Blockly.Msg.MATH_CHANGE_HELPURL = "https://zh.wikipedia.org/wiki/%E5%8A%A0%E6%B3%95";
+Blockly.Msg.MATH_CHANGE_HELPURL = "https://zh.wikipedia.org/wiki/加法";
 Blockly.Msg.MATH_CHANGE_TITLE = "更改 %1 由 %2";
 Blockly.Msg.MATH_CHANGE_TOOLTIP = "将一个数添加到变量“%1”。";
 Blockly.Msg.MATH_CONSTANT_HELPURL = "https://zh.wikipedia.org/wiki/数学常数";
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "返回一个常见常量：π (3.141......)
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "限制数字 %1 介于 (低) %2 到 (高) %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "限制数字介于两个指定的数字之间";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "可被整除";
 Blockly.Msg.MATH_IS_EVEN = "是偶数";
 Blockly.Msg.MATH_IS_NEGATIVE = "为负";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "为整数";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://zh.wikipedia.org/wiki/模除";
 Blockly.Msg.MATH_MODULO_TITLE = "取余数自 %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "返回这两个数字相除后的余数。";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://zh.wikipedia.org/wiki/数";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "一个数字。";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "设置此变量，以使它和输入值相等。";
-<<<<<<< HEAD
-Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = "已存在名为“%1”的变量。";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
+Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

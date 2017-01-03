@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "Mentre un valor sigui fals, lla
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "Mentre un valor sigui cert, llavors executar unes sentències.";
 Blockly.Msg.DELETE_ALL_BLOCKS = "Esborrar els %1 blocs?";
 Blockly.Msg.DELETE_BLOCK = "Esborra bloc";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "Esborra %1 blocs";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "Retorna una de les constants més habituals
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "limitar %1 entre %2 i %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "Limita un nombre perquè estigui entre els límits especificats (inclosos).";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "és divisible per";
 Blockly.Msg.MATH_IS_EVEN = "és parell";
 Blockly.Msg.MATH_IS_NEGATIVE = "és negatiu";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "és enter";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://ca.wikipedia.org/wiki/Residu_%28aritm%C3%A8tica%29";
 Blockly.Msg.MATH_MODULO_TITLE = "residu de %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "Retorna el residu de dividir els dos nombres.";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://ca.wikipedia.org/wiki/Nombre";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "Un nombre.";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -388,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "Modifica aquesta variable al valor introduït.";
-<<<<<<< HEAD
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A property named '%1' already exists.";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;

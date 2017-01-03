@@ -62,8 +62,8 @@ Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL = "ขณะที่ค่าเ�
 Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE = "ขณะที่ค่าเป็นจริง ก็จะทำบางคำสั่ง";
 Blockly.Msg.DELETE_ALL_BLOCKS = "ลบ %1 บล็อกทั้งหมด?";
 Blockly.Msg.DELETE_BLOCK = "ลบบล็อก";
-Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' variable";  // untranslated
-Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' variable?";  // untranslated
+Blockly.Msg.DELETE_VARIABLE = "Delete the '%1' property";  // untranslated
+Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = "Delete %1 uses of the '%2' property?";  // untranslated
 Blockly.Msg.DELETE_X_BLOCKS = "ลบ %1 บล็อก";
 Blockly.Msg.DICTS_CREATE_EMPTY_TITLE = "empty dictionary";  // untranslated
 Blockly.Msg.DICTS_CREATE_WITH_CONTAINER_TITLE_ADD = "Create Dictionary";  // untranslated
@@ -212,7 +212,7 @@ Blockly.Msg.MATH_CONSTANT_TOOLTIP = "คืนค่าคงตัวทาง�
 Blockly.Msg.MATH_CONSTRAIN_HELPURL = "https://en.wikipedia.org/wiki/Clamping_%28graphics%29";  // untranslated
 Blockly.Msg.MATH_CONSTRAIN_TITLE = "จำกัดค่า %1 ต่ำสุด %2 สูงสุด %3";
 Blockly.Msg.MATH_CONSTRAIN_TOOLTIP = "จำกัดค่าของตัวเลขให้อยู่ในช่วงที่กำหนด";
-Blockly.Msg.MATH_DIVISION_SYMBOL = "/";  // untranslated
+Blockly.Msg.MATH_DIVISION_SYMBOL = "÷";  // untranslated
 Blockly.Msg.MATH_IS_DIVISIBLE_BY = "หารลงตัว";
 Blockly.Msg.MATH_IS_EVEN = "เป็นจำนวนคู่";
 Blockly.Msg.MATH_IS_NEGATIVE = "เป็นเลขติดลบ";
@@ -224,7 +224,7 @@ Blockly.Msg.MATH_IS_WHOLE = "เป็นเลขจำนวนเต็ม";
 Blockly.Msg.MATH_MODULO_HELPURL = "https://en.wikipedia.org/wiki/Modulo_operation";
 Blockly.Msg.MATH_MODULO_TITLE = "เศษของ %1 ÷ %2";
 Blockly.Msg.MATH_MODULO_TOOLTIP = "คืนค่าเศษที่ได้จากการหารของตัวเลขทั้งสองจำนวน";
-Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "*";  // untranslated
+Blockly.Msg.MATH_MULTIPLICATION_SYMBOL = "×";  // untranslated
 Blockly.Msg.MATH_NUMBER_HELPURL = "https://th.wikipedia.org/wiki/จำนวน";
 Blockly.Msg.MATH_NUMBER_TOOLTIP = "จำนวน";
 Blockly.Msg.MATH_ONLIST_HELPURL = "";  // untranslated
@@ -306,11 +306,7 @@ Blockly.Msg.PROCEDURES_IFRETURN_HELPURL = "http://c2.com/cgi/wiki?GuardClause"; 
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "ถ้ามีค่าเป็นจริง ให้คืนค่าที่สอง";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "ระวัง: บล็อกนี้ใช้เฉพาะในการสร้างฟังก์ชันเท่านั้น";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "ชื่อนำเข้า:";
-<<<<<<< HEAD
-Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add a parameter to the function.";  // untranslated
-=======
 Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "เพิ่มค่าป้อนเข้าฟังก์ชัน";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "นำเข้า";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "เพิ่ม, ลบ, หรือจัดเรียง ข้อมูลที่ป้อนเข้าฟังก์ชันนี้";
 Blockly.Msg.REDO = "ทำซ้ำ";
@@ -380,12 +376,8 @@ Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT = "ลบช่องว่างด้า�
 Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT = "ลบช่องว่างข้างท้ายของ";
 Blockly.Msg.TEXT_TRIM_TOOLTIP = "คืนค่าสำเนาของข้อความที่ลบเอาช่องว่างหน้าและหลังข้อความออกแล้ว";
 Blockly.Msg.TODAY = "วันนี้";
-<<<<<<< HEAD
 Blockly.Msg.TYPE_CHECK = "type of";  // untranslated
-Blockly.Msg.UNDO = "Undo";  // untranslated
-=======
 Blockly.Msg.UNDO = "ย้อนกลับ";
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.VARIABLES_DEFAULT_NAME = "รายการ";
 Blockly.Msg.VARIABLES_GET_CREATE_SET = "สร้าง \"กำหนด %1\"";
 Blockly.Msg.VARIABLES_GET_HELPURL = "https://github.com/google/blockly/wiki/Variables#get";  // untranslated
@@ -396,11 +388,8 @@ Blockly.Msg.VARIABLES_SET_HELPURL = "https://github.com/google/blockly/wiki/Vari
 Blockly.Msg.VARIABLES_SET_TAIL = "=";  // untranslated
 Blockly.Msg.VARIABLES_SET_TITLE = "set";  // untranslated
 Blockly.Msg.VARIABLES_SET_TOOLTIP = "กำหนดให้ตัวแปรนี้เท่ากับการป้อนข้อมูล";
-<<<<<<< HEAD
+Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A property named '%1' already exists.";  // untranslated
 Blockly.Msg.MATH_CHANGE_TITLE_ITEM = Blockly.Msg.VARIABLES_DEFAULT_NAME;
-=======
-Blockly.Msg.VARIABLE_ALREADY_EXISTS = "A variable named '%1' already exists.";  // untranslated
->>>>>>> 0fb46e31a071c57149222f697bcc989ddb2c404f
 Blockly.Msg.PROCEDURES_DEFRETURN_TITLE = Blockly.Msg.PROCEDURES_DEFNORETURN_TITLE;
 Blockly.Msg.CONTROLS_IF_IF_TITLE_IF = Blockly.Msg.CONTROLS_IF_MSG_IF;
 Blockly.Msg.CONTROLS_WHILEUNTIL_INPUT_DO = Blockly.Msg.CONTROLS_REPEAT_INPUT_DO;
