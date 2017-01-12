@@ -392,3 +392,70 @@ Blockly.Python['list_comprehension'] = function(block) {
   // TODO: Change ORDER_NONE to the correct strength.
   return [code, Blockly.Python.ORDER_NONE];
 };
+
+/**
+ * Decode an XML DOM and create blocks on the workspace.
+ * @param {!Element} xml XML DOM.
+ * @param {!Blockly.Workspace} workspace The workspace.
+ */
+Blockly.Xml.domToWorkspaceDestructive = function(xml, workspace, errorXml) {
+  if (xml instanceof Blockly.Workspace) {
+    var swap = xml;
+    xml = workspace;
+    workspace = swap;
+    console.warn('Deprecated call to Blockly.Xml.domToWorkspace, ' +
+                 'swap the arguments.');
+  }
+  var width;  // Not used in LTR.
+  if (workspace.RTL) {
+    width = workspace.getWidth();
+  }
+  Blockly.Field.startCache();
+  // Safari 7.1.3 is known to provide node lists with extra references to
+  // children beyond the lists' length.  Trust the length, do not use the
+  // looping pattern of checking the index for an object.
+  var childCount = xml.childNodes.length;
+  var existingGroup = Blockly.Events.getGroup();
+  if (!existingGroup) {
+    Blockly.Events.setGroup(true);
+  }
+  Blockly.Events.disable();
+  while (workspace.topBlocks_.length) {
+    workspace.topBlocks_[0].dispose();
+  }
+  workspace.variableList.length = 0;
+  Blockly.Events.enable();
+
+  // Disable workspace resizes as an optimization.
+  if (workspace.setResizesEnabled) {
+    workspace.setResizesEnabled(false);
+  }
+  for (var i = 0; i < childCount; i++) {
+    var xmlChild = xml.childNodes[i];
+    var name = xmlChild.nodeName.toLowerCase();
+    if (name == 'block' ||
+        (name == 'shadow' && !Blockly.Events.recordUndo)) {
+      // Allow top-level shadow blocks if recordUndo is disabled since
+      // that means an undo is in progress.  Such a block is expected
+      // to be moved to a nested destination in the next operation.
+      var block = Blockly.Xml.domToBlock(xmlChild, workspace);
+      var blockX = parseInt(xmlChild.getAttribute('x'), 10);
+      var blockY = parseInt(xmlChild.getAttribute('y'), 10);
+      if (!isNaN(blockX) && !isNaN(blockY)) {
+        block.moveBy(workspace.RTL ? width - blockX : blockX, blockY);
+      }
+    } else if (name == 'shadow') {
+      goog.asserts.fail('Shadow block cannot be a top-level block.');
+    }
+  }
+  if (!existingGroup) {
+    Blockly.Events.setGroup(false);
+  }
+  Blockly.Field.stopCache();
+
+  workspace.updateVariableList(false);
+  // Re-enable workspace resizing.
+  if (workspace.setResizesEnabled) {
+    workspace.setResizesEnabled(true);
+  }      
+}

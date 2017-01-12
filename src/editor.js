@@ -30,8 +30,12 @@ function BlockPyEditor(main, tag) {
     this.blockly = null;
     this.codeMirror = null;
     // The updateStack keeps track of whether an update is percolating, to prevent duplicate update events.
-    this.updateStack = [];
+    this.silenceBlock = false;
+    this.silenceBlockTimer = null;
+    this.silenceText = false;
+    this.silenceModel = 0;
     this.blocksFailed = false;
+    this.blocksFailedTimeout = null;
     
     // Keep track of the toolbox width
     this.blocklyToolboxWidth = 0;
@@ -48,6 +52,11 @@ function BlockPyEditor(main, tag) {
     
     // Handle level switching
     this.main.model.settings.level.subscribe(function() {editor.setLevel()});
+    
+    // Have to force a manual block update
+    //this.updateText();
+    this.updateBlocksFromModel();
+    this.updateTextFromModel();
 }
 
 /**
@@ -69,15 +78,16 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.blockly.enableUndo();
     // Register model changer
     var editor = this;
-    this.blockly.addChangeListener(function() { 
+    this.blockly.addChangeListener(function(evt) { 
         //editor.main.components.feedback.clearEditorErrors();
-        editor.updateCodeFromBlocks();
+        editor.updateBlocks();
+        //editor.updateBlocks();
     });
-    //this.main.model.program.subscribe(function() {editor.updateBlocks()});
+    this.main.model.program.subscribe(function() {editor.updateBlocksFromModel()});
     this.main.model.settings.filename.subscribe(function() {
-        if (editor.main.model.settings.editor() == "Blocks") {
-            editor.updateBlocks()
-        }
+        /*if (editor.main.model.settings.editor() == "Blocks") {
+            editor.updateBlocksFromModel()
+        }*/
     });
     this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
     // Force the proper window size
@@ -138,9 +148,9 @@ BlockPyEditor.prototype.initText = function() {
     var editor = this;
     this.codeMirror.on("change", function() {
         //editor.main.components.feedback.clearEditorErrors();
-        editor.updateCodeFromText()
+        editor.updateText()
     });
-    this.main.model.program.subscribe(function() {editor.updateText()});
+    this.main.model.program.subscribe(function() {editor.updateTextFromModel()});
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
     
@@ -319,7 +329,6 @@ BlockPyEditor.prototype.setModeToText = function() {
     this.hideInstructorMenu();
     this.showTextMenu();
     // Update the text model from the blocks
-    this.updateText(); //TODO: is this necessary?
 }
 
 /**
@@ -333,16 +342,25 @@ BlockPyEditor.prototype.setModeToBlocks = function() {
     this.hideUploadMenu();
     this.hideInstructorMenu();
     this.showBlockMenu();
-    // Update the blocks model from the text
-    success = this.updateBlocks();
-    if (!success) {
+    if (this.blocksFailed !== false) {
+        this.showConversionError();
         var main = this.main;
-        main.components.editor.updateText();
         main.model.settings.editor("Text");
         setTimeout(function() {
             main.components.toolbar.tags.mode_set_text.click();
         }, 0);
     }
+    // Update the blocks model from the text
+    /*
+    success = this.updateBlocksFromModel();
+    if (!success) {
+        var main = this.main;
+        main.components.editor.updateTextFromModel();
+        main.model.settings.editor("Text");
+        setTimeout(function() {
+            main.components.toolbar.tags.mode_set_text.click();
+        }, 0);
+    }*/
 }
 
 /**
@@ -365,6 +383,9 @@ BlockPyEditor.prototype.setModeToSplit = function() {
     this.hideBlockMenu();
     this.hideUploadMenu();
     this.showSplitMenu();
+    if (this.blocksFailed !== false) {
+        this.showConversionError();
+    }
 }
 
 /**
@@ -402,10 +423,8 @@ BlockPyEditor.prototype.setMode = function(mode) {
     }
     // Dispatch according to new mode
     if (mode == 'Blocks') {
-        //this.updateCodeFromText()
         this.setModeToBlocks();
     } else if (mode == 'Text') {
-        //this.updateCodeFromBlocks();
         this.setModeToText();
     } else if (mode == 'Upload') {
         this.setModeToUpload();
@@ -419,18 +438,87 @@ BlockPyEditor.prototype.setMode = function(mode) {
 }
 
 /**
+ * Actually changes the value of the CodeMirror instance
+ *
+ * @param {String} code - The new code for the CodeMirror
+ */
+BlockPyEditor.prototype.setText = function(code) {
+    if (code == undefined || code.trim() == "") {
+        this.codeMirror.setValue("\n");
+    } else {
+        this.codeMirror.setValue(code);
+    }
+    // Ensure that we maintain proper highlighting
+    this.refreshHighlight();
+}
+
+BlockPyEditor.prototype.showConversionError = function() {
+    var error = this.blocksFailed;
+    this.main.components.feedback.editorError(error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ error.args.v[2]+', where it says:<br><code>'+error.args.v[3][2]+'</code>', error.args.v[2]);
+}
+
+BlockPyEditor.prototype.setBlocks = function(python_code) {
+    var xml_code = "";
+    if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
+        var result = this.converter.convertSource(python_code);
+        xml_code = result.xml;
+        window.clearTimeout(this.blocksFailedTimeout);
+        if (result.error !== null) {
+            this.blocksFailed = result.error;
+            var editor = this;
+            this.blocksFailedTimeout = window.setTimeout(function() {
+                editor.showConversionError();
+            }, 500)
+        } else {
+            this.blocksFailed = false;
+            this.main.components.feedback.clearEditorErrors();
+        }
+    }
+    var error_code = this.converter.convertSourceToCodeBlock(python_code);
+    var errorXml = Blockly.Xml.textToDom(error_code);
+    if (xml_code !== '' && xml_code !== undefined) {
+        var blocklyXml = Blockly.Xml.textToDom(xml_code);
+        try {
+            this.setBlocksFromXml(blocklyXml);
+        } catch (e) {
+            console.error(e);
+            this.setBlocksFromXml(errorXml);
+        }
+    } else {
+        this.setBlocksFromXml(errorXml);
+    }
+    Blockly.Events.disable();
+    // Parsons shuffling
+    if (this.main.model.assignment.parsons()) {
+        this.blockly.shuffle();
+    } else {
+        this.blockly.align();
+    }
+    Blockly.Events.enable();
+    if (this.previousLine !== null) {
+        this.refreshBlockHighlight(this.previousLine);
+    }
+}
+
+/**
  * Attempts to update the model for the current code file from the 
  * block workspace. Might be prevented if an update event was already
  * percolating.
  */
-BlockPyEditor.prototype.updateCodeFromBlocks = function() {
-    if (this.updateStack.slice(-1).pop() !== undefined) {
-        return;
+BlockPyEditor.prototype.updateBlocks = function() {
+    if (! this.silenceBlock) {
+        console.log("UB");
+        var newCode = Blockly.Python.workspaceToCode(this.blockly);
+        console.log("+UB", newCode);
+        // Update Model
+        this.silenceModel = 2;
+        this.main.setCode(newCode);
+        // Update Text
+        this.silenceText = true;
+        this.setText(newCode);
+    } else {
+        console.log("UB", "but not actually");
     }
-    var newCode = Blockly.Python.workspaceToCode(this.blockly);
-    this.updateStack.push('blocks');
-    this.main.setCode(newCode);
-    this.updateStack.pop();
 }
 
 /**
@@ -438,37 +526,47 @@ BlockPyEditor.prototype.updateCodeFromBlocks = function() {
  * text editor. Might be prevented if an update event was already
  * percolating. Also unhighlights any lines.
  */
-BlockPyEditor.prototype.updateCodeFromText = function() {
-    if (this.updateStack.slice(-1).pop() !== undefined) {
-        return;
+var timerGuard = null;
+BlockPyEditor.prototype.updateText = function() {
+    if (! this.silenceText) {
+        var newCode = this.codeMirror.getValue();
+        // Update Model
+        this.silenceModel = 2;
+        this.main.setCode(newCode);
+        console.log("+UT", "Finished model?")
+        // Update Blocks
+        this.silenceBlock = true;
+        this.setBlocks(newCode);
+        this.unhighlightLines();
+        var editor = this;
+        if (editor.silenceBlockTimer != null) {
+            clearTimeout(editor.silenceBlockTimer);
+        }
+        this.silenceBlockTimer = window.setTimeout(function() {
+            editor.silenceBlock = false;
+            editor.silenceBlockTimer = null;
+        }, 40);
     }
-    var newCode = this.codeMirror.getValue();
-    this.updateStack.push('text');
-    // TODO: Check to see if an actual change or not
-    this.main.setCode(newCode);
-    this.unhighlightLines();
-    this.updateStack.pop();
-    // Ensure that we maintain proper highlighting
+    this.silenceText = false;
 }
+
+
 
 /**
  * Updates the text editor from the current code file in the
  * model. Might be prevented if an update event was already
  * percolating.
  */
-BlockPyEditor.prototype.updateText = function() {
-    if (this.updateStack.slice(-1).pop() == 'text') {
-        return;
-    }
-    var code = this.main.model.program();
-    this.updateStack.push('text');
-    if (code == undefined || code.trim() == "") {
-        this.codeMirror.setValue("\n");
+BlockPyEditor.prototype.updateTextFromModel = function() {
+    if (this.silenceModel == 0) {
+        console.log("UTFM", "Trigger text");
+        var code = this.main.model.program();
+        this.silenceText = true;
+        this.setText(code);
     } else {
-        this.codeMirror.setValue(code);
+        console.log("UTFM", "but not actually");
+        this.silenceModel -= 1;
     }
-    this.refreshHighlight();
-    this.updateStack.pop();
 }
 
 /**
@@ -478,46 +576,16 @@ BlockPyEditor.prototype.updateText = function() {
  *
  * @returns {Boolean} Returns true upon success.
  */
-BlockPyEditor.prototype.updateBlocks = function() {
-    if (this.updateStack.slice(-1).pop() == 'blocks') {
-        return;
-    }
-    var python_code = this.main.model.program().trim(), xml_code = "";
-    if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
-        var result = this.converter.convertSource(python_code);
-        xml_code = result.xml;
-        if (result.error !== null) {
-            this.blocksFailed = true;
-            this.main.components.feedback.editorError(result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
-            return false;
-        }
-    }
-    if (xml_code !== '' && xml_code !== undefined) {
-        var blocklyXml = Blockly.Xml.textToDom(xml_code);
-        this.updateStack.push('blocks');
-        try {
-            this.setBlocksFromXml(blocklyXml);
-        } catch (e) {
-            console.error(e);
-            var error_code = this.converter.convertSourceToCodeBlock(python_code);
-            var blocklyXml = Blockly.Xml.textToDom(error_code);
-            this.setBlocksFromXml(blocklyXml);
-        }
+BlockPyEditor.prototype.updateBlocksFromModel = function() {
+    if (this.silenceModel == 0) {
+        console.log("UBFM", "Trigger block");
+        var code = this.main.model.program().trim();
+        this.silenceBlock = true;
+        this.setBlocks(code);
     } else {
-        this.updateStack.push('blocks');
-        this.blockly.clear();
+        console.log("UBFM", "but not actually");
+        this.silenceModel -= 1;
     }
-    // Parsons shuffling
-    if (this.main.model.assignment.parsons()) {
-        this.blockly.shuffle();
-    } else {
-        this.blockly.align();
-    }
-    if (this.previousLine !== null) {
-        this.refreshBlockHighlight(this.previousLine);
-    }
-    this.updateStack.pop();
-    return true;
 }
 
 /**
@@ -535,8 +603,8 @@ BlockPyEditor.prototype.getBlocksFromXml = function() {
  * whatever XML DOM is given. This clears out any existing blocks.
  */
 BlockPyEditor.prototype.setBlocksFromXml = function(xml) {
-    this.blockly.clear();
-    Blockly.Xml.domToWorkspace(xml, this.blockly);
+    //this.blockly.clear();
+    Blockly.Xml.domToWorkspaceDestructive(xml, this.blockly);
     //console.log(this.blockly.getAllBlocks());
 }
 
