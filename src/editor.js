@@ -241,7 +241,7 @@ BlockPyEditor.prototype.hideTextMenu = function() {
 BlockPyEditor.prototype.showTextMenu = function() {
     this.textTag.show();
     // Adjust height
-    this.textTag.css('height', '100%');
+    this.textTag.css('height', '450px');
     this.textTag.css('width', '100%');
     // Show CodeMirror
     $(this.codeMirror.getWrapperElement()).show();
@@ -488,7 +488,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
         xml_code = result.xml;
         if (result.error !== null) {
             this.blocksFailed = true;
-            this.components.feedback.editorError(result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
+            this.main.components.feedback.editorError(result.error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ result.error.args.v[2]+', where it says:<br><code>'+result.error.args.v[3][2]+'</code>', result.error.args.v[2]);
             return false;
         }
     }

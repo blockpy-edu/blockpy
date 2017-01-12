@@ -102,6 +102,10 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.components.corgis.openDialog();
         main.components.server.logEvent('editor', 'import')
     });
+    this.tag.find('.blockpy-toolbar-history').click(function() {
+        main.components.history.openDialog();
+        main.components.server.logEvent('editor', 'history')
+    });
     this.tag.find('.blockpy-toolbar-english').click(function() {
         main.components.english.openDialog();
         main.components.server.logEvent('editor', 'english')

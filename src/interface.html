@@ -162,6 +162,9 @@
             <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
             </button>
+            <button type='button' class='btn btn-default blockpy-toolbar-history'>
+                <span class='glyphicon glyphicon-history-alt'></span> History
+            </button>
 
             <!--
             <button type='button' class='btn btn-default blockpy-toolbar-english'>
@@ -186,7 +189,7 @@
                 <div class='blockly-div' style='height:450px; width: 100%' '></div>
                 <!-- <div class='blockly-area'></div> -->
             </div>
-            <div class='blockpy-text blockpy-editor-menu'>
+            <div class='blockpy-text blockpy-editor-menu' style='height: 450px'>
                 <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>
                 <!--
                 <button type='button' class='btn btn-default blockpy-text-insert-if'>Decision (If)</button>

@@ -272,6 +272,7 @@ BlockPy.prototype.initComponents = function() {
     components.engine = new BlockPyEngine(main);
     components.server = new BlockPyServer(main);
     components.corgis = new BlockPyCorgis(main);
+    components.history = new BlockPyHistory(main);
     components.english = new BlockPyEnglish(main);
     components.editor.setMode();
     main.model.status.server('Loaded')
