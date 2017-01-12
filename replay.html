@@ -181,31 +181,99 @@
             global_scrubing = BACKWARD_SCRUB;
             updatePauseButton();
         });
-        //TODO: adjust scrub backwards mechanism to go back to last code event, but run to last event
+        
+        function handleCodeEvents(record){
+            switch (record.action.toLowerCase()) {
+                case "set":
+                    blockpy.model.programs['__main__'](record.body);
+                    blockpy.components.editor.updateBlocks();
+                    break;
+                }
+        }
+
+        function executeLastCodeEvent(pastRecords){
+            var codeEvent = null;
+            for(i = pastRecords.length-1; i >= 0; i--){
+                var rawRecord = pastRecords[i];
+                record = JSON.parse(rawRecord);
+                if(record.event.toLowerCase() == "code"){
+                    codeEvent = record;
+                    break;
+                }
+            }
+            if(codeEvent != null){
+                handleCodeEvents(codeEvent);
+            }
+        }
+
+        function handleFeedbackEvents(record){
+            var messages = record.body.split("\n");
+            var detailError = messages[0];
+            var bodyMessage = "";
+            var regex = /line (\d{1,})/i;
+            for(i = 1; i < messages.length; i++){
+                bodyMessage += messages[i];
+            }
+            var results = regex.exec(bodyMessage);
+            var line = results != null && results.length > 1 ? results[1] : null;
+            switch (record.action.toLowerCase()) {
+                case "success":
+                    blockpy.components.feedback.complete(detailError, bodyMessage, line);
+                    break;
+                case "editor error":
+                    blockpy.components.feedback.editorError(detailError, bodyMessage, line);
+                    break;
+                case "no errors":
+                    blockpy.components.feedback.noErrors(detailError, bodyMessage, line);
+                    break;
+                case "syntax error":
+                    blockpy.components.feedback.syntaxError(detailError, bodyMessage, line);
+                    break;
+                case "semantic error":
+                    blockpy.components.feedback.semanticError(detailError, bodyMessage, line);
+                    break;
+                case "internal error":
+                    blockpy.components.feedback.internalError(detailError, bodyMessage, line);
+                    break;
+                case "instructor feedback":
+                    blockpy.components.feedback.instructorFeedback(detailError, bodyMessage, line);
+                    break;
+                case "empty program":
+                    blockpy.components.feedback.emptyProgram(detailError, bodyMessage, line);
+                    break;
+                default:
+                    console.log(record.action.toLowerCase());
+                    break;
+                // ...
+            }
+        };
+
         $('#replay-button').click(function() {
             var records = $('#replay-data').val().split(/\r?\n/);
             var previousTime = null;
             var pastRecords = [];
+            var goingBackwards = false;
             function processAnother(recordsLeft) {
                 var gap = 100;
                 var moveForward = true;
                 if(global_isPaused){
                     switch(global_scrubing){
                         case BACKWARD_SCRUB:
-                        if(pastRecords.length > 1){
-                            blockpy.components.feedback.clearEditorErrors();
-                            blockpy.components.feedback.clear();
-                            recordsLeft.unshift(pastRecords.pop());
-                            recordsLeft.unshift(pastRecords.pop());
-                        }else{
-                            moveForward = false;
-                        }
-                        global_scrubing = STOP_SCRUB;
-                        previousTime = null;
+                            if(pastRecords.length > 1){
+                                blockpy.components.feedback.clearEditorErrors();
+                                blockpy.components.feedback.clear();
+                                recordsLeft.unshift(pastRecords.pop());
+                                recordsLeft.unshift(pastRecords.pop());
+                                goingBackwards = true;
+                                //TODO: Handle when going backwards to a feedback event
+                            }else{
+                                moveForward = false;
+                            }
+                            //NOTE: This cascades into FORWARD_SCRUB
                         case FORWARD_SCRUB:
-                        global_scrubing = STOP_SCRUB;
-                        previousTime = null;
-                        break;
+                            global_scrubing = STOP_SCRUB;
+                            previousTime = null;
+                            break;
                         default:
                         moveForward = false;
                         break;
@@ -219,66 +287,24 @@
                     pastRecords.push(rawRecord);
                     switch (record.event.toLowerCase()) {
                         case "code":
-                            switch (record.action.toLowerCase()) {
-                                case "set":
-                                    blockpy.model.programs['__main__'](record.body);
-                                    blockpy.components.editor.updateBlocks()
-                                    break;
-                            } 
+                            handleCodeEvents(record);
                             break;
                         case "feedback":
-                            var messages = record.body.split("\n");
-                            var detailError = messages[0];
-                            var bodyMessage = "";
-                            var regex = /line (\d{1,})/i;
-                            for(i = 1; i < messages.length; i++){
-                                bodyMessage += messages[i];
+                            if(goingBackwards){
+                                executeLastCodeEvent(pastRecords);
                             }
-                            var results = regex.exec(bodyMessage);
-                            var line = results != null && results.length > 1 ? results[1] : null;
-                            switch (record.action.toLowerCase()) {
-                                case "success":
-                                    //TODO: change this to success instead of complete when this starts working.
-                                    blockpy.components.feedback.complete(detailError, bodyMessage, line);
-                                    //console.log("success event");
-                                    break;
-                                case "editor error":
-                                    blockpy.components.feedback.editorError(detailError, bodyMessage, line);
-                                    break;
-                                case "no errors":
-                                    blockpy.components.feedback.noErrors(detailError, bodyMessage, line);
-                                    break;
-                                case "syntax error":
-                                    blockpy.components.feedback.syntaxError(detailError, bodyMessage, line);
-                                    break;
-                                case "semantic error":
-                                    blockpy.components.feedback.semanticError(detailError, bodyMessage, line);
-                                    break;
-                                case "internal error":
-                                    blockpy.components.feedback.internalError(detailError, bodyMessage, line);
-                                    break;
-                                case "instructor feedback":
-                                    blockpy.components.feedback.instructorFeedback(detailError, bodyMessage, line);
-                                    break;
-                                case "empty program":
-                                    blockpy.components.feedback.emptyProgram(detailError, bodyMessage, line);
-                                    break;
-                                default:
-                                    console.log(record.action.toLowerCase());
-                                    break;
-                                // ...
-                            }
+                            handleFeedbackEvents(record);
                             break;
                     }
                     if(!global_isPaused){
                         gap = previousTime != null ? record.time - previousTime : 0;
                         gap = (gap > 2000 ? 2000 : gap)*speed;
                         previousTime = record.time;
-                        console.log(gap + ": " + record.time);
+                        console.log(gap + ": " + record.time + ", " + record.assignment);
                     }else{
-                        console.log("freeze frame" + ": " + record.time);
+                        console.log("freeze frame" + ": " + record.time + ", " + record.assignment);
                     }
-                    blockpy.components.editor.getPngFromBlocks
+                    //blockpy.components.editor.getPngFromBlocks
                 }
                 setTimeout(function() {processAnother(recordsLeft)}, gap);
             }
