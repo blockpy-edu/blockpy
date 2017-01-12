@@ -60,7 +60,7 @@ BlockPyFeedback.prototype.clear = function() {
 };
 
 /**
- * Clears any errors from the editor area. I'm not sure that this is actually used.
+ * Clears any errors from the editor area.
  */
 BlockPyFeedback.prototype.clearEditorErrors = function() {
     if (this.main.model.status.error() == "editor") {
@@ -84,7 +84,7 @@ BlockPyFeedback.prototype.editorError = function(original, message, line) {
     this.body.html(message);
     this.main.model.status.error("editor");
     this.main.components.editor.highlightError(line-1);
-    this.main.components.printer.print("Editor error - could not make blocks!");
+    //this.main.components.printer.print("Editor error - could not make blocks!");
     this.main.components.server.logEvent('feedback', "Editor Error", original+"\n|\n"+message);
 }
 
