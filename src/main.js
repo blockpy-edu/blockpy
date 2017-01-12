@@ -119,6 +119,7 @@ function BlockPy(settings, assignment, submission, programs) {
             "__main__": ko.observable(programs.__main__),
             "starting_code": ko.observable(assignment.starting_code),
             "give_feedback": ko.observable(assignment.give_feedback),
+            "answer": ko.observable(assignment.answer)
         }
     };
     
