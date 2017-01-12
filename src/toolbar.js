@@ -94,6 +94,10 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.model.settings.editor("Instructor");
         main.components.server.logEvent('editor', 'instructor')
     });
+    this.tag.find('.blockpy-mode-set-split').click(function() {
+        main.model.settings.editor("Split");
+        main.components.server.logEvent('editor', 'split')
+    });
     this.tag.find('.blockpy-toolbar-import').click(function() {
         main.components.corgis.openDialog();
         main.components.server.logEvent('editor', 'import')

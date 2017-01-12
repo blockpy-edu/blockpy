@@ -47,6 +47,8 @@ function AbstractInterpreter(code, filename) {
     this.report = this.newReport();
     
     this.visit(this.ast);
+    
+    //console.log(this.variables)
     this.postProcess();
 }
 
@@ -171,8 +173,10 @@ function otherBranch(branch) {
 }
 
 AbstractInterpreter.prototype.postProcess = function() {
+    //console.log("POST PORCESS", this.source)
     for (var name in this.variables) {
         if (!(name in this.BUILTINS)) {
+            //console.log("STARTING", name, this.source)
             var trace = this.variables[name];
             if (name == "___") {
                 this.report["Unconnected blocks"].push({"position": trace[0].position})
@@ -204,7 +208,7 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 return result;
             })(this.branchTree[null], null);
-            //console.log("TT", traceTree)
+            //console.log("TT", this.source, traceTree)
             
             var SETTINGS = ["was set", "was read", "was overwritten"],
                 report = this.report,
@@ -509,7 +513,9 @@ AbstractInterpreter.prototype.visit_ImportFrom = function(node) {
 }
 
 AbstractInterpreter.prototype.visit_Name = function(node) {
-    if (node.ctx.name === "Load") {
+    //console.log(node);
+    //TODO:
+    if (node.ctx.prototype._astname === "Load") {
         this.readVariable(node.id.v, this.getLocation(node));
     }
     this.generic_visit(node);
@@ -554,7 +560,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
         iterationList = null;
     for (var i = 0, len = walked.length; i < len; i++) {
         var child = walked[i];
-        if (child._astname === "Name" && child.ctx.name === "Load") {
+        if (child._astname === "Name" && child.ctx.prototype._astname === "Load") {
             iterationList = child.id.v;
             if (this.isTypeEmptyList(child.id.v)) {
                 this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
@@ -580,7 +586,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
     var iterationVariable = null;
     for (var i = 0, len = walked.length; i < len; i++) {
         var child = walked[i];
-        if (child._astname === "Name" && child.ctx.name === "Store") {
+        if (child._astname === "Name" && child.ctx.prototype._astname === "Store") {
             iterationVariable = node.target.id.v;
             this.setIterVariable(node.target.id.v, iterSubtype, this.getLocation(node));
         } else {

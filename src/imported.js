@@ -92,8 +92,8 @@ Blockly.Blocks['datetime_time'] = {
    */
     init: function() {
         this.setColour(DATA_HUE);
-        var dropdown = new Blockly.FieldDropdown([["Now", "NOW"]].concat(HOURS), function(option) {
-            var isNow = (option == 'NOW');
+        var dropdown = new Blockly.FieldDropdown([["Now", "NOW"]].concat(HOURS), function(opt) {
+            var isNow = (opt == 'NOW');
             this.sourceBlock_.updateShape_(isNow);
         });
         this.appendDummyInput()
@@ -105,11 +105,11 @@ Blockly.Blocks['datetime_time'] = {
     mutationToDom: function() {
         var container = document.createElement('mutation');
         var isNow = (this.getFieldValue('HOUR') == 'NOW');
-        container.setAttribute('isNow', isNow);
+        container.setAttribute('isnow', isNow);
         return container;
     },
     domToMutation: function(xmlElement) {
-        var isNow = (xmlElement.getAttribute('isNow') == 'true');
+        var isNow = (xmlElement.getAttribute('isnow') == 'true');
         this.updateShape_(isNow);
     },
     updateShape_: function(isNow) {

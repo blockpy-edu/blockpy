@@ -117,6 +117,6 @@
     if (errors == 0) {
         console.log("All test cases passed!");
     } else {
-        console.log(errors, "test cases failed");
+        console.log(errors, "test cases failed out of", unit_tests.length);
     }
 })();

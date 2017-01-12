@@ -141,6 +141,12 @@
                     <span class='glyphicon glyphicon-list-alt'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
                 </label>
+                <label class="btn btn-default blockpy-mode-set-split"
+                       data-bind="visible: settings.instructor,
+                                  css: {active: settings.editor() == 'Split'}">
+                    <span class='glyphicon glyphicon-list-alt'></span>
+                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Split
+                </label>
                 <label class="btn btn-default blockpy-mode-set-text" 
                        data-bind="css: {active: settings.editor() == 'Text'}">
                     <span class='glyphicon glyphicon-pencil'></span>
