@@ -1,11 +1,22 @@
+/**
+ * An object that manages the main toolbar, including the different mode buttons.
+ * This doesn't actually have many responsibilities after the initial load.
+ *
+ * @constructor
+ * @this {BlockPyToolbar}
+ * @param {Object} main - The main BlockPy instance
+ * @param {HTMLElement} tag - The HTML object this is attached to.
+ */
 function BlockPyToolbar(main, tag) {
     this.main = main;
     this.tag = tag;
     
+    // Holds the HTMLElement tags for each of the toolbar items
     this.tags = {};
     this.tags.mode_set_text = this.tag.find('.blockpy-mode-set-text');
     this.tags.filename_picker = this.tag.find('.blockpy-toolbar-filename-picker');
     
+    // Set up each of the relevant Button Groups
     var groupHtml = '<div class="btn-group" role="group"></div>';
     var runGroup =      $(groupHtml).appendTo(tag);
     var modeGroup =     $(groupHtml).appendTo(tag);
@@ -13,32 +24,10 @@ function BlockPyToolbar(main, tag) {
     var blocksGroup =   $(groupHtml).appendTo(tag);
     var codeGroup =     $(groupHtml).appendTo(tag);
     var programsGroup = $(groupHtml).appendTo(tag);
+    
+    // this used to hold many items, but now we store them directly in the
+    // html of interface.js
     this.elements = {
-        /*'undo': $("<button></button>")
-                            .addClass('btn btn-default blockpy-toolbar-undo')
-                            .attr("role", "group")
-                            .html('<i class="fa fa-undo"></i>')
-                            .appendTo(doGroup),
-        'redo': $("<button></button>")
-                            .addClass('btn btn-default blockpy-toolbar-redo')
-                            .attr("role", "group")
-                            .html('<i class="fa fa-repeat"></i>')
-                            .appendTo(doGroup),*/
-        /*'align': $("<button></button>")
-                            .addClass('btn btn-default blockpy-toolbar-align')
-                            .attr("role", "group")
-                            .html('<i class="fa fa-align-left"></i> Align')
-                            .appendTo(doGroup),
-        'reset': $("<button></button>")
-                            .addClass('btn btn-default blockpy-toolbar-reset')
-                            .attr("role", "group")
-                            .html('<i class="fa fa-refresh"></i> Reset')
-                            .appendTo(doGroup),
-        'clear': $("<button></button>")
-                            .addClass('btn btn-default blockpy-toolbar-clear')
-                            .attr("role", "group")
-                            .html('<i class="fa fa-trash-o"></i> Clear')
-                            .appendTo(doGroup),*/
         'programs': $("<div></div>")
                             .addClass('btn-group blockpy-programs')
                             .attr("data-toggle", "buttons")
@@ -46,9 +35,17 @@ function BlockPyToolbar(main, tag) {
     };    
     this.elements.programs.hide();
     this.elements.editor_mode = this.tag.find('.blockpy-change-mode');
+    
+    // Actually set up the toolbar!
     this.activateToolbar();
 }
 
+/**
+ * Add a new button for the given filename in the Programs button group.
+ * These programs will be things like "__main__".
+ *
+ * @param {String} name - The name of the new program.
+ */
 BlockPyToolbar.prototype.addProgram = function(name) {
     this.elements.programs.append("<label class='btn btn-default'>"+
                                     "<input type='radio' id='"+name+"' "+
@@ -57,18 +54,25 @@ BlockPyToolbar.prototype.addProgram = function(name) {
                                    "</label>");
 }
 
+/**
+ * Show the programs button group.
+ */
 BlockPyToolbar.prototype.showPrograms = function() {
     this.elements.programs.show();
 }
 
+/**
+ * Hide the programs button group.
+ */
 BlockPyToolbar.prototype.hidePrograms = function() {
     this.elements.programs.hide();
 }
     
-    
+/**
+ * Register click events for more complex toolbar actions.
+ */
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
-    var elements = this.elements;
     this.tag.find('.blockpy-run').click(function() {
         main.components.engine.run();
         main.components.server.logEvent('editor', 'run')

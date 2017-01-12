@@ -35,6 +35,7 @@ function AbstractInterpreter(code, filename) {
     this.astStackDepth = 0;
     
     this.variables = {};
+    this.variableTypes = {};
     for (var name in this.BUILTINS) {
         this.setVariable(name, this.BUILTINS[name]);
     }
@@ -209,7 +210,8 @@ AbstractInterpreter.prototype.postProcess = function() {
                 report = this.report,
                 previousType = null,
                 testTypeEquality = this.testTypeEquality.bind(this),
-                overwrittenLine = null;
+                overwrittenLine = null,
+                variableTypes = this.variableTypes;
             var finalState = (function walkState(nodes, previous) {
                 var result;
                 if (previous === null) {
@@ -221,6 +223,9 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 for (var i = 0, len = nodes.length; i < len; i += 1) {
                     var node = nodes[i];
+                    if (node.type !== null && node.type !== undefined && !(name in variableTypes)) {
+                        variableTypes[name] = node.type;
+                    }
                     if (node.method == "branch") {
                         var ifResult = walkState(node["if"], result)
                         var elseResult = walkState(node["else"], result)
