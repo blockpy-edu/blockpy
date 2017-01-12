@@ -135,3 +135,12 @@
 .col-md-12 { padding-left: 0px; padding-right: 0px; }   
 .container-fluid {padding-left: 0px; padding-right: 0px; } 
 */
+
+div.blockpy-text.blockpy-editor-menu.col-md-6 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
+    padding-left: 0px;
+}

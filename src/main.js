@@ -140,7 +140,7 @@ function BlockPy(settings, assignment, submission, programs) {
             case 'syntax': return ['label-syntax-error', 'Syntax Error'];
             case 'editor': return ['label-syntax-error', 'Editor Error'];
             case 'internal': return ['label-internal-error', 'Internal Error'];
-            case 'semantic': return ['label-semantic-error', 'Semantic Error'];
+            case 'semantic': return ['label-semantic-error', 'Algorithm Error'];
             case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
             case 'complete': return ['label-problem-complete', 'Complete'];
             case 'no errors': return ['label-no-errors', 'No errors'];

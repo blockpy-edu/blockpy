@@ -203,6 +203,30 @@ BlockPyEditor.prototype.addAvailableModule = function(name) {
 /**
  * Hides the Text tab, which involves shrinking it and hiding its CodeMirror too.
  */
+BlockPyEditor.prototype.hideSplitMenu = function() {
+    this.hideTextMenu();
+    this.hideBlockMenu();
+}
+
+/**
+ * Shows the Text tab, which requires restoring its height, showing AND refreshing
+ * the CodeMirror instance.
+ */
+BlockPyEditor.prototype.showSplitMenu = function() {
+    this.showBlockMenu();
+    this.showTextMenu();
+    
+    this.textTag.css('width', '40%');
+    this.blockTag.css('width', '60%');
+    this.textSidebarTag.css('width', '0px');
+    this.textTag.addClass('col-md-6');
+    this.blockTag.addClass('col-md-6');
+    Blockly.svgResize(this.blockly);
+}
+
+/**
+ * Hides the Text tab, which involves shrinking it and hiding its CodeMirror too.
+ */
 BlockPyEditor.prototype.hideTextMenu = function() {
     this.textTag.css('height', '0%');
     $(this.codeMirror.getWrapperElement()).hide();
@@ -218,6 +242,7 @@ BlockPyEditor.prototype.showTextMenu = function() {
     this.textTag.show();
     // Adjust height
     this.textTag.css('height', '100%');
+    this.textTag.css('width', '100%');
     // Show CodeMirror
     $(this.codeMirror.getWrapperElement()).show();
     // CodeMirror doesn't know its changed size
@@ -228,6 +253,7 @@ BlockPyEditor.prototype.showTextMenu = function() {
     var sideBarWidth = this.blocklyToolboxWidth-codemirrorGutterWidth-2;
     this.textSidebarTag.css('width', sideBarWidth+'px');
     this.textSidebarTag.show();
+    this.textTag.removeClass('col-md-6');
 }
 
 /**
@@ -244,8 +270,11 @@ BlockPyEditor.prototype.hideBlockMenu = function() {
  */
 BlockPyEditor.prototype.showBlockMenu = function() {
     this.blockTag.css('height', '100%');
+    this.blockTag.css('width', '100%');
     this.blockly.resize();
     this.blockly.setVisible(true);
+    this.blockTag.removeClass('col-md-6');
+    Blockly.svgResize(this.blockly);
 }
 
 /**
@@ -328,6 +357,17 @@ BlockPyEditor.prototype.setModeToUpload = function() {
 }
 
 /**
+ * Sets the current editor mode to Split mode, hiding the other menus.
+ */
+BlockPyEditor.prototype.setModeToSplit = function() {
+    this.hideTextMenu();
+    this.hideInstructorMenu();
+    this.hideBlockMenu();
+    this.hideUploadMenu();
+    this.showSplitMenu();
+}
+
+/**
  * Sets the current editor mode to the Instructor mode, hiding the other menus.
  */
 BlockPyEditor.prototype.setModeToInstructor = function() {
@@ -369,6 +409,8 @@ BlockPyEditor.prototype.setMode = function(mode) {
         this.setModeToText();
     } else if (mode == 'Upload') {
         this.setModeToUpload();
+    } else if (mode == 'Split') {
+        this.setModeToSplit();
     } else if (mode == 'Instructor') {
         this.setModeToInstructor();
     } else {
