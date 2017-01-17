@@ -467,7 +467,9 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
             this.blocksFailed = result.error;
             var editor = this;
             this.blocksFailedTimeout = window.setTimeout(function() {
-                editor.showConversionError();
+                if (editor.main.model.settings.editor() != 'Text') {
+                    editor.showConversionError();
+                }
             }, 500)
         } else {
             this.blocksFailed = false;
@@ -476,7 +478,9 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
     }
     var error_code = this.converter.convertSourceToCodeBlock(python_code);
     var errorXml = Blockly.Xml.textToDom(error_code);
-    if (xml_code !== '' && xml_code !== undefined) {
+    if (python_code == '' || python_code == undefined || python_code.trim() == '') {
+        this.blockly.clear();
+    } else if (xml_code !== '' && xml_code !== undefined) {
         var blocklyXml = Blockly.Xml.textToDom(xml_code);
         try {
             this.setBlocksFromXml(blocklyXml);
@@ -507,17 +511,13 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
  */
 BlockPyEditor.prototype.updateBlocks = function() {
     if (! this.silenceBlock) {
-        console.log("UB");
         var newCode = Blockly.Python.workspaceToCode(this.blockly);
-        console.log("+UB", newCode);
         // Update Model
         this.silenceModel = 2;
         this.main.setCode(newCode);
         // Update Text
         this.silenceText = true;
         this.setText(newCode);
-    } else {
-        console.log("UB", "but not actually");
     }
 }
 
@@ -533,24 +533,28 @@ BlockPyEditor.prototype.updateText = function() {
         // Update Model
         this.silenceModel = 2;
         this.main.setCode(newCode);
-        console.log("+UT", "Finished model?")
         // Update Blocks
         this.silenceBlock = true;
         this.setBlocks(newCode);
         this.unhighlightLines();
-        var editor = this;
-        if (editor.silenceBlockTimer != null) {
-            clearTimeout(editor.silenceBlockTimer);
-        }
-        this.silenceBlockTimer = window.setTimeout(function() {
-            editor.silenceBlock = false;
-            editor.silenceBlockTimer = null;
-        }, 40);
+        this.resetBlockSilence();
     }
     this.silenceText = false;
 }
 
-
+/**
+ * Resets the silenceBlock after a short delay
+ */
+BlockPyEditor.prototype.resetBlockSilence = function() {
+    var editor = this;
+    if (editor.silenceBlockTimer != null) {
+        clearTimeout(editor.silenceBlockTimer);
+    }
+    this.silenceBlockTimer = window.setTimeout(function() {
+        editor.silenceBlock = false;
+        editor.silenceBlockTimer = null;
+    }, 40);
+};
 
 /**
  * Updates the text editor from the current code file in the
@@ -559,12 +563,10 @@ BlockPyEditor.prototype.updateText = function() {
  */
 BlockPyEditor.prototype.updateTextFromModel = function() {
     if (this.silenceModel == 0) {
-        console.log("UTFM", "Trigger text");
         var code = this.main.model.program();
         this.silenceText = true;
         this.setText(code);
     } else {
-        console.log("UTFM", "but not actually");
         this.silenceModel -= 1;
     }
 }
@@ -578,12 +580,11 @@ BlockPyEditor.prototype.updateTextFromModel = function() {
  */
 BlockPyEditor.prototype.updateBlocksFromModel = function() {
     if (this.silenceModel == 0) {
-        console.log("UBFM", "Trigger block");
         var code = this.main.model.program().trim();
         this.silenceBlock = true;
         this.setBlocks(code);
+        this.resetBlockSilence();
     } else {
-        console.log("UBFM", "but not actually");
         this.silenceModel -= 1;
     }
 }

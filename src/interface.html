@@ -142,9 +142,8 @@
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
                 </label>
                 <label class="btn btn-default blockpy-mode-set-split"
-                       data-bind="visible: settings.instructor,
-                                  css: {active: settings.editor() == 'Split'}">
-                    <span class='glyphicon glyphicon-list-alt'></span>
+                       data-bind="css: {active: settings.editor() == 'Split'}">
+                    <span class='glyphicon glyphicon-resize-horizontal'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Split
                 </label>
                 <label class="btn btn-default blockpy-mode-set-text" 
@@ -160,10 +159,10 @@
                 <span class='glyphicon glyphicon-picture'></span> Capture
             </button>-->
             <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
-                <span class='glyphicon glyphicon-list-alt'></span> Import Datasets
+                <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
             </button>
             <button type='button' class='btn btn-default blockpy-toolbar-history'>
-                <span class='glyphicon glyphicon-history-alt'></span> History
+                <span class='glyphicon glyphicon-hourglass'></span> History
             </button>
 
             <!--

@@ -83,7 +83,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     });
     this.tag.find('.blockpy-toolbar-reset').click(function() {
         main.model.programs['__main__'](main.model.programs['starting_code']());
-        main.components.editor.updateBlocks();
+        //main.components.editor.updateBlocks();
         main.components.server.logEvent('editor', 'reset');
     });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {

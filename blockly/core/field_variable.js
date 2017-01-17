@@ -190,8 +190,12 @@ Blockly.FieldVariable.prototype.onItemSelected = function(menu, menuItem) {
       return;
     } else if (this.newVarItemIndex_ >= 0 &&
                menu.getChildAt(this.newVarItemIndex_) == menuItem) {
-      Blockly.Variables.createVariable(workspace);
-      
+      var that = this;
+      Blockly.Variables.createVariable(workspace, function(new_name) {
+        if (new_name !== null && new_name !== undefined) {
+            that.setValue(new_name);
+        }
+      });
       return;
     } else if (this.deleteVarItemIndex_ >= 0 &&
         menu.getChildAt(this.deleteVarItemIndex_) === menuItem) {

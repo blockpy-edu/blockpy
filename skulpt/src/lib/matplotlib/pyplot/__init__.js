@@ -343,15 +343,18 @@ var $builtinmodule = function(name) {
             }
         }
         if (Sk.console.pngMode) {
+            var doctype = '<?xml version="1.0" standalone="no"?>' + '<' + '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
             var xml = new XMLSerializer().serializeToString(chart.svg[0][0]);
-            var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+            var blob = new Blob([ doctype + xml], { type: 'image/svg+xml' });
+            var url = window.URL.createObjectURL(blob);
+            //var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
             var img  = document.createElement("img");
-            img.setAttribute('src', data);
             img.style.display = 'block';
             var oldChart = chart;
             var oldPlots = plots;
             Sk.console.printHtml(img, oldPlots);
             resetChart();
+            oldChart.svg[0][0].parentNode.replaceChild(img, oldChart.svg[0][0])
             img.onload = function() {
                 img.onload = null;
                 //TODO: Make this capture a class descendant. Cross the D3/Jquery barrier!
@@ -362,12 +365,12 @@ var $builtinmodule = function(name) {
                 ctx.drawImage(img, 0, 0);
                 var canvasUrl = canvas.toDataURL("image/png");
                 img.setAttribute('src', canvasUrl);
-                oldChart.svg[0][0].parentNode.replaceChild(img, oldChart.svg[0][0])
                 // Snip off this chart, we can now start a new one.
             }
             img.onerror = function() {
                 
             }
+            img.setAttribute('src', url);
         } else {
             Sk.console.printHtml(chart.svg, plots);
             // Snip off this chart, we can now start a new one.

@@ -29,7 +29,12 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
         xml.appendChild(raw_block(python_source))
         return {"xml": xmlToString(xml), "error": error};
     }
-    this.comments = parse.comments;
+    this.comments = {};
+    for (var commentLocation in parse.comments) {
+        var lineColumn = commentLocation.split(",");
+        var yLocation = parseInt(lineColumn[0], 10);
+        this.comments[yLocation] = parse.comments[commentLocation];
+    }
     this.measureNode(ast);
     var converted = this.convert(ast);
     if (converted !== null) {
@@ -107,21 +112,39 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     // This is tricked by semicolons. Hard to get around that...
     // TODO: Force semicolon breaks in a preprocessor, and extract comments too
-    //console.log(this.comments);
-    //console.log('text_comment');
     
     // Build the actual blocks
-    var from = node[0].lineno;
+    var lineFrom = node[0].lineno;
     var to = this.heights.shift();
+    var currentLine = 0;
     
     // Walk through and convert the blocks to statements
     var children = [];
     var currentChild = null,
-        firstChild = null;
+        firstChild = null,
+        commentChildren = [],
+        actualLine = 0,
+        previousLine = 0;
     for (var i = 0; i < node.length; i++) {
-        from = node[i].lineno;
+        actualLine += 1;
+        // Handle actual line
+        lineFrom = node[i].lineno;
+        currentLine = lineFrom;
         to = this.heights.shift();
-        var newChild = this.convertStatement(node[i], this.getSourceCode(from, to), is_top_level);
+        var newChild = this.convertStatement(node[i], this.getSourceCode(lineFrom, to), is_top_level);
+        var distance = lineFrom - previousLine;
+        actualLine += distance-1;
+        
+        // Handle earlier comments
+        if (is_top_level) {
+            for (var yLocation in this.comments) {
+                if (yLocation < actualLine && actualLine-distance+1 <= yLocation) {
+                    commentChild = this.Comment(this.comments[yLocation], yLocation);
+                    children.push(commentChild);
+                }
+            }
+        }
+        previousLine = lineFrom;
         
         // Skip null blocks (e.g., imports)
         if (newChild !== null) {
@@ -150,6 +173,12 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     if (firstChild !== null) {
         children.unshift(firstChild);
     }
+    
+    // Handle trailing comments
+    if (lineFrom+1 in this.comments) {
+        children.push(this.Comment(this.comments[lineFrom+1], lineFrom));
+    }
+    
     return children;
 }
 
@@ -224,8 +253,8 @@ function block(type, lineNumber, fields, values, settings, mutations, statements
     return newBlock;
 }
 
-raw_block = function(text) {
-    return block("raw_block", 0, { "TEXT": text });
+raw_block = function(txt) {
+    return block("raw_block", 0, { "TEXT": txt });
 }
 
 PythonToBlocks.prototype.convert = function(node, is_top_level) {
@@ -284,6 +313,12 @@ PythonToBlocks.prototype.getChunkHeights = function(node) {
 PythonToBlocks.prototype.Module = function(node)
 {
     return this.convertBody(node.body, true);
+}
+
+PythonToBlocks.prototype.Comment = function(txt, lineno) {
+    return block("comment_single", lineno, {
+        "BODY": txt.slice(1)
+    }, {}, {}, {}, {})
 }
 
 /*
@@ -1200,6 +1235,12 @@ PythonToBlocks.prototype.Call = function(node) {
                     return block("math_on_list", node.lineno, {"OP": "MAX"}, {"LIST": this.convert(args[0])})
                 case "len":
                     return block("lists_length", node.lineno, {}, {"VALUE": this.convert(args[0])})
+                case "xrange":
+                    return block("procedures_callreturn", node.lineno, {}, 
+                        {"ARG0": this.convert(args[0])},
+                        {"inline": "true"}, 
+                        {"@name": "xrange",
+                         "": this.convert(args[0])})
                 default:
                     if (starargs !== null && starargs.length > 0) {
                         throw new Error("*args (variable arguments) are not implemented yet.");
@@ -1256,7 +1297,12 @@ PythonToBlocks.prototype.Num_value = function(node)
 PythonToBlocks.prototype.Str = function(node)
 {
     var s = node.s;
-    return block("text", node.lineno, {"TEXT": Sk.ffi.remapToJs(s)});
+    var strValue = Sk.ffi.remapToJs(s);
+    if (strValue.split("\n").length > 1) {
+        return block("string_multiline", node.lineno, {"TEXT": strValue});
+    } else {
+        return block("text", node.lineno, {"TEXT": strValue});
+    }
 }
 
 PythonToBlocks.prototype.Str_value = function(node) {
