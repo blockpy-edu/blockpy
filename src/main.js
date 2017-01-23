@@ -85,6 +85,8 @@ function BlockPy(settings, assignment, submission, programs) {
             'error': ko.observable('none'),
             // "Loading", "Saving", "Ready", "Disconnected", "Error"
             'server': ko.observable("Loading"),
+            // Some message from a server error can go here
+            'server_error': ko.observable(''),
             // Dataset loading
             'dataset_loading': ko.observableArray()
         },
@@ -223,6 +225,7 @@ BlockPy.DEFAULT_MODULES = ['Properties', 'Decisions',
  *
  */
 BlockPy.prototype.initMain = function() {
+    this.turnOnHacks();
     this.initInterface();
     this.initModel();
     this.initComponents();
@@ -277,6 +280,14 @@ BlockPy.prototype.initComponents = function() {
     components.english = new BlockPyEnglish(main);
     components.editor.setMode();
     main.model.status.server('Loaded')
+    
+    var statusBox = container.find(".blockpy-status-box");
+    main.model.status.server.subscribe(function(newValue) {
+        if (newValue == "Error" || newValue == "Offline") {
+            statusBox.effect("shake");
+        }
+    });
+    statusBox.tooltip();
 }
 
 /**
@@ -311,4 +322,43 @@ BlockPy.prototype.setCode = function(code, name) {
         name = this.model.settings.filename();
     }
     this.model.programs[name](code);
+}
+
+/**
+ * Function for running any code that fixes bugs and stuff upstream.
+ * Not pleasant that this exists, but better to have it isolated than
+ * just lying about randomly...
+ *
+ */
+BlockPy.prototype.turnOnHacks = function() {
+    /*
+     * jQuery UI shake - Padding disappears
+     * Courtesy: http://stackoverflow.com/questions/22301972/jquery-ui-shake-padding-disappears
+     */
+    if ($.ui) {
+        (function () {
+            var oldEffect = $.fn.effect;
+            $.fn.effect = function (effectName) {
+                if (effectName === "shake") {
+                    var old = $.effects.createWrapper;
+                    $.effects.createWrapper = function (element) {
+                        var result;
+                        var oldCSS = $.fn.css;
+
+                        $.fn.css = function (size) {
+                            var _element = this;
+                            var hasOwn = Object.prototype.hasOwnProperty;
+                            return _element === element && hasOwn.call(size, "width") && hasOwn.call(size, "height") && _element || oldCSS.apply(this, arguments);
+                        };
+
+                        result = old.apply(this, arguments);
+
+                        $.fn.css = oldCSS;
+                        return result;
+                    };
+                }
+                return oldEffect.apply(this, arguments);
+            };
+        })();
+    }
 }

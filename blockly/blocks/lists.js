@@ -31,7 +31,7 @@ goog.require('Blockly.Blocks');
 /**
  * Common HSV hue for all blocks in this category.
  */
-Blockly.Blocks.lists.HUE = 100;
+Blockly.Blocks.lists.HUE = 30;
 
 Blockly.Blocks['lists_create_empty'] = {
   /**

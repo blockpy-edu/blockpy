@@ -112,22 +112,6 @@ Blockly.Variables.flyoutCategory = function(workspace) {
   xmlList.push(button);
 
   if (variableList.length > 0) {
-    if (Blockly.Blocks['variables_set']) {
-      // <block type="variables_set" gap="20">
-      //   <field name="VAR">item</field>
-      // </block>
-      var block = goog.dom.createDom('block');
-      block.setAttribute('type', 'variables_set');
-      if (Blockly.Blocks['math_change']) {
-        block.setAttribute('gap', 8);
-      } else {
-        block.setAttribute('gap', 24);
-      }
-      var field = goog.dom.createDom('field', null, variableList[0]);
-      field.setAttribute('name', 'VAR');
-      block.appendChild(field);
-      xmlList.push(block);
-    }
     /*
     if (Blockly.Blocks['math_change']) {
       // <block type="math_change">
@@ -161,6 +145,24 @@ Blockly.Variables.flyoutCategory = function(workspace) {
       xmlList.push(block);
     }*/
 
+    for (var i = 0; i < variableList.length; i++) {
+      if (Blockly.Blocks['variables_set']) {
+        // <block type="variables_set" gap="20">
+        //   <field name="VAR">item</field>
+        // </block>
+        var block = goog.dom.createDom('block');
+        block.setAttribute('type', 'variables_set');
+        if (Blockly.Blocks['math_change']) {
+          block.setAttribute('gap', 8);
+        } else {
+          //block.setAttribute('gap', 24);
+        }
+        var field = goog.dom.createDom('field', null, variableList[i]);
+        field.setAttribute('name', 'VAR');
+        block.appendChild(field);
+        xmlList.push(block);
+      }
+    }
     for (var i = 0; i < variableList.length; i++) {
       if (Blockly.Blocks['variables_get']) {
         // <block type="variables_get" gap="8">

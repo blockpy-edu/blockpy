@@ -26,9 +26,11 @@
         </div>
         <div class='blockpy-content-topright col-md-3 col-sm-3'>
             <span class='text-muted' data-bind="visible: status.dataset_loading().length">Loading Dataset!</span>
-            <span class='pull-right label label-default'
+            <span class='pull-right label label-default blockpy-status-box'
                   data-bind="css: status_server_class()[0],
-                             text: status_server_class()[1]">Loading</span>
+                             text: status_server_class()[1],
+                             attr: { 'data-original-title': status.server_error }"
+                  data-toggle="tooltip" data-placement="left">Loading</span>
             <div class='pull-right'>
                 Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors">
                 <label class='blockpy-toolbar-auto-upload' data-bind="visible: settings.instructor">

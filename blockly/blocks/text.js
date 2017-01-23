@@ -43,7 +43,7 @@ Blockly.Blocks['text'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_TEXT_HELPURL);
-    this.setColour(Blockly.Blocks.texts.HUE);
+    this.setColour(DATA_HUE);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
