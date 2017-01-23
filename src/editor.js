@@ -504,6 +504,15 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
     }
 }
 
+BlockPyEditor.prototype.clearDeadBlocks = function() {
+    var all_blocks = this.blockly.getAllBlocks();
+    all_blocks.forEach(function(elem) {
+        if (!Blockly.Python[elem.type]) {
+            elem.dispose(true);
+        }
+    });
+}
+
 /**
  * Attempts to update the model for the current code file from the 
  * block workspace. Might be prevented if an update event was already
@@ -511,7 +520,12 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
  */
 BlockPyEditor.prototype.updateBlocks = function() {
     if (! this.silenceBlock) {
-        var newCode = Blockly.Python.workspaceToCode(this.blockly);
+        try {
+            var newCode = Blockly.Python.workspaceToCode(this.blockly);
+        } catch (e) {
+            this.clearDeadBlocks();
+            this.main.components.feedback.editorError("Unknown Block", "It looks like you attempted to paste or load some blocks that were not known. Typically, this is because you failed to load in the dataset before trying to paste in a data block. If there are any black blocks on the canvas, delete them before continuing.", "Unknown Block");
+        }
         // Update Model
         this.silenceModel = 2;
         this.main.setCode(newCode);

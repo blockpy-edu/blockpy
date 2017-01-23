@@ -26,16 +26,24 @@ BlockPyServer.prototype.TIMER_DELAY = 1000;
 
 BlockPyServer.prototype.createServerData = function() {
     var assignment = this.main.model.assignment;
+    var d = new Date();
+    var seconds = Math.round(d.getTime() / 1000);
     return {
         'assignment_id': assignment.assignment_id,
         'course_id': assignment.course_id,
         'student_id': assignment.student_id,
-        'version': assignment.version()
+        'version': assignment.version(),
+        'timestamp': seconds
     }
 }
 
-BlockPyServer.prototype.setStatus = function(status) {
+BlockPyServer.prototype.setStatus = function(status, server_error) {
     this.main.model.status.server(status);
+    if (server_error !== undefined) {
+        this.main.model.status.server_error(server_error);
+    } else {
+        this.main.model.status.server_error('');
+    }
 }
 
 BlockPyServer.prototype.defaultResponse = function(response) {
@@ -45,11 +53,11 @@ BlockPyServer.prototype.defaultResponse = function(response) {
         this.setStatus('Saved');
     } else {
         console.error(response);
-        this.setStatus('Error');
+        this.setStatus('Error', response.message);
     }
 }
-BlockPyServer.prototype.defaultFailure = function() {
-    this.setStatus('Disconnected');
+BlockPyServer.prototype.defaultFailure = function(error, textStatus) {
+    this.setStatus('Disconnected', "Could not access server!\n"+textStatus);
 }
 
 BlockPyServer.prototype.logEvent = function(event_name, action, body) {
@@ -68,7 +76,7 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
                this.defaultResponse.bind(this))
          .fail(this.defaultFailure.bind(this));
     } else {
-        this.setStatus('Offline');
+        this.setStatus('Offline', "Server is not connected!");
     }
 }
 
@@ -87,7 +95,7 @@ BlockPyServer.prototype.markSuccess = function(success) {
                    server.defaultResponse.bind(server))
              .fail(server.defaultFailure.bind(server));
         } else {
-            server.setStatus('Offline');
+            server.setStatus('Offline', "Server is not connected!");
         }
     });
 };
@@ -114,7 +122,7 @@ BlockPyServer.prototype.saveAssignment = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline');
+        this.setStatus('Offline', "Server is not connected!");
     }
 }
 
@@ -137,7 +145,7 @@ BlockPyServer.prototype.saveCode = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline');
+        this.setStatus('Offline', "Server is not connected!");
     }
 }
 
@@ -152,7 +160,7 @@ BlockPyServer.prototype.getHistory = function(callback) {
                callback.bind(server))
          .fail(server.defaultFailure.bind(server));
     } else {
-        this.setStatus('Offline');
+        this.setStatus('Offline', "Server is not connected!");
         callback([
             {code: "=", time: "20160801-105102"},
             {code: "= 0", time: "20160801-105112"},
