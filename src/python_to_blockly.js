@@ -254,7 +254,12 @@ function block(type, lineNumber, fields, values, settings, mutations, statements
 }
 
 raw_block = function(txt) {
+    // TODO: lineno as second parameter!
     return block("raw_block", 0, { "TEXT": txt });
+}
+
+raw_expression = function(txt, lineno) {
+    return block("raw_expression", lineno, {"TEXT": txt});
 }
 
 PythonToBlocks.prototype.convert = function(node, is_top_level) {
@@ -1079,7 +1084,7 @@ PythonToBlocks.KNOWN_MODULES = {
     }
 };
 PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
-PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs) {
+PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs, node) {
     var name = this.identifier(func.attr);
     if (func.value._astname == "Name") {
         var module = this.identifier(func.value.id);
@@ -1183,15 +1188,39 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             default: throw new Error("Unknown function call!");
         }
     } else {
-        console.log(func, args, keywords, starargs, kwargs);
-        
+        //console.log(func, args, keywords, starargs, kwargs);
+        heights = this.getChunkHeights(node);
+        extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
+        var col_endoffset = node.col_endoffset;
+        if (args.length > 0) {
+            for (var i = 0; i < args.length; i+= 1) {
+                col_endoffset = args[i].col_endoffset;
+            }
+        } else {
+            col_endoffset += 2;
+            expressionCall += "()";
+        }
+        var expressionCall = extractedSource.slice(node.col_offset, 1+col_endoffset);
+        //console.log(node, extractedSource, node.col_offset, node.col_endoffset);
+        var lineno = node.lineno;
+        //console.error(e);
+        return raw_expression(expressionCall, lineno);
         /*
         var arguments = {};
-        for (var i = 0; i < args.length; i++) {
-            arguments["ARGUMENT"+i] = this.convert(args[i]);
+        var argumentsMutation = {"@name": name};
+        for (var i = 0; i < args.length; i+= 1) {
+            arguments["ARG"+i] = this.convert(args[i]);
+            argumentsMutation[i] = this.convert(args[i]);
         }
-        return block("function_call", {"NAME": name}, arguments);*/
-        //throw new Error("Unknown function call or not implemented");
+        var methodCall = block("procedures_callreturn", node.lineno, {
+        }, arguments, {
+            "inline": "false"
+        }, argumentsMutation);
+        
+        return block("attribute_access", node.lineno, {}, {
+            "MODULE": this.convert(func.value),
+            "NAME": methodCall
+        }, { "inline": "false"}, {});*/
     }
 }
 
@@ -1260,7 +1289,7 @@ PythonToBlocks.prototype.Call = function(node) {
         // Direct function call
         case "Attribute":
         // Module function call
-            return this.CallAttribute(func, args, keywords, starargs, kwargs);
+            return this.CallAttribute(func, args, keywords, starargs, kwargs, node);
     }
 }
 
