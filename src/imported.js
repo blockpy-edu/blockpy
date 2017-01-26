@@ -509,3 +509,27 @@ Blockly.Python['string_multiline'] = function(block) {
   var code = '"""'+text_body+'"""\n';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
+
+Blockly.Blocks['attribute_access'] = {
+  init: function() {
+    this.appendValueInput("MODULE")
+        .setCheck(null);
+    this.appendValueInput("NAME")
+        .setCheck(null)
+        .appendField(".");
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['attribute_access'] = function(block) {
+  var value_module = Blockly.JavaScript.valueToCode(block, 'MODULE', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+  // TODO: Assemble JavaScript into code variable.
+  var code = value_module+'.'+value_name;
+  // TODO: Change ORDER_NONE to the correct strength.
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};

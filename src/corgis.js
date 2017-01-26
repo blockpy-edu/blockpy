@@ -15,7 +15,7 @@ function BlockPyCorgis(main) {
     });
     $.when.apply($, imports).done(function() {
         if (main.model.settings.editor() == "Blocks") {
-            main.components.editor.updateBlocks();
+            main.components.editor.updateBlocksFromModel();
         }
         main.components.editor.updateToolbox(true);
     }).fail(function(e) {
@@ -73,7 +73,7 @@ BlockPyCorgis.prototype.openDialog = function(name) {
             var editor = corgis.main.components.editor;
             corgis.main.components.dialog.show("Import Datasets", body, function() {
                 if (editor.main.model.settings.editor() == "Blocks") {
-                    editor.updateBlocks();
+                    editor.updateBlocksFromModel();
                 }
             });
         });

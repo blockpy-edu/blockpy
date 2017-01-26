@@ -157,17 +157,26 @@ BlockPyServer.prototype.getHistory = function(callback) {
     this.setStatus('Loading History');
     if (model.server_is_connected('get_history')) {
         $.post(model.constants.urls.get_history, data, 
-               callback.bind(server))
+               function(response) {
+                if (response.success) {
+                    server.setStatus('Saved');
+                    callback(response.data);
+                } else {
+                    console.error(response);
+                    server.setStatus('Error', response.message);
+                }
+               })
          .fail(server.defaultFailure.bind(server));
     } else {
         this.setStatus('Offline', "Server is not connected!");
-        callback([
+        callback([]);
+        /*callback([
             {code: "=", time: "20160801-105102"},
             {code: "= 0", time: "20160801-105112"},
             {code: "a = 0", time: "20160801-105502"},
             {code: "a = 0\nprint", time: "20160801-110003"},
             {code: "a = 0\nprint(a)", time: "20160801-111102"}
-        ])
+        ])*/
     }
 }
 
