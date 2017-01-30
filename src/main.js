@@ -284,7 +284,9 @@ BlockPy.prototype.initComponents = function() {
     var statusBox = container.find(".blockpy-status-box");
     main.model.status.server.subscribe(function(newValue) {
         if (newValue == "Error" || newValue == "Offline") {
-            statusBox.effect("shake");
+            if (!statusBox.is(':animated')) {
+                statusBox.effect("shake");
+            }
         }
     });
     statusBox.tooltip();
@@ -339,7 +341,7 @@ BlockPy.prototype.turnOnHacks = function() {
         (function () {
             var oldEffect = $.fn.effect;
             $.fn.effect = function (effectName) {
-                if (effectName === "shake") {
+                if (effectName === "shake" || effectName.effect == "shake") {
                     var old = $.effects.createWrapper;
                     $.effects.createWrapper = function (element) {
                         var result;
