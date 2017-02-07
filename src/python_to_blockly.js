@@ -35,6 +35,8 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
         var yLocation = parseInt(lineColumn[0], 10);
         this.comments[yLocation] = parse.comments[commentLocation];
     }
+    this.previousGlobalLine = 0;
+    this.nextExpectedLine = 0;
     this.measureNode(ast);
     var converted = this.convert(ast);
     if (converted !== null) {
@@ -92,8 +94,8 @@ PythonToBlocks.prototype.measureNode = function(node) {
     this.heights.shift();
 }
 
-PythonToBlocks.prototype.getSourceCode = function(from, to) {
-    var lines = this.source.slice(from-1, to);
+PythonToBlocks.prototype.getSourceCode = function(frm, to) {
+    var lines = this.source.slice(frm-1, to);
     // Strip out any starting indentation.
     if (lines.length > 0) {
         var indentation = lines[0].search(/\S/);
@@ -111,23 +113,25 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     }
     
     // This is tricked by semicolons. Hard to get around that...
-    // TODO: Force semicolon breaks in a preprocessor, and extract comments too
+    // TODO: Force semicolon breaks in a preprocessor
     
-    // Build the actual blocks
+    // The actual line inside the entire program
     var lineFrom = node[0].lineno;
     var to = this.heights.shift();
+    // Offset within this body
     var currentLine = 0;
     
-    // Walk through and convert the blocks to statements
+    // Final result list
     var children = [];
+    
     var currentChild = null,
         firstChild = null,
-        commentChildren = [],
         actualLine = 0,
         previousLine = 0;
+    // Iterate through each node
     for (var i = 0; i < node.length; i++) {
         actualLine += 1;
-        // Handle actual line
+        
         lineFrom = node[i].lineno;
         currentLine = lineFrom;
         to = this.heights.shift();
@@ -181,6 +185,10 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     return children;
 }
+
+
+
+
 
 function block(type, lineNumber, fields, values, settings, mutations, statements) {
     var newBlock = document.createElement("block");

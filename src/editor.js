@@ -984,6 +984,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     xml += '</xml>';
     if (only_set) {
         this.blockly.updateToolbox(xml);
+        this.blockly.resize();
     } else {
         return xml;
     }
