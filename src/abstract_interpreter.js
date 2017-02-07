@@ -521,6 +521,11 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
     this.generic_visit(node);
 }
 
+AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
+    this.setVariable(node.name.v, {"type": "Function"}, this.getLocation(node))
+    this.generic_visit(node);
+}
+
 AbstractInterpreter.prototype.visit_If = function(node) {
     // Visit the conditional
     this.visit(node.test);

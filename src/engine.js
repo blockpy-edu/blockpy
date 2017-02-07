@@ -228,7 +228,8 @@ BlockPyEngine.prototype.run = function() {
     // Reset everything
     this.reset();
     
-    if (!this.main.model.settings.disable_semantic_errors()) {
+    if (!this.main.model.settings.disable_semantic_errors() &&
+        !this.main.model.assignment.disable_algorithm_errors()) {
         var success = this.analyze();
         if (success === false) {
             return;
@@ -325,6 +326,52 @@ var instructor_module = function(name) {
         var ast = parses[source];
         return (new NodeVisitor()).recursive_walk(ast);
     }
+    function getNonListNums(source) {
+        if (!(source in parses)) {
+            var parse = Sk.parse("__main__", source);
+            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
+        }
+        var ast = parses[source];
+        var visitor = new NodeVisitor();
+        var insideList = false;
+        var nums = [];
+        visitor.visit_List = function(node) {
+            insideList = true;
+            this.generic_visit(node);
+            insideList = false;
+        }
+        visitor.visit_Num = function(node) {
+            if (!insideList) {
+                nums.push(node.n);
+            }
+            this.generic_visit(node);
+        }
+        visitor.visit(ast);
+        return nums;
+    }
+    function getPrintedNonProperties(source) {
+        if (!(source in parses)) {
+            var parse = Sk.parse("__main__", source);
+            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
+        }
+        var ast = parses[source];
+        var visitor = new NodeVisitor();
+        var nonVariables = [];
+        visitor.visit_Call = function(node) {
+            var func = node.func;
+            var args = node.args;
+            if (func._astname == 'Name' && func.id.v == 'print') {
+                for (var i =0; i < args.length; i+= 1) {
+                    if (args[i]._astname != "Name") {
+                        nonVariables.push(args[i]);
+                    }
+                }
+            }
+            this.generic_visit(node);
+        }
+        visitor.visit(ast);
+        return nonVariables;
+    }
     
     mod.get_value_by_name = new Sk.builtin.func(function(name) {
         Sk.builtin.pyCheckArgs("get_value_by_name", arguments, 1, 1);
@@ -416,6 +463,33 @@ var instructor_module = function(name) {
         
         return Sk.ffi.remapToPy(count);
     });
+    
+    mod.no_nonlist_nums = new Sk.builtin.func(function(source) {
+        Sk.builtin.pyCheckArgs("no_nonlist_nums", arguments, 1, 1);
+        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
+        
+        source = source.v;
+        
+        var num_list = getNonListNums(source);
+        
+        var count = 0;
+        for (var i = 0, len = num_list.length; i < len; i = i+1) {
+            if (num_list[i].v != 0 && num_list[i].v != 1) {
+                return Sk.ffi.remapToPy(true);
+            }
+        }
+        return Sk.ffi.remapToPy(false);
+    });
+    mod.only_printing_properties = new Sk.builtin.func(function(source) {
+        Sk.builtin.pyCheckArgs("only_printing_properties", arguments, 1, 1);
+        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
+        
+        source = source.v;
+        
+        var non_var_list = getPrintedNonProperties(source);
+        return Sk.ffi.remapToPy(non_var_list.length == 0);
+    });
+    
     return mod;
 }
 
@@ -442,6 +516,8 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
     Sk.builtins.set_success = this.instructor_module.set_success;
     Sk.builtins.set_feedback = this.instructor_module.set_feedback;
     Sk.builtins.count_components = this.instructor_module.count_components;
+    Sk.builtins.no_nonlist_nums = this.instructor_module.no_nonlist_nums;
+    Sk.builtins.only_printing_properties = this.instructor_module.only_printing_properties;
     Sk.builtins.calls_function = this.instructor_module.calls_function;
     Sk.builtins.get_property = this.instructor_module.get_property;
     Sk.builtins.get_value_by_name = this.instructor_module.get_value_by_name;
@@ -458,7 +534,6 @@ BlockPyEngine.prototype.disposeEnvironment = function() {
     Sk.builtins.log = undefined;
     Sk.builtins._trace = undefined;
     Sk.builtins.trace = undefined;
-    Sk.builtins.trace = undefined;
     Sk.builtins.code = undefined;
     Sk.builtins.set_success = undefined;
     Sk.builtins.set_feedback = undefined;
@@ -467,6 +542,8 @@ BlockPyEngine.prototype.disposeEnvironment = function() {
     Sk.builtins.get_property = undefined;
     Sk.builtins.get_value_by_name = undefined;
     Sk.builtins.get_value_by_type = undefined;
+    Sk.builtins.no_nonlist_nums = undefined;
+    Sk.builtins.only_printing_properties = undefined;
     Sk.builtins.parse_json = undefined;
     Sk.skip_drawing = false;
     GLOBAL_VALUE = undefined;

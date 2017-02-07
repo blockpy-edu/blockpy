@@ -66,8 +66,9 @@ BlockPyPrinter.prototype.stepPrinter = function(step, page) {
  * @param {String} lineText - A line of text to be printed out.
  */
 BlockPyPrinter.prototype.print = function(lineText) {
-    var stepNumber = this.main.model.execution.step();
-    var lineNumber = this.main.model.execution.line_number();
+    // Should probably be accessing the model instead of a component...
+    var stepNumber = this.main.components.engine.executionBuffer.step;
+    var lineNumber = this.main.components.engine.executionBuffer.line_number;
     // Perform any necessary cleaning
     if (lineText !== "\n") {
         var encodedText = encodeHTML(lineText);

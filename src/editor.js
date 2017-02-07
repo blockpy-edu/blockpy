@@ -38,6 +38,10 @@ function BlockPyEditor(main, tag) {
     this.blocksFailed = false;
     this.blocksFailedTimeout = null;
     
+    // Hack to prevent chrome errors. Forces audio to load on demand. 
+    // See: https://github.com/google/blockly/issues/299
+    Blockly.WorkspaceSvg.prototype.preloadAudio_ = function() {};
+    
     // Keep track of the toolbox width
     this.blocklyToolboxWidth = 0;
     
@@ -53,6 +57,13 @@ function BlockPyEditor(main, tag) {
     
     // Handle level switching
     this.main.model.settings.level.subscribe(function() {editor.setLevel()});
+    
+    // Handle filename switching
+    this.main.model.settings.filename.subscribe(function (name) {
+        if (name == 'give_feedback') {
+            editor.setMode('Text');
+        }
+    });
     
     // Have to force a manual block update
     //this.updateText();
@@ -72,14 +83,11 @@ BlockPyEditor.prototype.initBlockly = function() {
                                     readOnly: this.main.model.settings.read_only(),
                                     zoom: {enabled: false},
                                     toolbox: this.updateToolbox(false)});
-    // Activate tracing in blockly for highlighting
-    this.blockly.traceOn(true);
-    // Activate undo/redo
-    this.blockly.enableUndo();
     // Register model changer
     var editor = this;
     this.blockly.addChangeListener(function(evt) { 
         //editor.main.components.feedback.clearEditorErrors();
+        editor.blockly.highlightBlock(null);
         editor.updateBlocks();
         //editor.updateBlocks();
     });
@@ -678,7 +686,7 @@ BlockPyEditor.prototype.highlightError = function(line) {
  * @param {Number} block - The ID of the block object to highlight.
  */
 BlockPyEditor.prototype.highlightBlock = function(block) {
-    this.blockly.highlightBlock(block);
+    //this.blockly.highlightBlock(block);
 }
 
 /**
@@ -695,7 +703,8 @@ BlockPyEditor.prototype.refreshBlockHighlight = function(line) {
         this.blocksFailed = false;
         return;
     }
-    if (this.main.model.settings.editor() != "Blocks") {
+    if (this.main.model.settings.editor() != "Blocks" &&
+        this.main.model.settings.editor() != "Split") {
         return;
     }
     var all_blocks = this.blockly.getAllBlocks();
@@ -711,12 +720,14 @@ BlockPyEditor.prototype.refreshBlockHighlight = function(line) {
     });
     if (1+line in blockMap) {
         var hblocks = blockMap[1+line];
-        /*hblocks.forEach(function(elem) {
-            elem.addSelect();
-        });*/
-        if (hblocks.length > 0) {
-            this.blockly.highlightBlock(hblocks[0].id);
-        }
+        var blockly = this.blockly;
+        hblocks.forEach(function(elem) {
+            //elem.addSelect();
+            blockly.highlightBlock(elem.id, true);
+        });
+        /*if (hblocks.length > 0) {
+            this.blockly.highlightBlock(hblocks[0].id, true);
+        }*/
     }
 }
 
@@ -773,11 +784,15 @@ BlockPyEditor.prototype.getHighlightMap = function() {
 
 /**
  * Updates the current file being edited in the editors.
+ * This appears to be deprecated.
  *
  * @param {String} name - The name of the file being edited (e.g, "__main__", "starting_code")
  */
 BlockPyEditor.prototype.changeProgram = function(name) {
     this.silentChange_ = true;
+    if (name == 'give_feedback') {
+        this.setMode('Text');
+    }
     this.model.settings.filename = name;
     this.editor.setPython(this.model.programs[name]);
     this.toolbar.elements.programs.find("[data-name="+name+"]").click();
@@ -974,6 +989,20 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     }
 };
 
+BlockPyEditor.prototype.DOCTYPE = '<?xml version="1.0" standalone="no"?>' + '<' + '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
+BlockPyEditor.prototype.cssData = null;
+BlockPyEditor.prototype.loadCss = function() {
+    if (this.cssData == null) {
+        var txt = '.blocklyDraggable {}\n';
+        txt += Blockly.Css.CONTENT.join('\n');
+        if (Blockly.FieldDate) {
+            txt += Blockly.FieldDate.CSS.join('\n');
+        }
+        // Strip off any trailing slash (either Unix or Windows).
+        this.cssData = txt.replace(/<<<PATH>>>/g, Blockly.Css.mediaPath_);
+    }
+}
+
 /**
  * Generates a PNG version of the current workspace. This PNG is stored in a Base-64 encoded
  * string as part of a data URL (e.g., "data:image/png;base64,...").
@@ -983,38 +1012,62 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
  * @param {Function} callback - A function to be called with the results. This function should take two parameters, the URL (as a string) of the generated base64-encoded PNG and the IMG tag.
  */
 BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
-    var blocks = this.blockly.svgBlockCanvas_.cloneNode(true);
-    blocks.removeAttribute("width");
-    blocks.removeAttribute("height");
-    if (blocks.children[0] !== undefined) {
-        blocks.removeAttribute("transform");
-        blocks.children[0].removeAttribute("transform");
-        blocks.children[0].children[0].removeAttribute("transform");
-        var linkElm = document.createElementNS("http://www.w3.org/1999/xhtml", "style");
-        linkElm.textContent = Blockly.Css.CONTENT.join('') + '\n\n';
-        blocks.insertBefore(linkElm, blocks.firstChild);
-        var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
-        var xml = new XMLSerializer().serializeToString(blocks);
-        xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
-        var data = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
-        var img  = document.createElement("img");
-        img.setAttribute('src', data);
-        img.style.display = 'block';
-        img.onload = function() {
-            //TODO: Make this capture a class descendant. Cross the D3/Jquery barrier!
-            var canvas = d3.select('#capture-canvas').node();//d3.select('body').append('canvas').node();
-            canvas.width = bbox.width;
-            canvas.height = bbox.height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            var canvasUrl = canvas.toDataURL("image/png");
-            callback(canvasUrl, img);
+    this.loadCss();
+    try {
+        // Retreive the entire canvas, strip some unnecessary tags
+        var blocks = this.blockly.svgBlockCanvas_.cloneNode(true);
+        blocks.removeAttribute("width");
+        blocks.removeAttribute("height");
+        // Ensure that we have some content
+        if (blocks.childNodes[0] !== undefined) {
+            // Remove tags that offset
+            blocks.removeAttribute("transform");
+            blocks.childNodes[0].removeAttribute("transform");
+            blocks.childNodes[0].childNodes[0].removeAttribute("transform");
+            // Add in styles
+            var linkElm = document.createElementNS("http://www.w3.org/1999/xhtml", "style");
+            linkElm.textContent = this.cssData + '\n\n';
+            blocks.insertBefore(linkElm, blocks.firstChild);
+            // Get the bounding box
+            var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
+            // Create the XML representation of the SVG
+            var xml = new XMLSerializer().serializeToString(blocks);
+            xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
+            // create a file blob of our SVG.
+            // Unfortunately, this crashes modern chrome for unknown reasons.
+            //var blob = new Blob([ this.DOCTYPE + xml], { type: 'image/svg+xml' });
+            //var url = window.URL.createObjectURL(blob);
+            // Old method: this failed on IE
+            var url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+            // Create an IMG tag to hold the new element
+            var img  = document.createElement("img");
+            img.style.display = 'block';
+            img.onload = function() {
+                console.log("A");
+                var canvas = document.createElement('canvas');
+                canvas.width = bbox.width;
+                canvas.height = bbox.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                var canvasUrl;
+                try {
+                    canvasUrl = canvas.toDataURL("image/png");
+                } catch (e) {
+                    canvasUrl = url;
+                }
+                img.onload = null;
+                callback(canvasUrl, img);
+            }
+            img.onerror = function() {
+                callback("", img);
+            }
+            img.setAttribute('src', url);
+        } else {
+            callback("", document.createElement("img"))
         }
-        img.onerror = function() {
-            callback("", img);
-        }
-    } else {
-        callback("", document.createElement("img"))
+    } catch (e) {
+        callback("", document.createElement("img"));
+        console.error("PNG image creation not supported!", e);
     }
 }
 

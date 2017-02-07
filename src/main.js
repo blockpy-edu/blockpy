@@ -18,6 +18,25 @@ function expandArray(array, addArray, removeArray) {
 }
 
 /**
+ * Deeply clones a node
+ * @param {Node} node A node to clone
+ * @return {Node} A clone of the given node and all its children
+ */
+function cloneNode(node) {
+    // If the node is a text node, then re-create it rather than clone it
+    var clone = node.nodeType == 3 ? document.createTextNode(node.nodeValue) : node.cloneNode(false);
+ 
+    // Recurse     
+    var child = node.firstChild;
+    while(child) {
+        clone.appendChild(cloneNode(child));
+        child = child.nextSibling;
+    }
+     
+    return clone;
+}
+
+/**
  * Creates an instance of BlockPy
  *
  * @constructor
@@ -47,7 +66,8 @@ function BlockPy(settings, assignment, submission, programs) {
             // string
             'level': ko.observable("level"),
             // boolean
-            'disable_semantic_errors': ko.observable(settings.disable_semantic_errors),
+            'disable_semantic_errors': ko.observable(settings.disable_semantic_errors ||
+                                                     assignment.disable_algorithm_errors || false),
             // boolean
             'disable_variable_types': ko.observable(settings.disable_variable_types || false),
             // boolean
@@ -115,7 +135,8 @@ function BlockPy(settings, assignment, submission, programs) {
             "initial_view": ko.observable(assignment.initial_view || 'Blocks'),
             'parsons': ko.observable(assignment.parsons),
             'upload': ko.observable(assignment.initial_view == 'Upload'),
-            'importable': ko.observable(assignment.importable),
+            'importable': ko.observable(assignment.importable || false),
+            'disable_algorithm_errors': ko.observable(assignment.disable_algorithm_errors || false)
         },
         "programs": {
             "__main__": ko.observable(programs.__main__),
@@ -155,6 +176,7 @@ function BlockPy(settings, assignment, submission, programs) {
         switch (this.status.server()) {
             default: case 'Loading': return ['label-default', 'Loading'];
             case 'Offline': return ['label-default', 'Offline'];
+            case 'Out of date': return ['label-danger', 'Out of Date'];
             case 'Loaded': return ['label-success', 'Loaded'];
             case 'Logging': return ['label-primary', 'Logging'];
             case 'Saving': return ['label-primary', 'Saving'];
@@ -283,9 +305,15 @@ BlockPy.prototype.initComponents = function() {
     
     var statusBox = container.find(".blockpy-status-box");
     main.model.status.server.subscribe(function(newValue) {
-        if (newValue == "Error" || newValue == "Offline") {
+        if (newValue == "Error" || 
+            newValue == "Offline" ||
+            newValue == "Disconnected") {
             if (!statusBox.is(':animated')) {
                 statusBox.effect("shake");
+            }
+        } else if (newValue == "Out of date") {
+            if (!statusBox.is(':animated')) {
+                statusBox.effect("shake").effect("shake");
             }
         }
     });
