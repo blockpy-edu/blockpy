@@ -76,6 +76,9 @@ Blockly.Blocks['lists_create_with'] = {
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
+    /*if (this.itemCount_ > 3) {
+        container.setAttribute("inline", "false");
+    } */
     return container;
   },
   /**
@@ -169,6 +172,11 @@ Blockly.Blocks['lists_create_with'] = {
           input.appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH);
         }
       }
+    }
+    if (this.itemCount_ > 3) {
+        this.setInputsInline(false);
+    } else {
+        this.setInputsInline(true);
     }
     // Remove deleted inputs.
     while (this.getInput('ADD' + i)) {

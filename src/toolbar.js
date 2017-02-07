@@ -85,6 +85,9 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.model.programs['__main__'](main.model.programs['starting_code']());
         //main.components.editor.updateBlocks();
         main.components.server.logEvent('editor', 'reset');
+        if (main.model.assignment.parsons()) {
+            main.components.editor.blockly.shuffle();
+        }
     });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {
         main.model.settings.editor("Blocks");

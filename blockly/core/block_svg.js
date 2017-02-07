@@ -1437,6 +1437,9 @@ Blockly.BlockSvg.prototype.setDisabled = function(disabled) {
  * @param {boolean} highlighted True if highlighted.
  */
 Blockly.BlockSvg.prototype.setHighlighted = function(highlighted) {
+  if (!this.rendered) {
+    return;
+  }
   if (highlighted) {
     this.svgPath_.setAttribute('filter',
         'url(#' + this.workspace.options.embossFilterId + ')');

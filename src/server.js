@@ -17,6 +17,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
     model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
     model.assignment.importable.subscribe(function() { server.saveAssignment(); });
+    model.assignment.disable_algorithm_errors.subscribe(function() { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
     model.assignment.modules.subscribe(function() { server.saveAssignment(); });
     model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
@@ -45,11 +46,19 @@ BlockPyServer.prototype.setStatus = function(status, server_error) {
         this.main.model.status.server_error('');
     }
 }
-
+BlockPyServer.prototype.defaultResponseWithoutVersioning = function(response) {
+    if (response.success) {
+        this.setStatus('Saved');
+    } else {
+        console.error(response);
+        this.setStatus('Error', response.message);
+    }
+}
 BlockPyServer.prototype.defaultResponse = function(response) {
-    if (response.is_version_correct) {
+    /*console.log(response);
+    if (!response.is_version_correct) {
         this.setStatus('Out of date');
-    } else if (response.success) {
+    } else */if (response.success) {
         this.setStatus('Saved');
     } else {
         console.error(response);
@@ -107,6 +116,7 @@ BlockPyServer.prototype.saveAssignment = function() {
     data['parsons'] = model.assignment.parsons();
     data['initial'] = model.assignment.initial_view();
     data['importable'] = model.assignment.importable();
+    data['disable_algorithm_errors'] = model.assignment.disable_algorithm_errors();
     data['name'] = model.assignment.name();
     //data['disabled'] = disabled;
     data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
@@ -118,7 +128,7 @@ BlockPyServer.prototype.saveAssignment = function() {
         clearTimeout(this.presentationTimer);
         this.presentationTimer = setTimeout(function() {
             $.post(server.main.model.constants.urls.save_assignment, data, 
-                   server.defaultResponse.bind(server))
+                   server.defaultResponseWithoutVersioning.bind(server))
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
@@ -141,7 +151,9 @@ BlockPyServer.prototype.saveCode = function() {
         }
         this.saveTimer[filename] = setTimeout(function() {
             $.post(server.main.model.constants.urls.save_code, data, 
-                   server.defaultResponse.bind(server))
+                   filename == '__main__'
+                    ? server.defaultResponse.bind(server)
+                    : server.defaultResponseWithoutVersioning.bind(server))
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {

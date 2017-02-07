@@ -207,6 +207,7 @@
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
                 <!-- Name -->
+                <br>
                 <form class="form-inline" style='display:inline-block'>
                 <label>Name:</label>
                 <input type='text' class='blockpy-presentation-name-editor form-control'
@@ -226,10 +227,17 @@
                 </label> 
                 <br>
                 
-                <!-- Parsons -->
+                <!-- Importable Datasets -->
                 <label class='blockpy-presentation-importable-check'>
                 Able to import datasets:
                 <input type='checkbox' class='form-control' data-bind="checked:assignment.importable">
+                </label> 
+                <br>
+                
+                <!-- Algorithm Errors -->
+                <label class='blockpy-presentation-importable-check'>
+                Disable Algorithm Errors:
+                <input type='checkbox' class='form-control' data-bind="checked:assignment.disable_algorithm_errors">
                 </label> 
                 <br>
                 

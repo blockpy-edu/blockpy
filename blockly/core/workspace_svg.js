@@ -539,6 +539,7 @@ Blockly.WorkspaceSvg.prototype.align = function() {
     }
 }
 
+/*
 Blockly.WorkspaceSvg.prototype.maximum_undos = 20;
 
 Blockly.WorkspaceSvg.prototype.enableUndo = function() {
@@ -596,6 +597,7 @@ Blockly.WorkspaceSvg.prototype.redo = function() {
         this.last_change_by_undo = false;
     }
 }
+*/
 
 /**
  * Returns the horizontal offset of the workspace.

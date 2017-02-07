@@ -1437,7 +1437,7 @@ PythonToBlocks.prototype.List = function(node) {
     return block("lists_create_with", node.lineno, {}, 
         this.convertElements("ADD", elts)
     , {
-        "inline": "true"
+        "inline": elts.length > 3 ? "false" : "true", 
     }, {
         "@items": elts.length
     });
