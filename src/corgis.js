@@ -18,8 +18,10 @@ function BlockPyCorgis(main) {
             main.components.editor.updateBlocksFromModel();
         }
         main.components.editor.updateToolbox(true);
+        main.components.server.finalizeSubscriptions();
     }).fail(function(e) {
         console.error(e);
+        main.components.server.finalizeSubscriptions();
     });
 }
 

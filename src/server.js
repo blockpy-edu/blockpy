@@ -13,14 +13,27 @@ function BlockPyServer(main) {
 BlockPyServer.prototype.createSubscriptions = function() {
     var server = this, model = this.main.model;
     model.program.subscribe(function() { server.saveCode(); });
-    model.assignment.name.subscribe(function() { server.saveAssignment();});
-    model.assignment.introduction.subscribe(function() { server.saveAssignment(); });
-    model.assignment.parsons.subscribe(function() { server.saveAssignment(); });
-    model.assignment.importable.subscribe(function() { server.saveAssignment(); });
-    model.assignment.disable_algorithm_errors.subscribe(function() { server.saveAssignment(); });
-    model.assignment.initial_view.subscribe(function() { server.saveAssignment(); });
-    model.assignment.modules.subscribe(function() { server.saveAssignment(); });
+    model.assignment.name.subscribe(function(e) { server.saveAssignment();});
+    model.assignment.introduction.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.parsons.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.importable.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
     model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
+    model.execution.show_trace.subscribe(function(newValue) { server.logEvent('trace', newValue); });
+    model.execution.trace_step.subscribe(function(newValue) { server.logEvent('trace_step', newValue); });
+};
+
+/**
+ *
+ * Some subscriptions have to happen after other things have been loaded.
+ * Right now this is just after CORGIS libraries have been loaded, but maybe
+ * we'll add more later and this will need to be refactored.
+ * 
+ */
+BlockPyServer.prototype.finalizeSubscriptions = function() {
+    var server = this, model = this.main.model;
+    model.assignment.modules.subscribe(function(e) { server.saveAssignment(); });
 };
 
 BlockPyServer.prototype.TIMER_DELAY = 1000;

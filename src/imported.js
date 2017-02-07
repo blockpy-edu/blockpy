@@ -104,12 +104,12 @@ Blockly.Blocks['datetime_time'] = {
     },
     mutationToDom: function() {
         var container = document.createElement('mutation');
-        var isNow = (this.getFieldValue('HOUR') == 'NOW');
+        var isNow = (this.getFieldValue('HOUR').toUpperCase() == 'NOW');
         container.setAttribute('isnow', isNow);
         return container;
     },
     domToMutation: function(xmlElement) {
-        var isNow = (xmlElement.getAttribute('isnow') == 'true');
+        var isNow = (xmlElement.getAttribute('isnow').toLowerCase() == 'true');
         this.updateShape_(isNow);
     },
     updateShape_: function(isNow) {
@@ -196,7 +196,7 @@ PythonToBlocks.KNOWN_MODULES['parking'] = {
                             {"type": "mapper", "name": "VALUE", "method": convertDate}],
     "Day": ["datetime_day", {"type": "mapper", "name": "DAY", "method": convertDate}],
     "now": ["datetime_time", ["HOUR", "NOW"]],
-    "Time": ["datetime_time", {"type": "integer", "name": "HOUR", "add_mutation": {"name": "@isnow", "value": "true"}}, 
+    "Time": ["datetime_time", {"type": "integer", "name": "HOUR", "add_mutation": {"name": "@isnow", "value": "false"}}, 
                              {"type": "integer_mapper", "name": "MINUTE", "method": convertMinute}, 
                              "MERIDIAN"],
     "time_compare": ["datetime_check_time", "OP",

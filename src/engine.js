@@ -122,7 +122,7 @@ BlockPyEngine.prototype.lastStep = function() {
     this.main.model.execution.step(this.executionBuffer.step)
     this.main.model.execution.last_step(this.executionBuffer.last_step)
     this.main.model.execution.line_number(this.executionBuffer.line_number)
-    this.executionBuffer = undefined;
+    //this.executionBuffer = undefined;
 }
 
 /**
