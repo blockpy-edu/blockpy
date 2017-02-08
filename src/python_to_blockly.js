@@ -35,7 +35,7 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
         var yLocation = parseInt(lineColumn[0], 10);
         this.comments[yLocation] = parse.comments[commentLocation];
     }
-    this.previousGlobalLine = 0;
+    this.highestLineSeen = 0;
     this.nextExpectedLine = 0;
     this.measureNode(ast);
     var converted = this.convert(ast);
@@ -107,81 +107,144 @@ PythonToBlocks.prototype.getSourceCode = function(frm, to) {
 }
 
 PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
-    // Empty body. Boring!
+    // Empty body, return nothing
     if (node.length == 0) {
         return null;
     }
     
-    // This is tricked by semicolons. Hard to get around that...
-    // TODO: Force semicolon breaks in a preprocessor
-    
-    // The actual line inside the entire program
-    var lineFrom = node[0].lineno;
-    var to = this.heights.shift();
-    // Offset within this body
-    var currentLine = 0;
-    
     // Final result list
-    var children = [];
+    var children = [], // The complete set of peers
+        root = null, // The top of the current peer
+        current = null; // The bottom of the current peer
+        
+    function addPeer(peer) {
+        if (root == null) {
+            children.push(peer);
+        } else {
+            children.push(root);
+            root = peer;
+            current = peer;
+        }
+    }
     
-    var currentChild = null,
-        firstChild = null,
-        actualLine = 0,
-        previousLine = 0;
+    function finalizePeers() {
+        if (root != null) {
+            children.push(root);
+        }
+    }
+    
+    function nestChild(child) {
+        if (root == null) {
+            root = child;
+            current = child;
+        } else if (current == null) {
+            root = current;
+        } else {
+            var nextElement = document.createElement("next");
+            nextElement.appendChild(child);
+            current.appendChild(nextElement);
+            current = child;
+        }
+    }
+    
+    var lineNumberInBody = 0,
+        lineNumberInProgram,
+        previousLineInProgram=null,
+        distance,
+        skipped_line,
+        commentCount
+        previousHeight = null;
     // Iterate through each node
     for (var i = 0; i < node.length; i++) {
-        actualLine += 1;
+        lineNumberInBody += 1;
         
-        lineFrom = node[i].lineno;
-        currentLine = lineFrom;
-        to = this.heights.shift();
-        var newChild = this.convertStatement(node[i], this.getSourceCode(lineFrom, to), is_top_level);
-        var distance = lineFrom - previousLine;
-        actualLine += distance-1;
+        lineNumberInProgram = node[i].lineno;
+        distance = 0, wasFirstLine = true;
+        if (previousLineInProgram != null) {
+            distance = lineNumberInProgram - previousLineInProgram-1;
+            wasFirstLine = false;
+        }
+        lineNumberInBody += distance;
         
         // Handle earlier comments
-        if (is_top_level) {
-            for (var yLocation in this.comments) {
-                if (yLocation < actualLine && actualLine-distance+1 <= yLocation) {
-                    commentChild = this.Comment(this.comments[yLocation], yLocation);
-                    children.push(commentChild);
+        commentCount = 0;
+        for (var commentLineInProgram in this.comments) {
+            if (commentLineInProgram < lineNumberInProgram) {
+                commentChild = this.Comment(this.comments[commentLineInProgram], commentLineInProgram);
+                if (previousLineInProgram == null) {
+                    nestChild(commentChild);
+                } else {
+                    skipped_previous_line = Math.abs(previousLineInProgram-commentLineInProgram) > 1;
+                    if (is_top_level && skipped_previous_line) {
+                        addPeer(commentChild);
+                    } else {
+                        nestChild(commentChild);
+                    }
                 }
+                previousLineInProgram = commentLineInProgram;
+                this.highestLineSeen = Math.max(this.highestLineSeen, parseInt(commentLineInProgram, 10));
+                distance = lineNumberInProgram - previousLineInProgram;
+                delete this.comments[commentLineInProgram];
+                commentCount += 1;
             }
         }
-        previousLine = lineFrom;
+        
+        distance = lineNumberInProgram - this.highestLineSeen;
+        this.highestLineSeen = Math.max(lineNumberInProgram, this.highestLineSeen);
+        
+        // Now convert the actual node
+        var height = this.heights.shift();
+        var originalSourceCode = this.getSourceCode(lineNumberInProgram, height);
+        var newChild = this.convertStatement(node[i], originalSourceCode, is_top_level);
         
         // Skip null blocks (e.g., imports)
-        if (newChild !== null) {
-            if (is_top_level && newChild.constructor == Array) {
-                // Add non-statement expressions to the end
-                children.push(newChild[0]);
-            } else if (is_top_level && children.length > 0) {
-                children.push(newChild);
-            } else {
-                if (newChild.constructor == Array) {
-                    newChild = newChild[0];
-                }
-                if (firstChild == null) {
-                    firstChild = newChild;
-                    currentChild = newChild;
-                } else {
-                    var nextElement = document.createElement("next");
-                    nextElement.appendChild(newChild);
-                    currentChild.appendChild(nextElement);
-                    currentChild = newChild;
-                }
-            }
+        if (newChild == null) {
+            continue;
+        }
+        skipped_line = distance > 1;
+        previousLineInProgram = lineNumberInProgram;
+        previousHeight = height;
+        
+        // Handle top-level expression blocks
+        if (is_top_level && newChild.constructor == Array) {
+            addPeer(newChild[0]);
+        // Handle skipped line
+        } else if (is_top_level && skipped_line) {
+            addPeer(newChild);
+        // Otherwise, always embed it in there.
+        } else {
+            nestChild(newChild);
         }
     }
-    // Actually add that first child to the start
-    if (firstChild !== null) {
-        children.unshift(firstChild);
+    
+    
+    // Handle comments that are on the very last line
+    var lastLineNumber = lineNumberInProgram+1
+    if (lastLineNumber in this.comments) {
+        commentChild = this.Comment(this.comments[lastLineNumber], lastLineNumber);
+        nestChild(commentChild);
+        delete this.comments[lastLineNumber];
     }
     
-    // Handle trailing comments
-    if (lineFrom+1 in this.comments) {
-        children.push(this.Comment(this.comments[lineFrom+1], lineFrom));
+    // Handle any extra comments that stuck around
+    if (is_top_level) {
+        for (var commentLineInProgram in this.comments) {
+            commentChild = this.Comment(this.comments[commentLineInProgram], commentLineInProgram);
+            distance = commentLineInProgram - previousLineInProgram;
+            if (previousLineInProgram == null) {
+                addPeer(commentChild);
+            } else if (distance > 1) {
+                addPeer(commentChild);
+            } else {
+                nestChild(commentChild);
+            }
+            previousLineInProgram = commentLineInProgram;
+            delete this.comments[lastLineNumber];
+        }
     }
+    
+    
+    finalizePeers();
     
     return children;
 }
