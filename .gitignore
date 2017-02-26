@@ -6,6 +6,7 @@ closure-compiler/
 research/
 test_corgis/
 advertising/*.mp4
+~*.pptx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
