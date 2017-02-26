@@ -1164,6 +1164,7 @@ PythonToBlocks.KNOWN_MODULES = {
     }
 };
 PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];
+PythonToBlocks.KNOWN_ATTR_FUNCTIONS = {};
 PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs, kwargs, node) {
     var name = this.identifier(func.attr);
     if (func.value._astname == "Name") {
@@ -1267,6 +1268,8 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
                     { "TEXT": this.convert(func.value) });
             default: throw new Error("Unknown function call!");
         }
+    } else if (name in PythonToBlocks.KNOWN_ATTR_FUNCTIONS) {
+        return PythonToBlocks.KNOWN_ATTR_FUNCTIONS[name].bind(this)(func, args, keywords, starargs, kwargs, node)
     } else {
         console.log(func, args, keywords, starargs, kwargs);
         heights = this.getChunkHeights(node);
