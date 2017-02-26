@@ -17,6 +17,23 @@ function BlockPyEngine(main) {
 }
 
 /**
+ * Definable function to be run when execution has fully ended,
+ * whether it succeeds or fails.
+ *
+ */
+BlockPyEngine.prototype.onExecutionEnd = null;
+
+/**
+ * Helper function that will attempt to call the defined onExecutionEnd,
+ * but will do nothing if there is no function defined.
+ */
+BlockPyEngine.prototype.executionEnd_ = function() {
+    if (this.onExecutionEnd !== null) {
+        this.onExecutionEnd();
+    }
+};
+
+/**
  * Initializes the Python Execution engine and the Printer (console).
  */
 BlockPyEngine.prototype.loadEngine = function() {
@@ -221,7 +238,7 @@ BlockPyEngine.prototype.analyze = function() {
 
 var GLOBAL_VALUE;
 
-/*
+/**
  * Runs the given python code, resetting the console and Trace Table.
  */
 BlockPyEngine.prototype.run = function() {
@@ -232,6 +249,7 @@ BlockPyEngine.prototype.run = function() {
         !this.main.model.assignment.disable_algorithm_errors()) {
         var success = this.analyze();
         if (success === false) {
+            this.executionEnd_();
             return;
         }
     }
@@ -252,6 +270,7 @@ BlockPyEngine.prototype.run = function() {
     if (code.trim() == "") {
         feedback.emptyProgram();
         this.main.model.execution.status("error");
+        this.executionEnd_();
         return;
     }
     // Actually run the python code
@@ -272,21 +291,48 @@ BlockPyEngine.prototype.run = function() {
             engine.check(code, execution.trace(), execution.output(), execution.ast, module.$d);
             // Reenable "Run"
             engine.main.model.execution.status("waiting");
+            engine.executionEnd_();
         },
         function(error) {
             feedback.printError(error);
             engine.main.model.execution.status("error");
+            engine.executionEnd_();
             //server.logEvent('blockly_error', error);
         }
     );
 }
 
+/**
+ * Indents the given string by 4 spaces. This correctly handles multi-line strings.
+ *
+ * @param {String} str - The string to be manipulated.
+ * @returns {String} The string with four spaces added at the start of every new line.
+ */
 function indent(str) {
   return str.replace(/^(?=.)/gm, '    ');
 }
 
+/**
+ * Skulpt Module for holding the Instructor API.
+ *
+ * This module is a little hackish. We need to sit down and reevaluate the best way to
+ * organize it and whether this particular structure is ideal. I suspect it should be
+ * it's own proper JS file.
+ *
+ * @param {String} name - The name of the module (should always be 'instructor')
+ *
+ */
 var instructor_module = function(name) {
+    // Main module object that gets returned at the end.
     var mod = {};
+    
+    /**
+     * Skulpt Exception that represents a Feedback object, to be rendered to the user
+     * when the feedback system finds a problem.
+     * 
+     * @param {Array} args - A list of optional arguments to pass to the Exception.
+     *                       Usually this will include a message for the user.
+     */
     Sk.builtin.Feedback = function (args) {
         var o;
         if (!(this instanceof Sk.builtin.Feedback)) {
@@ -297,6 +343,14 @@ var instructor_module = function(name) {
         Sk.builtin.Exception.apply(this, arguments);
     };
     Sk.abstr.setUpInheritance("Feedback", Sk.builtin.Feedback, Sk.builtin.Exception);
+    
+    /**
+     * Skulpt Exception that represents a Success object, to be thrown when the user
+     * completes their program successfully.
+     *
+     ** @param {Array} args - A list of optional arguments to pass to the Exception.
+     *                       Usually this will be empty.
+     */
     Sk.builtin.Success = function (args) {
         var o;
         if (!(this instanceof Sk.builtin.Success)) {
@@ -307,17 +361,53 @@ var instructor_module = function(name) {
         Sk.builtin.Exception.apply(this, arguments);
     };
     Sk.abstr.setUpInheritance("Success", Sk.builtin.Success, Sk.builtin.Exception);
+    
+    /**
+     * A Skulpt function that throws a Feedback exception, allowing us to give feedback
+     * to the user through the Feedback panel. This function call is done for aesthetic
+     * reasons, so that we are calling a function instead of raising an error. Still,
+     * exceptions allow us to break out of the control flow immediately, like a 
+     * return, so they are a good mechanism to use under the hood.
+     * 
+     * @param {String} message - The message to display to the user.
+     */
     mod.set_feedback = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("set_feedback", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
         throw new Sk.builtin.Feedback(message.v);
     });
+    
+    /**
+     * A Skulpt function that throws a Success exception. This will terminate the
+     * feedback analysis, but reports that the students' code was successful.
+     * This function call is done for aesthetic reasons, so that we are calling a
+     * function instead of raising an error. Still, exceptions allow us to break
+     * out of the control flow immediately, like a return would, so they are a
+     * good mechanism to use under the hood.
+     */
     mod.set_success = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
         throw new Sk.builtin.Success();
     });
     
+    // Memoization of previous parses - some mild redundancy to save time
+    // TODO: There's no evidence this is good, and could be a memory hog on big
+    // programs. Someone should investigate this. The assumption is that multiple
+    // helper functions might be using parses. But shouldn't we trim old parses?
+    // Perhaps a timed cache would work better.
     var parses = {};
+    
+    /**
+     * Given source code as a string, return a flat list of all of the AST elements
+     * in the parsed source code.
+     *
+     * TODO: There's redundancy here, since the source code was previously parsed
+     * to run the file and to execute it. We should probably be able to do this just
+     * once and shave off time.
+     *
+     * @param {String} source - Python source code.
+     * @returns {Array.<Skulpt AST elements>}
+     */
     function getParseList(source) {
         if (!(source in parses)) {
             var parse = Sk.parse("__main__", source);
@@ -326,6 +416,14 @@ var instructor_module = function(name) {
         var ast = parses[source];
         return (new NodeVisitor()).recursive_walk(ast);
     }
+    
+    /**
+     * Given source code as a string, return a list of all of the AST elements
+     * that are Num (aka numeric literals) but that are not inside List elements.
+     *
+     * @param {String} source - Python source code.
+     * @returns {Array.number} The list of JavaScript numeric literals that were found.
+     */
     function getNonListNums(source) {
         if (!(source in parses)) {
             var parse = Sk.parse("__main__", source);
@@ -349,6 +447,14 @@ var instructor_module = function(name) {
         visitor.visit(ast);
         return nums;
     }
+    
+    /**
+     * Given source code as a string, return a list of all of the AST elements
+     * that are being printed (using the print function) but are not variables.
+     *
+     * @param {String} source - Python source code.
+     * @returns {Array.<Skulpt AST Elements>} The list of AST elements that were found.
+     */
     function getPrintedNonProperties(source) {
         if (!(source in parses)) {
             var parse = Sk.parse("__main__", source);
@@ -373,6 +479,9 @@ var instructor_module = function(name) {
         return nonVariables;
     }
     
+    /**
+     * Skulpt function to 
+     */
     mod.get_value_by_name = new Sk.builtin.func(function(name) {
         Sk.builtin.pyCheckArgs("get_value_by_name", arguments, 1, 1);
         Sk.builtin.pyCheckType("name", "string", Sk.builtin.checkString(name));

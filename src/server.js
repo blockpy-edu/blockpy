@@ -7,6 +7,8 @@ function BlockPyServer(main) {
     this.saveTimer = {};
     this.presentationTimer = null;
     
+    this.inProgressWalks = [];
+    
     this.createSubscriptions();
 }
 
@@ -42,13 +44,17 @@ BlockPyServer.prototype.createServerData = function() {
     var assignment = this.main.model.assignment;
     var d = new Date();
     var seconds = Math.round(d.getTime() / 1000);
-    return {
+    data = {
         'assignment_id': assignment.assignment_id,
         'course_id': assignment.course_id,
         'student_id': assignment.student_id,
         'version': assignment.version(),
         'timestamp': seconds
+    };
+    if (this.main.model.settings.log_id() != null) {
+        data['log_id'] = this.main.model.settings.log_id();
     }
+    return data;
 }
 
 BlockPyServer.prototype.setStatus = function(status, server_error) {
@@ -202,6 +208,56 @@ BlockPyServer.prototype.getHistory = function(callback) {
             {code: "a = 0\nprint", time: "20160801-110003"},
             {code: "a = 0\nprint(a)", time: "20160801-111102"}
         ])*/
+    }
+}
+
+BlockPyServer.prototype.walkOldCode = function() {
+    var server = this,
+        main = this.main;
+    if (this.inProgressWalks.length > 0) {
+        var response = this.inProgressWalks.pop();
+        console.log('Processing walk', response.log_id);
+        main.setCode(response.code, '__main__');
+        main.setCode(response.feedback, 'give_feedback');
+        main.model.assignment.assignment_id = response.assignment_id;
+        main.model.assignment.user_id = response.user_id;
+        main.model.settings.log_id(response.log_id);
+        main.components.engine.onExecutionEnd = function(newState) {
+            console.log(response.log_id, newState);
+            main.components.engine.onExecutionEnd = null;
+            setTimeout(function() {
+                server.walkOldCode()
+            }, 0);
+        };
+        console.log("Running");
+        main.components.engine.run();
+    } else {
+        var data = this.createServerData();
+        this.setStatus('Retrieving');
+        if (main.model.server_is_connected('walk_old_code')) {
+            $.post(server.main.model.constants.urls.walk_old_code, data, 
+                   function (response) {
+                       if (response.success) {
+                           if (response.more_to_do) {
+                            server.inProgressWalks = response.walks;
+                            server.walkOldCode();
+                           }
+                       } else {
+                           this.setStatus('Failure', response.message);
+                       }
+                   })
+            .fail(
+            function(response) {
+                console.error(response);
+                setTimeout(function() {
+                    server.walkOldCode()
+                }, 3000);
+            }
+            );
+            //server.defaultFailure.bind(server));
+        } else {
+            this.setStatus('Offline', "Server is not connected!");
+        }
     }
 }
 

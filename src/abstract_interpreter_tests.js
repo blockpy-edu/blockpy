@@ -93,6 +93,9 @@
         ['a = 0\nif True:\n\tif False:\n\t\ta = 0\n\telse:\n\t\ta = 2\nelse:\n\ta = 1', [], ['Overwritten variables']],
         // Overwritten in all branch
         ['a = 0\nif True:\n\tprint(a)\n\tif False:\n\t\ta = 0\n\telse:\n\t\ta = 2\nelse:\n\ta = 1', ['Overwritten variables'], []],
+        
+        // Handle function definitions
+        ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
     ];
     
     var errors = 0;
