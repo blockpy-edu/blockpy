@@ -523,6 +523,12 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
 
 AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
     this.setVariable(node.name.v, {"type": "Function"}, this.getLocation(node))
+    var args = node.args.args;
+    for (var i = 0; i < args.length; i++) {
+        var arg = args[i];
+        var name = Sk.ffi.remapToJs(arg.id);
+        this.setVariable(name, {}, this.getLocation(node))
+    }
     this.generic_visit(node);
 }
 

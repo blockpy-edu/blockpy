@@ -57,6 +57,8 @@ function BlockPy(settings, assignment, submission, programs) {
             // boolean
             'instructor': ko.observable(settings.instructor),
             'instructor_initial': ko.observable(settings.instructor),
+            // String
+            'log_id': ko.observable(null),
             // boolean
             'enable_blocks': ko.observable(settings.blocks_enabled),
             // boolean

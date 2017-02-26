@@ -1,10 +1,20 @@
 _IMPORTED_DATASETS = {};
 
+/**
+ * Module that connects to the CORGIS datasets and manages interactions
+ * with them. This includes loading in datasets at launch and on-the-fly.
+ * Note that this has no presence on screen, so it does not have a tag.
+ *
+ * @constructor
+ * @this {BlockPyCorgis}
+ * @param {Object} main - The main BlockPy instance
+ */
 function BlockPyCorgis(main) {
     this.main = main;
     
     this.loadedDatasets = [];
     
+    // Load in each the datasets
     var corgis = this;
     var imports = [];
     this.main.model.assignment.modules().forEach(function(name) {
@@ -13,6 +23,7 @@ function BlockPyCorgis(main) {
             imports.push.apply(imports, corgis.importDataset(post_prefix, name));
         }
     });
+    // When datasets are loaded, update the toolbox.
     $.when.apply($, imports).done(function() {
         if (main.model.settings.editor() == "Blocks") {
             main.components.editor.updateBlocksFromModel();

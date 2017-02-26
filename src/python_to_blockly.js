@@ -36,6 +36,7 @@ PythonToBlocks.prototype.convertSource = function(python_source) {
         this.comments[yLocation] = parse.comments[commentLocation];
     }
     this.highestLineSeen = 0;
+    this.levelIndex = 0;
     this.nextExpectedLine = 0;
     this.measureNode(ast);
     var converted = this.convert(ast);
@@ -107,6 +108,7 @@ PythonToBlocks.prototype.getSourceCode = function(frm, to) {
 }
 
 PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
+    this.levelIndex += 1;
     // Empty body, return nothing
     if (node.length == 0) {
         return null;
@@ -115,16 +117,17 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     // Final result list
     var children = [], // The complete set of peers
         root = null, // The top of the current peer
-        current = null; // The bottom of the current peer
+        current = null,
+        levelIndex = this.levelIndex; // The bottom of the current peer
         
     function addPeer(peer) {
         if (root == null) {
             children.push(peer);
         } else {
             children.push(root);
-            root = peer;
-            current = peer;
         }
+        root = peer;
+        current = peer;
     }
     
     function finalizePeers() {
@@ -153,7 +156,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         distance,
         skipped_line,
         commentCount
-        previousHeight = null;
+        previousHeight = null,
+        visitedFirstLine = false;
     // Iterate through each node
     for (var i = 0; i < node.length; i++) {
         lineNumberInBody += 1;
@@ -201,6 +205,7 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         if (newChild == null) {
             continue;
         }
+        
         skipped_line = distance > 1;
         previousLineInProgram = lineNumberInProgram;
         previousHeight = height;
@@ -209,12 +214,14 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         if (is_top_level && newChild.constructor == Array) {
             addPeer(newChild[0]);
         // Handle skipped line
-        } else if (is_top_level && skipped_line) {
+        } else if (is_top_level && skipped_line && visitedFirstLine) {
             addPeer(newChild);
         // Otherwise, always embed it in there.
         } else {
             nestChild(newChild);
         }
+        
+        visitedFirstLine = true;
     }
     
     
@@ -245,6 +252,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     
     finalizePeers();
+    
+    this.levelIndex -= 1;
     
     return children;
 }
@@ -1259,7 +1268,7 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
             default: throw new Error("Unknown function call!");
         }
     } else {
-        //console.log(func, args, keywords, starargs, kwargs);
+        console.log(func, args, keywords, starargs, kwargs);
         heights = this.getChunkHeights(node);
         extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
         var col_endoffset = node.col_endoffset;
@@ -1275,8 +1284,8 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
         //console.log(node, extractedSource, node.col_offset, node.col_endoffset);
         var lineno = node.lineno;
         //console.error(e);
-        return raw_expression(expressionCall, lineno);
-        /*
+        //return raw_expression(expressionCall, lineno);
+        
         var arguments = {};
         var argumentsMutation = {"@name": name};
         for (var i = 0; i < args.length; i+= 1) {
@@ -1291,7 +1300,7 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
         return block("attribute_access", node.lineno, {}, {
             "MODULE": this.convert(func.value),
             "NAME": methodCall
-        }, { "inline": "false"}, {});*/
+        }, { "inline": "true"}, {});
     }
 }
 
@@ -1422,7 +1431,14 @@ PythonToBlocks.prototype.Attribute = function(node)
     var attr = node.attr;
     var ctx = node.ctx;
     
-    throw new Error("Attribute access not implemented");
+    console.log(node);
+    
+    return block("attribute_access", node.lineno, {
+        "MODULE": this.convert(value),
+        "NAME": this.convert(attr)
+    });
+    
+    //throw new Error("Attribute access not implemented");
 }
 
 /*
