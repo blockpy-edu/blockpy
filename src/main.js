@@ -73,6 +73,8 @@ function BlockPy(settings, assignment, submission, programs) {
             // boolean
             'disable_variable_types': ko.observable(settings.disable_variable_types || false),
             // boolean
+            'disable_timeout': ko.observable(settings.disable_timeout || false),
+            // boolean
             'auto_upload': ko.observable(true),
             // boolean
             'developer': ko.observable(settings.developer || false),

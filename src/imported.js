@@ -538,7 +538,7 @@ Blockly.Python['attribute_access'] = function(block) {
 /**
  * Turtles!
  */
-Blockly.Blocks['turtles_create'] = {
+Blockly.Blocks['turtle_create'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("create new turtle");
@@ -548,14 +548,14 @@ Blockly.Blocks['turtles_create'] = {
     this.setHelpUrl('');
   }
 };
-Blockly.Python['turtles_create'] = function(block) {
+Blockly.Python['turtle_create'] = function(block) {
     Blockly.Python.definitions_['import_turtle'] = 'import turtle';
   var code = 'turtle.Turtle()\n';
   // TODO: Change ORDER_NONE to the correct strength.
   return [code, Blockly.Python.ORDER_NONE];
 };
 PythonToBlocks.KNOWN_MODULES['turtle'] = {
-    "Turtle": ["turtles_create"]
+    "Turtle": ["turtle_create"]
 }
 
 Blockly.Blocks['turtle_color'] = {
@@ -569,6 +569,7 @@ Blockly.Blocks['turtle_color'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setOutput(false);
+    this.setInputsInline(true);
     this.setColour(180);
     this.setTooltip('');
     this.setHelpUrl('');
@@ -601,6 +602,7 @@ Blockly.Blocks['turtle_forward'] = {
         .appendField("move forward by");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
+    this.setInputsInline(true);
     this.setOutput(false);
     this.setColour(180);
     this.setTooltip('');
@@ -633,6 +635,7 @@ Blockly.Blocks['turtle_backward'] = {
         .setCheck(null)
         .appendField("move backward by");
     this.setPreviousStatement(true);
+    this.setInputsInline(true);
     this.setNextStatement(true);
     this.setOutput(false);
     this.setColour(180);
@@ -667,6 +670,7 @@ Blockly.Blocks['turtle_left'] = {
         .appendField("turn left by");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
+    this.setInputsInline(true);
     this.setOutput(false);
     this.setColour(180);
     this.setTooltip('');
@@ -700,6 +704,7 @@ Blockly.Blocks['turtle_right'] = {
         .appendField("turn right by");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
+    this.setInputsInline(true);
     this.setOutput(false);
     this.setColour(180);
     this.setTooltip('');

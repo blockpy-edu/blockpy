@@ -155,9 +155,10 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         previousLineInProgram=null,
         distance,
         skipped_line,
-        commentCount
+        commentCount,
         previousHeight = null,
         visitedFirstLine = false;
+        
     // Iterate through each node
     for (var i = 0; i < node.length; i++) {
         lineNumberInBody += 1;

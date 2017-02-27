@@ -859,6 +859,14 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="plot_xlabel"></block>'+
                     '<block type="plot_ylabel"></block>'+
                 '</category>',
+    'Turtles': '<category name="Turtles" colour="180">'+
+                    '<block type="turtle_create"></block>'+
+                    '<block type="turtle_forward"></block>'+
+                    '<block type="turtle_backward"></block>'+
+                    '<block type="turtle_left"></block>'+
+                    '<block type="turtle_right"></block>'+
+                    '<block type="turtle_color"></block>'+
+                '</category>',
     'Values':   '<category name="Values" colour="100">'+
                     '<block type="text"></block>'+
                     '<block type="math_number"></block>'+
