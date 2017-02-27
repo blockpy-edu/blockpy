@@ -43,7 +43,12 @@ BlockPyEngine.prototype.loadEngine = function() {
     // No connected services
     Sk.connectedServices = {}
     // Limit execution to 5 seconds
-    Sk.execLimit = 5000;
+    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
+    
+    this.main.model.settings.disable_timeout.subscribe(function(newValue) {
+        Sk.execLimit = newValue ? null : 5000;
+    });
+    
     // Ensure version 3, so we get proper print handling
     Sk.python3 = true;
     // Major Skulpt configurations
@@ -480,7 +485,9 @@ var instructor_module = function(name) {
     }
     
     /**
-     * Skulpt function to 
+     * Skulpt function to iterate through the final state of
+     * all the variables in the program, and check to see if they have
+     * a given value.
      */
     mod.get_value_by_name = new Sk.builtin.func(function(name) {
         Sk.builtin.pyCheckArgs("get_value_by_name", arguments, 1, 1);
