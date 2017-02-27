@@ -538,12 +538,14 @@ BlockPyEditor.prototype.updateBlocks = function() {
         }
         // Update Model
         this.silenceModel = 2;
-        console.log("Silenced model from UB-start");
-        this.main.setCode(newCode);
-        // Update Text
-        this.silenceText = true;
-        this.setText(newCode);
-        console.log("Silenced model from UB-end");
+        var changed = this.main.setCode(newCode);
+        if (!changed) {
+            this.silenceModel = 0;
+        } else {
+            // Update Text
+            this.silenceText = true;
+            this.setText(newCode);
+        }
     }
 }
 
@@ -558,14 +560,12 @@ BlockPyEditor.prototype.updateText = function() {
         var newCode = this.codeMirror.getValue();
         // Update Model
         this.silenceModel = 2;
-        console.log("Silenced model from UT-start");
         this.main.setCode(newCode);
         // Update Blocks
         this.silenceBlock = true;
         this.setBlocks(newCode);
         this.unhighlightLines();
         this.resetBlockSilence();
-        console.log("Silenced model from UT-end");
     }
     this.silenceText = false;
 }
@@ -595,7 +595,6 @@ BlockPyEditor.prototype.updateTextFromModel = function() {
         this.silenceText = true;
         this.setText(code);
     } else {
-        console.log("UTFM -= 1");
         this.silenceModel -= 1;
     }
 }
@@ -614,7 +613,6 @@ BlockPyEditor.prototype.updateBlocksFromModel = function() {
         this.setBlocks(code);
         this.resetBlockSilence();
     } else {
-        console.log("UBFM -= 1");
         this.silenceModel -= 1;
     }
 }
@@ -1058,7 +1056,6 @@ BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
             var img  = document.createElement("img");
             img.style.display = 'block';
             img.onload = function() {
-                console.log("A");
                 var canvas = document.createElement('canvas');
                 canvas.width = bbox.width;
                 canvas.height = bbox.height;

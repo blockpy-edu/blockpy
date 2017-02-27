@@ -348,14 +348,19 @@ BlockPy.prototype.reportError = function(component, original, message, line) {
 }
 
 /**
- * Helper function for setting the current code. I'm not sure if this is used anywhere.
+ * Helper function for setting the current code, optionally in the given filename.
  *
+ * @param {String} code - The new Python source code to set.
+ * @param {String?} name - An optional filename (e.g,. '__main__') to update. Defaults to the currently selected filename.
+ * @returns {Boolean} - whether the code was updated (i.e. there was a diff between new and old).
  */
 BlockPy.prototype.setCode = function(code, name) {
     if (name === undefined) {
         name = this.model.settings.filename();
     }
+    var original = this.model.programs[name]();
     this.model.programs[name](code);
+    return original != this.model.programs[name]();
 }
 
 /**
