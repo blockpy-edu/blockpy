@@ -102,6 +102,19 @@ BlockPyFeedback.prototype.complete = function() {
 }
 
 /**
+ * Mark this problem as finished for the student. This will appear in the Feedback area,
+ * and will also unhighlight lines in the editor and log to the server.
+ */
+BlockPyFeedback.prototype.finished = function() {
+    this.title.html("Ran");
+    this.original.hide();
+    this.body.html("Your program ran successfully, without any errors. However, this problem does not have a correct solution. When you are satisfied with your program, you may stop working.");
+    this.main.model.status.error("no errors");
+    this.main.components.editor.unhighlightLines();
+    this.main.components.server.logEvent('feedback', "Finished");
+}
+
+/**
  * This notifies the student that their code ran without errors, but that there was no
  * Success raised by the Checker. This will appear in the Feedback area,
  * and will also unhighlight lines in the editor and log to the server.

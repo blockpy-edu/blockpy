@@ -125,7 +125,7 @@ Sk.builtin.file.prototype["read"] = new Sk.builtin.func(function (self, size) {
 Sk.builtin.file.$readline = function (self, size, prompt) {
     if (self.fileno === 0) {
         var x, resolution, susp;
-
+        
         var lprompt = Sk.ffi.remapToJs(prompt);
 
         lprompt = lprompt ? lprompt : "";

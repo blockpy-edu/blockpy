@@ -62,6 +62,8 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.console = printer.getConfiguration();
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
+    // Definitely use a prompt
+    Sk.inputfunTakesPrompt = true;
     
     // Keeps track of the tracing while the program is executing; destroyed afterwards.
     this.executionBuffer = {};
@@ -368,6 +370,26 @@ var instructor_module = function(name) {
     Sk.abstr.setUpInheritance("Success", Sk.builtin.Success, Sk.builtin.Exception);
     
     /**
+     * Skulpt Exception that represents a Finished object, to be thrown when the user
+     * completes their program successfully, but isn't in a problem with a "solution".
+     * This is useful for open-ended canvases where we still want to capture the students'
+     * code in Canvas.
+     *
+     ** @param {Array} args - A list of optional arguments to pass to the Exception.
+     *                       Usually this will be empty.
+     */
+    Sk.builtin.Finished = function (args) {
+        var o;
+        if (!(this instanceof Sk.builtin.Finished)) {
+            o = Object.create(Sk.builtin.Finished.prototype);
+            o.constructor.apply(o, arguments);
+            return o;
+        }
+        Sk.builtin.Exception.apply(this, arguments);
+    };
+    Sk.abstr.setUpInheritance("Finished", Sk.builtin.Finished, Sk.builtin.Exception);
+    
+    /**
      * A Skulpt function that throws a Feedback exception, allowing us to give feedback
      * to the user through the Feedback panel. This function call is done for aesthetic
      * reasons, so that we are calling a function instead of raising an error. Still,
@@ -393,6 +415,19 @@ var instructor_module = function(name) {
     mod.set_success = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
         throw new Sk.builtin.Success();
+    });
+    
+    /**
+     * A Skulpt function that throws a Finished exception. This will terminate the
+     * feedback analysis, but reports that the students' code was successful.
+     * This function call is done for aesthetic reasons, so that we are calling a
+     * function instead of raising an error. Still, exceptions allow us to break
+     * out of the control flow immediately, like a return would, so they are a
+     * good mechanism to use under the hood.
+     */
+    mod.set_finished = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("set_finished", arguments, 0, 0);
+        throw new Sk.builtin.Finished();
     });
     
     // Memoization of previous parses - some mild redundancy to save time
@@ -631,6 +666,7 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
     Sk.builtins.code = Sk.ffi.remapToPy(student_code);
     Sk.builtins.set_success = this.instructor_module.set_success;
     Sk.builtins.set_feedback = this.instructor_module.set_feedback;
+    Sk.builtins.set_finished = this.instructor_module.set_finished;
     Sk.builtins.count_components = this.instructor_module.count_components;
     Sk.builtins.no_nonlist_nums = this.instructor_module.no_nonlist_nums;
     Sk.builtins.only_printing_properties = this.instructor_module.only_printing_properties;
@@ -653,6 +689,7 @@ BlockPyEngine.prototype.disposeEnvironment = function() {
     Sk.builtins.code = undefined;
     Sk.builtins.set_success = undefined;
     Sk.builtins.set_feedback = undefined;
+    Sk.builtins.set_finished = undefined;
     Sk.builtins.count_components = undefined;
     Sk.builtins.calls_function = undefined;
     Sk.builtins.get_property = undefined;
@@ -691,6 +728,9 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast, 
                 } else if (error.tp$name == "Feedback") {
                     server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
+                } else if (error.tp$name == "Finished") {
+                    server.markSuccess(1.0);
+                    engine.main.components.feedback.finished();
                 } else {
                     console.error(error);
                     engine.main.components.feedback.internalError(error, "Feedback Error", "Error in instructor's feedback. Please show the above message to an instructor!");

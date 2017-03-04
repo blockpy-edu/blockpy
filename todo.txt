@@ -4,7 +4,6 @@ Assessment API/Blocks
 Unrolled Loop mode
 Time rewinder
 Tooltips over errors
-Connect blocks to text by storing line numbers in the converted AST
 Multiple block levels by manipulating the paths in the block.js file
     Remove color, reduce padding, simplify text
     Swap append order
@@ -13,24 +12,20 @@ Multiple block levels by manipulating the paths in the block.js file
     create empty list becomes []
 Add in variable dictionary access block
 Tabular block
-Add the word "module" to datasets
 Call friend
     Identifies students in the cohort who are on the same problem
     Signals to the TA that the student has an issue
     Emails a question to the TA
-Default provide if, if/else, if/elif/else blocks
 Popup question dialog
     Fill in the blank
     Multiple choice
         What variable is a dictionary (selectable list of variables) - optionally show type.
     TAs see answers to questions
-Side-by-side views of code and blocks with the mappings
 
 If then else - logic for instructor API
     Allowed to write python snippets
     Should the whole thing translate to python?
-    
-Input block
+
 Turn off name wrangler? It might be better to let them make mistakes and then point them out.
 Highlight parser error line in the code block!
 
@@ -39,8 +34,6 @@ Instead of having it shown as a value changing, visualize it as a cursor moving 
 Predict the next value of the trace
 Explain a given line of code
 "All the variables you need are here" <-- prevent them from creating new variables.
-
-Walk the AST to add in unique IDs. When an exception occurs, the exact ID of the parse tree can be returned. This ID can be used to identify the relevant block, and the "lineno"/"endlineno"/"colno"/"endcolno" can be used to identify the exact code snippet. Additionally, we can report out the error more clearly - explain the actual type of the object, the expected type of the object, and even other suitable objects from the static analyzer.
 
 Slowmode - when you run, it executes the code but "plays" its results slightly slowed down, so you can see the code highlighting.
 

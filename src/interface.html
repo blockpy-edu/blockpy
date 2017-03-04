@@ -32,22 +32,23 @@
                              attr: { 'data-original-title': status.server_error }"
                   data-toggle="tooltip" data-placement="left">Loading</span>
             <div class='pull-right'>
-                Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors">
-                Disable Timeout: <input type='checkbox' data-bind="checked: settings.disable_timeout">
+                Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors"><br>
+                Disable Timeout: <input type='checkbox' data-bind="checked: settings.disable_timeout"><br>
+                Disable Typed Blocks: <input type='checkbox' data-bind="checked: settings.disable_variable_types"><br>
                 
                 <label class='blockpy-toolbar-auto-upload' data-bind="visible: settings.instructor">
                 Auto-save:
-                <input type='checkbox' data-bind="checked:settings.auto_upload">
-                </label> 
+                <input type='checkbox' data-bind="checked:settings.auto_upload"><br>
+                </label>
                 
                 <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
                 Instructor mode: 
-                <input type='checkbox' data-bind="checked:settings.instructor">
+                <input type='checkbox' data-bind="checked:settings.instructor"><br>
                 </label>
                 
                 <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
                 Upload mode: 
-                <input type='checkbox' data-bind="checked:assignment.upload">
+                <input type='checkbox' data-bind="checked:assignment.upload"><br>
                 </label> 
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
@@ -64,7 +65,7 @@
              style='padding:10px'>
             <div class='blockpy-feedback'>
                 <button type='button' class='btn btn-sm btn-default blockpy-feedback-trace pull-right' 
-                        data-bind="visible: !execution.show_trace() && (status.error() == 'feedback' || status.error() == 'no errors')">
+                        data-bind="visible: !execution.show_trace() && (status.error() == 'feedback' || status.error() == 'no errors'|| status.error() == 'complete')">
                     <span class='glyphicon glyphicon-circle-arrow-down'></span> Trace Variables
                 </button>
                 

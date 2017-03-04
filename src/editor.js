@@ -107,7 +107,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     
     // Enable static type checking! 
     this.blockly.addChangeListener(function() {
-        if (editor.main.model.settings.disable_variable_types()) {
+        if (!editor.main.model.settings.disable_variable_types()) {
             var variables = editor.main.components.engine.analyzeVariables()
             editor.blockly.getAllBlocks().filter(function(r) {return r.type == 'variables_get'}).forEach(function(block) { 
                 var name = block.inputList[0].fieldRow[0].value_;

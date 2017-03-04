@@ -71,7 +71,7 @@ function BlockPy(settings, assignment, submission, programs) {
             'disable_semantic_errors': ko.observable(settings.disable_semantic_errors ||
                                                      assignment.disable_algorithm_errors || false),
             // boolean
-            'disable_variable_types': ko.observable(settings.disable_variable_types || false),
+            'disable_variable_types': ko.observable(settings.disable_variable_types || true),
             // boolean
             'disable_timeout': ko.observable(settings.disable_timeout || false),
             // boolean
