@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * A helper function for extending an array based
+ * on an "addArray" and "removeArray". Any element
+ * found in removeArray is removed from the first array
+ * and all the elements of addArray are added.
+ * Creates a new array, so is non-destructive.
+ *
+ * @param {Array} array - the array to manipulate
+ * @param {Array} addArray - the elements to add to the array
+ * @param {Array} removeArray - the elements to remove from the array
+ * @return {Array} The modified array
+ */
+function expandArray(array, addArray, removeArray) {
+    var copyArray = array.filter(function(item) {
+        return removeArray.indexOf(item) === -1;
+    });
+    return copyArray.concat(addArray);
+}
+
+/**
+ * Deeply clones a node
+ * @param {Node} node A node to clone
+ * @return {Node} A clone of the given node and all its children
+ */
+function cloneNode(node) {
+    // If the node is a text node, then re-create it rather than clone it
+    var clone = node.nodeType == 3 ? document.createTextNode(node.nodeValue) : node.cloneNode(false);
+ 
+    // Recurse     
+    var child = node.firstChild;
+    while(child) {
+        clone.appendChild(cloneNode(child));
+        child = child.nextSibling;
+    }
+     
+    return clone;
+}
+
+/**
+ * Creates an instance of BlockPy
+ *
+ * @constructor
+ * @this {BlockPy}
+ * @param {Object} settings - User level settings (e.g., what view mode, whether to mute semantic errors, etc.)
+ * @param {Object} assignment - Assignment level settings (data about the loaded assignment, user, submission, etc.)
+ * @param {Object} submission - Unused parameter.
+ * @param {Object} programs - Includes the source code of any programs to be loaded
+ */
+function BlockPy(settings, assignment, submission, programs) {
+    this.model = {
+        // User level settings
+        "settings": {
+            // Default mode when you open the screen is text
+            // 'text', 'blocks'
+            'editor': ko.observable(assignment.initial_view),
+            // Default mode when you open the screen is instructor
+            // boolean
+            'instructor': ko.observable(settings.instructor),
+            'instructor_initial': ko.observable(settings.instructor),
+            // String
+            'log_id': ko.observable(null),
+            // boolean
+            'enable_blocks': ko.observable(settings.blocks_enabled),
+            // boolean
+            'read_only': ko.observable(settings.read_only),
+            // string
+            'filename': ko.observable("__main__"),
+            // string
+            'level': ko.observable("level"),
+            // boolean
+            'disable_semantic_errors': ko.observable(settings.disable_semantic_errors ||
+                                                     assignment.disable_algorithm_errors || false),
+            // boolean
+            'disable_variable_types': ko.observable(settings.disable_variable_types || true),
+            // boolean
+            'disable_timeout': ko.observable(settings.disable_timeout || false),
+            // boolean
+            'auto_upload': ko.observable(true),
+            // boolean
+            'developer': ko.observable(settings.developer || false),
+            // boolean
+            'mute_printer': ko.observable(false)
+        },
+        'execution': {
+            // 'waiting', 'running'
+            'status': ko.observable('waiting'),
+            // integer
+            'step': ko.observable(0),
+            // integer
+            'last_step': ko.observable(0),
+            // list of string/list of int
+            'output': ko.observableArray([]),
+            // integer
+            'line_number': ko.observable(0),            
+            // array of simple objects
+            'trace': ko.observableArray([]),
+            // integer
+            'trace_step': ko.observable(0),
+            // object
+            'ast': {},
+            // boolean
+            'show_trace': ko.observable(false),
+        },
+        'status': {
+            // boolean
+            'loaded': ko.observable(false),
+            'text': ko.observable("Loading"),
+            // 'none', 'runtime', 'syntax', 'semantic', 'feedback', 'complete', 'editor'
+            'error': ko.observable('none'),
+            // "Loading", "Saving", "Ready", "Disconnected", "Error"
+            'server': ko.observable("Loading"),
+            // Some message from a server error can go here
+            'server_error': ko.observable(''),
+            // Dataset loading
+            'dataset_loading': ko.observableArray()
+        },
+        'constants': {
+            // string
+            'blocklyPath': settings.blocklyPath,
+            // boolean
+            'blocklyScrollbars': true,
+            // string
+            'attachmentPoint': settings.attachmentPoint,
+            // JQuery object
+            'container': null,
+            // Maps codes ('log_event', 'save_code') to URLs
+            'urls': settings.urls
+        },
+        // Assignment level settings
+        "assignment": {
+            'modules': ko.observableArray(expandArray(BlockPy.DEFAULT_MODULES, assignment.modules.added || [], assignment.modules.removed || [])),
+            'assignment_id': assignment.assignment_id,
+            'student_id': assignment.student_id,
+            'course_id': assignment.course_id,
+            'version': ko.observable(assignment.version),
+            //'lis_result_sourcedid': assignment.lis_result_sourcedid,
+            'name': ko.observable(assignment.name),
+            'introduction': ko.observable(assignment.introduction),
+            "initial_view": ko.observable(assignment.initial_view || 'Blocks'),
+            'parsons': ko.observable(assignment.parsons),
+            'upload': ko.observable(assignment.initial_view == 'Upload'),
+            'importable': ko.observable(assignment.importable || false),
+            'disable_algorithm_errors': ko.observable(assignment.disable_algorithm_errors || false)
+        },
+        "programs": {
+            "__main__": ko.observable(programs.__main__),
+            "starting_code": ko.observable(assignment.starting_code),
+            "give_feedback": ko.observable(assignment.give_feedback),
+            "answer": ko.observable(assignment.answer)
+        }
+    };
+    
+    // The code for the current active program file (e.g., "__main__")
+    this.model.program = ko.computed(function() {
+        return this.programs[this.settings.filename()]();
+    }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+    
+    // Whether this URL has been specified
+    this.model.server_is_connected = function(url) {
+        return this.constants.urls !== undefined &amp;&amp; this.constants.urls[url] !== undefined;
+    };
+    
+    // Helper function to map error statuses to UI elements
+    this.model.status_feedback_class = ko.computed(function() {
+        switch (this.status.error()) {
+            default: case 'none': return ['label-none', ''];
+            case 'runtime': return ['label-runtime-error', 'Runtime Error'];
+            case 'syntax': return ['label-syntax-error', 'Syntax Error'];
+            case 'editor': return ['label-syntax-error', 'Editor Error'];
+            case 'internal': return ['label-internal-error', 'Internal Error'];
+            case 'semantic': return ['label-semantic-error', 'Algorithm Error'];
+            case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
+            case 'complete': return ['label-problem-complete', 'Complete'];
+            case 'no errors': return ['label-no-errors', 'No errors'];
+        }
+    }, this.model);
+    
+    // Helper function to map Server error statuses to UI elements
+    this.model.status_server_class = ko.computed(function() {
+        switch (this.status.server()) {
+            default: case 'Loading': return ['label-default', 'Loading'];
+            case 'Offline': return ['label-default', 'Offline'];
+            case 'Out of date': return ['label-danger', 'Out of Date'];
+            case 'Loaded': return ['label-success', 'Loaded'];
+            case 'Logging': return ['label-primary', 'Logging'];
+            case 'Saving': return ['label-primary', 'Saving'];
+            case 'Saved': return ['label-success', 'Saved'];
+            case 'Disconnected': return ['label-danger', 'Disconnected'];
+            case 'Error': return ['label-danger', 'Error'];
+        }
+    }, this.model);
+    
+    // Program trace functions
+    var execution = this.model.execution;
+    this.model.moveTraceFirst = function(index) { 
+        execution.trace_step(0); };
+    this.model.moveTraceBackward = function(index) { 
+        var previous = Math.max(execution.trace_step()-1, 0);
+        execution.trace_step(previous); };
+    this.model.moveTraceForward = function(index) { 
+        var next = Math.min(execution.trace_step()+1, execution.last_step());
+        execution.trace_step(next); };
+    this.model.moveTraceLast = function(index) { 
+        execution.trace_step(execution.last_step()); };
+    this.model.current_trace = ko.pureComputed(function() {
+        return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
+    });
+    
+    /**
+     * Opens a new window to represent the exact value of a Skulpt object.
+     * Particularly useful for things like lists that can be really, really
+     * long.
+     * 
+     * @param {String} type - The type of the value
+     * @param {Object} exact_value - A Skulpt value to be rendered.
+     */
+    this.model.viewExactValue = function(type, exact_value) {
+        return function() {
+            if (type == "List") {
+                var output = exact_value.$r().v;
+                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
+                window.open('data:application/json;' + result);
+            }
+        }
+    }
+    
+    // For performance reasons, batch notifications for execution handling.
+    // I'm not even sure these have any value any more.
+    execution.trace.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.last_step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.line_number.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    
+    this.initMain();
+}
+
+/**
+ * The default modules to make available to the user.
+ *
+ * @type Array.&lt;String>
+ */
+BlockPy.DEFAULT_MODULES = ['Properties', 'Decisions', 
+                           'Iteration',
+                           'Calculation', 'Output', 
+                           'Values', 
+                           'Lists', 'Dictionaries']
+
+/**
+ * Initializes the BlockPy object by initializing its interface,
+ * model, and components.
+ *
+ */
+BlockPy.prototype.initMain = function() {
+    this.turnOnHacks();
+    this.initInterface();
+    this.initModel();
+    this.initComponents();
+    if (this.model.settings.developer()) {
+        this.initDevelopment();
+    }
+}
+
+/**
+ * Initializes the User Inteface for the instance, by loading in the
+ * HTML file (which has been manually encoded into a JS string using
+ * the build.py script). We do this because its a giant hassle to keep
+ * HTML correct when it's stored in JS strings. We should look into
+ * more sophisticated templating features, probably.
+ *
+ */
+BlockPy.prototype.initInterface = function() {
+    var constants = this.model.constants;
+    // Refer to interface.js, interface.html, and build.py
+    constants.container = $(constants.attachmentPoint).html($(BlockPyInterface))
+}
+
+/**
+ * Applys the KnockoutJS bindings to the model, instantiating the values into the
+ * HTML.
+ */
+BlockPy.prototype.initModel = function() {
+    ko.applyBindings(this.model);
+}
+
+/**
+ * Initializes each of the relevant components of BlockPy. For more information,
+ * consult each of the component's relevant JS file in turn.
+ */
+BlockPy.prototype.initComponents = function() {
+    var container = this.model.constants.container;
+    this.components = {};
+    var main = this,
+        components = this.components;
+    // Each of these components will take the BlockPy instance, and possibly a
+    // reference to the relevant HTML location where it will be embedded.
+    components.dialog = new BlockPyDialog(main, container.find('.blockpy-popup'));
+    components.toolbar  = new BlockPyToolbar(main,  container.find('.blockpy-toolbar'));
+    components.feedback = new BlockPyFeedback(main, container.find('.blockpy-feedback'));
+    components.editor   = new BlockPyEditor(main,   container.find('.blockpy-editor'));
+    components.presentation = new BlockPyPresentation(main, container.find('.blockpy-presentation'));
+    components.printer = new BlockPyPrinter(main, container.find('.blockpy-printer'));
+    components.engine = new BlockPyEngine(main);
+    components.server = new BlockPyServer(main);
+    components.corgis = new BlockPyCorgis(main);
+    components.history = new BlockPyHistory(main);
+    components.english = new BlockPyEnglish(main);
+    components.editor.setMode();
+    main.model.status.server('Loaded')
+    
+    var statusBox = container.find(".blockpy-status-box");
+    main.model.status.server.subscribe(function(newValue) {
+        if (newValue == "Error" || 
+            newValue == "Offline" ||
+            newValue == "Disconnected") {
+            if (!statusBox.is(':animated')) {
+                statusBox.effect("shake");
+            }
+        } else if (newValue == "Out of date") {
+            if (!statusBox.is(':animated')) {
+                statusBox.effect("shake").effect("shake");
+            }
+        }
+    });
+    statusBox.tooltip();
+}
+
+/**
+ * Initiailizes certain development data, useful for testing out new modules in
+ * Skulpt.
+ */
+BlockPy.prototype.initDevelopment = function () {
+    /*$.get('src/skulpt_ast.js', function(data) {
+        Sk.builtinFiles['files']['src/lib/ast/__init__.js'] = data;
+    });*/
+}
+
+/**
+ * Redundant method for reporting an error. If this is used anywhere, it should be
+ * converted to direct calls to components.feedback.
+ */
+BlockPy.prototype.reportError = function(component, original, message, line) {
+    if (component == 'editor') {
+        this.components.feedback.editorError(original, message, line);
+    } else if (component == 'syntax') {
+        this.components.feedback.syntaxError(original, message, line);
+    }
+    console.error(component, message)
+}
+
+/**
+ * Helper function for setting the current code, optionally in the given filename.
+ *
+ * @param {String} code - The new Python source code to set.
+ * @param {String?} name - An optional filename (e.g,. '__main__') to update. Defaults to the currently selected filename.
+ * @returns {Boolean} - whether the code was updated (i.e. there was a diff between new and old).
+ */
+BlockPy.prototype.setCode = function(code, name) {
+    if (name === undefined) {
+        name = this.model.settings.filename();
+    }
+    var original = this.model.programs[name]();
+    this.model.programs[name](code);
+    return original != this.model.programs[name]();
+}
+
+/**
+ * Function for running any code that fixes bugs and stuff upstream.
+ * Not pleasant that this exists, but better to have it isolated than
+ * just lying about randomly...
+ *
+ */
+BlockPy.prototype.turnOnHacks = function() {
+    /*
+     * jQuery UI shake - Padding disappears
+     * Courtesy: http://stackoverflow.com/questions/22301972/jquery-ui-shake-padding-disappears
+     */
+    if ($.ui) {
+        (function () {
+            var oldEffect = $.fn.effect;
+            $.fn.effect = function (effectName) {
+                if (effectName === "shake" || effectName.effect == "shake") {
+                    var old = $.effects.createWrapper;
+                    $.effects.createWrapper = function (element) {
+                        var result;
+                        var oldCSS = $.fn.css;
+
+                        $.fn.css = function (size) {
+                            var _element = this;
+                            var hasOwn = Object.prototype.hasOwnProperty;
+                            return _element === element &amp;&amp; hasOwn.call(size, "width") &amp;&amp; hasOwn.call(size, "height") &amp;&amp; _element || oldCSS.apply(this, arguments);
+                        };
+
+                        result = old.apply(this, arguments);
+
+                        $.fn.css = oldCSS;
+                        return result;
+                    };
+                }
+                return oldEffect.apply(this, arguments);
+            };
+        })();
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

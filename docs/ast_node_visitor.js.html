@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ast_node_visitor.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ast_node_visitor.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+var filename = '__main__.py';
+var python_source = 'a, b = 0\nfor x in y:\n    t = 0';
+parse = Sk.parse(filename, python_source);
+ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+*/
+
+var iter_fields = function(node) {
+    /** Yield a tuple of ``(fieldname, value)`` for each field in ``node._fields``
+    that is present on *node*. **/
+    var fieldList = [];
+    for (var i = 0; i &lt; node._fields.length; i += 2) {
+        var field = node._fields[i];
+        if (field in node) {
+            fieldList.push([field, node[field]]);
+        }
+    }
+    return fieldList;
+}
+
+var iter_child_nodes = function(node) {
+    var fieldList = iter_fields(node);
+    var resultList = [];
+    for (var i = 0; i &lt; fieldList.length; i += 1) {
+        var field = fieldList[i][0], value = fieldList[i][1];
+        if (value === null) {
+            continue;
+        }
+        if ("_astname" in value) {
+            resultList.push(value);
+        } else if (value.constructor === Array) {
+            for (var j = 0; j &lt; value.length; j += 1) {
+                var subvalue = value[j];
+                if ("_astname" in subvalue) {
+                    resultList.push(subvalue);
+                }
+            }
+        }
+    }
+    return resultList;
+}
+
+function NodeVisitor() {};
+
+NodeVisitor.prototype.visit = function(node) {
+    /** Visit a node. **/
+    var method_name = 'visit_' + node._astname;
+    if (method_name in this) {
+        return this[method_name](node);
+    } else {
+        return this.generic_visit(node);
+    }
+}
+
+NodeVisitor.prototype.walk = function(node) {
+    var resultList = [node];
+    var childList = iter_child_nodes(node);
+    for (var i = 0; i &lt; childList.length; i += 1) {
+        var child = childList[i];
+        resultList.concat(this.walk(child));
+    }
+    return resultList;
+}
+
+NodeVisitor.prototype.visitList = function(nodes) {
+    for (var j = 0; j &lt; nodes.length; j += 1) {
+        var node = nodes[j];
+        if ("_astname" in node) {
+            this.visit(node);
+        }
+    }
+}
+
+NodeVisitor.prototype.generic_visit = function(node) {
+    /** Called if no explicit visitor function exists for a node. **/
+    var fieldList = iter_fields(node);
+    for (var i = 0; i &lt; fieldList.length; i += 1) {
+        var field = fieldList[i][0], value = fieldList[i][1];
+        if (value === null) {
+            continue;
+        }
+        if (Array === value.constructor) {
+            for (var j = 0; j &lt; value.length; j += 1) {
+                var subvalue = value[j];
+                if (subvalue instanceof Object &amp;&amp; "_astname" in subvalue) {
+                    this.visit(subvalue);
+                }
+            }
+        } else if (value instanceof Object &amp;&amp; "_astname" in value) {
+            this.visit(value);
+        }
+    }
+}
+
+NodeVisitor.prototype.recursive_walk = function(node) {
+    var todo = [node];
+    var result = [];
+    while (todo.length > 0) {
+        node = todo.shift();
+        todo = todo.concat(iter_child_nodes(node))
+        result.push(node);
+    }
+    return result;
+}
+
+/*
+function CodeAnalyzer() {
+    NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
+    this.id = 0;
+};
+
+CodeAnalyzer.prototype = new NodeVisitor();
+CodeAnalyzer.prototype.visit = function(node) {
+    node._id = this.id;
+    this.id += 1;
+    NodeVisitor.prototype.visit.call(this, node);
+    //console.log(node);
+}
+*/
+
+/*
+CodeAnalyzer.prototype.visit_Num = function(node) {
+    node._id = this.id;
+    this.id += 1;
+    console.log(node.n.v);
+    // NodeVisitor.prototype.visit_Num.call(this, node);
+};*/
+
+//console.log((new NodeVisitor()).visit(ast));
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

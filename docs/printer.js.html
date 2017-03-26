@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: printer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: printer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * An object for managing the console where printing and plotting is outputed.
+ *
+ * @constructor
+ * @this {BlockPyEditor}
+ * @param {Object} main - The main BlockPy instance
+ * @param {HTMLElement} tag - The HTML object this is attached to.
+ */
+function BlockPyPrinter(main, tag) {
+    this.main = main;
+    this.tag = tag;
+    
+    /** Keep printer settings available for interested parties */
+    this.printerSettings = {};
+    
+    this.resetPrinter();
+};
+
+/**
+ * Reset the status of the printer, including removing any text in it and
+ * fixing its size.
+ */
+BlockPyPrinter.prototype.resetPrinter = function() {
+    this.tag.empty();
+    this.main.model.execution.output.removeAll();
+    this.printerSettings['width'] = Math.min(500, this.tag.width()-40);
+    this.printerSettings['height'] = Math.min(500, this.tag.height()+40);
+    Sk.TurtleGraphics = {'target': this.tag[0], 
+                         'width': this.printerSettings['width'], 
+                         'height': this.printerSettings['height']};
+}
+
+/**
+ * Update and return the current configuration of the printer. This 
+ * involves calculating its size, among other operations.
+ *
+ * @returns {Object} Returns an object with information about the printer.
+ */
+BlockPyPrinter.prototype.getConfiguration = function() {
+    var printer = this;
+    this.printerSettings['printHtml']= function(html, value) { printer.printHtml(html, value);};
+    this.printerSettings['width']= Math.min(500, this.tag.width()-40);
+    this.printerSettings['pngMode']= true;
+    this.printerSettings['skipDrawing']= false;
+    this.printerSettings['height']= Math.min(500, this.tag.height()+40);
+    this.printerSettings['container']= this.tag[0];
+    return this.printerSettings;
+}
+
+/**
+ * Updates each printed element in the printer and makes it hidden
+ * or visible, depending on what step we're on.
+ *
+ * @param {Number} step - The current step of the executed program that we're on; each element in the printer must be marked with a "data-step" property to resolve this.
+ * @param {Number} page - Deprecated, not sure what this even does.
+ */
+BlockPyPrinter.prototype.stepPrinter = function(step, page) {
+    $(this.printer).find('.blockpy-printer-output').each(function() {
+        if ($(this).attr("data-step") &lt;= step) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
+/**
+ * Print a successful line to the on-screen printer.
+ * @param {String} lineText - A line of text to be printed out.
+ */
+BlockPyPrinter.prototype.print = function(lineText) {
+    // Should probably be accessing the model instead of a component...
+    var stepNumber = this.main.components.engine.executionBuffer.step;
+    var lineNumber = this.main.components.engine.executionBuffer.line_number;
+    // Perform any necessary cleaning
+    if (lineText !== "\n") {
+        var encodedText = encodeHTML(lineText);
+        this.main.model.execution.output.push(encodedText.trim());
+        if (!(this.main.model.settings.mute_printer())) {
+            var lineContainer = $("&lt;div class='blockpy-printer-output' >");
+            var lineData = $("&lt;samp>&lt;/samp>", {
+                'data-toggle': 'tooltip',
+                'data-placement': 'left',
+                'data-step': stepNumber,
+                "html": encodedText,
+                'title': "Step "+stepNumber + ", Line "+lineNumber,
+            })
+            lineContainer.append(lineData);
+            // Append to the current text
+            this.tag.append(lineContainer);
+            lineData.tooltip();
+        }
+    }
+}
+
+/**
+ * Prints a successful HTML blob to the printer. This is typically charts,
+ * but it can actually be any kind of HTML. This will probably be useful for
+ * doing Turtle and Processing stuff down the road.
+ * 
+ * @param {HTML} html - A blob of HTML to render in the tag
+ * @param {Anything} value - a value to push on the outputList for comparison. For instance, on charts this is typically the data of the chart.
+ */
+BlockPyPrinter.prototype.printHtml = function(chart, value) {
+    var step = this.main.model.execution.step();
+    var line = this.main.model.execution.line_number();
+    this.main.model.execution.output.push(value);
+    if (!(this.main.model.settings.mute_printer())) {
+        var outerDiv = $(Sk.console.png_mode ? chart : chart[0]);//.parent();
+        outerDiv.parent().show();
+        outerDiv.attr({
+            "data-toggle": 'tooltip',
+            "data-placement": 'left',
+            //"data-container": '#'+chart.attr("id"),
+            "class": "blockpy-printer-output",
+            "data-step": step,
+            "title": "Step "+step+", Line "+line
+        });
+        outerDiv.tooltip();
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
