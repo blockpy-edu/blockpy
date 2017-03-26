@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Return a random integer between [`min`, `max`].
+ * 
+ * @param {number} min - The lowest possible integer.
+ * @param {number} max - The highest possible integer (inclusive).
+ * @returns {number} A random integer.
+ */
+function randomInteger(min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+/**
+ * Indents the given string
+ * @param {string} str  The string to be indented.
+ * @param {number} numOfIndents  The amount of indentations to place at the
+ *     beginning of each line of the string.
+ * @param {number=} opt_spacesPerIndent  Optional.  If specified, this should be
+ *     the number of spaces to be used for each tab that would ordinarily be
+ *     used to indent the text.  These amount of spaces will also be used to
+ *     replace any tab characters that already exist within the string.
+ * @return {string}  The new string with each line beginning with the desired
+ *     amount of indentation.
+ */
+function indent(str, numOfIndents, opt_spacesPerIndent) {
+  str = str.replace(/^(?=.)/gm, new Array(numOfIndents + 1).join('\t'));
+  numOfIndents = new Array(opt_spacesPerIndent + 1 || 0).join(' '); // re-use
+  return opt_spacesPerIndent
+    ? str.replace(/^\t+/g, function(tabs) {
+        return tabs.replace(/./g, numOfIndents);
+    })
+    : str;
+}
+
+/**
+ * Encodes some text so that it can be safely written into an HTML box.
+ * This includes replacing special HTML characters (&amp;, &lt;, >, etc.).
+ *
+ * @param {string} str - The text to be converted.
+ * @return {string} The HTML-safe text.
+ */
+function encodeHTML(str) {
+    return str.replace(/&amp;/g, '&amp;amp;')
+              .replace(/&lt;/g, '&amp;lt;')
+              .replace(/>/g, '&amp;gt;')
+              .replace(/"/g, '&amp;quot;')
+              .replace(/'/g, '&amp;apos;');
+}
+
+/**
+ * Shuffle the blocks in the workspace
+ */
+Blockly.WorkspaceSvg.prototype.shuffle = function() {
+    var metrics = this.getMetrics();
+    var width = metrics.viewWidth / 2,
+        height = metrics.viewHeight;
+    var blocks = this.getTopBlocks(false);
+    var y = 5, x = 0,
+        maximal_increase = height/blocks.length;
+    for (var i = 0; i &lt; blocks.length; i++){
+        // Get a block
+        var block = blocks[i];
+        var properties = block.getRelativeToSurfaceXY();
+        if (i == 0) {
+            x = 5;
+        } else {
+            x = -properties.x+randomInteger(10, width);
+        }
+        block.moveBy(x, 
+                     -properties.y+y);
+        y = y + randomInteger(5, maximal_increase);
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

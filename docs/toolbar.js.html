@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: toolbar.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: toolbar.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * An object that manages the main toolbar, including the different mode buttons.
+ * This doesn't actually have many responsibilities after the initial load.
+ *
+ * @constructor
+ * @this {BlockPyToolbar}
+ * @param {Object} main - The main BlockPy instance
+ * @param {HTMLElement} tag - The HTML object this is attached to.
+ */
+function BlockPyToolbar(main, tag) {
+    this.main = main;
+    this.tag = tag;
+    
+    // Holds the HTMLElement tags for each of the toolbar items
+    this.tags = {};
+    this.tags.mode_set_text = this.tag.find('.blockpy-mode-set-text');
+    this.tags.filename_picker = this.tag.find('.blockpy-toolbar-filename-picker');
+    
+    // Set up each of the relevant Button Groups
+    var groupHtml = '&lt;div class="btn-group" role="group">&lt;/div>';
+    var runGroup =      $(groupHtml).appendTo(tag);
+    var modeGroup =     $(groupHtml).appendTo(tag);
+    var doGroup =       $(groupHtml).appendTo(tag);
+    var blocksGroup =   $(groupHtml).appendTo(tag);
+    var codeGroup =     $(groupHtml).appendTo(tag);
+    var programsGroup = $(groupHtml).appendTo(tag);
+    
+    // this used to hold many items, but now we store them directly in the
+    // html of interface.js
+    this.elements = {
+        'programs': $("&lt;div>&lt;/div>")
+                            .addClass('btn-group blockpy-programs')
+                            .attr("data-toggle", "buttons")
+                            .appendTo(programsGroup)
+    };    
+    this.elements.programs.hide();
+    this.elements.editor_mode = this.tag.find('.blockpy-change-mode');
+    
+    // Actually set up the toolbar!
+    this.activateToolbar();
+}
+
+/**
+ * Add a new button for the given filename in the Programs button group.
+ * These programs will be things like "__main__".
+ *
+ * @param {String} name - The name of the new program.
+ */
+BlockPyToolbar.prototype.addProgram = function(name) {
+    this.elements.programs.append("&lt;label class='btn btn-default'>"+
+                                    "&lt;input type='radio' id='"+name+"' "+
+                                      "data-name='"+name+"' autocomplete='off'>"+
+                                        name+
+                                   "&lt;/label>");
+}
+
+/**
+ * Show the programs button group.
+ */
+BlockPyToolbar.prototype.showPrograms = function() {
+    this.elements.programs.show();
+}
+
+/**
+ * Hide the programs button group.
+ */
+BlockPyToolbar.prototype.hidePrograms = function() {
+    this.elements.programs.hide();
+}
+    
+/**
+ * Register click events for more complex toolbar actions.
+ */
+BlockPyToolbar.prototype.activateToolbar = function() {
+    var main = this.main;
+    this.tag.find('.blockpy-run').click(function() {
+        main.components.engine.run();
+        main.components.server.logEvent('editor', 'run')
+    });
+    this.tags.mode_set_text.click(function() {
+        main.model.settings.editor("Text");
+        main.components.server.logEvent('editor', 'text')
+    });
+    this.tag.find('.blockpy-toolbar-reset').click(function() {
+        main.model.programs['__main__'](main.model.programs['starting_code']());
+        //main.components.editor.updateBlocks();
+        main.components.server.logEvent('editor', 'reset');
+        if (main.model.assignment.parsons()) {
+            main.components.editor.blockly.shuffle();
+        }
+    });
+    this.tag.find('.blockpy-mode-set-blocks').click(function() {
+        main.model.settings.editor("Blocks");
+        main.components.server.logEvent('editor', 'blocks')
+    });
+    this.tag.find('.blockpy-mode-set-instructor').click(function() {
+        main.model.settings.editor("Instructor");
+        main.components.server.logEvent('editor', 'instructor')
+    });
+    this.tag.find('.blockpy-mode-set-split').click(function() {
+        main.model.settings.editor("Split");
+        main.components.server.logEvent('editor', 'split')
+    });
+    this.tag.find('.blockpy-toolbar-import').click(function() {
+        main.components.corgis.openDialog();
+        main.components.server.logEvent('editor', 'import')
+    });
+    this.tag.find('.blockpy-toolbar-history').click(function() {
+        main.components.history.openDialog();
+        main.components.server.logEvent('editor', 'history')
+    });
+    this.tag.find('.blockpy-toolbar-english').click(function() {
+        main.components.english.openDialog();
+        main.components.server.logEvent('editor', 'english')
+    });
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,3 +1,7 @@
+/**
+ * A dictionary of improved explanations for Python errors. These are shown to users
+ * alongside the regular errors to hopefully increase clarity.
+ */
 EXTENDED_ERROR_EXPLANATION = {
 	'ParseError': "A parse error means that Python does not understand the syntax on the line the error message points out.  Common examples are forgetting commas beteween arguments or forgetting a : (colon) on a for statement.      <br><b>Suggestion: </b>To fix a parse error you just need to look carefully at the line with the error and possibly the line before it.  Make sure it conforms to all of Python's rules.",
 	'TypeError': "Type errors most often occur when an expression tries to combine two objects with types that should not be combined.  Like using \"+\" to add a number to a list instead of \".append\", or dividing a string by a number.  <br><b>Suggestion: </b>To fix a type error you will most likely need to trace through your code and make sure the variables have the types you expect them to have.",

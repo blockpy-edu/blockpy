@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: engine.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: engine.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * An object for executing Python code and passing the results along to interested components.
  *
  * @constructor
@@ -119,7 +147,7 @@ BlockPyEngine.prototype.reset = function() {
  */
 BlockPyEngine.prototype.step = function(variables, lineNumber, 
                                        columnNumber, filename, astType, ast) {
-    if (filename == '<stdin>.py') {
+    if (filename == '&lt;stdin>.py') {
         var currentStep = this.executionBuffer.step;
         var globals = this.parseGlobals(variables);
         this.executionBuffer.trace.push(
@@ -153,7 +181,7 @@ BlockPyEngine.prototype.lastStep = function() {
  * Runs the AbstractInterpreter to get some static information about the code,
  * in particular the variables' types. This is needed for type checking.
  *
- * @returns {Object<String, AIType>} Maps variable names (as Strings) to types as constructed by the AbstractIntepreter.
+ * @returns {Object&lt;String, AIType>} Maps variable names (as Strings) to types as constructed by the AbstractIntepreter.
  */
 BlockPyEngine.prototype.analyzeVariables = function() {
     // Get the code
@@ -196,7 +224,7 @@ BlockPyEngine.prototype.analyze = function() {
         console.log(report.error.args.v)
         var codeLine = '.';
         if (report.error.args.v.length > 3) {
-            codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
+            codeLine = ', where it says:&lt;br>&lt;code>'+report.error.args.v[3][2]+'&lt;/code>';
         }
         this.main.reportError('editor', report.error, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+codeLine, report.error.args.v[2]);
         return false;
@@ -208,31 +236,31 @@ BlockPyEngine.prototype.analyze = function() {
         return false;
     } else if (report['Iteration variable is iteration list'].length >= 1) {
         var variable = report['Iteration variable is iteration list'][0];
-        feedback.semanticError("Iteration Problem", "The property <code>"+variable.name+"</code> was iterated on line "+variable.position.line+", but you used the same variable as the iteration variable. You should choose a different variable name for the iteration variable. Usually, the iteration variable is the singular form of the iteration list (e.g., <code>for dog in dogs:</code>).", variable.position.line)
+        feedback.semanticError("Iteration Problem", "The property &lt;code>"+variable.name+"&lt;/code> was iterated on line "+variable.position.line+", but you used the same variable as the iteration variable. You should choose a different variable name for the iteration variable. Usually, the iteration variable is the singular form of the iteration list (e.g., &lt;code>for dog in dogs:&lt;/code>).", variable.position.line)
         return false;
     } else if (report["Undefined variables"].length >= 1) {
         var variable = report["Undefined variables"][0];
-        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.position.line)
+        feedback.semanticError("Initialization Problem", "The property &lt;code>"+variable.name+"&lt;/code> was read on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.position.line)
         return false;
     } else if (report["Possibly undefined variables"].length >= 1) {
         var variable = report["Possibly undefined variables"][0];
-        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        feedback.semanticError("Initialization Problem", "The property &lt;code>"+variable.name+"&lt;/code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
         return false;
     } else if (report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was set, but was never used after that.", null)
+        feedback.semanticError("Unused Property", "The property &lt;code>"+variable.name+"&lt;/code> was set, but was never used after that.", null)
         return false;
     } else if (report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
-        feedback.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set, but before it could be read it was changed on line "+variable.position.line+". It is unnecessary to change an existing variable's value without reading it first.", variable.position.line)
+        feedback.semanticError("Overwritten Property", "The property &lt;code>"+variable.name+"&lt;/code> was set, but before it could be read it was changed on line "+variable.position.line+". It is unnecessary to change an existing variable's value without reading it first.", variable.position.line)
         return false;
     } else if (report["Empty iterations"].length >= 1) {
         var variable = report["Empty iterations"][0];
-        feedback.semanticError("Iterating over empty list", "The property <code>"+variable.name+"</code> was set as an empty list, and then you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        feedback.semanticError("Iterating over empty list", "The property &lt;code>"+variable.name+"&lt;/code> was set as an empty list, and then you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
         return false;
     } else if (report["Non-list iterations"].length >= 1) {
         var variable = report["Non-list iterations"][0];
-        feedback.semanticError("Iterating over non-list", "The property <code>"+variable.name+"</code> is not a list, but you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        feedback.semanticError("Iterating over non-list", "The property &lt;code>"+variable.name+"&lt;/code> is not a list, but you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
         return false;
     } else if (report["Incompatible types"].length >= 1) {
         var variable = report["Incompatible types"][0];
@@ -252,7 +280,7 @@ BlockPyEngine.prototype.run = function() {
     // Reset everything
     this.reset();
     
-    if (!this.main.model.settings.disable_semantic_errors() &&
+    if (!this.main.model.settings.disable_semantic_errors() &amp;&amp;
         !this.main.model.assignment.disable_algorithm_errors()) {
         var success = this.analyze();
         if (success === false) {
@@ -282,7 +310,7 @@ BlockPyEngine.prototype.run = function() {
     }
     // Actually run the python code
     var executionPromise = Sk.misceval.asyncToPromise(function() {
-        return Sk.importMainWithBody("<stdin>", false, code, true);
+        return Sk.importMainWithBody("&lt;stdin>", false, code, true);
     });
     
     var engine = this;
@@ -291,7 +319,7 @@ BlockPyEngine.prototype.run = function() {
     executionPromise.then(
         function (module) {
             // Run the afterSingleExecution one extra time for final state
-            Sk.afterSingleExecution(module.$d, -1, 0, "<stdin>.py");
+            Sk.afterSingleExecution(module.$d, -1, 0, "&lt;stdin>.py");
             engine.lastStep();
             // Handle checks
             feedback.noErrors()
@@ -446,7 +474,7 @@ var instructor_module = function(name) {
      * once and shave off time.
      *
      * @param {String} source - Python source code.
-     * @returns {Array.<Object>}
+     * @returns {Array.&lt;Object>}
      */
     function getParseList(source) {
         if (!(source in parses)) {
@@ -493,7 +521,7 @@ var instructor_module = function(name) {
      * that are being printed (using the print function) but are not variables.
      *
      * @param {String} source - Python source code.
-     * @returns {Array.<Object>} The list of AST elements that were found.
+     * @returns {Array.&lt;Object>} The list of AST elements that were found.
      */
     function getPrintedNonProperties(source) {
         if (!(source in parses)) {
@@ -506,8 +534,8 @@ var instructor_module = function(name) {
         visitor.visit_Call = function(node) {
             var func = node.func;
             var args = node.args;
-            if (func._astname == 'Name' && func.id.v == 'print') {
-                for (var i =0; i < args.length; i+= 1) {
+            if (func._astname == 'Name' &amp;&amp; func.id.v == 'print') {
+                for (var i =0; i &lt; args.length; i+= 1) {
                     if (args[i]._astname != "Name") {
                         nonVariables.push(args[i]);
                     }
@@ -559,11 +587,11 @@ var instructor_module = function(name) {
         Sk.builtin.pyCheckType("name", "string", Sk.builtin.checkString(name));
         name = name.v;
         var trace = Sk.builtins._trace;
-        if (trace.length <= 0) {
+        if (trace.length &lt;= 0) {
             return Sk.builtin.none.none$;
         }
         var properties = trace[trace.length-1]["properties"];
-        for (var i = 0, len = properties.length; i < len; i += 1) {
+        for (var i = 0, len = properties.length; i &lt; len; i += 1) {
             if (properties[i]['name'] == name) {
                 return Sk.ffi.remapToPy(properties[i])
             }
@@ -582,7 +610,7 @@ var instructor_module = function(name) {
         var ast_list = getParseList(source);
         
         var count = 0;
-        for (var i = 0, len = ast_list.length; i < len; i = i+1) {
+        for (var i = 0, len = ast_list.length; i &lt; len; i = i+1) {
             if (ast_list[i]._astname == 'Call') {
                 if (ast_list[i].func._astname == 'Attribute') {
                     count += Sk.ffi.remapToJs(ast_list[i].func.attr) == name | 0;
@@ -606,7 +634,7 @@ var instructor_module = function(name) {
         var ast_list = getParseList(source);
         
         var count = 0;
-        for (var i = 0, len = ast_list.length; i < len; i = i+1) {
+        for (var i = 0, len = ast_list.length; i &lt; len; i = i+1) {
             if (ast_list[i]._astname == component) {
                 count = count+1;
             }
@@ -624,8 +652,8 @@ var instructor_module = function(name) {
         var num_list = getNonListNums(source);
         
         var count = 0;
-        for (var i = 0, len = num_list.length; i < len; i = i+1) {
-            if (num_list[i].v != 0 && num_list[i].v != 1) {
+        for (var i = 0, len = num_list.length; i &lt; len; i = i+1) {
+            if (num_list[i].v != 0 &amp;&amp; num_list[i].v != 1) {
                 return Sk.ffi.remapToPy(true);
             }
         }
@@ -708,12 +736,12 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast, 
     var server = this.main.components.server;
     var model = this.main.model;
     var on_run = model.programs['give_feedback']();
-    if (on_run !== undefined && on_run.trim() !== "") {
+    if (on_run !== undefined &amp;&amp; on_run.trim() !== "") {
         on_run = 'def run_code():\n'+indent(student_code)+'\n'+on_run;
         this.setupEnvironment(student_code, traceTable, output, ast, final_values);
         
         var executionPromise = Sk.misceval.asyncToPromise(function() {
-            return Sk.importMainWithBody("<stdin>", false, on_run, true);
+            return Sk.importMainWithBody("&lt;stdin>", false, on_run, true);
         });
         executionPromise.then(
             function (module) {
@@ -745,7 +773,7 @@ BlockPyEngine.prototype.parseGlobals = function(variables) {
     var modules = Array();
     for (var property in variables) {
         var value = variables[property];
-        if (property !== "__name__" && property !== "__doc__") {
+        if (property !== "__name__" &amp;&amp; property !== "__doc__") {
             property = property.replace('_$rw$', '')
                                .replace('_$rn$', '');
             var parsed = this.parseValue(property, value);
@@ -812,7 +840,7 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                 "value": value.$r().v
             };
         case Sk.builtin.list:
-            if (value.v.length <= 20) {
+            if (value.v.length &lt;= 20) {
                 return {'name': property,
                     'type': "List",
                     "value": value.$r().v,
@@ -852,3 +880,26 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                     };
     }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

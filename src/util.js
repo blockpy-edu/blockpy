@@ -1,3 +1,10 @@
+/**
+ * Return a random integer between [`min`, `max`].
+ * 
+ * @param {number} min - The lowest possible integer.
+ * @param {number} max - The highest possible integer (inclusive).
+ * @returns {number} A random integer.
+ */
 function randomInteger(min,max) {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
@@ -24,12 +31,19 @@ function indent(str, numOfIndents, opt_spacesPerIndent) {
     : str;
 }
 
-function encodeHTML(text) {
-    return text.replace(/&/g, '&amp;')
-               .replace(/</g, '&lt;')
-               .replace(/>/g, '&gt;')
-               .replace(/"/g, '&quot;')
-               .replace(/'/g, '&apos;');
+/**
+ * Encodes some text so that it can be safely written into an HTML box.
+ * This includes replacing special HTML characters (&, <, >, etc.).
+ *
+ * @param {string} str - The text to be converted.
+ * @return {string} The HTML-safe text.
+ */
+function encodeHTML(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&apos;');
 }
 
 /**

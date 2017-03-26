@@ -1,4 +1,32 @@
-_IMPORTED_DATASETS = {};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: corgis.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: corgis.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>_IMPORTED_DATASETS = {};
 
 /**
  * Module that connects to the CORGIS datasets and manages interactions
@@ -47,7 +75,7 @@ function BlockPyCorgis(main) {
  *
  * @param {String} slug - The URL safe version of the dataset name
  * @param {String} name - The user-friendly version of the dataset name.
- * @returns {Array.<Deferred>} - Returns the async requests as deferred objects.
+ * @returns {Array.&lt;Deferred>} - Returns the async requests as deferred objects.
  */
 BlockPyCorgis.prototype.importDataset = function(slug, name) {
     var url_retrievals = [];
@@ -89,12 +117,12 @@ BlockPyCorgis.prototype.openDialog = function(name) {
         $.getJSON(root+'index.json', function(data) {
             // Make up the Body
             var datasets = data.blockpy.datasets;
-            var start = $("<p>Documentation is available at url</p>");
-            var body = $('<table></table>', {'class': 'table-bordered table-condensed table-striped'});
+            var start = $("&lt;p>Documentation is available at url&lt;/p>");
+            var body = $('&lt;table>&lt;/table>', {'class': 'table-bordered table-condensed table-striped'});
             Object.keys(datasets).map(function(name) {
                 var title_name = name;
                 name = name.replace(/\s/g, '_').toLowerCase();
-                var btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');
+                var btn = $('&lt;button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load&lt;/button>');
                 if (corgis.loadedDatasets.indexOf(name) > -1) {
                     set_button_loaded(btn);
                 } else {
@@ -103,10 +131,10 @@ BlockPyCorgis.prototype.openDialog = function(name) {
                         set_button_loaded(btn);
                     });
                 }
-                $("<tr></tr>")
-                    .append($("<td class='col-md-4'>"+title_name+"</td>"))
-                    .append($("<td>"+datasets[title_name]['short']+"</td>"))
-                    .append($("<td class='col-md-2'></td>").append(btn))
+                $("&lt;tr>&lt;/tr>")
+                    .append($("&lt;td class='col-md-4'>"+title_name+"&lt;/td>"))
+                    .append($("&lt;td>"+datasets[title_name]['short']+"&lt;/td>"))
+                    .append($("&lt;td class='col-md-2'>&lt;/td>").append(btn))
                     .appendTo(body);
             });
             // Show the actual dialog
@@ -133,4 +161,26 @@ var set_button_loaded = function(btn) {
        .prop("disabled", true)
        .text("Loaded")
        .attr("aria-pressed", "true");
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BlockPy.html">BlockPy</a></li><li><a href="BlockPyCorgis.html">BlockPyCorgis</a></li><li><a href="BlockPyDialog.html">BlockPyDialog</a></li><li><a href="BlockPyEditor.html">BlockPyEditor</a></li><li><a href="BlockPyEngine.html">BlockPyEngine</a></li><li><a href="BlockPyEnglish.html">BlockPyEnglish</a></li><li><a href="BlockPyFeedback.html">BlockPyFeedback</a></li><li><a href="BlockPyHistory.html">BlockPyHistory</a></li><li><a href="BlockPyPresentation.html">BlockPyPresentation</a></li><li><a href="BlockPyPrinter.html">BlockPyPrinter</a></li><li><a href="BlockPyServer.html">BlockPyServer</a></li><li><a href="BlockPyToolbar.html">BlockPyToolbar</a></li><li><a href="LocalStorageWrapper.html">LocalStorageWrapper</a></li><li><a href="PythonToBlocks.html">PythonToBlocks</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BlockPyInterface">BlockPyInterface</a></li><li><a href="global.html#cloneNode">cloneNode</a></li><li><a href="global.html#encodeHTML">encodeHTML</a></li><li><a href="global.html#expandArray">expandArray</a></li><li><a href="global.html#EXTENDED_ERROR_EXPLANATION">EXTENDED_ERROR_EXPLANATION</a></li><li><a href="global.html#indent">indent</a></li><li><a href="global.html#instructor_module">instructor_module</a></li><li><a href="global.html#prettyPrintDateTime">prettyPrintDateTime</a></li><li><a href="global.html#randomInteger">randomInteger</a></li><li><a href="global.html#set_button_loaded">set_button_loaded</a></li><li><a href="global.html#timerGuard">timerGuard</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Mar 26 2017 09:45:03 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
