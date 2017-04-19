@@ -904,6 +904,7 @@ PythonToBlocks.prototype.BoolOp = function(node) {
 }
 
 PythonToBlocks.prototype.binaryOperator = function(op) {
+    console.log(op);
     switch (op.name) {
         case "Add": return "ADD";
         case "Sub": return "MINUS";
