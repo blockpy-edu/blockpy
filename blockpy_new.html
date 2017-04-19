@@ -45,7 +45,6 @@
     <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
     <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
     
-    
     <!-- Source Code -->
     <script type="text/javascript" src="src/python_errors.js"></script>
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
@@ -64,12 +63,16 @@
     <script type="text/javascript" src="src/corgis.js"></script>
     <script type="text/javascript" src="src/history.js"></script>
     <script type="text/javascript" src="src/presentation.js"></script>
-    <script type="text/javascript" src="src/property_explorer.js"></script>
     <script type="text/javascript" src="src/editor.js"></script>
     <script type="text/javascript" src="src/feedback.js"></script>
     <script type="text/javascript" src="src/toolbar.js"></script>
     <script type="text/javascript" src="src/engine.js"></script>
     <script type="text/javascript" src="src/main.js"></script>
+    
+    <!-- CORGIS -->
+    <!--<script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_dataset.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_skulpt.js"></script>-->
     
     <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
@@ -91,7 +94,7 @@
                 'developer': true,
                 'disable_semantic_errors': false,
                 'urls': {
-                    'import_datasets': 'http://localhost:8000/test_corgis/',
+                    'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
                     //'walk_old_code': 'http://localhost:8000/walk_code/',
                     //'log_event': 'http://localhost:8000/save_events/'
                     /*'save_code': 'http://localhost:8000/save_code/',
@@ -123,7 +126,8 @@
             
                 //'__main__': "x and y and z"
                 //'__main__': "#test\n\nx = range(1000)\n\ntotal = 0\nfor y in x:\n    total = total + y\n    total=1\n    a=0\nprint(total)"
-                '__main__': "x =0\n\nfor x in y:\n    pass\nx=0"
+                '__main__': 'import school_scores\nschool_scores.get("Arts/Music.Average GPA","(None)","")'
+                //'__main__': "a+=1\nx =0\n\nfor x in y:\n    pass\nx=0"
                 //'__main__': '# apples\na = 0\n# testing\nprint(a)\n#final',
                 //'__main__': '#start\nalpha=0\n#Here I am\nfor x in y:\n    a\n    print(x)\n    #inside\n\n    print(0)\n\n    if x:\n        a = 0\n    else:\n        a=b\n    c=0\nprint(alpha\n)\nx = 0\n#excellent',
                 //'__main__': "import turtle\nt = turtle.Turtle()\nfor c in ['red', 'green', 'yellow', 'blue']:\n    t.color(c)\n    t.forward(75)\n    t.left(90)",

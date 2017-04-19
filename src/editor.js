@@ -871,6 +871,7 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="logic_boolean"></block>'+
                 '</category>',
     'Lists':    '<category name="Lists" colour="30">'+
+                    '<block type="lists_create"></block>'+
                     '<block type="lists_create_with">'+
                         '<value name="ADD0">'+
                           '<block type="math_number"><field name="NUM">0</field></block>'+

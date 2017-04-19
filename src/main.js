@@ -400,4 +400,17 @@ BlockPy.prototype.turnOnHacks = function() {
             };
         })();
     }
+    // Fix Function#name on browsers that do not support it (IE):
+    // Courtesy: http://stackoverflow.com/a/17056530/1718155
+    if (!(function f() {}).name) {
+        Object.defineProperty(Function.prototype, 'name', {
+            get: function() {
+                var name = (this.toString().match(/^function\s*([^\s(]+)/) || [])[1];
+                // For better performance only parse once, and then cache the
+                // result through a new accessor for repeated access.
+                Object.defineProperty(this, 'name', { value: name });
+                return name;
+            }
+        });
+    }
 }

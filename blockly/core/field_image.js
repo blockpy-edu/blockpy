@@ -49,7 +49,7 @@ Blockly.FieldImage = function(src, width, height, opt_alt) {
   this.size_ = new goog.math.Size(this.width_,
       this.height_ + 2 * Blockly.BlockSvg.INLINE_PADDING_Y);
   this.text_ = opt_alt || '';
-  this.setValue(src);
+  this.setSrc(src);
 };
 goog.inherits(Blockly.FieldImage, Blockly.Field);
 
@@ -83,7 +83,7 @@ Blockly.FieldImage.prototype.init = function() {
   this.imageElement_ = Blockly.createSvgElement('image',
       {'height': this.height_ + 'px',
        'width': this.width_ + 'px'}, this.fieldGroup_);
-  this.setValue(this.src_);
+  this.setSrc(this.src_);
   if (goog.userAgent.GECKO) {
     /**
      * Due to a Firefox bug which eats mouse events on image elements,
@@ -128,7 +128,7 @@ Blockly.FieldImage.prototype.setTooltip = function(newTip) {
  * @return {string} Current text.
  * @override
  */
-Blockly.FieldImage.prototype.getValue = function() {
+Blockly.FieldImage.prototype.getSrc = function() {
   return this.src_;
 };
 
@@ -137,7 +137,7 @@ Blockly.FieldImage.prototype.getValue = function() {
  * @param {?string} src New source.
  * @override
  */
-Blockly.FieldImage.prototype.setValue = function(src) {
+Blockly.FieldImage.prototype.setSrc = function(src) {
   if (src === null) {
     // No change if null.
     return;

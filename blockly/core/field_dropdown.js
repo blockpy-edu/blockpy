@@ -95,7 +95,6 @@ Blockly.FieldDropdown.prototype.init = function() {
   this.arrow_.appendChild(document.createTextNode(this.sourceBlock_.RTL ?
       Blockly.FieldDropdown.ARROW_CHAR + ' ' :
       ' ' + Blockly.FieldDropdown.ARROW_CHAR));
-
   Blockly.FieldDropdown.superClass_.init.call(this);
   // Force a reset of the text to add the arrow.
   var text = this.text_;
