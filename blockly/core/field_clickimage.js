@@ -39,11 +39,12 @@ goog.require('Blockly.FieldImage');
  * @extends {Blockly.FieldImage}
  * @constructor
  */
-Blockly.FieldClickImage = function(src, width, height, opt_alt, opt_Handler) {
+Blockly.FieldClickImage = function(src, width, height, opt_alt, opt_Handler, yOffset) {
   Blockly.FieldClickImage.superClass_.constructor.call(this,
                                                    src, width, height, '');
 
   this.handler_ = opt_Handler;
+  this.yOffset_ = yOffset;
 };
 
 goog.inherits(Blockly.FieldClickImage, Blockly.FieldImage);
@@ -93,6 +94,8 @@ Blockly.FieldClickImage.prototype.init = function(block) {
       Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
   // Force a render.
   this.updateTextNode_();
+  
+  this.imageElement_.style.y = this.yOffset_;
 }
 
 /**
@@ -113,11 +116,11 @@ Blockly.FieldClickImage.prototype.clone = function() {
  * of cleanup which needs to complete
  * @private
  */
-Blockly.FieldClickImage.prototype.showEditor_ = function() {
+Blockly.FieldClickImage.prototype.showEditor_ = function(e) {
   if (this.handler_) {
     var saveDragMode = Blockly.dragMode_;
     Blockly.dragMode_ = 0;
-    this.handler_(this, this.sourceBlock_);
+    this.handler_(this, this.sourceBlock_, e);
     Blockly.dragMode_ = saveDragMode;
   }
 };

@@ -19,6 +19,10 @@
     border: 1px solid lightgray;
 }
 
+.blockpy-upload {
+    border: 1px solid lightgray;
+}
+
 .blockpy-printer {
     height: 200px;
     overflow: auto;

@@ -473,7 +473,7 @@ Blockly.Field.prototype.onMouseUp_ = function(e) {
     return;
   } else if (this.sourceBlock_.isEditable()) {
     // Non-abstract sub-classes must define a showEditor_ method.
-    this.showEditor_();
+    this.showEditor_(e);
     // The field is handling the touch, but we also want the blockSvg onMouseUp
     // handler to fire, so we will leave the touch identifier as it is.
     // The next onMouseUp is responsible for nulling it out.

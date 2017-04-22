@@ -339,13 +339,13 @@ Blockly.Blocks['class_creation'] = {
     this.appendDummyInput()
         .appendField("Create class")
         .appendField(new Blockly.FieldVariable("new class"), "CLASS");
-    /*
+    
     this.appendDummyInput()
         .appendField("Inherits from")
         .appendField(new Blockly.FieldVariable("j"), "NAME")
         .appendField(",")
         .appendField(new Blockly.FieldVariable("k"), "NAME");
-    */
+  
     this.appendStatementInput("BODY")
         .setCheck(null);
     this.setPreviousStatement(true, null);
@@ -778,9 +778,18 @@ Blockly.Blocks['lists_create'] = {
    */
   updateShape_: function() {
     var that = this;
-    function addField() {
-        that.itemCount_ += 1;
-        var input = that.appendValueInput('ADD' + that.itemCount_);
+    function addField(field, block, e) {
+        var rect = field.fieldGroup_.getBoundingClientRect();
+        var yPosition = e.clientY;
+        if (yPosition < rect.top+rect.height/2) {
+            that.itemCount_ += 1;
+            var input = that.appendValueInput('ADD' + that.itemCount_);
+        } else {
+            if (that.itemCount_ > 0) {
+                that.removeInput('ADD' + that.itemCount_)
+                that.itemCount_ -= 1;
+            }
+        }
     }
     function popField() {
         if (that.itemCount_ > 0) {
@@ -789,10 +798,12 @@ Blockly.Blocks['lists_create'] = {
         }
     }
     if (!this.getInput('START')) {
+        var clickablePlusMinus = new Blockly.FieldClickImage("https://cdn.pixabay.com/photo/2012/04/02/14/00/plus-24572_960_720.png", 24, 24, '+', addField, '-2px');
+        console.log(clickablePlusMinus);
+        //clickablePlusMinus.imageElement_.style.y = '-2px';
         this.appendDummyInput('START')
             .appendField("create list of")
-            .appendField(new Blockly.FieldClickImage("https://image.flaticon.com/icons/png/128/121/121717.png", 12, 12, '+', addField))
-            .appendField(new Blockly.FieldClickImage("https://image.flaticon.com/icons/png/128/121/121716.png", 12, 12, '-', popField));;
+            .appendField(clickablePlusMinus);
     }
     // Add new inputs.
     for (var i = 1; i <= this.itemCount_; i++) {

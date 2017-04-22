@@ -47,7 +47,7 @@ Blockly.FieldImage = function(src, width, height, opt_alt) {
   this.height_ = Number(height);
   this.width_ = Number(width);
   this.size_ = new goog.math.Size(this.width_,
-      this.height_ + 2 * Blockly.BlockSvg.INLINE_PADDING_Y);
+      this.height_ + 1 * Blockly.BlockSvg.INLINE_PADDING_Y);
   this.text_ = opt_alt || '';
   this.setSrc(src);
 };
