@@ -49,6 +49,7 @@ function BlockPyEditor(main, tag) {
     this.initText();
     this.initBlockly();
     this.initInstructor();
+    this.initUpload();
     
     var editor = this;
     
@@ -203,6 +204,24 @@ BlockPyEditor.prototype.initInstructor = function() {
     this.availableModules.multiSelect({ selectableOptgroup: true });
     
     
+}
+
+/**
+ * Initializes the Upload tab, which allows students to upload some python code as files.
+ */
+BlockPyEditor.prototype.initUpload = function() {
+    // something
+    var editor = this;
+    var uploadButton = this.uploadTag.find(".blockpy-upload-button");
+    uploadButton.change(function() {
+        console.log("TRIGGER");
+        var fr = new FileReader();
+        var files = uploadButton[0].files;
+        fr.onload = function(e) {
+            editor.main.setCode(e.target.result)
+        };
+        fr.readAsText(files[0]);
+    });
 }
 
 /**
@@ -443,7 +462,7 @@ BlockPyEditor.prototype.setMode = function(mode) {
     } else if (mode == 'Instructor') {
         this.setModeToInstructor();
     } else {
-        this.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.")
+        this.main.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.")
     }
 }
 
@@ -830,6 +849,12 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="controls_forEach"></block>'+
                 '</category>',
     'Functions': '<category name="Functions" custom="PROCEDURE" colour="210">'+
+                '</category>',
+    'Classes': '<category name="Classes" colour="210">'+
+                    '<block type="class_creation"></block>'+
+                    '<block type="class_creation">'+
+                        '<mutation value="k"></mutation>'+
+                    '</block>'+
                 '</category>',
     'Calculation': '<category name="Calculation" colour="270">'+
                     //'<block type="raw_table"></block>'+

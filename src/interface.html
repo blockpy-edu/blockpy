@@ -166,7 +166,7 @@
             <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
             </button>
-            <button type='button' class='btn btn-default blockpy-toolbar-history'>
+            <button type='button' class='btn btn-default blockpy-toolbar-history' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-hourglass'></span> History
             </button>
 
@@ -203,10 +203,14 @@
                 <textarea class='codemirror-div language-python'
                            style='height:100%'></textarea>
             </div>
-            <div class='blockpy-upload blockpy-editor-menu'>
+            <div class='blockpy-upload blockpy-editor-menu' style='height:450px'>
+                <form class="form-inline" style='display:inline-block'>
                 <label class="btn btn-default btn-file">
-                    Browse <input type="file" style="display: none;">
+                    Browse <input class="blockpy-upload-button" type="file" style="display: none;">
                 </label>
+                </form>
+                <pre>
+                </pre>
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
                 <!-- Name -->

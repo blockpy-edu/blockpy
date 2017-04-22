@@ -90,7 +90,7 @@
                 'editor': 'Text',
                 'blocklyPath': "blockly/",
                 'attachmentPoint': document.getElementById('blockpy-div'),
-                'instructor': getQueryParams()["instructor"]=="true" || false,
+                'instructor': getQueryParams()["instructor"]=="true" || true,
                 'developer': true,
                 'disable_semantic_errors': false,
                 'urls': {
@@ -107,15 +107,15 @@
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
                 //'give_feedback': "if not only_printing_properties(code):\n    set_feedback('You cannot store the answer a number!')",
-                'give_feedback': "for_loops = count_components(code, 'For')\nif for_loops != 1:\n    set_feedback('You need a for-loop to iterate through that list')\n\noutputs = get_output()\nif str(4) in outputs:\n    set_feedback('You may have computed the length of the list instead of the sum.')",
+                'give_feedback': '',
                 //'give_feedback': 'v = get_value_by_name("b")\nif v == None:\n\tset_feedback("You must declare a variable named b")\nif not isinstance(v, list):\n\tset_feedback("B should be a list.")\nif sum(v) > 10:\n\tset_feedback("Your list is too big.")\nset_success()',
                 //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
                 'parsons': true,
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Split',
+                'initial_view': 'Block',
                 'modules': {
-                    'added': ['Functions', 'Data - Parking', 'Turtles'],
+                    'added': ['Functions', 'Classes', 'Data - Parking', 'Turtles'],
                     'removed': []
                 }
             },
@@ -125,8 +125,9 @@
             {
             
                 //'__main__': "x and y and z"
+                '__main__': "def x():\n    pass\nx()"
                 //'__main__': "#test\n\nx = range(1000)\n\ntotal = 0\nfor y in x:\n    total = total + y\n    total=1\n    a=0\nprint(total)"
-                '__main__': 'import school_scores\nschool_scores.get("Arts/Music.Average GPA","(None)","")'
+                //'__main__': 'import school_scores\nschool_scores.get("Arts/Music.Average GPA","(None)","")'
                 //'__main__': "a+=1\nx =0\n\nfor x in y:\n    pass\nx=0"
                 //'__main__': '# apples\na = 0\n# testing\nprint(a)\n#final',
                 //'__main__': '#start\nalpha=0\n#Here I am\nfor x in y:\n    a\n    print(x)\n    #inside\n\n    print(0)\n\n    if x:\n        a = 0\n    else:\n        a=b\n    c=0\nprint(alpha\n)\nx = 0\n#excellent',
