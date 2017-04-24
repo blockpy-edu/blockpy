@@ -45,11 +45,6 @@
                 Instructor mode: 
                 <input type='checkbox' data-bind="checked:settings.instructor"><br>
                 </label>
-                
-                <label class='blockpy-toolbar-instructor-mode' data-bind="visible: settings.instructor_initial">
-                Upload mode: 
-                <input type='checkbox' data-bind="checked:assignment.upload"><br>
-                </label> 
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
@@ -166,6 +161,9 @@
             <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
             </button>
+            <label class="btn btn-default btn-file">
+                Upload <input class="blockpy-toolbar-upload" type="file" style="display: none;">
+            </label>
             <button type='button' class='btn btn-default blockpy-toolbar-history' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
                 <span class='glyphicon glyphicon-hourglass'></span> History
             </button>
@@ -202,15 +200,6 @@
                 </div>
                 <textarea class='codemirror-div language-python'
                            style='height:100%'></textarea>
-            </div>
-            <div class='blockpy-upload blockpy-editor-menu' style='height:450px'>
-                <form class="form-inline" style='display:inline-block'>
-                <label class="btn btn-default btn-file">
-                    Browse <input class="blockpy-upload-button" type="file" style="display: none;">
-                </label>
-                </form>
-                <pre>
-                </pre>
             </div>
             <div class='blockpy-instructor blockpy-editor-menu form-inline'>
                 <!-- Name -->

@@ -92,6 +92,7 @@
                 'attachmentPoint': document.getElementById('blockpy-div'),
                 'instructor': getQueryParams()["instructor"]=="true" || true,
                 'developer': true,
+                'read_only': false,
                 'disable_semantic_errors': false,
                 'urls': {
                     'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
@@ -110,10 +111,10 @@
                 'give_feedback': '',
                 //'give_feedback': 'v = get_value_by_name("b")\nif v == None:\n\tset_feedback("You must declare a variable named b")\nif not isinstance(v, list):\n\tset_feedback("B should be a list.")\nif sum(v) > 10:\n\tset_feedback("Your list is too big.")\nset_success()',
                 //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
-                'parsons': true,
+                'parsons': false,
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Block',
+                'initial_view': 'Text',
                 'modules': {
                     'added': ['Functions', 'Classes', 'Data - Parking', 'Turtles'],
                     'removed': []

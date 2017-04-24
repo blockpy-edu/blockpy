@@ -257,6 +257,7 @@ BlockPyEngine.prototype.run = function() {
         var success = this.analyze();
         if (success === false) {
             this.executionEnd_();
+            this.main.components.server.markSuccess(0.0);
             return;
         }
     }
@@ -278,6 +279,7 @@ BlockPyEngine.prototype.run = function() {
         feedback.emptyProgram();
         this.main.model.execution.status("error");
         this.executionEnd_();
+        this.main.components.server.markSuccess(0.0);
         return;
     }
     // Actually run the python code
@@ -304,6 +306,7 @@ BlockPyEngine.prototype.run = function() {
             feedback.printError(error);
             engine.main.model.execution.status("error");
             engine.executionEnd_();
+            server.markSuccess(0.0);
             //server.logEvent('blockly_error', error);
         }
     );
@@ -735,6 +738,7 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast, 
                     console.error(error);
                     engine.main.components.feedback.internalError(error, "Feedback Error", "Error in instructor's feedback. Please show the above message to an instructor!");
                     server.logEvent('blockly_instructor_error', ''+error);
+                    server.markSuccess(0.0);
                 }
             });
     }

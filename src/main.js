@@ -132,6 +132,7 @@ function BlockPy(settings, assignment, submission, programs) {
             'assignment_id': assignment.assignment_id,
             'student_id': assignment.student_id,
             'course_id': assignment.course_id,
+            'group_id': assignment.group_id,
             'version': ko.observable(assignment.version),
             //'lis_result_sourcedid': assignment.lis_result_sourcedid,
             'name': ko.observable(assignment.name),
@@ -361,6 +362,12 @@ BlockPy.prototype.setCode = function(code, name) {
     var original = this.model.programs[name]();
     this.model.programs[name](code);
     return original != this.model.programs[name]();
+}
+
+BlockPy.prototype.setAssignment = function(assignment, settings) {
+    // Update Model
+    // Reload blockly
+    // Reload CodeMirror
 }
 
 /**
