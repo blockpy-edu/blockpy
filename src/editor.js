@@ -5,7 +5,6 @@
  *  - Blocks: A Blockly instance
  *  - Text: A CodeMirror instance
  *  - Instructor: Features for changing the assignment and environment settings
- *  - Upload: (Incomplete) A menu for uploading and running code from a desktop file.
  *
  * @constructor
  * @this {BlockPyEditor}
@@ -23,7 +22,6 @@ function BlockPyEditor(main, tag) {
     this.blockTag = tag.find('.blockpy-blocks');
     this.blocklyDiv = this.blockTag.find('.blockly-div');
     this.textTag = tag.find('.blockpy-text');
-    this.uploadTag = tag.find('.blockpy-upload');
     this.instructorTag = tag.find('.blockpy-instructor');
     this.textSidebarTag = this.textTag.find(".blockpy-text-sidebar");
     
@@ -49,7 +47,6 @@ function BlockPyEditor(main, tag) {
     this.initText();
     this.initBlockly();
     this.initInstructor();
-    this.initUpload();
     
     var editor = this;
     
@@ -102,7 +99,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     // Force the proper window size
     this.blockly.resize();
     // Keep the toolbox width set
-    this.blocklyToolboxWidth = this.blockly.toolbox_.width;
+    this.blocklyToolboxWidth = this.getToolbarWidth();
     
     Blockly.captureDialog_ = this.copyImage.bind(this);
     
@@ -131,6 +128,19 @@ BlockPyEditor.prototype.initBlockly = function() {
 
 
 };
+
+/**
+ * Retrieves the current width of the Blockly Toolbox, unless
+ * we're in read-only mode (when there is no toolbox).
+ * @returns {Number} The current width of the toolbox.
+ */
+BlockPyEditor.prototype.getToolbarWidth = function() {
+    if (this.main.model.settings.read_only()) {
+        return 0;
+    } else {
+        return this.blockly.toolbox_.width;
+    }
+}
 
 /**
  * Initializes the CodeMirror instance. This handles text editing (with syntax highlighting)
@@ -207,24 +217,6 @@ BlockPyEditor.prototype.initInstructor = function() {
 }
 
 /**
- * Initializes the Upload tab, which allows students to upload some python code as files.
- */
-BlockPyEditor.prototype.initUpload = function() {
-    // something
-    var editor = this;
-    var uploadButton = this.uploadTag.find(".blockpy-upload-button");
-    uploadButton.change(function() {
-        console.log("TRIGGER");
-        var fr = new FileReader();
-        var files = uploadButton[0].files;
-        fr.onload = function(e) {
-            editor.main.setCode(e.target.result)
-        };
-        fr.readAsText(files[0]);
-    });
-}
-
-/**
  * Makes the module available in the availableModules multi-select menu by adding
  * it to the list.
  * 
@@ -297,7 +289,8 @@ BlockPyEditor.prototype.showTextMenu = function() {
  * Hides the Block tab, which involves shrinking it and hiding the Blockly instance.
  */
 BlockPyEditor.prototype.hideBlockMenu = function() {
-    this.blocklyToolboxWidth = this.blockly.toolbox_.width;
+    
+    this.blocklyToolboxWidth = this.getToolbarWidth();
     this.blockTag.css('height', '0%');
     this.blocklyDiv.css("width", "0");
     this.blockly.setVisible(false);
@@ -314,22 +307,6 @@ BlockPyEditor.prototype.showBlockMenu = function() {
     this.blockly.setVisible(true);
     this.blockTag.removeClass('col-md-6');
     Blockly.svgResize(this.blockly);
-}
-
-/**
- * Hides the Upload tab, which shrinking it.
- */
-BlockPyEditor.prototype.hideUploadMenu = function() {
-    this.uploadTag.hide();
-    this.uploadTag.css('height', '0%');
-}
-
-/**
- * Shows the Upload tab, which involves restoring its height.
- */
-BlockPyEditor.prototype.showUploadMenu = function() {
-    this.uploadTag.css('height', '100%');
-    this.uploadTag.show();
 }
 
 /**
@@ -354,7 +331,6 @@ BlockPyEditor.prototype.showInstructorMenu = function() {
  */
 BlockPyEditor.prototype.setModeToText = function() {
     this.hideBlockMenu();
-    this.hideUploadMenu();
     this.hideInstructorMenu();
     this.showTextMenu();
     // Update the text model from the blocks
@@ -368,7 +344,6 @@ BlockPyEditor.prototype.setModeToText = function() {
  */
 BlockPyEditor.prototype.setModeToBlocks = function() {
     this.hideTextMenu();
-    this.hideUploadMenu();
     this.hideInstructorMenu();
     this.showBlockMenu();
     if (this.blocksFailed !== false) {
@@ -393,24 +368,12 @@ BlockPyEditor.prototype.setModeToBlocks = function() {
 }
 
 /**
- * Sets the current editor mode to Upload mode, hiding the other menus.
- */
-BlockPyEditor.prototype.setModeToUpload = function() {
-    this.hideTextMenu();
-    this.hideInstructorMenu();
-    this.hideBlockMenu();
-    this.showUploadMenu();
-    //TODO: finish upload mode
-}
-
-/**
  * Sets the current editor mode to Split mode, hiding the other menus.
  */
 BlockPyEditor.prototype.setModeToSplit = function() {
     this.hideTextMenu();
     this.hideInstructorMenu();
     this.hideBlockMenu();
-    this.hideUploadMenu();
     this.showSplitMenu();
     if (this.blocksFailed !== false) {
         this.showConversionError();
@@ -423,7 +386,6 @@ BlockPyEditor.prototype.setModeToSplit = function() {
 BlockPyEditor.prototype.setModeToInstructor = function() {
     this.hideTextMenu();
     this.hideBlockMenu();
-    this.hideUploadMenu();
     this.showInstructorMenu();
     //TODO: finish upload mode
     //this.main.reportError("editor", "Instructor mode has not been implemented");
@@ -441,7 +403,7 @@ BlockPyEditor.prototype.changeMode = function() {
  * Dispatch method to set the mode to the given argument.
  * If the mode is invalid, an editor error is reported. If the 
  *
- * @param {String} mode - The new mode to set to ("Blocks", "Text", "Upload", or "Instructor")
+ * @param {String} mode - The new mode to set to ("Blocks", "Text", or "Instructor")
  */
 BlockPyEditor.prototype.setMode = function(mode) {
     // Either update the model, or go with the model's
@@ -455,8 +417,6 @@ BlockPyEditor.prototype.setMode = function(mode) {
         this.setModeToBlocks();
     } else if (mode == 'Text') {
         this.setModeToText();
-    } else if (mode == 'Upload') {
-        this.setModeToUpload();
     } else if (mode == 'Split') {
         this.setModeToSplit();
     } else if (mode == 'Instructor') {
@@ -1020,7 +980,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
         //'<sep></sep>'+
     }
     xml += '</xml>';
-    if (only_set) {
+    if (only_set && !this.main.model.settings.read_only()) {
         this.blockly.updateToolbox(xml);
         this.blockly.resize();
     } else {
