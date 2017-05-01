@@ -799,6 +799,7 @@ BlockPyEditor.CATEGORY_MAP = {
     'Properties': '<category name="Properties" custom="VARIABLE" colour="240">'+
                   '</category>',
     'Decisions': '<category name="Decisions" colour="330">'+
+                    '<block type="controls_if_better"></block>'+
                     '<block type="controls_if"></block>'+
                     '<block type="controls_if"><mutation else="1"></mutation></block>'+
                     '<block type="logic_compare"></block>'+
