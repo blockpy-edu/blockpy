@@ -31,10 +31,14 @@
                              text: status_server_class()[1],
                              attr: { 'data-original-title': status.server_error }"
                   data-toggle="tooltip" data-placement="left">Loading</span>
-            <button type='button' class='btn btn-default btn-xs'>
+            <br>
+            <button type='button' class='btn btn-default btn-xs pull-right'
+                    data-bind="css: {active: settings.show_settings},
+                               click: showHideSettings"
+                    >
                 <span class='glyphicon glyphicon-wrench'></span>
             </button>
-            <div class='pull-right'>
+            <div class='pull-right' data-bind="visible: settings.show_settings">
                 Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors"><br>
                 Disable Timeout: <input type='checkbox' data-bind="checked: settings.disable_timeout"><br>
                 Disable Typed Blocks: <input type='checkbox' data-bind="checked: settings.disable_variable_types"><br>

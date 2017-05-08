@@ -68,10 +68,12 @@ function BlockPy(settings, assignment, submission, programs) {
             // string
             'level': ko.observable("level"),
             // boolean
+            'show_settings': ko.observable(settings.show_settings),
+            // boolean
             'disable_semantic_errors': ko.observable(settings.disable_semantic_errors ||
                                                      assignment.disable_algorithm_errors || false),
             // boolean
-            'disable_variable_types': ko.observable(settings.disable_variable_types || true),
+            'disable_variable_types': ko.observable(settings.disable_variable_types),
             // boolean
             'disable_timeout': ko.observable(settings.disable_timeout || false),
             // boolean
@@ -159,6 +161,11 @@ function BlockPy(settings, assignment, submission, programs) {
     // Whether this URL has been specified
     this.model.server_is_connected = function(url) {
         return this.constants.urls !== undefined && this.constants.urls[url] !== undefined;
+    };
+    
+    var modelSettings = this.model.settings;
+    this.model.showHideSettings = function() {
+        modelSettings.show_settings(!modelSettings.show_settings());
     };
     
     // Helper function to map error statuses to UI elements
