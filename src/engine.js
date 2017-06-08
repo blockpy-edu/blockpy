@@ -64,6 +64,7 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.afterSingleExecution = this.step.bind(this);
     // Definitely use a prompt
     Sk.inputfunTakesPrompt = true;
+    Sk.inputfun = this.inputFunction.bind(this);
     
     // Keeps track of the tracing while the program is executing; destroyed afterwards.
     this.executionBuffer = {};
@@ -83,6 +84,36 @@ BlockPyEngine.prototype.readFile = function(filename) {
         throw "File not found: '" + filename + "'";
     }
     return Sk.builtinFiles["files"][filename];
+}
+
+/**
+ * Creates and registers a Promise from the Input box
+ * 
+ */
+BlockPyEngine.prototype.inputFunction = function(promptMessage) {
+    var printer = this.main.components.printer;
+    var result = printer.printInput(promptMessage);
+    if (result.promise) {
+        var resolveOnClick;
+        var submittedPromise = new Promise(function(resolve, reject) {
+            resolveOnClick = resolve;
+        });
+        var submitForm = function() {
+            resolveOnClick(result.input.val());
+            result.input.prop('disabled', true);
+            result.button.prop('disabled', true);
+        };
+        result.button.click(submitForm);
+        result.input.keyup(function(e) {
+            if (e.keyCode == 13) {
+                submitForm();
+            }
+        });
+        result.input.focus();
+        return submittedPromise;
+    } else {
+        return "";
+    }
 }
 
 /**
