@@ -62,6 +62,8 @@ AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'},
                                 'xrange': {"type": "List", "subtype": {"type": "Num"} },
                                 'reversed': {"type": "List"},
                                 'len': {"type": "Num"},
+                                'type': {"type": "Any"},
+                                'dir': {"type": "List"},
                                 'True': {"type": "Bool"}, 
                                 'False': {"type": "Bool"}, 
                                 'None': {"type": 'None'}}
@@ -76,6 +78,9 @@ AbstractInterpreter.MODULES = {
         'get_forecasted_reports': [{"temperature": 'Num', "humidity": "Num", "wind": "Num"}],
         'get_all_forecasted_temperatures': [{'city': 'str', 'forecasts': ['int']}],
         'get_highs_lows': {'highs': ['Num'], 'lows': ['Num']}
+    },
+    'image': {
+        
     },
     'stocks': {
         'get_current': 'float',
