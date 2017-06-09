@@ -133,8 +133,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     // Final result list
     var children = [], // The complete set of peers
         root = null, // The top of the current peer
-        current = null,
-        levelIndex = this.levelIndex; // The bottom of the current peer
+        current = null, // The bottom of the current peer
+        levelIndex = this.levelIndex; 
         
     function addPeer(peer) {
         if (root == null) {
@@ -173,6 +173,7 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         skipped_line,
         commentCount,
         previousHeight = null,
+        previousWasStatement = false;
         visitedFirstLine = false;
         
     // Iterate through each node
@@ -233,10 +234,14 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         // Handle skipped line
         } else if (is_top_level && skipped_line && visitedFirstLine) {
             addPeer(newChild);
+        // The previous line was not a Peer
+        } else if (is_top_level && !previousWasStatement) {
+            addPeer(newChild);
         // Otherwise, always embed it in there.
         } else {
             nestChild(newChild);
         }
+        previousWasStatement = newChild.constructor !== Array;
         
         visitedFirstLine = true;
     }
@@ -269,6 +274,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     
     finalizePeers();
+    
+    console.log(children);
     
     this.levelIndex -= 1;
     
