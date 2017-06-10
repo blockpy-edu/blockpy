@@ -119,7 +119,7 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
     }
 }
 
-BlockPyServer.prototype.markSuccess = function(success) {
+BlockPyServer.prototype.markSuccess = function(success, callback) {
     var data = this.createServerData();
     var server = this,
         model = this.main.model;
@@ -131,7 +131,15 @@ BlockPyServer.prototype.markSuccess = function(success) {
         server.setStatus('Saving');
         if (model.server_is_connected('save_success')) {
             $.post(model.constants.urls.save_success, data, 
-                   server.defaultResponse.bind(server))
+                function(response) {
+                   if (response.success) {
+                        this.setStatus('Saved');
+                        callback(data);
+                    } else {
+                        console.error(response);
+                        this.setStatus('Error', response.message);
+                    }
+                })
              .fail(server.defaultFailure.bind(server));
         } else {
             server.setStatus('Offline', "Server is not connected!");

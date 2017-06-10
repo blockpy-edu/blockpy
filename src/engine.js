@@ -757,13 +757,13 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast, 
                 engine.disposeEnvironment();
                 console.log(error.tp$name, error.tp$name == "Success");
                 if (error.tp$name == "Success") {
-                    server.markSuccess(1.0);
+                    server.markSuccess(1.0, model.settings.completedCallback);
                     engine.main.components.feedback.complete();
                 } else if (error.tp$name == "Feedback") {
                     server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
                 } else if (error.tp$name == "Finished") {
-                    server.markSuccess(1.0);
+                    server.markSuccess(1.0, model.settings.completedCallback);
                     engine.main.components.feedback.finished();
                 } else {
                     console.error(error);

@@ -81,7 +81,9 @@ function BlockPy(settings, assignment, submission, programs) {
             // boolean
             'developer': ko.observable(settings.developer || false),
             // boolean
-            'mute_printer': ko.observable(false)
+            'mute_printer': ko.observable(false),
+            // function
+            'completedCallback': settings.completedCallback,
         },
         'execution': {
             // 'waiting', 'running'
