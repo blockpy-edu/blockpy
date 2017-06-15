@@ -133,11 +133,15 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
             $.post(model.constants.urls.save_success, data, 
                 function(response) {
                    if (response.success) {
-                        this.setStatus('Saved');
-                        callback(data);
+                        server.setStatus('Saved');
+                        if (success) {
+                            callback(data);
+                        }
                     } else {
                         console.error(response);
-                        this.setStatus('Error', response.message);
+                        server.setStatus('Error', response.message);
+                        callback(data);
+                        console.log(data, callback);
                     }
                 })
              .fail(server.defaultFailure.bind(server));
@@ -262,7 +266,7 @@ BlockPyServer.prototype.walkOldCode = function() {
                             server.walkOldCode();
                            }
                        } else {
-                           this.setStatus('Failure', response.message);
+                           server.setStatus('Failure', response.message);
                        }
                    })
             .fail(
