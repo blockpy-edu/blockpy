@@ -1,5 +1,7 @@
 
-js_in = ["src/python_errors.js",
+js_in = ["src/front.js",
+         "src/utilities.js",
+         "src/python_errors.js",
          "src/ast_node_visitor.js",
          "src/abstract_interpreter.js",
          "src/python_to_blockly.js",
