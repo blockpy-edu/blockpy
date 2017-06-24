@@ -1534,10 +1534,13 @@ PythonToBlocks.prototype.Name_str = function(node)
     return this.identifier(id);
 }
 
-PythonToBlocks.prototype.convertElements = function(key, values) {
+PythonToBlocks.prototype.convertElements = function(key, values, plusser) {
+    if (plusser === undefined) {
+        plusser = 0;
+    }
     var output = {};
     for (var i = 0; i < values.length; i++) {
-        output[key+i] = this.convert(values[i]);
+        output[key+(plusser+i)] = this.convert(values[i]);
     }
     return output;
 }
@@ -1551,8 +1554,8 @@ PythonToBlocks.prototype.List = function(node) {
     var elts = node.elts;
     var ctx = node.ctx;
     
-    return block("lists_create_with", node.lineno, {}, 
-        this.convertElements("ADD", elts)
+    return block("lists_create", node.lineno, {}, 
+        this.convertElements("ADD", elts, 1)
     , {
         "inline": elts.length > 3 ? "false" : "true", 
     }, {
@@ -1569,7 +1572,13 @@ PythonToBlocks.prototype.Tuple = function(node)
     var elts = node.elts;
     var ctx = node.ctx;
     
-    throw new Error("Tuples not implemented");
+    return block("tuple_create", node.lineno, {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": elts.length > 3 ? "false" : "true", 
+    }, {
+        "@items": elts.length
+    });
 }
 
 /*

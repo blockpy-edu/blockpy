@@ -335,6 +335,9 @@ BlockPy.prototype.setCode = function(code, name) {
     return original != this.model.programs[name]();
 }
 
+/**
+ * Helper function for loading in an assignment.
+ */
 BlockPy.prototype.setAssignment = function(assignment, settings) {
     // Update Model
     // Reload blockly
