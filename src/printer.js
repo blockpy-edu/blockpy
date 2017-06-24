@@ -26,8 +26,8 @@ BlockPyPrinter.prototype.resetPrinter = function() {
     this.printerSettings['width'] = Math.min(500, this.tag.width()-40);
     this.printerSettings['height'] = Math.min(500, this.tag.height()+40);
     Sk.TurtleGraphics = {'target': this.tag[0], 
-                         'width': this.printerSettings['width'], 
-                         'height': this.printerSettings['height']};
+                         'width': this.printerSettings['width']-40, 
+                         'height': this.printerSettings['height']-40};
 }
 
 /**
