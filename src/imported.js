@@ -94,3 +94,41 @@ Blockly.Xml.domToWorkspaceDestructive = function(xml, workspace, errorXml) {
     workspace.setResizesEnabled(true);
   }      
 }
+
+
+function PLUS_MINUS_updateShape(listItemName, startMessage) {
+    return function() {
+        var that = this;
+        function addField(field, block, e) {
+            var rect = field.fieldGroup_.getBoundingClientRect();
+            var yPosition = e.clientY;
+            if (yPosition < rect.top+rect.height/2) {
+                var input = that.appendValueInput(listItemName + that.itemCount_);
+                that.itemCount_ += 1;
+            } else {
+                if (that.itemCount_ > 0) {
+                    that.itemCount_ -= 1;
+                    that.removeInput(listItemName + that.itemCount_)
+                }
+            }
+        }
+        if (!this.getInput('START')) {
+            var clickablePlusMinus = new Blockly.FieldClickImage("images/plus-minus-button.svg", 12, 24, '+', addField, '-2px');
+            //clickablePlusMinus.imageElement_.style.y = '-2px';
+            this.appendDummyInput('START')
+                .appendField(startMessage)
+                .appendField(clickablePlusMinus);
+        }
+        // Add new inputs.
+        for (var i = 0; i < this.itemCount_; i++) {
+          if (!this.getInput(listItemName + i)) {
+            var input = this.appendValueInput(listItemName + i);
+          }
+        }
+        // Remove deleted inputs.
+        while (this.getInput(listItemName + i)) {
+          this.removeInput(listItemName + i);
+          i++;
+        }
+    }
+}

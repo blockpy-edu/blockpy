@@ -1017,7 +1017,15 @@ PythonToBlocks.prototype.Dict = function(node) {
 PythonToBlocks.prototype.Set = function(node)
 {
     var elts = node.elts;
-    throw new Error("Sets are not implemented");
+    var ctx = node.ctx;
+    
+    return block("set_create", node.lineno, {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": elts.length > 3 ? "false" : "true", 
+    }, {
+        "@items": elts.length
+    });
 }
 
 /*
@@ -1555,7 +1563,7 @@ PythonToBlocks.prototype.List = function(node) {
     var ctx = node.ctx;
     
     return block("lists_create", node.lineno, {}, 
-        this.convertElements("ADD", elts, 1)
+        this.convertElements("ADD", elts)
     , {
         "inline": elts.length > 3 ? "false" : "true", 
     }, {

@@ -2,8 +2,8 @@ Blockly.Python['lists_create'] = function(block) {
     // Create a list with any number of elements of any type.
   var elements = new Array(block.itemCount_);
   console.log(block.itemCount_)
-  for (var i = 1; i <= block.itemCount_; i++) {
-    elements[i-1] = Blockly.Python.valueToCode(block, 'ADD' + i,
+  for (var i = 0; i < block.itemCount_; i++) {
+    elements[i] = Blockly.Python.valueToCode(block, 'ADD' + i,
         Blockly.Python.ORDER_NONE) || '___';
   }
   var code = '[' + elements.join(', ') + ']';
@@ -47,39 +47,5 @@ Blockly.Blocks['lists_create'] = {
    * @private
    * @this Blockly.Block
    */
-  updateShape_: function() {
-    var that = this;
-    function addField(field, block, e) {
-        var rect = field.fieldGroup_.getBoundingClientRect();
-        var yPosition = e.clientY;
-        if (yPosition < rect.top+rect.height/2) {
-            that.itemCount_ += 1;
-            var input = that.appendValueInput('ADD' + that.itemCount_);
-        } else {
-            if (that.itemCount_ >= 0) {
-                that.removeInput('ADD' + that.itemCount_)
-                that.itemCount_ -= 1;
-            }
-        }
-    }
-    function popField() {
-        if (that.itemCount_ >= 0) {
-            that.removeInput('ADD' + that.itemCount_)
-            that.itemCount_ -= 1;
-        }
-    }
-    if (!this.getInput('START')) {
-        var clickablePlusMinus = new Blockly.FieldClickImage("images/plus-minus-button.svg", 12, 24, '+', addField, '-2px');
-        //clickablePlusMinus.imageElement_.style.y = '-2px';
-        this.appendDummyInput('START')
-            .appendField("create list of")
-            .appendField(clickablePlusMinus);
-    }
-    // Add new inputs.
-    for (var i = 0; i < this.itemCount_; i++) {
-      if (!this.getInput('ADD' + i)) {
-        var input = this.appendValueInput('ADD' + i);
-      }
-    }
-  }
+  updateShape_: PLUS_MINUS_updateShape('ADD', "create list of")
 };
