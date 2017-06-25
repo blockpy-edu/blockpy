@@ -55,7 +55,7 @@ BlockPyServer.prototype.createServerData = function() {
     var d = new Date();
     var seconds = Math.round(d.getTime() / 1000);
     data = {
-        'assignment_id': assignment.assignment_id,
+        'assignment_id': assignment.assignment_id(),
         'group_id': assignment.group_id,
         'course_id': assignment.course_id,
         'student_id': assignment.student_id,
