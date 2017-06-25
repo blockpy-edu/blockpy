@@ -20,8 +20,8 @@ function LocalStorageWrapper(namespace) {
  * @param {String} value - The value.
  */
 LocalStorageWrapper.prototype.set =  function(key, value) {
-    localStorage.setItem(namespace+"_"+key+"_value", value);
-    localStorage.setItem(namespace+"_"+key+"_timestamp", $.now());
+    localStorage.setItem(this.namespace+"_"+key+"_value", value);
+    localStorage.setItem(this.namespace+"_"+key+"_timestamp", $.now());
 };
 
 /**
@@ -30,8 +30,8 @@ LocalStorageWrapper.prototype.set =  function(key, value) {
  * @param {String} key - The name of the key to remove.
  */
 LocalStorageWrapper.prototype.remove = function(key) {
-    localStorage.removeItem(namespace+"_"+key+"_value");
-    localStorage.removeItem(namespace+"_"+key+"_timestamp");
+    localStorage.removeItem(this.namespace+"_"+key+"_value");
+    localStorage.removeItem(this.namespace+"_"+key+"_timestamp");
 };
 
 /**
@@ -40,7 +40,24 @@ LocalStorageWrapper.prototype.remove = function(key) {
  * @param {String} key - The name of the key to retrieve the value for.
  */
 LocalStorageWrapper.prototype.get = function(key) {
-    return localStorage.getItem(namespace+"_"+key+"_value");
+    return localStorage.getItem(this.namespace+"_"+key+"_value");
+};
+
+/**
+ * A method for retrieving the value associated with the given key.
+ * If the key does not exist, then the default value is used instead.
+ * This default will be set.
+ *
+ * @param {String} key - The name of the key to retrieve the value for.
+ * @param {String} defaultValue - The default value to use. Must be a string.
+ */
+LocalStorageWrapper.prototype.getDefault = function(key, defaultValue) {
+    if (this.has(key)) {
+        return this.get(key);
+    } else {
+        this.set(key, defaultValue);
+        return defaultValue;
+    }
 };
 
 /**
@@ -49,7 +66,7 @@ LocalStorageWrapper.prototype.get = function(key) {
  * @param {String} key - The key to test existence for.
  */
 LocalStorageWrapper.prototype.has = function(key) {
-    return localStorage.getItem(namespace+"_"+key+"_value") !== null;
+    return localStorage.getItem(this.namespace+"_"+key+"_value") !== null;
 };
 
 /**
@@ -61,6 +78,6 @@ LocalStorageWrapper.prototype.has = function(key) {
  * @param {Integer} server_time - The server's time as an epoch (in milliseconds)
  */
 LocalStorageWrapper.prototype.is_new = function(key, server_time) {
-    var stored_time = localStorage.getItem(namespace+"_"+key+"_timestamp");
+    var stored_time = localStorage.getItem(this.namespace+"_"+key+"_timestamp");
     return (server_time >= stored_time+5000);
 };

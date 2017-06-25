@@ -53,9 +53,6 @@ function BlockPyEditor(main, tag) {
     // Handle mode switching
     this.main.model.settings.editor.subscribe(function() {editor.setMode()});
     
-    // Handle level switching
-    this.main.model.settings.level.subscribe(function() {editor.setLevel()});
-    
     // Handle filename switching
     this.main.model.settings.filename.subscribe(function (name) {
         if (name == 'give_feedback') {
