@@ -11,7 +11,7 @@
 function BlockPy(settings, assignment, submission, programs) {
     this.localSettings = new LocalStorageWrapper('localSettings');
     this.initModel(settings);
-    this.setAssignment(settings, assignment, programs);
+    this.setAssignment(assignment, settings, programs);
     
     // The code for the current active program file (e.g., "__main__")
     this.model.program = ko.computed(function() {
