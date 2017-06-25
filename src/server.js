@@ -100,17 +100,13 @@ BlockPyServer.prototype.defaultFailure = function(error, textStatus) {
 }
 
 BlockPyServer.prototype.logEvent = function(event_name, action, body) {
-    var data = this.createServerData();
-    data['event'] = event_name;
-    data['action'] = action;
-    if (body === undefined) {
-        data['body'] = '';
-    } else {
-        data['body'] = body;
-    }
-    
-    this.setStatus('Logging');
     if (this.main.model.server_is_connected('log_event')) {
+        var data = this.createServerData();
+        data['event'] = event_name;
+        data['action'] = action;
+        data['body'] = (body === undefined) ? '' : body;
+        this.setStatus('Logging');
+        // Trigger request
         $.post(this.main.model.constants.urls.log_event, data, 
                this.defaultResponse.bind(this))
          .fail(this.defaultFailure.bind(this));
@@ -120,16 +116,17 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
 }
 
 BlockPyServer.prototype.markSuccess = function(success, callback) {
-    var data = this.createServerData();
-    var server = this,
-        model = this.main.model;
-    data['code'] = model.programs.__main__;
-    data['status'] = success;
-    this.main.components.editor.getPngFromBlocks(function(pngData, img) {
-        data['image'] = pngData;
-        img.remove();
-        server.setStatus('Saving');
-        if (model.server_is_connected('save_success')) {
+    var model = this.main.model;
+    if (model.server_is_connected('save_success')) {
+        var data = this.createServerData();
+        var server = this;
+        data['code'] = model.programs.__main__;
+        data['status'] = success;
+        this.main.components.editor.getPngFromBlocks(function(pngData, img) {
+            data['image'] = pngData;
+            img.remove();
+            server.setStatus('Saving');
+            // Trigger request
             $.post(model.constants.urls.save_success, data, 
                 function(response) {
                    if (response.success) {
@@ -152,24 +149,24 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
 };
 
 BlockPyServer.prototype.saveAssignment = function() {
-    var data = this.createServerData();
     var model = this.main.model;
-    data['introduction'] = model.assignment.introduction();
-    data['parsons'] = model.assignment.parsons();
-    data['initial'] = model.assignment.initial_view();
-    data['importable'] = model.assignment.importable();
-    data['disable_algorithm_errors'] = model.assignment.disable_algorithm_errors();
-    data['name'] = model.assignment.name();
-    //data['disabled'] = disabled;
-    data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
-    
-    var server = this;
-    this.setStatus('Saving');
-    if (this.main.model.server_is_connected('save_assignment') && 
-        this.main.model.settings.auto_upload()) {
+    if (model.server_is_connected('save_assignment') && 
+        model.settings.auto_upload()) {
+        var data = this.createServerData();
+        data['introduction'] = model.assignment.introduction();
+        data['parsons'] = model.assignment.parsons();
+        data['initial'] = model.assignment.initial_view();
+        data['importable'] = model.assignment.importable();
+        data['disable_algorithm_errors'] = model.assignment.disable_algorithm_errors();
+        data['name'] = model.assignment.name();
+        data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
+        
+        var server = this;
+        this.setStatus('Saving');
         clearTimeout(this.presentationTimer);
+        // Trigger request
         this.presentationTimer = setTimeout(function() {
-            $.post(server.main.model.constants.urls.save_assignment, data, 
+            $.post(model.constants.urls.save_assignment, data, 
                    server.defaultResponseWithoutVersioning.bind(server))
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
@@ -179,20 +176,21 @@ BlockPyServer.prototype.saveAssignment = function() {
 }
 
 BlockPyServer.prototype.saveCode = function() {
-    var filename = this.main.model.settings.filename();
-    var data = this.createServerData();
-    data['filename'] = filename;
-    data['code'] = this.main.model.programs[filename]();
-    
-    var server = this;
-    this.setStatus('Saving');
-    if (this.main.model.server_is_connected('save_code') && 
-        this.main.model.settings.auto_upload()) {
+    var model = this.main.model;
+    if (model.server_is_connected('save_code') && 
+        model.settings.auto_upload()) {
+        var data = this.createServerData();
+        var filename = model.settings.filename();
+        data['filename'] = filename;
+        data['code'] = model.programs[filename]();
+        
+        var server = this;
+        this.setStatus('Saving');
         if (this.saveTimer[filename]) {
             clearTimeout(this.saveTimer[filename]);
         }
         this.saveTimer[filename] = setTimeout(function() {
-            $.post(server.main.model.constants.urls.save_code, data, 
+            $.post(model.constants.urls.save_code, data, 
                    filename == '__main__'
                     ? server.defaultResponse.bind(server)
                     : server.defaultResponseWithoutVersioning.bind(server))
@@ -204,12 +202,12 @@ BlockPyServer.prototype.saveCode = function() {
 }
 
 BlockPyServer.prototype.getHistory = function(callback) {
-    var data = this.createServerData();
     var model = this.main.model;
     
-    var server = this;
-    this.setStatus('Loading History');
     if (model.server_is_connected('get_history')) {
+        var data = this.createServerData();
+        var server = this;
+        this.setStatus('Loading History');
         $.post(model.constants.urls.get_history, data, 
                function(response) {
                 if (response.success) {
@@ -224,13 +222,6 @@ BlockPyServer.prototype.getHistory = function(callback) {
     } else {
         this.setStatus('Offline', "Server is not connected!");
         callback([]);
-        /*callback([
-            {code: "=", time: "20160801-105102"},
-            {code: "= 0", time: "20160801-105112"},
-            {code: "a = 0", time: "20160801-105502"},
-            {code: "a = 0\nprint", time: "20160801-110003"},
-            {code: "a = 0\nprint(a)", time: "20160801-111102"}
-        ])*/
     }
 }
 
