@@ -142,10 +142,10 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
                     }
                 })
              .fail(server.defaultFailure.bind(server));
-        } else {
-            server.setStatus('Offline', "Server is not connected!");
-        }
-    });
+        });
+    } else {
+        server.setStatus('Offline', "Server is not connected!");
+    }
 };
 
 BlockPyServer.prototype.saveAssignment = function() {
@@ -275,53 +275,25 @@ BlockPyServer.prototype.walkOldCode = function() {
     }
 }
 
-/*
-BlockPyServer.prototype.load = function() {
-    var data = {
-        'question_id': this.model.question.question_id,
-        'student_id': this.model.question.student_id,
-        'context_id': this.model.question.context_id
-    };
-    var alertBox = this.alertBox;
-    var server = this, blockpy = this.blockpy;
-    if (this.model.urls.server !== false && this.model.urls.load_code !== false) {
-        $.post(this.model.urls.load_code, data, function(response) {
-            if (response.success) {
-                if (server.storage.has(data.question_id)) {
-                    if (server.storage.is_new(data.question_id, response.timestamp)) {
-                        var xml = server.storage.get(data.question_id);
-                        server.model.load(xml);
-                        server.save();
+BlockPyServer.prototype.loadAssignment = function() {
+    var model = this.main.model;
+    if (model.server_is_connected('load_assignment')) {
+        var data = this.createServerData();        
+        var server = this;
+        this.setStatus('Reloading');
+        $.post(model.constants.urls.save_code, data, 
+                function(response) {
+                    if (response.success) {
+                        server.main.setAssignment(response.assignment, 
+                                                  response.settings, 
+                                                  response.programs)
+                        server.setStatus('Loaded');
                     } else {
-                        server.storage.remove(data.question_id);
-                        if (response.code !== null) {
-                            server.model.load(response.code);
-                        }
+                        server.setStatus('Failure', response.message);
                     }
-                } else {
-                    if (response.code !== null) {
-                        server.model.load(response.code);
-                    }
-                }
-                if (response.completed) {
-                    blockpy.feedback.success('');
-                }
-                alertBox("Loaded").delay(200).fadeOut("slow");
-            } else {
-                console.error("Server Load Error", response.message);
-                alertBox("Loading failed");
-            }
-        }).fail(function() {
-            alertBox("Loading failed");
-        }).always(function() {
-            server.model.loaded = true;
-        });
+               })
+         .fail(server.defaultFailure.bind(server));
     } else {
-        server.model.loaded = true;
-        alertBox("Loaded").delay(200).fadeOut("slow");
-        if (this.model.urls.load_success === true) {
-            this.blockpy.feedback.success('');
-        }
+        this.setStatus('Offline', "Server is not connected!");
     }
-};
-*/
+}
