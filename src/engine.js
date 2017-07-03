@@ -640,9 +640,22 @@ var instructor_module = function(name) {
         var non_var_list = getPrintedNonProperties(source);
         return Sk.ffi.remapToPy(non_var_list.length == 0);
     });
-    
+
+    //Enhanced feedback functions and objects starts here
+    mod.Stack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            self.stack = [];
+        });
+        $loc.push = new Sk.builtin.func(function(self,x) {
+            self.stack.push(x);
+        });
+        $loc.pop = new Sk.builtin.func(function(self) {
+            return self.stack.pop();
+        });
+    }, 'Stack', []);
+
     return mod;
-}
+}//end of instructor_module
 
 BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, output, ast, final_values) {
     var model = this.main.model;
@@ -675,6 +688,8 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
     Sk.builtins.get_value_by_name = this.instructor_module.get_value_by_name;
     Sk.builtins.get_value_by_type = this.instructor_module.get_value_by_type;
     Sk.builtins.parse_json = this.instructor_module.parse_json;
+    Sk.builtins.Stack = this.instructor_module.Stack;
+
     Sk.skip_drawing = true;
     model.settings.mute_printer(true);
 }
