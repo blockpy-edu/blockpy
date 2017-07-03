@@ -94,8 +94,9 @@
                 'developer': true,
                 'disable_semantic_errors': false,
                 'urls': {
-                    'import_datasets': 'http://localhost:8000/test_corgis/',
-                    /*'save_code': 'http://localhost:8000/save_code/',
+                    'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
+                    /*'import_datasets': 'http://localhost:8000/test_corgis/',
+                    'save_code': 'http://localhost:8000/save_code/',
                     'save_success': 'http://localhost:8000/submit_grade/',
                     'log_event': 'http://localhost:8000/save_events/'*/
                 }
@@ -109,9 +110,10 @@
                 //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Split',
+                'initial_view': 'Blocks',
                 'modules': {
-                    'added': ['Functions', 'Data - Parking'],
+                    //'added': ['Functions', 'Data - Parking'],
+                    'added': ['Functions', 'Data - Weather'],
                     'removed': []
                 }
             },
@@ -123,7 +125,9 @@
                 //'__main__': "x and y and z"
                 //"\nx = range(1000)\ntotal = 0\nfor y in x:\n    total = total + y\nprint(total)"
                 //'__main__': '# apples\na = 0\n# testing\nprint(a)\n#final',
-                '__main__': 'import weather\nprecipitation_list = weather.get("Precipitation","Location","Blacksburg, VA")',
+                //'__main__': 'import earthquakes',
+                '__main__': 'import weather'
+                //'__main__': 'import weather\nprecipitation_list = weather.get("Precipitation","Location","Blacksburg, VA")',
                 //'__main__': 'import matplotlib.pyplot as plt\na = xrange(1000)\nnew= []\nfor b in a:\n    if b > 5:\n        new.append(b)\nplt.hist(new)\nplt.show()'
                 //'a = [1,2,3]\nb=[4,5]\na,b',
                 //'__main__': 'import parking\ntoday = parking.today()\nif today == parking.Day("Tuesay"):\n    print("Can park")\nelse:\n    print("Cannot park!")',
@@ -162,6 +166,40 @@
         const STOP_SCRUB = "stop"
         var global_scrubing = STOP_SCRUB;
         var speed = 50;
+        document.onkeydown = navigationStroke;
+        
+        function pauseEvent(){
+            global_isPaused = !global_isPaused;
+            updatePauseButton();
+        }
+        function forwardEvent(){
+            global_isPaused = true;
+            global_scrubing = FORWARD_SCRUB;
+            updatePauseButton();
+        }
+        function backEvent(){
+            global_isPaused = true;
+            global_scrubing = BACKWARD_SCRUB;
+            updatePauseButton();
+        }
+        function navigationStroke(key){
+            var KeyNavigationEnabled = document.getElementById("myCheck").checked;
+            if(KeyNavigationEnabled == true){
+                key = key || window.event;
+                if (key.keyCode == '80') {
+                    // p is pressed
+                    pauseEvent();
+                }
+                else if (key.keyCode == '37') {
+                   // left arrow
+                   backEvent();
+                }
+                else if (key.keyCode == '39') {
+                   // right arrow
+                   forwardEvent();
+                }
+            }
+        }
 
         $('#speed-slider').change(function() {
             var sliderValue = document.getElementById("speed-slider").value;
@@ -175,15 +213,11 @@
         });
 
         $('#forward-button').click(function() {
-            global_isPaused = true;
-            global_scrubing = FORWARD_SCRUB;
-            updatePauseButton();
+            forwardEvent();
         });
 
         $('#backward-button').click(function() {
-            global_isPaused = true;
-            global_scrubing = BACKWARD_SCRUB;
-            updatePauseButton();
+            backEvent();
         });
         
         function handleCodeEvents(record){
@@ -220,43 +254,49 @@
             }
             var results = regex.exec(bodyMessage);
             var line = results != null && results.length > 1 ? results[1] : null;
-            switch (record.action.toLowerCase()) {
-                case "success":
-                    blockpy.components.feedback.complete(detailError, bodyMessage, line);
-                    break;
-                case "editor error":
-                    blockpy.components.feedback.editorError(detailError, bodyMessage, line);
-                    break;
-                case "no errors":
-                    blockpy.components.feedback.noErrors(detailError, bodyMessage, line);
-                    break;
-                case "syntax error":
-                    blockpy.components.feedback.syntaxError(detailError, bodyMessage, line);
-                    break;
-                case "semantic error":
-                    blockpy.components.feedback.semanticError(detailError, bodyMessage, line);
-                    break;
-                case "internal error":
-                    blockpy.components.feedback.internalError(detailError, bodyMessage, line);
-                    break;
-                case "instructor feedback":
-                    blockpy.components.feedback.instructorFeedback(detailError, bodyMessage, line);
-                    break;
-                case "empty program":
-                    blockpy.components.feedback.emptyProgram(detailError, bodyMessage, line);
-                    break;
-                default:
-                    console.log(record.action.toLowerCase());
-                    break;
-                // ...
+            try{
+                switch (record.action.toLowerCase()) {
+                    case "success":
+                        blockpy.components.feedback.complete(detailError, bodyMessage, line);
+                        break;
+                    case "editor error":
+                        blockpy.components.feedback.editorError(detailError, bodyMessage, line);
+                        break;
+                    case "no errors":
+                        blockpy.components.feedback.noErrors(detailError, bodyMessage, line);
+                        break;
+                    case "syntax error":
+                        blockpy.components.feedback.syntaxError(detailError, bodyMessage, line);
+                        break;
+                    case "semantic error":
+                        blockpy.components.feedback.semanticError(detailError, bodyMessage, line);
+                        break;
+                    case "internal error":
+                        blockpy.components.feedback.internalError(detailError, bodyMessage, line);
+                        break;
+                    case "instructor feedback":
+                        blockpy.components.feedback.instructorFeedback(detailError, bodyMessage, line);
+                        break;
+                    case "empty program":
+                        blockpy.components.feedback.emptyProgram(detailError, bodyMessage, line);
+                        break;
+                    default:
+                        console.log(record.action.toLowerCase());
+                        break;
+                    // ...
+                }
+            }catch(err){
+                console.error(err);
             }
         };
+
 
         $('#replay-button').click(function() {
             var records = $('#replay-data').val().split(/\r?\n/);
             var previousTime = null;
             var pastRecords = [];
             var goingBackwards = false;
+            var clearRunFlag = false;
             function processAnother(recordsLeft) {
                 var gap = 100;
                 var moveForward = true;
@@ -300,17 +340,23 @@
                             handleFeedbackEvents(record);
                             break;
                     }
+                    var cur_time = new Date(record.time*1000);
                     if(!global_isPaused){
                         gap = previousTime != null ? record.time - previousTime : 0;
                         gap = (gap > 2000 ? 2000 : gap)*speed;
                         previousTime = record.time;
-                        console.log(gap + ": " + record.time + ", " + record.assignment);
+                        //var cur_time = new Date(record.time*1000);
+                        //var cur_time = record.time;
+                        //cur_time = cur_time.getHours();
+                        console.log(gap + ": " + cur_time.getHours() + ":" + cur_time.getMinutes() + ":" + cur_time.getSeconds() + ":" + cur_time.getMilliseconds() + "/" + record.time + ", ass: " + record.assignment + ", user: " + record.user);
                     }else{
-                        console.log("freeze frame" + ": " + record.time + ", " + record.assignment);
+                        console.log("freeze frame" + ": " + cur_time.getHours() + ":" + cur_time.getMinutes() + ":" + cur_time.getSeconds() + ":" + cur_time.getMilliseconds() + "/" + record.time + ", ass:" + record.assignment + ", user: " + record.user);
                     }
                     //blockpy.components.editor.getPngFromBlocks
                 }
-                setTimeout(function() {processAnother(recordsLeft)}, gap);
+                if(!clearRunFlag){
+                   setTimeout(function() {processAnother(recordsLeft)}, gap);
+                }
             }
             processAnother(records);
         });
@@ -326,6 +372,7 @@
     <button type='button' class='btn btn-submit' id='pause-button'>Pause</button>
     <button type='button' class='btn btn-submit' id='backward-button'>Backward</button>
     <button type='button' class='btn btn-submit' id='forward-button'>Forward</button>
+    KeyNavigation: <input type="checkbox" id="myCheck" checked="check">
     <input type="range" id="speed-slider" value="50" min="1" max="100">
     <p id="sliderValue" value="50"></p>
     <div id="blockpy-div" style='height:100%'></div>
