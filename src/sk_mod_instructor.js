@@ -319,11 +319,22 @@ var $sk_mod_instructor = function(name) {
         var non_var_list = getPrintedNonProperties(source);
         return Sk.ffi.remapToPy(non_var_list.length == 0);
     });
+    
+    mod.ChildStack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        // define a repr
+        $loc.__repr__ = new Sk.builtin.func(function(self) {
+            return Sk.ffi.remapToPy('This is a child stack!');
+        });
+    }, 'ChildStack', []);
 
     //Enhanced feedback functions and objects starts here
     mod.Stack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
             self.stack = [];
+            // Make a new attribute named 'int_value'
+            Sk.abstr.sattr(self, 'int_value', Sk.ffi.remapToPy(5), true);
+            var aChild = Sk.misceval.callsimOrSuspend(mod.ChildStack);
+            Sk.abstr.sattr(self, 'child', aChild, true);
         });
         $loc.push = new Sk.builtin.func(function(self,x) {
             self.stack.push(x);
@@ -331,6 +342,7 @@ var $sk_mod_instructor = function(name) {
         $loc.pop = new Sk.builtin.func(function(self) {
             return self.stack.pop();
         });
+        
     }, 'Stack', []);
 
     return mod;
