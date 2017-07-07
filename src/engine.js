@@ -352,7 +352,7 @@ BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, ou
     Sk.builtins.get_value_by_name = this.instructor_module.get_value_by_name;
     Sk.builtins.get_value_by_type = this.instructor_module.get_value_by_type;
     Sk.builtins.parse_json = this.instructor_module.parse_json;
-    Sk.builtins.Stack = this.instructor_module.Stack;
+    //Sk.builtins.Stack = this.instructor_module.Stack;
 
     Sk.skip_drawing = true;
     model.settings.mute_printer(true);
