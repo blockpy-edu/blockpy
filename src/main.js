@@ -284,6 +284,7 @@ BlockPy.prototype.initModel = function(settings) {
             "__main__": ko.observable(''),
             "starting_code": ko.observable(''),
             "give_feedback": ko.observable(''),
+            "on_step": ko.observable(''),
             "answer": ko.observable('')
         },
         // Information about the current run of the program
