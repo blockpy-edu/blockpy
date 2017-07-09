@@ -231,7 +231,7 @@ BlockPyEngine.prototype.analyze = function() {
         if (report.error.args.v.length > 3) {
             codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
         }
-        this.main.reportError('editor', report.error, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+codeLine, report.error.args.v[2]);
+        feedback.editorError(report.error, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ report.error.args.v[2]+codeLine, report.error.args.v[2]);
         return false;
     }
         

@@ -203,19 +203,6 @@ BlockPy.prototype.initDevelopment = function () {
 }
 
 /**
- * Redundant method for reporting an error. If this is used anywhere, it should be
- * converted to direct calls to components.feedback.
- */
-BlockPy.prototype.reportError = function(component, original, message, line) {
-    if (component == 'editor') {
-        this.components.feedback.editorError(original, message, line);
-    } else if (component == 'syntax') {
-        this.components.feedback.syntaxError(original, message, line);
-    }
-    console.error(component, message)
-}
-
-/**
  * Helper function for setting the current code, optionally in the given filename.
  *
  * @param {String} code - The new Python source code to set.
