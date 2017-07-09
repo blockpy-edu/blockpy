@@ -1,6 +1,10 @@
 /**
  * An object for executing Python code and passing the results along to interested components.
  *
+ * Interesting components:
+ *  Execution Buffer: Responsible for collecting the trace during program execution.
+ *                    This prevents Knockoutjs from updating the view during execution.
+ *
  * @constructor
  * @this {BlockPyEditor}
  * @param {Object} main - The main BlockPy instance
@@ -8,50 +12,26 @@
  */
 function BlockPyEngine(main) {
     this.main = main;
-    
     this.loadEngine();
-    
-    this.instructor_module = {}; //instructor_module('instructor');
-    
-    //this.main.model.program.subscribe(this.analyze.bind(this))
 }
 
 /**
- * Definable function to be run when execution has fully ended,
- * whether it succeeds or fails.
- *
- */
-BlockPyEngine.prototype.onExecutionEnd = null;
-
-/**
- * Helper function that will attempt to call the defined onExecutionEnd,
- * but will do nothing if there is no function defined.
- */
-BlockPyEngine.prototype.executionEnd_ = function() {
-    if (this.onExecutionEnd !== null) {
-        this.onExecutionEnd();
-    }
-};
-
-/**
  * Initializes the Python Execution engine and the Printer (console).
+ * This is typically called only once.
  */
 BlockPyEngine.prototype.loadEngine = function() {
-    var engine = this;
-    var printer = this.main.components.printer;
     // Skulpt settings
     // No connected services
     Sk.connectedServices = {}
     // Limit execution to 5 seconds
     Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
-    
     this.main.model.settings.disable_timeout.subscribe(function(newValue) {
         Sk.execLimit = newValue ? null : 5000;
     });
-    
     // Ensure version 3, so we get proper print handling
     Sk.python3 = true;
     // Major Skulpt configurations
+    var printer = this.main.components.printer;
     Sk.configure({
         // Function to handle the text outputted by Skulpt
         output: printer.print.bind(printer),
@@ -62,9 +42,11 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.console = printer.getConfiguration();
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
-    // Definitely use a prompt
+    // Create an input box
     Sk.inputfunTakesPrompt = true;
     Sk.inputfun = this.inputFunction.bind(this);
+    // Access point for instructor data
+    Sk.executionReport = {};
     
     Sk.builtinFiles['files']['src/lib/instructor.js'] = 'var $builtinmodule = '+$sk_mod_instructor.toString();
     
@@ -90,6 +72,7 @@ BlockPyEngine.prototype.readFile = function(filename) {
 
 /**
  * Creates and registers a Promise from the Input box
+ * @param {String} promptMessage - Message to display to the user.
  * 
  */
 BlockPyEngine.prototype.inputFunction = function(promptMessage) {
@@ -147,11 +130,8 @@ BlockPyEngine.prototype.reset = function() {
  * @param {Number} lineNumber - The corresponding line number in the source code that is being executed.
  * @param {Number} columnNumber - The corresponding column number in the source code that is being executed. Think of it as the "X" position to the lineNumber's "Y" position.
  * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
- * @param {String} astType - Unused? TODO: What is this?
- * @param {String} ast - String-encoded JSON representation of the AST node associated with this element.
  */
-BlockPyEngine.prototype.step = function(variables, lineNumber, 
-                                       columnNumber, filename, astType, ast) {
+BlockPyEngine.prototype.step = function(variables, lineNumber, columnNumber, filename) {
     if (filename == '<stdin>.py') {
         var currentStep = this.executionBuffer.step;
         var globals = this.parseGlobals(variables);
@@ -277,6 +257,10 @@ BlockPyEngine.prototype.analyze = function() {
 }
 
 var GLOBAL_VALUE;
+
+/**
+ * 
+ */
 
 /**
  * Runs the given python code, resetting the console and Trace Table.
@@ -566,3 +550,19 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                     };
     }
 }
+
+/**
+ * Definable function to be run when execution has fully ended,
+ * whether it succeeds or fails.
+ */
+BlockPyEngine.prototype.onExecutionEnd = null;
+
+/**
+ * Helper function that will attempt to call the defined onExecutionEnd,
+ * but will do nothing if there is no function defined.
+ */
+BlockPyEngine.prototype.executionEnd_ = function() {
+    if (this.onExecutionEnd !== null) {
+        this.onExecutionEnd();
+    }
+};
