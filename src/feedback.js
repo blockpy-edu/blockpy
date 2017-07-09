@@ -276,3 +276,38 @@ BlockPyFeedback.prototype.printError = function(error) {
     this.main.components.editor.highlightError(error.traceback[0].lineno-1);
     this.main.components.server.logEvent('feedback', "Runtime", original);
 }
+
+
+/**
+ * Present any accumulated feedback
+ */
+BlockPyFeedback.prototype.presentFeedback = function() {
+    var report = this.main.model.execution.reports;
+    var suppress = this.main.model.execution.suppressions;
+    if !(suppress['verifier'] && !report['verifier'].success) {
+        this.emptyProgram();
+    } else if (!suppress['parser'] && !report['parser'].success) {
+        var parserReport = report['parser'].error;
+        var codeLine = '.';
+        if (report.error.args.v.length > 3) {
+            codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
+        }
+        this.editorError(parserReport, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ parserReport.args.v[2]+codeLine, parserReport.args.v[2]);
+    } else if (!suppress['analyzer'] && !report['analyzer'].success) {
+        
+    } else if (!suppress['student'] && !report['student'].success) {
+        
+    } else if (!suppress['instructor'] && !report['instructor'].success) {
+        
+    } else {
+        if (report['instructor'].compliments) {
+            
+        }
+        if (report['instructor'].complaints) {
+            
+        }
+    }
+}
+
+
+

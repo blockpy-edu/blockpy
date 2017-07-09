@@ -307,6 +307,8 @@ BlockPy.prototype.initModel = function(settings) {
             'show_trace': ko.observable(false),
             // object: strings => objects
             'reports': {}
+            // objects: strings => boolean
+            'suppressions': {}
             
         },
         // Internal and external status information
