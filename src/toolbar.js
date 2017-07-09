@@ -74,12 +74,12 @@ BlockPyToolbar.prototype.hidePrograms = function() {
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
     this.tag.find('.blockpy-run').click(function() {
-        main.components.engine.run();
         main.components.server.logEvent('editor', 'run')
+        main.components.engine.on_run();
     });
     this.tags.mode_set_text.click(function() {
-        main.model.settings.editor("Text");
         main.components.server.logEvent('editor', 'text')
+        main.model.settings.editor("Text");
     });
     this.tag.find('.blockpy-toolbar-reset').click(function() {
         main.model.programs['__main__'](main.model.programs['starting_code']());
@@ -90,8 +90,8 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         }
     });
     this.tag.find('.blockpy-mode-set-blocks').click(function() {
-        main.model.settings.editor("Blocks");
         main.components.server.logEvent('editor', 'blocks')
+        main.model.settings.editor("Blocks");
     });
     this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");

@@ -306,7 +306,7 @@ BlockPy.prototype.initModel = function(settings) {
             // boolean
             'show_trace': ko.observable(false),
             // object: strings => objects
-            'reports': {}
+            'reports': {},
             // objects: strings => boolean
             'suppressions': {}
             

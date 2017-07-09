@@ -275,8 +275,6 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     finalizePeers();
     
-    console.log(children);
-    
     this.levelIndex -= 1;
     
     return children;
