@@ -53,14 +53,14 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
     Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
     // Identify the location to put new charts
-    Sk.console = printer.getConfiguration();
+    Sk.console = this.main.components.printer.getConfiguration();
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
     // Unlink the instructor module to prevent abuse
     delete Sk.builtinFiles['files']['src/lib/instructor.js'];
     // Unmute everything
     Sk.skip_drawing = false;
-    model.settings.mute_printer(false);
+    this.main.model.settings.mute_printer(false);
 }
 BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
@@ -71,7 +71,7 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
     // Mute everything
     Sk.skip_drawing = true;
-    model.settings.mute_printer(true);
+    this.main.model.settings.mute_printer(true);
 }
 
 /**
@@ -222,8 +222,9 @@ BlockPyEngine.prototype.on_step = function() {
 
 BlockPyEngine.prototype.verifyCode = function() {
     this.main.model.execution.status("verifying");
+    var report = this.main.model.execution.reports;
     var FILENAME = '__main__';
-    var code = this.main.model.programs[FILENAME];
+    var code = this.main.model.programs[FILENAME]();
     // Make sure it has code
     if (code.trim()) {
         report['verifier'] = {
@@ -242,7 +243,7 @@ BlockPyEngine.prototype.verifyCode = function() {
 BlockPyEngine.prototype.updateParse = function() {
     this.main.model.execution.status("parsing");
     var FILENAME = '__main__';
-    var code = this.main.model.programs[FILENAME];
+    var code = this.main.model.programs[FILENAME]();
     var report = this.main.model.execution.reports;
     // Attempt a parse
     try {
@@ -306,7 +307,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
     this.setStudentEnvironment();
     // Actually run the python code
     var filename = '__main__';
-    var code = this.main.model.programs[filename];
+    var code = this.main.model.programs[filename]();
     Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody(filename, false, code, true);
     }).then(
@@ -316,7 +317,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
             engine.lastStep();
             report['student'] = {
                 'success': true,
-                'trace': this.executionBuffer.trace,
+                'trace': engine.executionBuffer.trace,
                 'module': module
             }
             after();
@@ -344,8 +345,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.resetExecution();
     this.setInstructorEnvironment();
     // Actually run the python code
-    var studentCode = this.main.model.programs['__main__'];
-    var instructorCode = this.main.model.programs[filename];
+    var studentCode = this.main.model.programs['__main__']();
+    var instructorCode = this.main.model.programs[filename]();
     instructorCode = 'def run_code():\n'+indent(studentCode)+'\n'+instructorCode;
     var engine = this;
     report['instructor'] = {};
