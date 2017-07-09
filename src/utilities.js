@@ -45,3 +45,54 @@ function cloneNode(node) {
 function indent(str) {
   return str.replace(/^(?=.)/gm, '    ');
 }
+
+/**
+ * Return a random integer between [`min`, `max`].
+ * 
+ * @param {number} min - The lowest possible integer.
+ * @param {number} max - The highest possible integer (inclusive).
+ * @returns {number} A random integer.
+ */
+function randomInteger(min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+/**
+ * Encodes some text so that it can be safely written into an HTML box.
+ * This includes replacing special HTML characters (&, <, >, etc.).
+ *
+ * @param {string} str - The text to be converted.
+ * @return {string} The HTML-safe text.
+ */
+function encodeHTML(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&apos;');
+}
+
+/**
+ * Shuffle the blocks in the workspace
+ */
+Blockly.WorkspaceSvg.prototype.shuffle = function() {
+    var metrics = this.getMetrics();
+    var width = metrics.viewWidth / 2,
+        height = metrics.viewHeight;
+    var blocks = this.getTopBlocks(false);
+    var y = 5, x = 0,
+        maximal_increase = height/blocks.length;
+    for (var i = 0; i < blocks.length; i++){
+        // Get a block
+        var block = blocks[i];
+        var properties = block.getRelativeToSurfaceXY();
+        if (i == 0) {
+            x = 5;
+        } else {
+            x = -properties.x+randomInteger(10, width);
+        }
+        block.moveBy(x, 
+                     -properties.y+y);
+        y = y + randomInteger(5, maximal_increase);
+    }
+}
