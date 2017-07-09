@@ -117,9 +117,9 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
 
 BlockPyServer.prototype.markSuccess = function(success, callback) {
     var model = this.main.model;
+    var server = this;
     if (model.server_is_connected('save_success')) {
         var data = this.createServerData();
-        var server = this;
         data['code'] = model.programs.__main__;
         data['status'] = success;
         this.main.components.editor.getPngFromBlocks(function(pngData, img) {

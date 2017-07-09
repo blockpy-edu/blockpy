@@ -31,6 +31,14 @@
                              text: status_server_class()[1],
                              attr: { 'data-original-title': status.server_error }"
                   data-toggle="tooltip" data-placement="left">Loading</span>
+            <small class='pull-right text-muted'>Server: </small>
+            <br>
+            <span class='pull-right label label-default'
+                  data-bind="css: execution_status_class()[0],
+                             text: execution_status_class()[1],
+                             attr: { 'data-original-title': execution.status }"
+                  data-toggle="tooltip" data-placement="left">Loading</span>
+            <small class='pull-right text-muted'>Execution: </small>
             <br>
             <button type='button' class='btn btn-default btn-xs pull-right'
                     data-bind="css: {active: settings.show_settings},
@@ -274,66 +282,6 @@
                 
             </div>
             <div class='blockpy-upload blockpy-editor-menu'>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div class='blockpy-content-right col-md-5 col-sm-5 alert alert-info'>
-            <div class='panel panel-default'>
-                <div class='panel-heading'>Data Explorer</div>
-                <div class='panel-body'>
-                <div class='blockpy-explorer'>
-                    <table><tr>
-                    <!-- Step: X of Y (Line: Z) -->
-                    <td colspan='4'>
-                        <div class='blockpy-explorer-run-hide'>
-                            <i>Run your code to explore it.</i>
-                        </div>
-                        <div class='blockpy-explorer-status'>
-                            <strong>Step: </strong>
-                            <span class='blockpy-explorer-step-span'>0</span> of 
-                            <span class='blockpy-explorer-length-span'>0</span> 
-                            (<strong>Line: </strong>
-                            <span class='blockpy-explorer-line-span'>0</span>)
-                        </div>
-                    </td>
-                    </tr><tr>
-                    <!-- First Previous Next Last -->
-                    <td style='width:25%'>
-                        <button type='button' class='btn btn-default blockpy-explorer-first'>
-                        <span class='glyphicon glyphicon-fast-backward'></span> First</button>
-                    </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default blockpy-explorer-back'>
-                        <span class='glyphicon glyphicon-backward'></span> Back</button>
-                    </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default blockpy-explorer-next'>
-                        Next <span class='glyphicon glyphicon-forward'></span></button>
-                    </td><td style='width:25%'>
-                        <button type='button' class='btn btn-default blockpy-explorer-last'>
-                        Last <span class='glyphicon glyphicon-fast-forward'></span> </button>
-                    </td>
-                    </tr></table>
-                    <!-- Printer -->
-                    
-                    <!-- Modules -->
-                    <br><div>
-                        <strong>Loaded Modules: </strong>
-                        <i class='blockpy-explorer-modules'>None</i>
-                    </div>
-                    <!-- Actual Trace data -->
-                    <br><strong>Trace Table</strong>
-                    <br><table style='width: 100%'
-                            class='table table-condensed table-striped 
-                                   table-bordered table-hover blockpy-explorer-table'>
-                        <!-- Property Type Value -->
-                        <tr>
-                            <th>Property</th>
-                            <th>Type</th>
-                            <th>Value</th>
-                        </tr>
-                    </table>
-                </div>
-                </div>
             </div>
         </div>
     </div>
