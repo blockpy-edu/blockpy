@@ -44,6 +44,7 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     Sk.inputfun = this.inputFunction.bind(this);
     // Access point for instructor data
     Sk.executionReport = this.main.model.execution.reports;
+    Sk.feedbackSuppressions = this.main.model.execution.suppressions;
 }
 
 /**
@@ -187,6 +188,7 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     var engine = this;
+    engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
     engine.analyzeParse();
@@ -208,18 +210,37 @@ BlockPyEngine.prototype.on_run = function() {
 BlockPyEngine.prototype.on_step = function() {
     this.main.model.execution.status("changing");
     var FILENAME = 'on_step';
+    // TODO: Do we actually want to skip if this is the case?
     // Skip if the instructor has not defined anything
     if (!this.main.model.programs[FILENAME]().trim()) {
         return false;
     }
     // On step does not perform parse analysis by default or run student code
     var engine = this;
+    engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
         engine.main.model.execution.status("complete");
     });
+}
+
+/**
+ * Reset reports and suppressions
+ */
+BlockPyEngine.prototype.resetReports = function() {
+    var report = this.main.model.execution.reports;
+    delete report['verifier'];
+    delete report['parser'];
+    delete report['analyzer'];
+    delete report['student'];
+    delete report['instructor'];
+    var suppress = this.main.model.execution.suppressions;
+    delete report['verifier'];
+    delete report['parser'];
+    delete report['analyzer'];
+    delete report['student'];
 }
 
 BlockPyEngine.prototype.verifyCode = function() {
