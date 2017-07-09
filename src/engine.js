@@ -187,11 +187,12 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     var engine = this;
+    engine.verifyCode();
     engine.updateParse();
     engine.analyzeParse();
     engine.runStudentCode(function() {
         engine.runInstructorCode('give_feedback', function() {
-            engine.presentFeedback();
+            engine.main.components.feedback.presentFeedback()
         });
     });
 }
@@ -207,10 +208,27 @@ BlockPyEngine.prototype.on_step = function() {
     }
     // On step does not perform parse analysis by default or run student code
     var engine = this;
+    engine.verifyCode();
     engine.updateParse();
     engine.runInstructorCode(FILENAME, function() {
-        engine.presentFeedback()
+        engine.main.components.feedback.presentFeedback()
     });
+}
+
+BlockpyEngine.prototype.verifyCode = function() {
+    this.main.model.execution.status("verifying");
+    var FILENAME = '__main__';
+    var code = this.main.model.programs[FILENAME];
+    // Make sure it has code
+    if (code.trim()) {
+        report['verifier'] = {
+            'success': true
+        }
+    } else {
+        report['verifier'] = {
+            'success': false
+        }
+    }
 }
 
 /**
@@ -347,12 +365,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     });
 }
 
-/**
- * Present any accumulated feedback
- */
-BlockPyEngine.prototype.presentFeedback = function() {
-    var report = this.main.model.execution.reports;
-}
+
 
 BlockPyEngine.prototype.parseGlobals = function(variables) {
     var result = Array();
