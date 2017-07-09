@@ -12,14 +12,18 @@
  */
 function BlockPyEngine(main) {
     this.main = main;
-    this.loadEngine();
+    this.configureSkulpt();
+    
+    // Keeps track of the tracing while the program is executing
+    this.executionBuffer = {};
+    this.abstractInterpreter = new AbstractInterpreter();
 }
 
 /**
  * Initializes the Python Execution engine and the Printer (console).
  * This is typically called only once.
  */
-BlockPyEngine.prototype.loadEngine = function() {
+BlockPyEngine.prototype.configureSkulpt = function() {
     // Skulpt settings
     // No connected services
     Sk.connectedServices = {}
@@ -47,11 +51,8 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.inputfun = this.inputFunction.bind(this);
     // Access point for instructor data
     Sk.executionReport = {};
-    
+    // Create the instructor module
     Sk.builtinFiles['files']['src/lib/instructor.js'] = 'var $builtinmodule = '+$sk_mod_instructor.toString();
-    
-    // Keeps track of the tracing while the program is executing; destroyed afterwards.
-    this.executionBuffer = {};
 }
 
 /**
@@ -107,7 +108,7 @@ BlockPyEngine.prototype.inputFunction = function(promptMessage) {
  * hiding the trace button.
  *
  */
-BlockPyEngine.prototype.reset = function() {
+BlockPyEngine.prototype.resetExecution = function() {
     this.executionBuffer = {
         'trace': [],
         'step': 0,
@@ -156,10 +157,9 @@ BlockPyEngine.prototype.step = function(variables, lineNumber, columnNumber, fil
 BlockPyEngine.prototype.lastStep = function() {
     var execution = this.main.model.execution;
     execution.trace(this.executionBuffer.trace);
-    this.main.model.execution.step(this.executionBuffer.step)
-    this.main.model.execution.last_step(this.executionBuffer.last_step)
-    this.main.model.execution.line_number(this.executionBuffer.line_number)
-    //this.executionBuffer = undefined;
+    execution.step(this.executionBuffer.step)
+    execution.last_step(this.executionBuffer.last_step)
+    execution.line_number(this.executionBuffer.line_number)
 }
 
 /**
@@ -259,15 +259,55 @@ BlockPyEngine.prototype.analyze = function() {
 var GLOBAL_VALUE;
 
 /**
- * 
+ * Activated whenever the Run button is clicked
  */
+BlockPyEngine.prototype.on_run = function() {
+    var engine = this;
+    engine.resetExecution();
+    engine.updateParse();
+    engine.analyzeParse();
+    engine.runStudentCode().then(
+        engine.runInstructorCode().then(
+            engine.presentFeedback();
+        );
+    );
+}
+/**
+ * Activated whenever the Python code changes
+ */
+BlockPyEngine.prototype.on_step = function() {
+    // Skip if the instructor has not defined anything
+    if (!this.main.model.programs['on_step']().trim()) {
+        return false;
+    }
+    // On step does not perform parse analysis by default or run student code
+    var engine = this;
+    engine.resetExecution();
+    engine.updateParse();
+    engine.runInstructorCode().then(
+        engine.presentFeedback();
+    );
+}
+
+/**
+ * Ensure that the parse information is up-to-date
+ */
+BlockPyEngine.prototype.updateParse = function() {
+    this.main.model.execution.ast = 
+}
 
 /**
  * Runs the given python code, resetting the console and Trace Table.
  */
 BlockPyEngine.prototype.run = function() {
     // Reset everything
-    this.reset();
+    this.resetExecution();
+    
+    // Parse student code
+    // (if on_run) Analyze student code
+    // (if on_run) Run student code
+    // Run instructor code
+    // Output feedback
     
     if (!this.main.model.settings.disable_semantic_errors() &&
         !this.main.model.assignment.disable_algorithm_errors()) {
@@ -278,6 +318,7 @@ BlockPyEngine.prototype.run = function() {
             return;
         }
     }
+    
     
     Sk.builtins.value = new Sk.builtin.func(function() {
         return Sk.ffi.remapToPy(GLOBAL_VALUE === undefined ? 5 : GLOBAL_VALUE);
