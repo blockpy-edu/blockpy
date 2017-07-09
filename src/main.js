@@ -303,10 +303,11 @@ BlockPy.prototype.initModel = function(settings) {
             'trace': ko.observableArray([]),
             // integer
             'trace_step': ko.observable(0),
-            // object
-            'ast': {},
             // boolean
             'show_trace': ko.observable(false),
+            // object: strings => objects
+            'reports': {}
+            
         },
         // Internal and external status information
         'status': {

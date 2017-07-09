@@ -19,6 +19,8 @@ function BlockPyEngine(main) {
     this.abstractInterpreter = new AbstractInterpreter();
 }
 
+BlockPyEngine.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+
 /**
  * Initializes the Python Execution engine and the Printer (console).
  * This is typically called only once.
@@ -27,11 +29,6 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     // Skulpt settings
     // No connected services
     Sk.connectedServices = {}
-    // Limit execution to 5 seconds
-    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
-    this.main.model.settings.disable_timeout.subscribe(function(newValue) {
-        Sk.execLimit = newValue ? null : 5000;
-    });
     // Ensure version 3, so we get proper print handling
     Sk.python3 = true;
     // Major Skulpt configurations
@@ -42,17 +39,41 @@ BlockPyEngine.prototype.configureSkulpt = function() {
         // Function to handle loading in new files
         read: this.readFile.bind(this)
     });
-    // Identify the location to put new charts
-    Sk.console = printer.getConfiguration();
-    // Stepper! Executed after every statement.
-    Sk.afterSingleExecution = this.step.bind(this);
     // Create an input box
     Sk.inputfunTakesPrompt = true;
     Sk.inputfun = this.inputFunction.bind(this);
     // Access point for instructor data
-    Sk.executionReport = {};
+    Sk.executionReport = this.main.model.execution.reports;
+}
+
+/**
+ *
+ */
+BlockPyEngine.prototype.configureStudentEnvironment = function() {
+    // Limit execution to 5 seconds
+    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
+    // Identify the location to put new charts
+    Sk.console = printer.getConfiguration();
+    // Stepper! Executed after every statement.
+    Sk.afterSingleExecution = this.step.bind(this);
+    // Unlink the instructor module to prevent abuse
+    delete Sk.builtinFiles['files']['src/lib/instructor.js'];
+    // Unmute everything
+    Sk.skip_drawing = false;
+    model.settings.mute_printer(false);
+}
+BlockPyEngine.prototype.configureInstructorEnvironment = function() {
+    // Instructors have no limits
+    Sk.execLimit = null;
+    // Identify the location to put new charts
+    Sk.console = printer.getConfiguration();
+    // Stepper! Executed after every statement.
+    Sk.afterSingleExecution = null;
     // Create the instructor module
-    Sk.builtinFiles['files']['src/lib/instructor.js'] = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+    Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
+    // Mute everything
+    Sk.skip_drawing = true;
+    model.settings.mute_printer(true);
 }
 
 /**
@@ -262,38 +283,108 @@ var GLOBAL_VALUE;
  * Activated whenever the Run button is clicked
  */
 BlockPyEngine.prototype.on_run = function() {
+    this.main.model.execution.status("running");
     var engine = this;
-    engine.resetExecution();
     engine.updateParse();
     engine.analyzeParse();
     engine.runStudentCode().then(
+    function() {
         engine.runInstructorCode().then(
+        function() {
             engine.presentFeedback();
-        );
-    );
+        });
+    });
 }
 /**
  * Activated whenever the Python code changes
  */
 BlockPyEngine.prototype.on_step = function() {
+    this.main.model.execution.status("changing");
     // Skip if the instructor has not defined anything
     if (!this.main.model.programs['on_step']().trim()) {
         return false;
     }
     // On step does not perform parse analysis by default or run student code
     var engine = this;
-    engine.resetExecution();
     engine.updateParse();
     engine.runInstructorCode().then(
-        engine.presentFeedback();
-    );
+    function() {
+        engine.presentFeedback()
+    });
 }
 
 /**
  * Ensure that the parse information is up-to-date
  */
 BlockPyEngine.prototype.updateParse = function() {
-    this.main.model.execution.ast = 
+    this.main.model.execution.status("parsing");
+    var filename = '__main__';
+    var code = this.main.model.programs[filename];
+    var report = this.main.model.execution.report;
+    // Attempt a parse
+    try {
+        var parse = Sk.parse(filename, code);
+        var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+    } catch (error) {
+        // Report the error
+        report['parser'] = {
+            'success': false,
+            'error': error
+        }
+        return false;
+    }
+    // Successful parse
+    report['parser'] = {
+        'success': true,
+        'ast': ast
+    }
+    return true;
+}
+
+/**
+ * Run the abstract interpreter
+ */
+BlockPyEngine.prototype.analyzeParse = function() {
+    this.main.model.execution.status("analyzing");
+    var report = this.main.model.execution.report;
+    if (!report['parser']['success']) {
+        report['analyzer'] = {
+            'success': false,
+            'error': 'Parser was unsuccessful. Cannot run Abstract Interpreter'
+        }
+        return false;
+    }
+    var ast = report['parser']['ast'];
+    try {
+        this.abstractInterpreter.processAst(ast);
+    } catch (error) {
+        report['analyzer'] = {
+            'success': false,
+            'error': error
+        }
+    }
+    report['analyzer'] = {
+        'success': true,
+        'variables': this.abstractInterpreter.variableTypes,
+        'issues': this.abstractInterpreter.report
+    }
+    return true;
+}
+
+/**
+ * Run the student code
+ */
+BlockPyEngine.prototype.runStudentCode = function(after) {
+    this.main.model.execution.status("student");
+    var report = this.main.model.execution.report;
+    // Prepare execution
+    this.resetExecution();
+    // Actually run the python code
+    var filename = '__main__';
+    var code = this.main.model.programs[filename];
+    var executionPromise = Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody(filename, false, code, true);
+    });
 }
 
 /**
@@ -302,12 +393,6 @@ BlockPyEngine.prototype.updateParse = function() {
 BlockPyEngine.prototype.run = function() {
     // Reset everything
     this.resetExecution();
-    
-    // Parse student code
-    // (if on_run) Analyze student code
-    // (if on_run) Run student code
-    // Run instructor code
-    // Output feedback
     
     if (!this.main.model.settings.disable_semantic_errors() &&
         !this.main.model.assignment.disable_algorithm_errors()) {
@@ -318,14 +403,6 @@ BlockPyEngine.prototype.run = function() {
             return;
         }
     }
-    
-    
-    Sk.builtins.value = new Sk.builtin.func(function() {
-        return Sk.ffi.remapToPy(GLOBAL_VALUE === undefined ? 5 : GLOBAL_VALUE);
-    });
-    Sk.builtins.set_value = new Sk.builtin.func(function(v) {
-        GLOBAL_VALUE = v.v;
-    });
     
     this.main.model.execution.status("running");
     

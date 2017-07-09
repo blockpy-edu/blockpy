@@ -4,21 +4,27 @@ function arrayContains(needle, haystack) {
 
 function AbstractInterpreter(code, filename) {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
-    
+}
+AbstractInterpreter.prototype = new NodeVisitor();
+
+AbstractInterpreter.prototype.processCode = function(code, filename) {
     // Code
-    this.code = code;
-    this.source = code !== "" ? this.code.split("\n") : [];
-    this.filename = filename || '__main__';
+    this.source = code !== "" ? code.split("\n") : [];
+    filename = filename || '__main__';
     
     // Attempt parsing - might fail!
     try {
-        var parse = Sk.parse(this.filename, this.code);
-        this.ast = Sk.astFromParse(parse.cst, this.filename, parse.flags);
+        var parse = Sk.parse(filename, code);
+        var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+        this.processAst(ast);
     } catch (error) {
         this.report = {"error": error, "message": "Parsing error"};
         return;
     }
-    
+};
+
+AbstractInterpreter.prototype.processAst = function(ast) {
+    this.ast = ast;
     // Handle loops
     this.loopStackId = 0
     this.loopHierarchy = {};
@@ -51,8 +57,6 @@ function AbstractInterpreter(code, filename) {
     //console.log(this.variables)
     this.postProcess();
 }
-
-AbstractInterpreter.prototype = new NodeVisitor();
 
 AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'}, 
                                 'sum': {"type": "Num"},

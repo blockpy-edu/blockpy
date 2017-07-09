@@ -101,6 +101,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     Blockly.captureDialog_ = this.copyImage.bind(this);
     
     // Enable static type checking! 
+    /*
     this.blockly.addChangeListener(function() {
         if (!editor.main.model.settings.disable_variable_types()) {
             var variables = editor.main.components.engine.analyzeVariables()
@@ -122,6 +123,7 @@ BlockPyEditor.prototype.initBlockly = function() {
             })
         }
     });
+    */
 
 
 };
