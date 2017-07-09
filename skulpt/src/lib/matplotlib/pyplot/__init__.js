@@ -174,7 +174,10 @@ var $builtinmodule = function(name) {
             resetChart();
             return;
         }
-        if (extents['xMin'] === undefined) {
+        if (plots.length == 0) {
+            return;
+        }
+        if (extents['xMin'] === undefined || extents['yMin'] === undefined) {
             return;
         }
         var yAxisBuffer;

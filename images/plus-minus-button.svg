@@ -1,0 +1,23 @@
+<svg width="200" height="408" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <defs>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_1_blur">
+   <feGaussianBlur stdDeviation="0" in="SourceGraphic"/>
+  </filter>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="410" width="202" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="1" x="1" height="400" width="580"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <rect x="2.5" filter="url(#svg_1_blur)" id="svg_1" height="200" width="195" y="2.5" stroke-width="5" stroke="#0C372C" fill="#7DD8B5"/>
+  <rect stroke="#4D2425" x="2.5" filter="url(#svg_1_blur)" id="svg_3" height="199.000001" width="195" y="206.499999" stroke-width="5" fill="#FFA9A2"/>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_4" y2="300" x2="160" y1="300" x1="40" stroke-width="30" stroke="#000000" fill="none"/>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_5" y2="100" x2="160" y1="100" x1="40" stroke-width="20" stroke="#000000" fill="none"/>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_6" y2="160" x2="100" y1="40" x1="100" stroke-width="20" stroke="#000000" fill="none"/>
+ </g>
+</svg>

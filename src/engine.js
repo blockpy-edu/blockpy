@@ -64,6 +64,7 @@ BlockPyEngine.prototype.loadEngine = function() {
     Sk.afterSingleExecution = this.step.bind(this);
     // Definitely use a prompt
     Sk.inputfunTakesPrompt = true;
+    Sk.inputfun = this.inputFunction.bind(this);
     
     Sk.builtinFiles['files']['src/lib/instructor.js'] = 'var $builtinmodule = '+$sk_mod_instructor.toString();
     
@@ -85,6 +86,36 @@ BlockPyEngine.prototype.readFile = function(filename) {
         throw "File not found: '" + filename + "'";
     }
     return Sk.builtinFiles["files"][filename];
+}
+
+/**
+ * Creates and registers a Promise from the Input box
+ * 
+ */
+BlockPyEngine.prototype.inputFunction = function(promptMessage) {
+    var printer = this.main.components.printer;
+    var result = printer.printInput(promptMessage);
+    if (result.promise) {
+        var resolveOnClick;
+        var submittedPromise = new Promise(function(resolve, reject) {
+            resolveOnClick = resolve;
+        });
+        var submitForm = function() {
+            resolveOnClick(result.input.val());
+            result.input.prop('disabled', true);
+            result.button.prop('disabled', true);
+        };
+        result.button.click(submitForm);
+        result.input.keyup(function(e) {
+            if (e.keyCode == 13) {
+                submitForm();
+            }
+        });
+        result.input.focus();
+        return submittedPromise;
+    } else {
+        return "";
+    }
 }
 
 /**
@@ -259,6 +290,7 @@ BlockPyEngine.prototype.run = function() {
         var success = this.analyze();
         if (success === false) {
             this.executionEnd_();
+            this.main.components.server.markSuccess(0.0);
             return;
         }
     }
@@ -280,6 +312,7 @@ BlockPyEngine.prototype.run = function() {
         feedback.emptyProgram();
         this.main.model.execution.status("error");
         this.executionEnd_();
+        this.main.components.server.markSuccess(0.0);
         return;
     }
     // Actually run the python code
@@ -306,6 +339,7 @@ BlockPyEngine.prototype.run = function() {
             feedback.printError(error);
             engine.main.model.execution.status("error");
             engine.executionEnd_();
+            server.markSuccess(0.0);
             //server.logEvent('blockly_error', error);
         }
     );
@@ -402,18 +436,19 @@ BlockPyEngine.prototype.check = function(student_code, traceTable, output, ast, 
                 engine.disposeEnvironment();
                 console.log(error.tp$name, error.tp$name == "Success");
                 if (error.tp$name == "Success") {
-                    server.markSuccess(1.0);
+                    server.markSuccess(1.0, model.settings.completedCallback);
                     engine.main.components.feedback.complete();
                 } else if (error.tp$name == "Feedback") {
                     server.markSuccess(0.0);
                     engine.main.components.feedback.instructorFeedback("Incorrect Answer", error.args.v[0].v);
                 } else if (error.tp$name == "Finished") {
-                    server.markSuccess(1.0);
+                    server.markSuccess(1.0, model.settings.completedCallback);
                     engine.main.components.feedback.finished();
                 } else {
                     console.error(error);
                     engine.main.components.feedback.internalError(error, "Feedback Error", "Error in instructor's feedback. Please show the above message to an instructor!");
                     server.logEvent('blockly_instructor_error', ''+error);
+                    server.markSuccess(0.0);
                 }
             });
     }

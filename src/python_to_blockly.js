@@ -133,8 +133,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     // Final result list
     var children = [], // The complete set of peers
         root = null, // The top of the current peer
-        current = null,
-        levelIndex = this.levelIndex; // The bottom of the current peer
+        current = null, // The bottom of the current peer
+        levelIndex = this.levelIndex; 
         
     function addPeer(peer) {
         if (root == null) {
@@ -173,6 +173,7 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         skipped_line,
         commentCount,
         previousHeight = null,
+        previousWasStatement = false;
         visitedFirstLine = false;
         
     // Iterate through each node
@@ -233,10 +234,14 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
         // Handle skipped line
         } else if (is_top_level && skipped_line && visitedFirstLine) {
             addPeer(newChild);
+        // The previous line was not a Peer
+        } else if (is_top_level && !previousWasStatement) {
+            addPeer(newChild);
         // Otherwise, always embed it in there.
         } else {
             nestChild(newChild);
         }
+        previousWasStatement = newChild.constructor !== Array;
         
         visitedFirstLine = true;
     }
@@ -269,6 +274,8 @@ PythonToBlocks.prototype.convertBody = function(node, is_top_level) {
     
     
     finalizePeers();
+    
+    console.log(children);
     
     this.levelIndex -= 1;
     
@@ -904,7 +911,7 @@ PythonToBlocks.prototype.BoolOp = function(node) {
 }
 
 PythonToBlocks.prototype.binaryOperator = function(op) {
-    console.log(op);
+    console.log(op._astname);
     switch (op.name) {
         case "Add": return "ADD";
         case "Sub": return "MINUS";
@@ -1010,7 +1017,15 @@ PythonToBlocks.prototype.Dict = function(node) {
 PythonToBlocks.prototype.Set = function(node)
 {
     var elts = node.elts;
-    throw new Error("Sets are not implemented");
+    var ctx = node.ctx;
+    
+    return block("set_create", node.lineno, {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": elts.length > 3 ? "false" : "true", 
+    }, {
+        "@items": elts.length
+    });
 }
 
 /*
@@ -1353,6 +1368,8 @@ PythonToBlocks.prototype.Call = function(node) {
                             {"inline": "true"
                             }, { "@items": args.length})];
                     }
+                case "input":
+                    return block("text_input", node.lineno, {"MESSAGE": this.Str_value(args[0])});
                 case "abs":
                     return block("math_single", node.lineno, {"OP": "ABS"}, {"NUM": this.convert(args[0])})
                 case "round":
@@ -1525,10 +1542,13 @@ PythonToBlocks.prototype.Name_str = function(node)
     return this.identifier(id);
 }
 
-PythonToBlocks.prototype.convertElements = function(key, values) {
+PythonToBlocks.prototype.convertElements = function(key, values, plusser) {
+    if (plusser === undefined) {
+        plusser = 0;
+    }
     var output = {};
     for (var i = 0; i < values.length; i++) {
-        output[key+i] = this.convert(values[i]);
+        output[key+(plusser+i)] = this.convert(values[i]);
     }
     return output;
 }
@@ -1542,7 +1562,7 @@ PythonToBlocks.prototype.List = function(node) {
     var elts = node.elts;
     var ctx = node.ctx;
     
-    return block("lists_create_with", node.lineno, {}, 
+    return block("lists_create", node.lineno, {}, 
         this.convertElements("ADD", elts)
     , {
         "inline": elts.length > 3 ? "false" : "true", 
@@ -1560,7 +1580,13 @@ PythonToBlocks.prototype.Tuple = function(node)
     var elts = node.elts;
     var ctx = node.ctx;
     
-    throw new Error("Tuples not implemented");
+    return block("tuple_create", node.lineno, {}, 
+        this.convertElements("ADD", elts)
+    , {
+        "inline": elts.length > 3 ? "false" : "true", 
+    }, {
+        "@items": elts.length
+    });
 }
 
 /*
