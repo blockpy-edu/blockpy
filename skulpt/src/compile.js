@@ -113,7 +113,7 @@ Compiler.prototype.annotateSource = function (ast, shouldStep) {
 		out("\nSk.currLineNo = ",lineno, ";\nSk.currColNo = ",col_offset,";\n\n");	//	Added by RNL
 		out("\nSk.currFilename = '",this.filename,"';\n\n");	//	Added by RNL
         if (shouldStep) {
-            out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename, '"+ast.constructor.name+"', "+JSON.stringify(ast)+");\n}\n");
+            out("\nif (typeof Sk.afterSingleExecution == 'function') {\n\tSk.afterSingleExecution($gbl, Sk.currLineNo, Sk.currColNo, Sk.currFilename);\n}\n");
         }
         out("currLineNo = ", lineno, ";\ncurrColNo = ", col_offset, ";\n\n");
     }
