@@ -1,9 +1,8 @@
 /**
  * Skulpt Module for holding the Instructor API.
  *
- * This module is a little hackish. We need to sit down and reevaluate the best way to
- * organize it and whether this particular structure is ideal. I suspect it should be
- * it's own proper JS file.
+ * This module is loaded in by getting the functions' source code from toString.
+ * Isn't that crazy?
  *
  * @param {String} name - The name of the module (should always be 'instructor')
  *
@@ -11,6 +10,23 @@
 var $sk_mod_instructor = function(name) {
     // Main module object that gets returned at the end.
     var mod = {};
+    
+    /**
+     * Skulpt Exception that forces the program to exit, but gracefully.
+     * 
+     * @param {Array} args - A list of optional arguments to pass to the Exception.
+     *                       Usually this will include a message for the user.
+     */
+    Sk.builtin.GracefulExit = function (args) {
+        var o;
+        if (!(this instanceof Sk.builtin.GracefulExit)) {
+            o = Object.create(Sk.builtin.GracefulExit.prototype);
+            o.constructor.apply(o, arguments);
+            return o;
+        }
+        Sk.builtin.Exception.apply(this, arguments);
+    };
+    Sk.abstr.setUpInheritance("GracefulExit", Sk.builtin.GracefulExit, Sk.builtin.Exception);
     
     /**
      * Skulpt Exception that represents a Feedback object, to be rendered to the user
