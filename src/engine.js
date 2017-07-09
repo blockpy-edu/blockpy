@@ -198,6 +198,7 @@ BlockPyEngine.prototype.on_run = function() {
             } else {
                 engine.main.components.server.markSuccess(0.0);
             }
+            engine.main.model.execution.status("complete");
         });
     });
 }
@@ -217,6 +218,7 @@ BlockPyEngine.prototype.on_step = function() {
     engine.updateParse();
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
+        engine.main.model.execution.status("complete");
     });
 }
 
@@ -348,6 +350,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     var studentCode = this.main.model.programs['__main__']();
     var instructorCode = this.main.model.programs[filename]();
     instructorCode = 'def run_code():\n'+indent(studentCode)+'\n'+instructorCode;
+    instructorCode = 'from instructor import *\n' + instructorCode;
     var engine = this;
     report['instructor'] = {};
     Sk.misceval.asyncToPromise(function() {
@@ -372,7 +375,12 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
 }
 
 
-
+/**
+ * Consume a set of variables traced from the execution and parse out any
+ * global variables and modules.
+ *
+ * @param {Object} variables - a mapping of variable names to their Skupt value.
+ */
 BlockPyEngine.prototype.parseGlobals = function(variables) {
     var result = Array();
     var modules = Array();
@@ -392,6 +400,12 @@ BlockPyEngine.prototype.parseGlobals = function(variables) {
     return {"properties": result, "modules": modules};
 }
 
+/**
+ * Convert a Skulpt value into a more easily printable object.
+ * 
+ * @param {String} property
+ * @param {Object} value - the skulpt value
+ */
 BlockPyEngine.prototype.parseValue = function(property, value) {
     if (value == undefined) {
         return {'name': property,

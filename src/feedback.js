@@ -293,8 +293,8 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     if (!suppress['parser'] && !report['parser'].success) {
         var parserReport = report['parser'].error;
         var codeLine = '.';
-        if (report.error.args.v.length > 3) {
-            codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
+        if (parserReport.args.v.length > 3) {
+            codeLine = ', where it says:<br><code>'+parserReport.args.v[3][2]+'</code>';
         }
         this.editorError(parserReport, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ parserReport.args.v[2]+codeLine, parserReport.args.v[2]);
         return 'parser';

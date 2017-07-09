@@ -57,6 +57,20 @@ function BlockPy(settings, assignment, submission, programs) {
             case 'Error': return ['label-danger', 'Error'];
         }
     }, this.model);
+    this.model.execution_status_class = ko.computed(function() {
+        switch (this.execution.status()) {
+            default: case 'idle': return ['label-default', 'Ready'];
+            case 'running': return ['label-info', 'Running'];
+            case 'changing': return ['label-info', 'Changing'];
+            case 'verifying': return ['label-info', 'Verifying'];
+            case 'parsing': return ['label-info', 'Parsing'];
+            case 'analyzing': return ['label-info', 'Analyzing'];
+            case 'student': return ['label-info', 'Student'];
+            case 'instructor': return ['label-info', 'Instructor'];
+            case 'complete': return ['label-success', 'Idle'];
+            
+        }
+    }, this.model);
     
     // Program trace functions
     var execution = this.model.execution;
