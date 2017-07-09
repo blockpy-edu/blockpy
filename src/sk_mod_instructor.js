@@ -29,6 +29,17 @@ var $sk_mod_instructor = function(name) {
     Sk.abstr.setUpInheritance("GracefulExit", Sk.builtin.GracefulExit, Sk.builtin.Exception);
     
     /**
+     * 
+     */
+    mod.compliment = new Sk.builtin.func(function(message) {
+        Sk.builtin.pyCheckArgs("compliment", arguments, 1, 1);
+        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        throw new Sk.builtin.Feedback(message.v);
+    });
+    
+    //---- Everything below this line is old stuff
+    
+    /**
      * Skulpt Exception that represents a Feedback object, to be rendered to the user
      * when the feedback system finds a problem.
      * 

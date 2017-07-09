@@ -339,7 +339,11 @@ BlockPyFeedback.prototype.presentFeedback = function() {
 
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     var report = this.main.model.execution.reports['analyzer'].issues;
-    if (report["Unconnected blocks"].length >= 1) {
+    var suppress = this.main.model.execution.suppressions['analyzer'] || {};
+    if (suppress === true) {
+        // Suppress all types of analyzer errors
+        return false;
+    } else if (report["Unconnected blocks"].length >= 1) {
         var variable = report['Unconnected blocks'][0];
         feedback.semanticError("Unconnected blocks", "It looks like you have unconnected blocks on line "+variable.position.line+". Before you run your program, you must make sure that all of your blocks are connected and that there are no unfilled holes.", variable.position.line)
         return true;
@@ -355,7 +359,8 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         var variable = report["Possibly undefined variables"][0];
         feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
         return true;
-    } else if (report["Unread variables"].length >= 1) {
+    } else if ( !suppress["Unread variables"] && 
+               report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
         feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was set, but was never used after that.", null)
         return true;
