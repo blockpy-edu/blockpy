@@ -46,13 +46,26 @@
     <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
     
     <!-- Source Code -->
+    <script type="text/javascript" src="src/utilities.js"></script>
     <script type="text/javascript" src="src/python_errors.js"></script>
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>
     <script type="text/javascript" src="src/python_to_blockly.js"></script>
     <script type="text/javascript" src="src/imported.js"></script>
-    <script type="text/javascript" src="src/custom_blocks.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/class.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comment.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comprehensions.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/dict.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/if.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/io.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/lists.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/sets.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/loops.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/parking.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/tuple.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/turtles.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/text.js"></script>
     <script type="text/javascript" src="src/util.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
@@ -91,8 +104,9 @@
                 'editor': 'Text',
                 'blocklyPath': "blockly/",
                 'attachmentPoint': document.getElementById('blockpy-div'),
-                'instructor': getQueryParams()["instructor"]=="true" || false,
+                'instructor': getQueryParams()["instructor"]=="true" || true,
                 'developer': true,
+                'read_only': false,
                 'disable_semantic_errors': false,
                 'urls': {
                     'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
@@ -108,15 +122,15 @@
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
                 //'give_feedback': "if not only_printing_properties(code):\n    set_feedback('You cannot store the answer a number!')",
-                'give_feedback': "for_loops = count_components(code, 'For')\nif for_loops != 1:\n    set_feedback('You need a for-loop to iterate through that list')\n\noutputs = get_output()\nif str(4) in outputs:\n    set_feedback('You may have computed the length of the list instead of the sum.')",
+                'give_feedback': '',
                 //'give_feedback': 'v = get_value_by_name("b")\nif v == None:\n\tset_feedback("You must declare a variable named b")\nif not isinstance(v, list):\n\tset_feedback("B should be a list.")\nif sum(v) > 10:\n\tset_feedback("Your list is too big.")\nset_success()',
                 //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
-                'parsons': true,
+                'parsons': false,
                 'starting_code': '',
                 'importable': true,
                 'initial_view': 'Split',
                 'modules': {
-                    'added': ['Functions', 'Data - Parking', 'Turtles'],
+                    'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples'],
                     'removed': []
                 }
             },
@@ -124,8 +138,10 @@
             {},
             // programs
             {
-            
+                //'__main__': "import image\n\n# Testing the Procedural API\nappleImg = image.makePicture('http://i.imgur.com/sPhLIKY.jpg')\nprint(appleImg)"
                 //'__main__': "x and y and z"
+                //'__main__': "def x():\n    pass\nx()"
+                //'__main__': "(1,2,)"
                 //'__main__': "#test\n\nx = range(1000)\n\ntotal = 0\nfor y in x:\n    total = total + y\n    total=1\n    a=0\nprint(total)"
                 //'__main__': 'import school_scores\nschool_scores.get("Arts/Music.Average GPA","(None)","")'
                 '__main__': 'import instructor\ns = instructor.Stack()\nprint(s.int_value, s.child)',

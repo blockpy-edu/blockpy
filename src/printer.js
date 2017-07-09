@@ -26,8 +26,8 @@ BlockPyPrinter.prototype.resetPrinter = function() {
     this.printerSettings['width'] = Math.min(500, this.tag.width()-40);
     this.printerSettings['height'] = Math.min(500, this.tag.height()+40);
     Sk.TurtleGraphics = {'target': this.tag[0], 
-                         'width': this.printerSettings['width'], 
-                         'height': this.printerSettings['height']};
+                         'width': this.printerSettings['width']-40, 
+                         'height': this.printerSettings['height']-40};
 }
 
 /**
@@ -118,4 +118,41 @@ BlockPyPrinter.prototype.printHtml = function(chart, value) {
         });
         outerDiv.tooltip();
     }
+}
+
+/**
+ * Creates an Input box for receiving input() from the user.
+ * 
+ * @param {String} promptMessage - a message to render before the input
+ * @returns {String} Returns the handle on the message box.
+ */
+BlockPyPrinter.prototype.printInput = function(promptMessage) {
+    // Should probably be accessing the model instead of a component...
+    var stepNumber = this.main.components.engine.executionBuffer.step;
+    var lineNumber = this.main.components.engine.executionBuffer.line_number;
+    // Perform any necessary cleaning
+    if (promptMessage !== "\n") {
+        var encodedText = encodeHTML(promptMessage);
+        if (!(this.main.model.settings.mute_printer())) {
+            var inputForm = $("<input type='text' />");
+            var inputMsg = $("<samp></samp>",  {"html": encodedText})
+            var inputBtn = $("<button></button>", {"html": "Enter"});
+            var inputBox = $("<div></div>",
+                    {
+                        'data-toggle': 'tooltip',
+                        'class': 'blockpy-printer-output',
+                        'data-placement': 'left',
+                        'data-step': stepNumber,                                
+                        'title': "Step "+stepNumber + ", Line "+lineNumber
+                    });
+            inputBox.append(inputMsg)
+                    .append($("<br>"))
+                    .append(inputForm)
+                    .append(inputBtn);
+            this.tag.append(inputBox);
+            inputBox.tooltip();
+            return {'input': inputForm, 'button': inputBtn, 'promise': true};
+        }
+    }
+    return {'promise': false}
 }

@@ -113,4 +113,16 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.components.english.openDialog();
         main.components.server.logEvent('editor', 'english')
     });
+    var uploadButton = this.tag.find('.blockpy-toolbar-upload');
+    uploadButton.change(function() {
+        var fr = new FileReader();
+        var files = uploadButton[0].files;
+        fr.onload = function(e) {
+            main.setCode(e.target.result)
+            main.components.server.logEvent('editor', 'upload')
+            main.components.engine.run();
+            main.components.server.logEvent('editor', 'run')
+        };
+        fr.readAsText(files[0]);
+    });
 }
