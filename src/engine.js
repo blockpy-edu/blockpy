@@ -49,7 +49,7 @@ BlockPyEngine.prototype.configureSkulpt = function() {
 /**
  *
  */
-BlockPyEngine.prototype.configureStudentEnvironment = function() {
+BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
     Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
     // Identify the location to put new charts
@@ -62,11 +62,9 @@ BlockPyEngine.prototype.configureStudentEnvironment = function() {
     Sk.skip_drawing = false;
     model.settings.mute_printer(false);
 }
-BlockPyEngine.prototype.configureInstructorEnvironment = function() {
+BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
     Sk.execLimit = null;
-    // Identify the location to put new charts
-    Sk.console = printer.getConfiguration();
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = null;
     // Create the instructor module
@@ -287,10 +285,8 @@ BlockPyEngine.prototype.on_run = function() {
     var engine = this;
     engine.updateParse();
     engine.analyzeParse();
-    engine.runStudentCode().then(
-    function() {
-        engine.runInstructorCode().then(
-        function() {
+    engine.runStudentCode(function() {
+        engine.runInstructorCode('give_feedback', function() {
             engine.presentFeedback();
         });
     });
@@ -300,15 +296,15 @@ BlockPyEngine.prototype.on_run = function() {
  */
 BlockPyEngine.prototype.on_step = function() {
     this.main.model.execution.status("changing");
+    var FILENAME = 'on_step';
     // Skip if the instructor has not defined anything
-    if (!this.main.model.programs['on_step']().trim()) {
+    if (!this.main.model.programs[FILENAME]().trim()) {
         return false;
     }
     // On step does not perform parse analysis by default or run student code
     var engine = this;
     engine.updateParse();
-    engine.runInstructorCode().then(
-    function() {
+    engine.runInstructorCode(FILENAME, function() {
         engine.presentFeedback()
     });
 }
@@ -318,13 +314,13 @@ BlockPyEngine.prototype.on_step = function() {
  */
 BlockPyEngine.prototype.updateParse = function() {
     this.main.model.execution.status("parsing");
-    var filename = '__main__';
-    var code = this.main.model.programs[filename];
-    var report = this.main.model.execution.report;
+    var FILENAME = '__main__';
+    var code = this.main.model.programs[FILENAME];
+    var report = this.main.model.execution.reports;
     // Attempt a parse
     try {
-        var parse = Sk.parse(filename, code);
-        var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
+        var parse = Sk.parse(FILENAME, code);
+        var ast = Sk.astFromParse(parse.cst, FILENAME, parse.flags);
     } catch (error) {
         // Report the error
         report['parser'] = {
@@ -346,7 +342,7 @@ BlockPyEngine.prototype.updateParse = function() {
  */
 BlockPyEngine.prototype.analyzeParse = function() {
     this.main.model.execution.status("analyzing");
-    var report = this.main.model.execution.report;
+    var report = this.main.model.execution.reports;
     if (!report['parser']['success']) {
         report['analyzer'] = {
             'success': false,
@@ -376,15 +372,80 @@ BlockPyEngine.prototype.analyzeParse = function() {
  */
 BlockPyEngine.prototype.runStudentCode = function(after) {
     this.main.model.execution.status("student");
-    var report = this.main.model.execution.report;
+    var report = this.main.model.execution.reports;
+    var engine = this;
     // Prepare execution
     this.resetExecution();
+    this.setStudentEnvironment();
     // Actually run the python code
     var filename = '__main__';
     var code = this.main.model.programs[filename];
-    var executionPromise = Sk.misceval.asyncToPromise(function() {
+    Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody(filename, false, code, true);
+    }).then(function() {
+        // Success
+        function (module) {
+            Sk.afterSingleExecution(module.$d, -1, 0, filename+".py");
+            engine.lastStep();
+            report['student'] = {
+                'success': true,
+                'trace': this.executionBuffer.trace,
+                'module': module
+            }
+            after();
+            engine.executionEnd_();
+        },
+        // Failure
+        function (error) {
+            report['student'] = {
+                'success': false,
+                'error': error
+            }
+            after();
+            engine.executionEnd_();
+        }
     });
+}
+
+/**
+ * Run the instructor code
+ */
+BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
+    this.main.model.execution.status("instructor");
+    var report = this.main.model.execution.reports;
+    // Prepare execution
+    this.resetExecution();
+    this.setInstructorEnvironment();
+    // Actually run the python code
+    var code = this.main.model.programs[filename];
+    var engine = this;
+    report['instructor'] = {};
+    Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody(filename, false, code, true);
+    }).then(function() {
+        // Success
+        function (module) {
+            report['instructor']['success'] = true;
+            after();
+        },
+        // Failure
+        function (error) {
+            if (error.tp$name === 'GracefulExit') {
+                report['instructor']['success'] = true;
+            } else {
+                report['instructor']['success'] = false;
+                report['instructor']['error'] = error;
+            }
+            after();
+        }
+    });
+}
+
+/**
+ * Present any accumulated feedback
+ */
+BlockPyEngine.prototype.presentFeedback = function() {
+    var report = this.main.model.execution.reports;
 }
 
 /**
@@ -445,16 +506,6 @@ BlockPyEngine.prototype.run = function() {
             //server.logEvent('blockly_error', error);
         }
     );
-}
-
-/**
- * Indents the given string by 4 spaces. This correctly handles multi-line strings.
- *
- * @param {String} str - The string to be manipulated.
- * @returns {String} The string with four spaces added at the start of every new line.
- */
-function indent(str) {
-  return str.replace(/^(?=.)/gm, '    ');
 }
 
 BlockPyEngine.prototype.setupEnvironment = function(student_code, traceTable, output, ast, final_values) {

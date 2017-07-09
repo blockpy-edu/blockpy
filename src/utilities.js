@@ -35,3 +35,13 @@ function cloneNode(node) {
      
     return clone;
 }
+
+/**
+ * Indents the given string by 4 spaces. This correctly handles multi-line strings.
+ *
+ * @param {String} str - The string to be manipulated.
+ * @returns {String} The string with four spaces added at the start of every new line.
+ */
+function indent(str) {
+  return str.replace(/^(?=.)/gm, '    ');
+}
