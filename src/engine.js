@@ -152,7 +152,7 @@ BlockPyEngine.prototype.resetExecution = function() {
  * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
  */
 BlockPyEngine.prototype.step = function(variables, lineNumber, columnNumber, filename) {
-    if (filename == '<stdin>.py') {
+    if (filename == '__main__.py') {
         var currentStep = this.executionBuffer.step;
         var globals = this.parseGlobals(variables);
         this.executionBuffer.trace.push(
@@ -344,7 +344,6 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.main.model.execution.status("instructor");
     var report = this.main.model.execution.reports;
     // Prepare execution
-    this.resetExecution();
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
