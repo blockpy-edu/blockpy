@@ -284,30 +284,97 @@ BlockPyFeedback.prototype.printError = function(error) {
 BlockPyFeedback.prototype.presentFeedback = function() {
     var report = this.main.model.execution.reports;
     var suppress = this.main.model.execution.suppressions;
-    if !(suppress['verifier'] && !report['verifier'].success) {
+    // Verifier
+    if (!suppress['verifier'] && !report['verifier'].success) {
         this.emptyProgram();
-    } else if (!suppress['parser'] && !report['parser'].success) {
+        return 'verifier';
+    }
+    // Parser
+    if (!suppress['parser'] && !report['parser'].success) {
         var parserReport = report['parser'].error;
         var codeLine = '.';
         if (report.error.args.v.length > 3) {
             codeLine = ', where it says:<br><code>'+report.error.args.v[3][2]+'</code>';
         }
         this.editorError(parserReport, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ parserReport.args.v[2]+codeLine, parserReport.args.v[2]);
-    } else if (!suppress['analyzer'] && !report['analyzer'].success) {
-        
-    } else if (!suppress['student'] && !report['student'].success) {
-        
-    } else if (!suppress['instructor'] && !report['instructor'].success) {
-        
-    } else {
-        if (report['instructor'].compliments) {
-            
+        return 'parser';
+    }
+    // Analyzer
+    if (!suppress['analyzer']) {
+        if (!report['analyzer'].success) {
+            engine.main.components.feedback.internalError(report['analyzer'].error, "Analyzer Error", "Error in analyzer. Please show the above message to an instructor!");
         }
-        if (report['instructor'].complaints) {
-            
+        var wasPresented = this.presentAnalyzerFeedback();
+        if (wasPresented) {
+            return 'analyzer';
         }
     }
+    // Student runtime errors
+    if (!suppress['student']) {
+        if (!report['student'].success) {
+            this.printError(report['student'].error);
+            return 'student';
+        }
+    }
+    // Instructor
+    if (!report['instructor'].success) {
+        engine.main.components.feedback.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        return 'instructor';
+    }
+    if (report['instructor'].compliments) {
+        this.compliment(report['instructor'].compliments);
+    }
+    var complaint = report['instructor'].complaint;
+    if (complaint) {
+        this.instructorFeedback(complaint.name, complaint.message, complaint.line);
+        return 'instructor';
+    }
+    if (report['instructor'].complete) {
+        this.complete();
+        return 'success';
+    }
+    this.noErrors()
+    return 'no errors';
 }
 
-
-
+BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
+    var report = this.main.model.execution.reports['analyzer'].issues;
+    if (report["Unconnected blocks"].length >= 1) {
+        var variable = report['Unconnected blocks'][0];
+        feedback.semanticError("Unconnected blocks", "It looks like you have unconnected blocks on line "+variable.position.line+". Before you run your program, you must make sure that all of your blocks are connected and that there are no unfilled holes.", variable.position.line)
+        return true;
+    } else if (report['Iteration variable is iteration list'].length >= 1) {
+        var variable = report['Iteration variable is iteration list'][0];
+        feedback.semanticError("Iteration Problem", "The property <code>"+variable.name+"</code> was iterated on line "+variable.position.line+", but you used the same variable as the iteration variable. You should choose a different variable name for the iteration variable. Usually, the iteration variable is the singular form of the iteration list (e.g., <code>for dog in dogs:</code>).", variable.position.line)
+        return true;
+    } else if (report["Undefined variables"].length >= 1) {
+        var variable = report["Undefined variables"][0];
+        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.position.line)
+        return true;
+    } else if (report["Possibly undefined variables"].length >= 1) {
+        var variable = report["Possibly undefined variables"][0];
+        feedback.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        return true;
+    } else if (report["Unread variables"].length >= 1) {
+        var variable = report["Unread variables"][0];
+        feedback.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was set, but was never used after that.", null)
+        return true;
+    } else if (report["Overwritten variables"].length >= 1) {
+        var variable = report["Overwritten variables"][0];
+        feedback.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set, but before it could be read it was changed on line "+variable.position.line+". It is unnecessary to change an existing variable's value without reading it first.", variable.position.line)
+        return true;
+    } else if (report["Empty iterations"].length >= 1) {
+        var variable = report["Empty iterations"][0];
+        feedback.semanticError("Iterating over empty list", "The property <code>"+variable.name+"</code> was set as an empty list, and then you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        return true;
+    } else if (report["Non-list iterations"].length >= 1) {
+        var variable = report["Non-list iterations"][0];
+        feedback.semanticError("Iterating over non-list", "The property <code>"+variable.name+"</code> is not a list, but you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        return true;
+    } else if (report["Incompatible types"].length >= 1) {
+        var variable = report["Incompatible types"][0];
+        feedback.semanticError("Incompatible types", "You attempted to "+variable.operation+" a "+variable.left.type+" and a "+variable.right.type+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
+        return true;
+    }
+    return false;
+}

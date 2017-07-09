@@ -192,7 +192,12 @@ BlockPyEngine.prototype.on_run = function() {
     engine.analyzeParse();
     engine.runStudentCode(function() {
         engine.runInstructorCode('give_feedback', function() {
-            engine.main.components.feedback.presentFeedback()
+            var result = engine.main.components.feedback.presentFeedback();
+            if (result == 'success' || result == 'no errors') {
+                engine.main.components.server.markSuccess(1.0);
+            } else {
+                engine.main.components.server.markSuccess(0.0);
+            }
         });
     });
 }
@@ -215,7 +220,7 @@ BlockPyEngine.prototype.on_step = function() {
     });
 }
 
-BlockpyEngine.prototype.verifyCode = function() {
+BlockPyEngine.prototype.verifyCode = function() {
     this.main.model.execution.status("verifying");
     var FILENAME = '__main__';
     var code = this.main.model.programs[FILENAME];
@@ -304,7 +309,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
     var code = this.main.model.programs[filename];
     Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody(filename, false, code, true);
-    }).then(function() {
+    }).then(
         // Success
         function (module) {
             Sk.afterSingleExecution(module.$d, -1, 0, filename+".py");
@@ -326,7 +331,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
             after();
             engine.executionEnd_();
         }
-    });
+    );
 }
 
 /**
@@ -346,7 +351,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     report['instructor'] = {};
     Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody(filename, false, instructorCode, true);
-    }).then(function() {
+    }).then(
         // Success
         function (module) {
             report['instructor']['success'] = true;
@@ -362,7 +367,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
             }
             after();
         }
-    });
+    );
 }
 
 
