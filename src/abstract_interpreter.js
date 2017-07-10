@@ -42,6 +42,7 @@ AbstractInterpreter.prototype.processAst = function(ast) {
     
     this.variables = {};
     this.variableTypes = {};
+    this.variablesNonBuiltin = {};
     for (var name in this.BUILTINS) {
         this.setVariable(name, this.BUILTINS[name]);
     }
@@ -188,6 +189,7 @@ AbstractInterpreter.prototype.postProcess = function() {
         if (!(name in this.BUILTINS)) {
             //console.log("STARTING", name, this.source)
             var trace = this.variables[name];
+            this.variablesNonBuiltin[name] = trace.slice();
             if (name == "___") {
                 this.report["Unconnected blocks"].push({"position": trace[0].position})
             }

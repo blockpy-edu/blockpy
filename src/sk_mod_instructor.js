@@ -29,13 +29,122 @@ var $sk_mod_instructor = function(name) {
     Sk.abstr.setUpInheritance("GracefulExit", Sk.builtin.GracefulExit, Sk.builtin.Exception);
     
     /**
-     * 
+     * Give complimentary feedback to the user
      */
     mod.compliment = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("compliment", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        throw new Sk.builtin.Feedback(message.v);
+        Sk.executionReports.instructor.compliments.push(Sk.ffi.remapToJS(message));
     });
+    /**
+     * Mark problem as completed
+     */
+    mod.complete = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("complete", arguments, 0, 0);
+        Sk.executionReports.instructor.complete = true;
+        throw new Sk.builtin.GracefulExit();
+    });
+    /**
+     * Let user know about an issue
+     */
+    mod.complaint = new Sk.builtin.func(function(message, line) {
+        Sk.builtin.pyCheckArgs("compliment", arguments, 1, 2);
+        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        if (line !== undefined) {
+            Sk.builtin.pyCheckType("line", "integer", Sk.builtin.checkInt(line));
+        }
+        Sk.executionReports.instructor.complaint = {
+            'name': 'Instructor Feedback',
+            'message': Sk.ffi.remapToJs(message),
+            'line': line
+        }
+        throw new Sk.builtin.GracefulExit();
+    });
+    
+    /**
+     * Prevent a certain kind of error from percolating.
+     */
+    mod.suppress = new Sk.builtin.func(function(type, subtype) {
+        Sk.builtin.pyCheckArgs("suppress", arguments, 1, 2);
+        Sk.builtin.pyCheckType("type", "string", Sk.builtin.checkString(type));
+        type = Sk.ffi.remapToJs(type);
+        if (subtype !== undefined) {
+            Sk.builtin.pyCheckType("subtype", "string", Sk.builtin.checkString(subtype));
+            subtype = Sk.ffi.remapToJs(subtype);
+            if (Sk.feedbackSuppressions[type] === false) {
+                Sk.feedbackSuppressions[type] = {subtype: true};
+            } else if (Sk.feedbackSuppressions[type] !== false) {
+                Sk.feedbackSuppressions[type][subtype] = true;
+            }
+        } else {
+            Sk.feedbackSuppressions[type] = true;
+        }
+    });
+    
+    // get_ast()
+    // get_trace()
+    // get_types()
+    // get_types_raw()
+    
+    //Enhanced feedback functions and objects starts here
+    mod.Ast = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var parser = Sk.executionReports['parser'];
+            if (parser.success) {
+                self.ast = parser.ast;
+            } else {
+                self.ast = null;
+            }
+            console.log("Parser AST", self.ast);
+        });
+    }, 'Ast', []);
+    
+    mod.Types = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var analyzer = Sk.executionReports['analyzer'];
+            if (analyzer.success) {
+                self.types = analyzer.variables;
+            } else {
+                self.types = null;
+            }
+            console.log("AI Types", self.types);
+        });
+    }, 'Types', []);
+    mod.Behavior = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var analyzer = Sk.executionReports['analyzer'];
+            if (analyzer.success) {
+                self.behavior = analyzer.behavior;
+            } else {
+                self.behavior = null;
+            }
+            console.log("AI Behavior", self.behavior);
+        });
+    }, 'Behavior', []);
+    
+    mod.Trace = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var student = Sk.executionReports['student'];
+            if (student.success) {
+                self.trace = student.trace;
+            } else {
+                self.trace = null;
+            }
+            console.log("Runtime Trace", self.trace);
+        });
+    }, 'Trace', []);
+    
+    mod.Issues = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var analyzer = Sk.executionReports['analyzer'];
+            if (analyzer.success) {
+                self.issues = analyzer.issues;
+            } else {
+                self.issues = null;
+            }
+            console.log("AI Issues", self.issues);
+        });
+    }, 'Issues', []);
     
     //---- Everything below this line is old stuff
     
@@ -354,7 +463,6 @@ var $sk_mod_instructor = function(name) {
         });
     }, 'ChildStack', []);
 
-    //Enhanced feedback functions and objects starts here
     mod.Stack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
             self.stack = [];

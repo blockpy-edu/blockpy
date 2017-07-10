@@ -43,7 +43,7 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     Sk.inputfunTakesPrompt = true;
     Sk.inputfun = this.inputFunction.bind(this);
     // Access point for instructor data
-    Sk.executionReport = this.main.model.execution.reports;
+    Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
 }
 
@@ -231,16 +231,16 @@ BlockPyEngine.prototype.on_step = function() {
  */
 BlockPyEngine.prototype.resetReports = function() {
     var report = this.main.model.execution.reports;
-    delete report['verifier'];
-    delete report['parser'];
-    delete report['analyzer'];
-    delete report['student'];
-    delete report['instructor'];
+    report['verifier'] = {};
+    report['parser'] = {};
+    report['analyzer'] = {};
+    report['student'] = {};
+    report['instructor'] = {};
     var suppress = this.main.model.execution.suppressions;
-    delete report['verifier'];
-    delete report['parser'];
-    delete report['analyzer'];
-    delete report['student'];
+    suppress['verifier'] = false;
+    suppress['parser'] = false;
+    suppress['analyzer'] = false;
+    suppress['student'] = false;
 }
 
 BlockPyEngine.prototype.verifyCode = function() {
@@ -313,6 +313,7 @@ BlockPyEngine.prototype.analyzeParse = function() {
     report['analyzer'] = {
         'success': true,
         'variables': this.abstractInterpreter.variableTypes,
+        'behavior': this.abstractInterpreter.variablesNonBuiltin,
         'issues': this.abstractInterpreter.report
     }
     return true;
