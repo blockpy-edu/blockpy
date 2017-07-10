@@ -271,7 +271,7 @@ var $sk_mod_instructor = function(name) {
         var ast = parses[source];
         return (new NodeVisitor()).recursive_walk(ast);
     }
-    
+
     /**
      * Given source code as a string, return a list of all of the AST elements
      * that are Num (aka numeric literals) but that are not inside List elements.
@@ -446,6 +446,7 @@ var $sk_mod_instructor = function(name) {
         }
         return Sk.ffi.remapToPy(false);
     });
+
     mod.only_printing_properties = new Sk.builtin.func(function(source) {
         Sk.builtin.pyCheckArgs("only_printing_properties", arguments, 1, 1);
         Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
@@ -456,29 +457,296 @@ var $sk_mod_instructor = function(name) {
         return Sk.ffi.remapToPy(non_var_list.length == 0);
     });
     
-    mod.ChildStack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        // define a repr
-        $loc.__repr__ = new Sk.builtin.func(function(self) {
-            return Sk.ffi.remapToPy('This is a child stack!');
-        });
-    }, 'ChildStack', []);
+    //Enhanced feedback functions and objects starts here
+    //variable used for easy reidentification of nodes so we don't have to recreate every node type
+    var flatTree = [];
+    //variable used for accumulating interrupting feedback AS A LIST OF PYTHON OBJECTS
+    var accInterruptFeedback = [];
+    //variable used for accumulating complementary feedback AS A LIST OF PYTHON OBJECTS
+    var accCompFeedback = [];
+    /**
+     * Given source code as a string, generate a flatTree and store it in the local variable.
+     * This function is meant to be used to avoid extra coding by recreating every AST node type
+     *
+     * @param {String} source - Python source code.
+     */
+    function generateFlatTree(source){
+        if (!(source in parses)) {
+            var parse = Sk.parse("__main__", source);
+            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
+        }
+        //Tree's already been built, don't do anything else
+        if(flatTree.length > 0){
+            return;
+        }
+        var ast = parses[source];
+        var visitor = new NodeVisitor();
+        visitor.visit = function(node){
+            flatTree.push(node);
+            /** Visit a node. **/
+            var method_name = 'visit_' + node._astname;
+            console.log(flatTree.length - 1 + ": " + node._astname)
+            if (method_name in this) {
+                return this[method_name](node);
+            } else {
+                return this.generic_visit(node);
+            }
+        }
+        visitor.visit(ast);
+    }
 
-    mod.Stack = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            self.stack = [];
-            // Make a new attribute named 'int_value'
-            Sk.abstr.sattr(self, 'int_value', Sk.ffi.remapToPy(5), true);
-            var aChild = Sk.misceval.callsimOrSuspend(mod.ChildStack);
-            Sk.abstr.sattr(self, 'child', aChild, true);
-        });
-        $loc.push = new Sk.builtin.func(function(self,x) {
-            self.stack.push(x);
-        });
-        $loc.pop = new Sk.builtin.func(function(self) {
-            return self.stack.pop();
+    function isSkBuiltin(obj){
+        return (obj instanceof Sk.builtin.dict) ||
+            (obj instanceof Sk.builtin.list) ||
+            (obj instanceof Sk.builtin.tuple) ||
+            (obj instanceof Sk.builtin.bool) ||
+            (obj instanceof Sk.builtin.int_) ||
+            (obj instanceof Sk.builtin.float_) ||
+            (obj instanceof Sk.builtin.lng);
+    }
+    /**
+     * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
+     * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
+     * cases where the types in obj ore a mix of python SIMPLE objects and SIMPLE normal javascript objects
+     * @param {object} obj - the object to be converted
+     * @return {Sk.builtin.???} - returns the corresponding python object, dropping all functions and things it can't convert
+    **/
+    function mixedRemapToPy(obj){
+        var k;
+        var kvs;
+        var i;
+        var arr;
+        if(isSkBuiltin(obj)){
+            return obj;
+        }else if (Object.prototype.toString.call(obj) === "[object Array]") {
+            arr = [];
+            for (i = 0; i < obj.length; ++i) {
+                var subval = obj[i];
+                if(!isSkBuiltin(subval)){
+                    arr.push(Sk.ffi.mixedRemapToPy(subval));
+                }else{
+                    arr.push(subval)
+                }
+            }
+            return new Sk.builtin.list(arr);
+        } else if (obj === null) {
+            return Sk.builtin.none.none$;
+        } else if (typeof obj === "object") {
+            if(!isSkBuiltin(obj)){
+                kvs = [];
+                for (k in obj) {
+                    if(!isSkBuiltin(k)){
+                        kvs.push(Sk.ffi.mixedRemapToPy(k));
+                    }else{
+                        kvs.push(k);
+                    }
+                    kvs.push(Sk.ffi.mixedRemapToPy(obj[k]));
+                }
+                return new Sk.builtin.dict(kvs);
+            }else{
+                return obj;
+            }
+        } else if (typeof obj === "string") {
+            return new Sk.builtin.str(obj);
+        } else if (typeof obj === "number") {
+            return Sk.builtin.assk$(obj);
+        } else if (typeof obj === "boolean") {
+            return new Sk.builtin.bool(obj);
+        }
+    }
+
+    /**
+     * Given source code as a string, generates the mock AST nodes the instructor will be using
+     * note that this function doesn't return anything.
+     * @param {String} source - Python source code.
+     * @param {mod.AstNode} - returns the python version of the root node
+    **/
+    mod.parse_program = new Sk.builtin.func(function(source) {
+        Sk.builtin.pyCheckArgs("parse_program", arguments, 1, 1);
+        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
+        source = source.v;
+        generateFlatTree(source);
+        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+    });
+
+    /**@TODO: make this function affect the UI
+     * Given a feedback string, records the corrective feedback string for later printing
+     * @param {string} feedback - the piece of feedback to save
+    **/
+    mod.add_interrupt_feedback = new Sk.builtin.func(function(feedback) {
+        Sk.builtin.pyCheckArgs("add_iterupt_feedback", arguments, 1, 1);
+        Sk.builtin.pyCheckType("feedback", "string", Sk.builtin.checkString(feedback));
+        accInterruptFeedback.push(feedback);
+    });
+    /**@TODO: make this function affect the UI
+     * Given a feedback string, records the complementary feedback string for later printing
+     * @param {string} feedback - the piece of feedback to save
+    **/
+    mod.add_comp_feedback = new Sk.builtin.func(function(feedback) {
+        Sk.builtin.pyCheckArgs("add_comp_feedback", arguments, 1, 1);
+        Sk.builtin.pyCheckType("feedback", "string", Sk.builtin.checkString(feedback));
+        accCompFeedback.push(feedback);
+    });
+
+    /**
+     * This resolves all of the feedback and posts it to the appropriate places
+     * @TODO: actually implement this functionality
+    **/
+    mod.post_feedback = new Sk.builtin.func(function() {
+        var allFeedback = accInterruptFeedback.concat(accCompFeedback);
+        completePythonAll = Sk.builtin.list(allFeedback);
+        jsPureFeedback = Sk.ffi.remapToJs(completePythonAll);
+        console.log("" + jsPureFeedback);
+    });
+
+    /**
+     * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
+     * is called first
+     * @property {number} self.id - the javascript id number of this object
+     * @property {string} self.type - the javascript string representing the type of the node (_astname)
+     * @property {Sk.abstr.(s/g)attr} id - the python version of self.id
+     * @property {Sk.abstr.(s/g)attr} type - the python version of self.type
+    **/
+    mod.AstNode = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self, id) {
+            self.id = Sk.ffi.remapToJs(id);//note that id is passed from PYTHON as a default type already
+            self.type = flatTree[self.id]._astname;
+            Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
+            var thisNode = flatTree[self.id];
         });
         
-    }, 'Stack', []);
+        /**
+         * This function dynamically looks to see if the ast node has a given property and does
+         * remapping where it can
+         * @param {obj} self - the javascript object representing the python AST node (which is also a python object)
+         * @param {string} key - the property the user is trying to look up
+        **/
+        $loc.__getattr__ = new Sk.builtin.func(function(self, key) {
+            console.log("getattr");
+            var actualAstNode = flatTree[self.id];
+            key = Sk.ffi.remapToJs(key);
+            if(key in actualAstNode){
+                var field = actualAstNode[key];
+                //@TODO: check for flag to see if chain assignments are allowed, otherwise return first item
+                if(actualAstNode._astname == "Assign" && key == "targets"){//this means its an assignment node
+                    var childId = flatTree.indexOf(field[0]);//get the relevant node
+                    return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
+                }else if(field.constructor === Array){
+                    console.log("array handling");
+                    var astNodeCount = 0
+                    var fieldArray = [];
+                    //this will likely always be a mixed array
+                    for(var i = 0; i < field.length; i++){
+                        var subfield = field[i];
+                        //if AST node, use callism and push new object
+                        if(subfield instanceof Object && "_astname" in subfield){//an AST node)
+                            var childId = flatTree.indexOf(subfield);//get the relevant node
+                            console.log(childId);
+                            fieldArray.push(Sk.misceval.callsimOrSuspend(mod.AstNode, childId));
+                        }else{//else smart remap
+                            console.log(subfield);
+                            var tranSubfield = mixedRemapToPy(subfield);
+                            if(tranSubfield != undefined){
+                                console.log(tranSubfield);
+                                fieldArray.push(tranSubfield);
+                            }
+                        }
+                    }
+                    return new Sk.builtin.list(fieldArray);
+                }else if('v' in field){//probably already a python object
+                    return field;
+                }else if(field instanceof Object && "_astname" in field){//an AST node
+                    var childId = flatTree.indexOf(field);//get the relevant node
+                    return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
+                }
+            }
+            return Sk.ffi.remapToPy(null);
+        });
 
+        /**
+         * Given the python Name ast node (variable) and self (which is automatically filled), checks
+         * the AST on the javascript side to see if the node has the specified variable using the name
+         * @TODO: change this so it can handle any data type as opposed to just numbers and ast nodes
+         * @param {???} self - the javascript reference of this object, which is self in python.
+         * @param {mod.AstNode} pyAstNode - the python object representing the variable node to look for
+        **/
+        $loc.has = new Sk.builtin.func(function(self, pyAstNode) {
+            var rawVariableName = null;
+            var rawNum = null;
+            var nodeId = self.id;
+            var thisNode = flatTree[nodeId];
+            //got a number instead of an AST node
+            if(Sk.builtin.checkNumber(pyAstNode)){
+                rawNum = Sk.ffi.remapToJs(pyAstNode);
+            }else{//assume it's an AST node
+                //@TODO: should handle exceptions/do type checking
+                var otherId = Sk.ffi.remapToJs(pyAstNode.id);
+                var otherNode = flatTree[otherId];
+                if(otherNode._astname != "Name"){
+                    return Sk.ffi.remapToPy(false);
+                }
+                rawVariableName = Sk.ffi.remapToJs(otherNode.id);
+            }
+
+            var hasVar = false;
+            var visitor = new NodeVisitor();
+            if(rawVariableName != null){
+                visitor.visit_Name = function(node){
+                    var otherRawName = Sk.ffi.remapToJs(node.id);
+                    if(rawVariableName == otherRawName){
+                        hasVar = true;
+                        return;
+                    }
+                    return this.generic_visit(node);
+                }
+            }
+
+            if(rawNum != null){
+                visitor.visit_Num = function(node){
+                    var otherNum = Sk.ffi.remapToJs(node.n);
+                    if(rawNum == otherNum){
+                        hasVar = true;
+                        return;
+                    }
+                    return this.generic_visit(node);
+                }
+            }
+
+            visitor.visit(flatTree[nodeId]);
+            return Sk.ffi.remapToPy(hasVar);
+        });
+
+        /**
+         * Given a type of ast node as a string, returns all in the ast that are nodes of the specified "type"
+         * valid options include BinOp, For, Call, If, Compare, Assign, Expr, note that these ARE case sensitive
+         * @param {???} self - the javascript reference of this object, which is self in python.
+         * @param {Sk.builtin.str} type - the python string representing the "type" of node to look for
+        **/
+        $loc.find_all = new Sk.builtin.func(function(self, type) {
+            var items = [];
+            var visitor = new NodeVisitor();
+            var currentId = self.id - 1;
+            var funcName = 'visit_' + Sk.ffi.remapToJs(type);
+            visitor.visit = function(node) {
+                currentId += 1;
+                /** Visit a node. **/
+                var method_name = 'visit_' + node._astname;
+                if (method_name in this) {
+                    return this[method_name](node);
+                } else {
+                    return this.generic_visit(node);
+                }
+            }
+            visitor[funcName] = function(node){
+                var skulptNode = Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
+                items.push(skulptNode);
+                return this.generic_visit(node);
+            }
+            var nodeId = self.id;
+            visitor.visit(flatTree[nodeId]);
+            //Don't use Sk.ffi because the objects in the array are already python objects
+            return new Sk.builtin.list(items);
+        });
+    });
     return mod;
 }
