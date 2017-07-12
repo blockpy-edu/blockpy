@@ -1,8 +1,29 @@
 /**
+ * Remove duplicate values from an array, preserving order.
+ * Creates a new array, so is non-destructive.
+ * Courtesy:
+ * https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
+ *
+ * @param {Array} array - The array to uniquify. Elements compared with ===.
+ */
+function arrayUnique(array) {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
+}
+
+/**
  * A helper function for extending an array based
  * on an "addArray" and "removeArray". Any element
  * found in removeArray is removed from the first array
  * and all the elements of addArray are added.
+ * Any duplicate items are removed.
  * Creates a new array, so is non-destructive.
  *
  * @param {Array} array - the array to manipulate
@@ -14,7 +35,7 @@ function expandArray(array, addArray, removeArray) {
     var copyArray = array.filter(function(item) {
         return removeArray.indexOf(item) === -1;
     });
-    return copyArray.concat(addArray);
+    return arrayUnique(copyArray.concat(addArray));
 }
 
 /**

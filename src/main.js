@@ -312,16 +312,17 @@ BlockPy.prototype.initModelMethods = function() {
             case 'Error': return ['label-danger', 'Error'];
         }
     }, this.model);
+    // Helper function to map Execution status messages to UI elements
     this.model.execution_status_class = ko.computed(function() {
         switch (this.execution.status()) {
-            default: case 'idle': return ['label-default', 'Ready'];
-            case 'running': return ['label-info', 'Running'];
-            case 'changing': return ['label-info', 'Changing'];
-            case 'verifying': return ['label-info', 'Verifying'];
-            case 'parsing': return ['label-info', 'Parsing'];
-            case 'analyzing': return ['label-info', 'Analyzing'];
-            case 'student': return ['label-info', 'Student'];
-            case 'instructor': return ['label-info', 'Instructor'];
+            default: case 'idle': return ['label-success', 'Ready'];
+            case 'running': return ['label-warning', 'Running'];
+            case 'changing': return ['label-warning', 'Changing'];
+            case 'verifying': return ['label-warning', 'Verifying'];
+            case 'parsing': return ['label-warning', 'Parsing'];
+            case 'analyzing': return ['label-warning', 'Analyzing'];
+            case 'student': return ['label-warning', 'Student'];
+            case 'instructor': return ['label-warning', 'Instructor'];
             case 'complete': return ['label-success', 'Idle'];
             
         }
@@ -377,6 +378,15 @@ BlockPy.prototype.initModelMethods = function() {
 BlockPy.prototype.resetSystem = function() {
     this.components.feedback.clear();
     this.components.printer.resetPrinter();
+}
+
+/**
+ * Function for initializing user, course, and assignment group info.
+ */
+BlockPy.prototype.setUserData = function(student_id, course_id, group_id) {
+    this.model.assignment['group_id'] = group_id;
+    this.model.assignment['student_id'] = student_id;
+    this.model.assignment['course_id'] = course_id;
 }
 
 /**
@@ -437,6 +447,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     // Reload blockly
     // Reload CodeMirror
     this.model.settings.server_connected(true)
+    this.components.corgis.loadDatasets();
 }
 
 /**
