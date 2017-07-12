@@ -152,3 +152,17 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 .CodeMirror-code div pre {
     border-bottom: 1px dashed rgba(1,1,1,.1);
 }
+
+.blockpy-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    z-index: 10000;
+}

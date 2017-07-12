@@ -188,14 +188,29 @@
                 <span class='glyphicon glyphicon-list-alt'></span> English
             </button>
             -->
-            
-            <select data-bind="visible: settings.instructor() & !assignment.upload(), value: settings.filename"
-                    class="blockpy-toolbar-filename-picker">
-                <option value='__main__' selected>Student Code</option>
-                <option value='starting_code'>Starting Code</option>
-                <option value='give_feedback'>Generate Feedback</option>
-            </select>
-                
+            <div class="btn-group blockpy-toolbar-filename-picker" data-toggle="buttons" 
+                 data-bind="visible: settings.instructor() & !assignment.upload()">
+                <label class="btn btn-default btn-sm blockpy-set-filename" 
+                       data-bind="css: {active: settings.filename() == '__main__'}"
+                       data-filename="__main__">
+                    <input type="radio" name="blockpy-filename-set" autocomplete="off" checked> __main__
+                </label>
+                <label class="btn btn-default btn-sm blockpy-set-filename"
+                       data-bind="css: {active: settings.filename() == 'starting_code'}"
+                       data-filename="starting_code">
+                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_start
+                </label>
+                <label class="btn btn-default btn-sm blockpy-set-filename"
+                       data-bind="css: {active: settings.filename() == 'give_feedback'}"
+                       data-filename="give_feedback">
+                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_run
+                </label>
+                <label class="btn btn-default btn-sm blockpy-set-filename"
+                       data-bind="css: {active: settings.filename() == 'on_step'}"
+                       data-filename="on_step">
+                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_change
+                </label>
+            </div>
         </div>
     </div>
     <div class='row blockpy-content-bottom'

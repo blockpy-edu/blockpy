@@ -144,13 +144,13 @@ BlockPy.prototype.initModel = function(settings) {
         'settings': {
             // Default mode when you open the screen is text
             // 'Text', 'Blocks', "Split"
-            'editor': ko.observable(getDefault('editor','Split')),
+            'editor': ko.observable(settings.editor || getDefault('editor','Split')),
             // Default mode when you open the screen is instructor
             // boolean
-            'instructor': ko.observable(getDefault('instructor', "true")=="true"),
+            'instructor': ko.observable(settings.instructor),
             // Track the original value
             // boolean
-            'instructor_initial': ko.observable(getDefault('instructor', "true")=="true"),
+            'instructor_initial': ko.observable(settings.instructor_initial),
             // Internal for Refresh mechanism to fix broken logs
             // String
             'log_id': ko.observable(null),
@@ -308,6 +308,7 @@ BlockPy.prototype.initModelMethods = function() {
             case 'Logging': return ['label-primary', 'Logging'];
             case 'Saving': return ['label-primary', 'Saving'];
             case 'Saved': return ['label-success', 'Saved'];
+            case 'Ungraded': return ['label-warning', 'Ungraded']
             case 'Disconnected': return ['label-danger', 'Disconnected'];
             case 'Error': return ['label-danger', 'Error'];
         }
@@ -397,8 +398,10 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.resetSystem();
     // Settings
     this.model.settings['editor'](assignment.initial_view);
-    this.model.settings['instructor'](settings.instructor);
-    this.model.settings['instructor_initial'](settings.instructor);
+    if (settings.instructor) {
+        this.model.settings['instructor'](settings.instructor);
+        this.model.settings['instructor_initial'](settings.instructor);
+    }
     this.model.settings['enable_blocks'](settings.blocks_enabled);
     this.model.settings['read_only'](settings.read_only);
     this.model.settings['show_settings'](settings.show_settings);
