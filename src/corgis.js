@@ -13,11 +13,17 @@ function BlockPyCorgis(main) {
     this.main = main;
     
     this.loadedDatasets = [];
-    
+    this.loadDatasets();
+}
+
+BlockPyCorgis.prototype.loadDatasets = function() {
     // Load in each the datasets
-    var corgis = this;
+    var corgis = this,
+        model = this.main.model,
+        editor = this.main.components.editor,
+        server = this.main.components.server;
     var imports = [];
-    this.main.model.assignment.modules().forEach(function(name) {
+    model.assignment.modules().forEach(function(name) {
         var post_prefix = name.substring(7).replace(/\s/g, '_').toLowerCase();
         if (!(name in BlockPyEditor.CATEGORY_MAP)) {
             imports.push.apply(imports, corgis.importDataset(post_prefix, name));
@@ -26,14 +32,14 @@ function BlockPyCorgis(main) {
     
     // When datasets are loaded, update the toolbox.
     $.when.apply($, imports).done(function() {
-        if (main.model.settings.editor() == "Blocks") {
-            main.components.editor.updateBlocksFromModel();
+        if (model.settings.editor() == "Blocks") {
+            editor.updateBlocksFromModel();
         }
-        main.components.editor.updateToolbox(true);
+        editor.updateToolbox(true);
     }).fail(function(e) {
         console.error(e);
     }).always(function() {
-        main.components.server.finalizeSubscriptions();
+        server.finalizeSubscriptions();
     });
 }
 
