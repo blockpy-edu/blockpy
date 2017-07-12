@@ -171,20 +171,6 @@ BlockPyEditor.prototype.initText = function() {
     this.main.model.program.subscribe(function() {editor.updateTextFromModel()});
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
-    
-    // Was toying with buttons for injecting code. These are deprecated now.
-    this.tag.find('.blockpy-text-insert-if').click(function() {
-        var line_number = blockpy.components.editor.codeMirror.getCursor().line;
-        var line = blockpy.components.editor.codeMirror.getLine(line_number);
-        var whitespace = line.match(/^(\s*)/)[1];
-        editor.codeMirror.replaceSelection("if ___:\n    "+whitespace+"pass");
-    });
-    this.tag.find('.blockpy-text-insert-if-else').click(function() {
-        var line_number = blockpy.components.editor.codeMirror.getCursor().line;
-        var line = blockpy.components.editor.codeMirror.getLine(line_number);
-        var whitespace = line.match(/^(\s*)/)[1];
-        editor.codeMirror.replaceSelection("if ___:\n    "+whitespace+"pass\n"+whitespace+"else:\n    "+whitespace+"pass");
-    });
 };
 
 /**
