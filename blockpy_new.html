@@ -97,33 +97,33 @@
     
     <script>
     $(document).ready(function() {
-        blockpy = new BlockPy(
+        blockpy = new BlockPy({
+            'blocklyPath': "blockly/",
+            'attachmentPoint': document.getElementById('blockpy-div'),
+            'instructor': getQueryParams()["instructor"]=="true" || true,
+            'developer': true,
+            'editor': 'Split',
+            'urls': {
+                'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
+                //'walk_old_code': 'http://localhost:8000/walk_code/',
+                //'log_event': 'http://localhost:8000/save_events/'
+                /*'save_code': 'http://localhost:8000/save_code/',
+                'save_success': 'http://localhost:8000/submit_grade/',
+                'log_event': 'http://localhost:8000/save_events/'*/
+            }
+        });
+        blockpy.setAssignment(
             // settings
             {
                 'editor': 'Text',
-                'blocklyPath': "blockly/",
-                'attachmentPoint': document.getElementById('blockpy-div'),
-                'instructor': getQueryParams()["instructor"]=="true" || true,
-                'developer': true,
                 'read_only': false,
                 'disable_semantic_errors': false,
-                'urls': {
-                    'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
-                    //'walk_old_code': 'http://localhost:8000/walk_code/',
-                    //'log_event': 'http://localhost:8000/save_events/'
-                    /*'save_code': 'http://localhost:8000/save_code/',
-                    'save_success': 'http://localhost:8000/submit_grade/',
-                    'log_event': 'http://localhost:8000/save_events/'*/
-                }
             },
             // assignment
             {
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
-                //'give_feedback': "if not only_printing_properties(code):\n    set_feedback('You cannot store the answer a number!')",
                 'give_feedback': 'Ast()\nTypes()\nBehavior()\nTrace()\nIssues()\ncomplaint("Your code is awful.")',
-                //'give_feedback': 'v = get_value_by_name("b")\nif v == None:\n\tset_feedback("You must declare a variable named b")\nif not isinstance(v, list):\n\tset_feedback("B should be a list.")\nif sum(v) > 10:\n\tset_feedback("Your list is too big.")\nset_success()',
-                //'give_feedback': 'import parking\nprop = get_property("today")\nnone = get_property("banana")\nparking._today = "Tuesday"\nreset_output()\nrun_code()\noutput=get_output()\nif "Can park" in output:\n    set_success()\nelse:\n    set_feedback("Your answer doesnt work for other days, such as Tuesday.")',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
@@ -133,31 +133,9 @@
                     'removed': []
                 }
             },
-            // submission
-            {},
             // programs
             {
-                //'__main__': "import image\n\n# Testing the Procedural API\nappleImg = image.makePicture('http://i.imgur.com/sPhLIKY.jpg')\nprint(appleImg)"
-                //'__main__': "x and y and z"
-                //'__main__': "def x():\n    pass\nx()"
-                //'__main__': "(1,2,)"
-                //'__main__': "#test\n\nx = range(1000)\n\ntotal = 0\nfor y in x:\n    total = total + y\n    total=1\n    a=0\nprint(total)"
-                //'__main__': 'import school_scores\nschool_scores.get("Arts/Music.Average GPA","(None)","")'
                 '__main__': 'a = 0\nprint(a)',
-                //'__main__': "a+=1\nx =0\n\nfor x in y:\n    pass\nx=0"
-                //'__main__': '# apples\na = 0\n# testing\nprint(a)\n#final',
-                //'__main__': '#start\nalpha=0\n#Here I am\nfor x in y:\n    a\n    print(x)\n    #inside\n\n    print(0)\n\n    if x:\n        a = 0\n    else:\n        a=b\n    c=0\nprint(alpha\n)\nx = 0\n#excellent',
-                //'__main__': "import turtle\nt = turtle.Turtle()\nfor c in ['red', 'green', 'yellow', 'blue']:\n    t.color(c)\n    t.forward(75)\n    t.left(90)",
-                //'__main__': 'import math\n\n\nfor x in y:\n    b=0\nprint(x)',
-                //'__main__': 'import matplotlib.pyplot as plt\na = xrange(1000)\nnew= []\nfor b in a:\n    if b > 5:\n        new.append(b)\nplt.hist(new)\nplt.show()'
-                //'a = [1,2,3]\nb=[4,5]\na,b',
-                //'__main__': 'import parking\ntoday = parking.today()\nif today == parking.Day("Tuesay"):\n    print("Can park")\nelse:\n    print("Cannot park!")',
-                //'__main__': 'import matplotlib.pyplot as plt\nplt.scatter([10, 20, 30, 40], [40, 30, 40, 50])\nplt.show()'
-                //'__main__': 'import parking\ntoday = parking.today()\ntuesday = parking.Day("tuesday")\nprint(parking.day_compare("IS", tuesday, "tue"))\nnow = parking.now()\nnoon = parking.Time(12,0,"pm")\nprint(parking.time_compare("IS", noon, 12, 0, "pm"))',
-                //'import parking\na = parking.today()\nif parking.day_compare("IS", a, "tue"):\n    print("Can park")\nelse:\n    print("Cannot park")'
-                    ///'import classics\nr =classics.get("Birth", "Name", "Joyce, James")\nprint(r)',
-                //'__main__': "import matplotlib.pyplot as plt\nplt.hist([1,2,2,2,2,5,5,8, 9, 9])\nplt.show()"
-                //$("#default-body").html()
             }
         )
         
@@ -198,20 +176,6 @@ function getQueryParams(){
        return {};
     }
 }
-
-/*$(document).ready(function() {
-    codes = ["#1\na=a", "#2\na=0\na", "#3\na\na=0", "#4\na\na\na=0", "#5\nfor a in [1,2]:\n  pass", "#6\nfor x in a:\n  pass","#7\na=[]", "#8\na=[]\nfor x in a:\n  pass"];
-    var t = $("<table>").addClass("table table-condensed table-striped");
-    for (var i= 0; i<codes.length; i++) {
-        var code = codes[i];
-        var results = (new AbstractInterpreter()).analyze(code);
-        var results = JSON.stringify(results, null, 2);
-        t.append($("<tr>").html(
-            "<td>"+code+"</td><td>"+results+"</td>"
-        ));
-    }
-    $("body").prepend(t)
-});*/
 </script>
 
   

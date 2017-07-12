@@ -275,17 +275,18 @@ BlockPyServer.prototype.walkOldCode = function() {
     }
 }
 
-BlockPyServer.prototype.loadAssignment = function() {
+BlockPyServer.prototype.loadAssignment = function(assignment_id) {
     var model = this.main.model;
+    var server = this;
     if (model.server_is_connected('load_assignment')) {
         var data = this.createServerData();        
-        var server = this;
+        data['assignment_id'] = assignment_id;
         this.setStatus('Reloading');
-        $.post(model.constants.urls.save_code, data, 
+        $.post(model.constants.urls.load_assignment, data, 
                 function(response) {
                     if (response.success) {
-                        server.main.setAssignment(response.assignment, 
-                                                  response.settings, 
+                        server.main.setAssignment(response.settings,
+                                                  response.assignment, 
                                                   response.programs)
                         server.setStatus('Loaded');
                     } else {

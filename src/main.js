@@ -8,111 +8,13 @@
  * @param {Object} submission - Unused parameter.
  * @param {Object} programs - Includes the source code of any programs to be loaded
  */
-function BlockPy(settings, assignment, submission, programs) {
+function BlockPy(settings, assignment, programs) {
     this.localSettings = new LocalStorageWrapper('localSettings');
     this.initModel(settings);
-    this.setAssignment(assignment, settings, programs);
-    
-    // The code for the current active program file (e.g., "__main__")
-    this.model.program = ko.computed(function() {
-        return this.programs[this.settings.filename()]();
-    }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
-    
-    // Whether this URL has been specified
-    this.model.server_is_connected = function(url) {
-        return this.constants.urls !== undefined && this.constants.urls[url] !== undefined;
-    };
-    
-    var modelSettings = this.model.settings;
-    this.model.showHideSettings = function() {
-        modelSettings.show_settings(!modelSettings.show_settings());
-    };
-    
-    // Helper function to map error statuses to UI elements
-    this.model.status_feedback_class = ko.computed(function() {
-        switch (this.status.error()) {
-            default: case 'none': return ['label-none', ''];
-            case 'runtime': return ['label-runtime-error', 'Runtime Error'];
-            case 'syntax': return ['label-syntax-error', 'Syntax Error'];
-            case 'editor': return ['label-syntax-error', 'Editor Error'];
-            case 'internal': return ['label-internal-error', 'Internal Error'];
-            case 'semantic': return ['label-semantic-error', 'Algorithm Error'];
-            case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
-            case 'complete': return ['label-problem-complete', 'Complete'];
-            case 'no errors': return ['label-no-errors', 'No errors'];
-        }
-    }, this.model);
-    
-    // Helper function to map Server error statuses to UI elements
-    this.model.status_server_class = ko.computed(function() {
-        switch (this.status.server()) {
-            default: case 'Loading': return ['label-default', 'Loading'];
-            case 'Offline': return ['label-default', 'Offline'];
-            case 'Out of date': return ['label-danger', 'Out of Date'];
-            case 'Loaded': return ['label-success', 'Loaded'];
-            case 'Logging': return ['label-primary', 'Logging'];
-            case 'Saving': return ['label-primary', 'Saving'];
-            case 'Saved': return ['label-success', 'Saved'];
-            case 'Disconnected': return ['label-danger', 'Disconnected'];
-            case 'Error': return ['label-danger', 'Error'];
-        }
-    }, this.model);
-    this.model.execution_status_class = ko.computed(function() {
-        switch (this.execution.status()) {
-            default: case 'idle': return ['label-default', 'Ready'];
-            case 'running': return ['label-info', 'Running'];
-            case 'changing': return ['label-info', 'Changing'];
-            case 'verifying': return ['label-info', 'Verifying'];
-            case 'parsing': return ['label-info', 'Parsing'];
-            case 'analyzing': return ['label-info', 'Analyzing'];
-            case 'student': return ['label-info', 'Student'];
-            case 'instructor': return ['label-info', 'Instructor'];
-            case 'complete': return ['label-success', 'Idle'];
-            
-        }
-    }, this.model);
-    
-    // Program trace functions
-    var execution = this.model.execution;
-    this.model.moveTraceFirst = function(index) { 
-        execution.trace_step(0); };
-    this.model.moveTraceBackward = function(index) { 
-        var previous = Math.max(execution.trace_step()-1, 0);
-        execution.trace_step(previous); };
-    this.model.moveTraceForward = function(index) { 
-        var next = Math.min(execution.trace_step()+1, execution.last_step());
-        execution.trace_step(next); };
-    this.model.moveTraceLast = function(index) { 
-        execution.trace_step(execution.last_step()); };
-    this.model.current_trace = ko.pureComputed(function() {
-        return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
-    });
-    
-    /**
-     * Opens a new window to represent the exact value of a Skulpt object.
-     * Particularly useful for things like lists that can be really, really
-     * long.
-     * 
-     * @param {String} type - The type of the value
-     * @param {Object} exact_value - A Skulpt value to be rendered.
-     */
-    this.model.viewExactValue = function(type, exact_value) {
-        return function() {
-            if (type == "List") {
-                var output = exact_value.$r().v;
-                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
-                window.open('data:application/json;' + result);
-            }
-        }
+    if (assignment !== undefined) {
+        this.setAssignment(settings, assignment, programs);
     }
-    
-    // For performance reasons, batch notifications for execution handling.
-    // I'm not even sure these have any value any more.
-    execution.trace.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
-    execution.step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
-    execution.last_step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
-    execution.line_number.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
-    
+    this.initModelMethods();
     this.initMain();
 }
 
@@ -276,6 +178,8 @@ BlockPy.prototype.initModel = function(settings) {
             'mute_printer': ko.observable(false),
             // function
             'completedCallback': undefined,
+            // boolean
+            'server_connected': ko.observable(true)
         },
         // Assignment level settings
         'assignment': {
@@ -359,9 +263,128 @@ BlockPy.prototype.initModel = function(settings) {
 }
 
 /**
+ * Define various helper methods that can be used in the view, based on 
+ * data from the model.
+ */
+BlockPy.prototype.initModelMethods = function() {
+    // The code for the current active program file (e.g., "__main__")
+    this.model.program = ko.computed(function() {
+        return this.programs[this.settings.filename()]();
+    }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+    
+    // Whether this URL has been specified
+    this.model.server_is_connected = function(url) {
+        return this.settings.server_connected() &&
+               this.constants.urls !== undefined && this.constants.urls[url] !== undefined;
+    };
+    
+    var modelSettings = this.model.settings;
+    this.model.showHideSettings = function() {
+        modelSettings.show_settings(!modelSettings.show_settings());
+    };
+    
+    // Helper function to map error statuses to UI elements
+    this.model.status_feedback_class = ko.computed(function() {
+        switch (this.status.error()) {
+            default: case 'none': return ['label-none', ''];
+            case 'runtime': return ['label-runtime-error', 'Runtime Error'];
+            case 'syntax': return ['label-syntax-error', 'Syntax Error'];
+            case 'editor': return ['label-syntax-error', 'Editor Error'];
+            case 'internal': return ['label-internal-error', 'Internal Error'];
+            case 'semantic': return ['label-semantic-error', 'Algorithm Error'];
+            case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
+            case 'complete': return ['label-problem-complete', 'Complete'];
+            case 'no errors': return ['label-no-errors', 'No errors'];
+        }
+    }, this.model);
+    
+    // Helper function to map Server error statuses to UI elements
+    this.model.status_server_class = ko.computed(function() {
+        switch (this.status.server()) {
+            default: case 'Loading': return ['label-default', 'Loading'];
+            case 'Offline': return ['label-default', 'Offline'];
+            case 'Out of date': return ['label-danger', 'Out of Date'];
+            case 'Loaded': return ['label-success', 'Loaded'];
+            case 'Logging': return ['label-primary', 'Logging'];
+            case 'Saving': return ['label-primary', 'Saving'];
+            case 'Saved': return ['label-success', 'Saved'];
+            case 'Disconnected': return ['label-danger', 'Disconnected'];
+            case 'Error': return ['label-danger', 'Error'];
+        }
+    }, this.model);
+    this.model.execution_status_class = ko.computed(function() {
+        switch (this.execution.status()) {
+            default: case 'idle': return ['label-default', 'Ready'];
+            case 'running': return ['label-info', 'Running'];
+            case 'changing': return ['label-info', 'Changing'];
+            case 'verifying': return ['label-info', 'Verifying'];
+            case 'parsing': return ['label-info', 'Parsing'];
+            case 'analyzing': return ['label-info', 'Analyzing'];
+            case 'student': return ['label-info', 'Student'];
+            case 'instructor': return ['label-info', 'Instructor'];
+            case 'complete': return ['label-success', 'Idle'];
+            
+        }
+    }, this.model);
+    
+    // Program trace functions
+    var execution = this.model.execution;
+    this.model.moveTraceFirst = function(index) { 
+        execution.trace_step(0); };
+    this.model.moveTraceBackward = function(index) { 
+        var previous = Math.max(execution.trace_step()-1, 0);
+        execution.trace_step(previous); };
+    this.model.moveTraceForward = function(index) { 
+        var next = Math.min(execution.trace_step()+1, execution.last_step());
+        execution.trace_step(next); };
+    this.model.moveTraceLast = function(index) { 
+        execution.trace_step(execution.last_step()); };
+    this.model.current_trace = ko.pureComputed(function() {
+        return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
+    });
+    
+    /**
+     * Opens a new window to represent the exact value of a Skulpt object.
+     * Particularly useful for things like lists that can be really, really
+     * long.
+     * 
+     * @param {String} type - The type of the value
+     * @param {Object} exact_value - A Skulpt value to be rendered.
+     */
+    this.model.viewExactValue = function(type, exact_value) {
+        return function() {
+            if (type == "List") {
+                var output = exact_value.$r().v;
+                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
+                window.open('data:application/json;' + result);
+            }
+        }
+    }
+    
+    // For performance reasons, batch notifications for execution handling.
+    // I'm not even sure these have any value any more.
+    execution.trace.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.last_step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    execution.line_number.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+}
+
+/**
+ * Restores any user interface items to their original states.
+ * This is used to manually reset anything that isn't tied automatically to
+ * the model.
+ */
+BlockPy.prototype.resetSystem = function() {
+    this.components.feedback.clear();
+    this.components.printer.resetPrinter();
+}
+
+/**
  * Helper function for loading in an assignment.
  */
-BlockPy.prototype.setAssignment = function(assignment, settings, programs) {
+BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
+    this.model.settings.server_connected(false);
+    this.resetSystem();
     // Settings
     this.model.settings['editor'](assignment.initial_view);
     this.model.settings['instructor'](settings.instructor);
@@ -413,6 +436,7 @@ BlockPy.prototype.setAssignment = function(assignment, settings, programs) {
     // Update Model
     // Reload blockly
     // Reload CodeMirror
+    this.model.settings.server_connected(true)
 }
 
 /**
