@@ -150,7 +150,7 @@ BlockPy.prototype.initModel = function(settings) {
             'instructor': ko.observable(settings.instructor),
             // Track the original value
             // boolean
-            'instructor_initial': ko.observable(settings.instructor_initial),
+            'instructor_initial': ko.observable(settings.instructor),
             // Internal for Refresh mechanism to fix broken logs
             // String
             'log_id': ko.observable(null),
@@ -450,7 +450,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     // Reload blockly
     // Reload CodeMirror
     this.model.settings.server_connected(true)
-    this.components.corgis.loadDatasets();
+    this.components.corgis.loadDatasets(true);
 }
 
 /**

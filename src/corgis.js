@@ -16,7 +16,7 @@ function BlockPyCorgis(main) {
     this.loadDatasets();
 }
 
-BlockPyCorgis.prototype.loadDatasets = function() {
+BlockPyCorgis.prototype.loadDatasets = function(silently) {
     // Load in each the datasets
     var corgis = this,
         model = this.main.model,
@@ -26,7 +26,7 @@ BlockPyCorgis.prototype.loadDatasets = function() {
     model.assignment.modules().forEach(function(name) {
         var post_prefix = name.substring(7).replace(/\s/g, '_').toLowerCase();
         if (!(name in BlockPyEditor.CATEGORY_MAP)) {
-            imports.push.apply(imports, corgis.importDataset(post_prefix, name));
+            imports.push.apply(imports, corgis.importDataset(post_prefix, name, silently));
         }
     });
     
@@ -55,7 +55,7 @@ BlockPyCorgis.prototype.loadDatasets = function() {
  * @param {String} name - The user-friendly version of the dataset name.
  * @returns {Array.<Deferred>} - Returns the async requests as deferred objects.
  */
-BlockPyCorgis.prototype.importDataset = function(slug, name) {
+BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
     var url_retrievals = [];
     if (this.main.model.server_is_connected('import_datasets')) {
         var root = this.main.model.constants.urls.import_datasets+'blockpy/'+slug+'/'+slug;
@@ -70,8 +70,15 @@ BlockPyCorgis.prototype.importDataset = function(slug, name) {
         var corgis = this;
         $.when(get_dataset, get_skulpt, get_blockly).done(function() {
             corgis.loadedDatasets.push(slug);
-            corgis.main.model.assignment.modules.push(name);
-            corgis.main.components.editor.addAvailableModule(name);
+            if (silently) {
+                corgis.main.model.settings.server_connected(false);
+                corgis.main.model.assignment.modules.push(name);
+                corgis.main.components.editor.addAvailableModule(name);
+                corgis.main.model.settings.server_connected(true);
+            } else {
+                corgis.main.model.assignment.modules.push(name);
+                corgis.main.components.editor.addAvailableModule(name);
+            }
             corgis.main.model.status.dataset_loading.pop();
         });
         url_retrievals.push(get_dataset, get_skulpt, get_blockly);

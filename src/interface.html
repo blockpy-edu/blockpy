@@ -188,8 +188,9 @@
                 <span class='glyphicon glyphicon-list-alt'></span> English
             </button>
             -->
-            <div class="btn-group blockpy-toolbar-filename-picker" data-toggle="buttons" 
-                 data-bind="visible: settings.instructor() & !assignment.upload()">
+            <div data-bind="visible: settings.instructor() & !assignment.upload()"
+                 style='clear:both'>
+            <div class="btn-group blockpy-toolbar-filename-picker" data-toggle="buttons">
                 <label class="btn btn-default btn-sm blockpy-set-filename" 
                        data-bind="css: {active: settings.filename() == '__main__'}"
                        data-filename="__main__">
@@ -210,6 +211,7 @@
                        data-filename="on_step">
                     <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_change
                 </label>
+            </div>
             </div>
         </div>
     </div>
