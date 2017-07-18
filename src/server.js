@@ -137,14 +137,16 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
                         } else {
                             server.setStatus('Ungraded', response.message);
                         }
-                        if (success) {
+                        if (success && callback) {
                             callback(data);
                         }
                     } else {
                         console.error(response);
                         server.setStatus('Error', response.message);
-                        callback(data);
-                        console.log(data, callback);
+                        if (callback) {
+                            callback(data);
+                            console.log(data, callback);
+                        }
                     }
                 })
              .fail(server.defaultFailure.bind(server));

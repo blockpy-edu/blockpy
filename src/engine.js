@@ -251,11 +251,13 @@ BlockPyEngine.prototype.verifyCode = function() {
     // Make sure it has code
     if (code.trim()) {
         report['verifier'] = {
-            'success': true
+            'success': true,
+            'code': code
         }
     } else {
         report['verifier'] = {
-            'success': false
+            'success': false,
+            'code': code
         }
     }
 }

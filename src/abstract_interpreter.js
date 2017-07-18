@@ -184,12 +184,12 @@ function otherBranch(branch) {
 }
 
 AbstractInterpreter.prototype.postProcess = function() {
-    //console.log("POST PORCESS", this.source)
     for (var name in this.variables) {
         if (!(name in this.BUILTINS)) {
             //console.log("STARTING", name, this.source)
             var trace = this.variables[name];
             this.variablesNonBuiltin[name] = trace.slice();
+            console.log(name, this.variablesNonBuiltin[name])
             if (name == "___") {
                 this.report["Unconnected blocks"].push({"position": trace[0].position})
             }
@@ -541,6 +541,11 @@ AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
         var name = Sk.ffi.remapToJs(arg.id);
         this.setVariable(name, {}, this.getLocation(node))
     }
+    this.generic_visit(node);
+}
+
+AbstractInterpreter.prototype.visit_ClassDef = function(node) {
+    this.setVariable(node.name.v, {"type": "Class"}, this.getLocation(node))
     this.generic_visit(node);
 }
 
