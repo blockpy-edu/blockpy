@@ -569,6 +569,11 @@ var $sk_mod_instructor = function(name) {
         return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
     });
 
+    mod.parse_program = new Sk.builtin.func(function() {
+        generateFlatTree(Sk.executionReports['verifier'].code);
+        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+    });
+
     /**@TODO: make this function affect the UI
      * Given a feedback string, records the corrective feedback string for later printing
      * @param {string} feedback - the piece of feedback to save
@@ -658,6 +663,8 @@ var $sk_mod_instructor = function(name) {
                 }else if(field instanceof Object && "_astname" in field){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
+                }else{//hope this is a basic type
+                    return Sk.ffi.remapToPy(field);
                 }
             }
             return Sk.ffi.remapToPy(null);

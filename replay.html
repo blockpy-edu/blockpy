@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Blockpy/Kennel/Silicon</title>
+    <title>BlockPy Replay</title>
     
     <link rel="stylesheet" href="libs/bootstrap.min.css">
     <link rel="stylesheet" href="libs/codemirror/codemirror.css">
@@ -32,9 +32,6 @@
     <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
     <script type="text/javascript" src="libs/summernote/summernote-ext-hint.js"></script>
     <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
-  
-    <!-- Datasets -->
-    <script type="text/javascript" src="libs/crime_data.js"></script>
     
     <!-- Blockly -->
     <script type="text/javascript" src="blockly/blockly_uncompressed.js"></script>
@@ -48,16 +45,27 @@
     <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
     <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
     
-    
     <!-- Source Code -->
+    <script type="text/javascript" src="src/utilities.js"></script>
     <script type="text/javascript" src="src/python_errors.js"></script>
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>
     <script type="text/javascript" src="src/python_to_blockly.js"></script>
     <script type="text/javascript" src="src/imported.js"></script>
-    <script type="text/javascript" src="src/custom_blocks.js"></script>
-    <script type="text/javascript" src="src/util.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/class.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comment.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comprehensions.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/dict.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/if.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/io.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/lists.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/sets.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/loops.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/parking.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/tuple.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/turtles.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/text.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
     <script type="text/javascript" src="src/printer.js"></script>
@@ -67,7 +75,6 @@
     <script type="text/javascript" src="src/corgis.js"></script>
     <script type="text/javascript" src="src/history.js"></script>
     <script type="text/javascript" src="src/presentation.js"></script>
-    <script type="text/javascript" src="src/property_explorer.js"></script>
     <script type="text/javascript" src="src/editor.js"></script>
     <script type="text/javascript" src="src/feedback.js"></script>
     <script type="text/javascript" src="src/toolbar.js"></script>
@@ -364,7 +371,7 @@
         });
     });
     </script>
-  
+
 </head>
 <body>
 <div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
