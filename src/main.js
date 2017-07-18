@@ -377,8 +377,10 @@ BlockPy.prototype.initModelMethods = function() {
  * the model.
  */
 BlockPy.prototype.resetSystem = function() {
-    this.components.feedback.clear();
-    this.components.printer.resetPrinter();
+    if (this.components) {
+        this.components.feedback.clear();
+        this.components.printer.resetPrinter();
+    }
 }
 
 /**
