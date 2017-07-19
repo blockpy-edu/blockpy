@@ -451,6 +451,8 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     // Update Model
     // Reload blockly
     // Reload CodeMirror
+    // Reload summernote
+    this.components.editor.reloadIntroduction();
     this.model.settings.server_connected(true)
     this.components.corgis.loadDatasets(true);
 }

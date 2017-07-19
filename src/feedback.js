@@ -344,7 +344,7 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     if (suppress === true) {
         // Suppress all types of analyzer errors
         return false;
-    } else if (report["Unconnected blocks"].length >= 1) {
+    } else if (!suppress['Unconnected blocks'] && report["Unconnected blocks"].length >= 1) {
         var variable = report['Unconnected blocks'][0];
         this.semanticError("Unconnected blocks", "It looks like you have unconnected blocks on line "+variable.position.line+". Before you run your program, you must make sure that all of your blocks are connected and that there are no unfilled holes.", variable.position.line)
         return true;

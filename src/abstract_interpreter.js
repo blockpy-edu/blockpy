@@ -63,7 +63,7 @@ AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'},
                                 'sum': {"type": "Num"},
                                 'round': {"type": "Num"},
                                 'range': {"type": "List", "subtype": {"type": "Num"} },
-                                'input': {"type": "String"},
+                                'input': {"type": "Str"},
                                 'xrange': {"type": "List", "subtype": {"type": "Num"} },
                                 'reversed': {"type": "List"},
                                 'len': {"type": "Num"},
@@ -189,7 +189,7 @@ AbstractInterpreter.prototype.postProcess = function() {
             //console.log("STARTING", name, this.source)
             var trace = this.variables[name];
             this.variablesNonBuiltin[name] = trace.slice();
-            console.log(name, this.variablesNonBuiltin[name])
+            //console.log(name, this.variablesNonBuiltin[name])
             if (name == "___") {
                 this.report["Unconnected blocks"].push({"position": trace[0].position})
             }

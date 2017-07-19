@@ -173,13 +173,19 @@ BlockPyEditor.prototype.initText = function() {
     this.codeMirror.setSize(null, "100%");
 };
 
+BlockPyEditor.prototype.reloadIntroduction = function() {
+    var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
+    var model = this.main.model;
+    introductionEditor.code(model.assignment.introduction());
+}
+
 /**
  * Initializes the Instructor tab, which has a number of buttons and menus for
  * manipulating assignments and the environment. One important job is to register the
  * SummerNote instance used for editing the Introduction of the assignment.
  */
 BlockPyEditor.prototype.initInstructor = function() {
-    var introductionEditor = this.instructorTag.find('.blockpy-presentation-body-editor');
+    var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
     var model = this.main.model;
     introductionEditor.summernote({
         codemirror: { // codemirror options
@@ -193,9 +199,9 @@ BlockPyEditor.prototype.initInstructor = function() {
             ['misc', ['codeview', 'help']]
         ]
     });
-    introductionEditor.code(model.assignment.introduction());
+    this.reloadIntroduction();
     
-    this.availableModules = this.instructorTag.find('.blockpy-available-modules');
+    this.availableModules = this.tag.find('.blockpy-available-modules');
     this.availableModules.multiSelect({ selectableOptgroup: true });
     
     

@@ -45,10 +45,10 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.components.server.logEvent('editor', 'blocks')
         main.model.settings.editor("Blocks");
     });
-    this.tag.find('.blockpy-mode-set-instructor').click(function() {
+    /*this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");
         main.components.server.logEvent('editor', 'instructor')
-    });
+    });*/
     this.tag.find('.blockpy-mode-set-split').click(function() {
         main.model.settings.editor("Split");
         main.components.server.logEvent('editor', 'split')
@@ -60,6 +60,14 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tag.find('.blockpy-toolbar-history').click(function() {
         main.components.history.openDialog();
         main.components.server.logEvent('editor', 'history')
+    });
+    var instructorDialog = this.main.model.constants.container.find('.blockpy-instructor-popup');
+    this.tag.find('.blockpy-toolbar-instructor').click(function() {
+        instructorDialog.modal({'backdrop': false}).modal('show');
+        instructorDialog.draggable({
+            'handle': '.modal-title'
+        });
+        main.components.server.logEvent('editor', 'instructor')
     });
     this.tag.find('.blockpy-toolbar-english').click(function() {
         main.components.english.openDialog();
