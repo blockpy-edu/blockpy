@@ -34,7 +34,7 @@ var $sk_mod_instructor = function(name) {
     mod.compliment = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("compliment", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        Sk.executionReports.instructor.compliments.push(Sk.ffi.remapToJS(message));
+        Sk.executionReports.instructor.compliments.push(Sk.ffi.remapToJs(message));
     });
     /**
      * Mark problem as completed
@@ -608,6 +608,21 @@ var $sk_mod_instructor = function(name) {
     });
 
     /**
+     * This function takes an AST node and if it's a name node, finds the type of the object
+     * @param {Skulpt AST node} node - the node to check
+    **/
+    function checkNameNodeType(node){
+        if((node instanceof Object) && ("_astname" in node) && node._astname == "Name"){
+            var analyzer = Sk.executionReports['analyzer'];
+            var typesList = analyzer.variables;
+            var name = Sk.ffi.remapToJs(node.id);
+            return Sk.ffi.remapToPy(typesList[name]["type"]);
+        }else{
+            return Ski.ffi.remapToPy(null);
+        }
+    }
+
+    /**
      * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
      * is called first
      * @property {number} self.id - the javascript id number of this object
@@ -619,8 +634,7 @@ var $sk_mod_instructor = function(name) {
         $loc.__init__ = new Sk.builtin.func(function(self, id) {
             self.id = Sk.ffi.remapToJs(id);//note that id is passed from PYTHON as a default type already
             self.type = flatTree[self.id]._astname;
-            Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
-            var thisNode = flatTree[self.id];
+            //Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
         });
         
         /**
@@ -632,6 +646,10 @@ var $sk_mod_instructor = function(name) {
         $loc.__getattr__ = new Sk.builtin.func(function(self, key) {
             var actualAstNode = flatTree[self.id];
             key = Sk.ffi.remapToJs(key);
+            if(key == "type"){
+                //if it's a name node, returns the data type, otherwise returns null
+                return checkNameNodeType(actualAstNode);
+            }
             if(key in actualAstNode){
                 var field = actualAstNode[key];
                 //@TODO: check for flag to see if chain assignments are allowed, otherwise return first item
