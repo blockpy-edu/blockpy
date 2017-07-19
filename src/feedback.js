@@ -309,18 +309,19 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             return 'analyzer';
         }
     }
+    // Instructor
+    if (!report['instructor'].success) {
+        this.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        console.error(report['instructor'].error);
+        return 'instructor';
+    }
+    
     // Student runtime errors
     if (!suppress['student']) {
         if (!report['student'].success) {
             this.printError(report['student'].error);
             return 'student';
         }
-    }
-    // Instructor
-    if (!report['instructor'].success) {
-        this.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-        console.error(report['instructor'].error);
-        return 'instructor';
     }
     if (report['instructor'].compliments) {
         this.compliment(report['instructor'].compliments);
