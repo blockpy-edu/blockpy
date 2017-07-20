@@ -118,7 +118,7 @@
             {
                 'introduction': "Welcome to BlockPy. Try running the code below.",
                 'name': "#1.2",
-                'give_feedback': 'suppress("analyzer", "Incompatible types")\nsuppress("student")\nAst()\nTypes()\nBehavior()\nTrace()\nIssues()\nast = parse_program()\nforLoops = ast.find_all("For")\nif len(forLoops) > 0:\n    add_comp_feedback("good job has loop")\nfor loop in forLoops:\n    iter_prop = loop.target\n    list_prop = loop.iter\n    if list_prop.type == "List":\n        add_comp_feedback("good job list is in right spot")\n    binOps = loop.find_all("BinOp")\n    if len(binOps) > 0:\n        add_comp_feedback("good job calculation")\n    for binOp in binOps:\n        if binOp.has(iter_prop):\n            add_interrupt_feedback("problem is counting not summation")\n        if binOp.has(list_prop):\n            add_interrupt_feedback("problem adding list")\n        if binOp.has(1):\n            add_comp_feedback("good job increment by 1")\npost_feedback()\n\nforLoops = ast.find_all("For")\nfor loop in forLoops:\n    assignments = loop.find_all("Assign")\n    for assignment in assignments:\n        right = assignment.value\n        left = assignment.targets\n        isUpdate = False\n        if right._astname == "BinOp":\n            if right.has(left):\n                isUpdate = True\n                add_comp_feedback("good job has update")\n\nif len(forLoops) > 1:\n    set_feedback("set_feedback too many loops")\npost_feedback()',
+                'give_feedback': 'ast = parse_program()\nforLoops = ast.find_all("For")\nif len(forLoops) > 0:\n    compliment("good job has loop")\nfor loop in forLoops:\n    iter_prop = loop.target\n    list_prop = loop.iter\n    binOps = loop.find_all("BinOp")\n    if iter_prop.data_type == "List":\n        correct("problem swapped slot","medium")\n    if len(binOps) > 0:\n        compliment("good job calculation")\n    for binOp in binOps:\n        if binOp.has(iter_prop):\n            correct("problem is counting not summation","low")\n        if binOp.has(1):\n            compliment("good job increment by 1")\n        if binOp.left.data_type == "List" or binOp.right.data_type == "List":\n            correct("problem adding list","high")\nforLoops = ast.find_all("For")\nfor loop in forLoops:\n    assignments = loop.find_all("Assign")\n    for assignment in assignments:\n        right = assignment.value\n        left = assignment.targets\n        is_update = False\n        if right.ast_name == "BinOp":\n            if right.has(left):\n                is_update = True\n                compliment("good job has update")\n        if def_use_error(left) and is_update:\n            correct("problem initializing accumulator","medium")\nif len(forLoops) > 1:\n    correct("problem too many loops","low")',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
@@ -130,7 +130,7 @@
             },
             // programs
             {
-                '__main__': 'list = [1,2,3,4] \ncount = 0 \nfor var in list: \n    count = count + list \nprint(count)'
+                '__main__': 'list = [1,2,3,4] \ncount = 0 \nfor list in var: \n    count = count + list \nprint(count)'
             }
         )
         
