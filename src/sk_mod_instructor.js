@@ -647,7 +647,7 @@ var $sk_mod_instructor = function(name) {
             var name = Sk.ffi.remapToJs(node.id);
             return Sk.ffi.remapToPy(typesList[name]["type"]);
         }else{
-            return Ski.ffi.remapToPy(null);
+            return Sk.ffi.remapToPy(null);
         }
     }
 
