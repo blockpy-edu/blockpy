@@ -34,31 +34,41 @@ var $sk_mod_instructor = function(name) {
     mod.compliment = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("compliment", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        if(!Sk.executionReports.instructor.compliments){
+            Sk.executionReports.instructor.compliments = [];
+        }
         Sk.executionReports.instructor.compliments.push(Sk.ffi.remapToJs(message));
     });
     /**
      * Mark problem as completed
      */
-    mod.complete = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("complete", arguments, 0, 0);
+    mod.set_success = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
         Sk.executionReports.instructor.complete = true;
         throw new Sk.builtin.GracefulExit();
     });
     /**
      * Let user know about an issue
      */
-    mod.complaint = new Sk.builtin.func(function(message, line) {
-        Sk.builtin.pyCheckArgs("compliment", arguments, 1, 2);
+    mod.correct = new Sk.builtin.func(function(message, priority, line) {
+        Sk.builtin.pyCheckArgs("correct", arguments, 1, 3);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        if(priority != undefined){
+            Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(priority));
+        }
         if (line !== undefined) {
             Sk.builtin.pyCheckType("line", "integer", Sk.builtin.checkInt(line));
         }
-        Sk.executionReports.instructor.complaint = {
+        if(!Sk.executionReports.instructor.complaint){
+            Sk.executionReports.instructor.complaint = [];
+        }
+        var newComplaint = {
             'name': 'Instructor Feedback',
             'message': Sk.ffi.remapToJs(message),
+            'priority': Sk.ffi.remapToJs(priority),
             'line': line
         }
-        throw new Sk.builtin.GracefulExit();
+        Sk.executionReports.instructor.complaint.push(newComplaint);
     });
     
     /**
@@ -607,6 +617,25 @@ var $sk_mod_instructor = function(name) {
         console.log("" + jsPureFeedback);
     });
 
+    mod.def_use_error = new Sk.builtin.func(function(py_node) {
+       var id = py_node.id;
+       var node = flatTree[id];
+       if((node instanceof Object) && ("_astname" in node) && node._astname == "Name"){
+            var undefVars = Sk.executionReports['analyzer'].issues["Undefined variables"];
+            var hasError = false;
+            var name = Sk.ffi.remapToJs(node.id);
+            for(var i = 0; i < undefVars.length; i += 1){
+                if(undefVars[i].name == name){
+                    hasError = true;
+                    break;
+                }
+            }
+            return Sk.ffi.remapToPy(hasError);
+        }else{
+            return Ski.ffi.remapToPy(false);
+        }
+    });
+
     /**
      * This function takes an AST node and if it's a name node, finds the type of the object
      * @param {Skulpt AST node} node - the node to check
@@ -636,6 +665,10 @@ var $sk_mod_instructor = function(name) {
             self.type = flatTree[self.id]._astname;
             //Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
         });
+
+        $loc.__eq__ = new Sk.builtin.func(function(self, other){
+            return Sk.ffi.remapToPy(self.id == other.id);
+        });
         
         /**
          * This function dynamically looks to see if the ast node has a given property and does
@@ -646,9 +679,12 @@ var $sk_mod_instructor = function(name) {
         $loc.__getattr__ = new Sk.builtin.func(function(self, key) {
             var actualAstNode = flatTree[self.id];
             key = Sk.ffi.remapToJs(key);
-            if(key == "type"){
+            if(key == "data_type"){
                 //if it's a name node, returns the data type, otherwise returns null
                 return checkNameNodeType(actualAstNode);
+            }
+            if(key == "ast_name"){
+                key = "_astname";
             }
             if(key in actualAstNode){
                 var field = actualAstNode[key];
