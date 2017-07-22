@@ -299,6 +299,50 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         this.editorError(parserReport, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ parserReport.args.v[2]+codeLine, parserReport.args.v[2]);
         return 'parser';
     }
+    // Instructor
+    if (!report['instructor'].success) {
+        this.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        console.error(report['instructor'].error);
+        return 'instructor';
+    }
+    if (report['instructor'].compliments) {
+        //this.compliment(report['instructor'].compliments);
+        console.log(report['instructor'].compliments);
+    }
+    var complaint = report['instructor'].complaint;
+    var priorityNumConvert = function(priority){
+        switch(priority){
+            case 'low':
+                priority = 1;
+                break;
+            case 'medium':
+                priority = 2;
+                break;
+            case 'high':
+                priority = 3;
+                break;
+            default:
+                priority = 2;
+                break;
+        }
+        return priority;
+    };
+    if (complaint) {
+        complaint.sort(function(a, b){
+            var priorityA = priorityNumConvert(a.priority);
+            var priorityB = priorityNumConvert(b.priority);
+            if(priorityA > priorityB){
+                return -1;
+            }else if(priorityB > priorityA){
+                return 1;
+            }else{
+                return 0;
+            }
+        });
+        console.log(complaint);
+        this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);
+        return 'instructor';
+    }
     // Analyzer
     if (suppress['analyzer'] !== true) {//if a subtype is specified, or no suppression requested, present feedback
         if (!report['analyzer'].success) {
@@ -316,20 +360,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             return 'student';
         }
     }
-    // Instructor
-    if (!report['instructor'].success) {
-        this.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-        console.error(report['instructor'].error);
-        return 'instructor';
-    }
-    if (report['instructor'].compliments) {
-        this.compliment(report['instructor'].compliments);
-    }
-    var complaint = report['instructor'].complaint;
-    if (complaint) {
-        this.instructorFeedback(complaint.name, complaint.message, complaint.line);
-        return 'instructor';
-    }
+    //instructor completion flag
     if (report['instructor'].complete) {
         this.complete();
         return 'success';
