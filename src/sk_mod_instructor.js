@@ -53,19 +53,24 @@ var $sk_mod_instructor = function(name) {
     mod.correct = new Sk.builtin.func(function(message, priority, line) {
         Sk.builtin.pyCheckArgs("correct", arguments, 1, 3);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        if(priority != undefined){
+        if (priority != undefined){
             Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(priority));
+            priority = Sk.ffi.remapToJs(priority);
+        } else {
+            priority = 'medium';
         }
         if (line !== undefined) {
             Sk.builtin.pyCheckType("line", "integer", Sk.builtin.checkInt(line));
+        } else {
+            line = null;
         }
-        if(!Sk.executionReports.instructor.complaint){
+        if (!Sk.executionReports.instructor.complaint){
             Sk.executionReports.instructor.complaint = [];
         }
         var newComplaint = {
             'name': 'Instructor Feedback',
             'message': Sk.ffi.remapToJs(message),
-            'priority': Sk.ffi.remapToJs(priority),
+            'priority': priority,
             'line': line
         }
         Sk.executionReports.instructor.complaint.push(newComplaint);
@@ -229,19 +234,6 @@ var $sk_mod_instructor = function(name) {
         Sk.builtin.pyCheckArgs("set_feedback", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
         throw new Sk.builtin.Feedback(message.v);
-    });
-    
-    /**
-     * A Skulpt function that throws a Success exception. This will terminate the
-     * feedback analysis, but reports that the students' code was successful.
-     * This function call is done for aesthetic reasons, so that we are calling a
-     * function instead of raising an error. Still, exceptions allow us to break
-     * out of the control flow immediately, like a return would, so they are a
-     * good mechanism to use under the hood.
-     */
-    mod.set_success = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("set_success", arguments, 0, 0);
-        throw new Sk.builtin.Success();
     });
     
     /**
