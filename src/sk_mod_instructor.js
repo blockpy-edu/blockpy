@@ -62,7 +62,8 @@ var $sk_mod_instructor = function(name) {
     });
     
     /**
-     * Prevent a certain kind of error from percolating.
+     * Prevent a certain kind of error from percolating where type is the phase that's being suppressed and
+     * subtype is a specific error in the report of that phase.
      */
     mod.suppress = new Sk.builtin.func(function(type, subtype) {
         Sk.builtin.pyCheckArgs("suppress", arguments, 1, 2);
@@ -72,10 +73,11 @@ var $sk_mod_instructor = function(name) {
             Sk.builtin.pyCheckType("subtype", "string", Sk.builtin.checkString(subtype));
             subtype = Sk.ffi.remapToJs(subtype);
             if (Sk.feedbackSuppressions[type] === false) {
-                Sk.feedbackSuppressions[type] = {subtype: true};
+                Sk.feedbackSuppressions[type] = {};
+                Sk.feedbackSuppressions[type][subtype] = true;
             } else if (Sk.feedbackSuppressions[type] !== false) {
                 Sk.feedbackSuppressions[type][subtype] = true;
-            }
+            }//@Austin Cory Bart @TODO: does this need a base case e.g. if Sk.feedbackSuppressions[type] === true, you set a boolean's field?
         } else {
             Sk.feedbackSuppressions[type] = true;
         }
@@ -350,6 +352,7 @@ var $sk_mod_instructor = function(name) {
             return Sk.builtin.none.none$;
         }
     });
+
     mod.get_value_by_type = new Sk.builtin.func(function(type) {
         Sk.builtin.pyCheckArgs("get_value_by_type", arguments, 1, 1);
         
@@ -369,6 +372,7 @@ var $sk_mod_instructor = function(name) {
         blob = blob.v;
         return Sk.ffi.remapToPy(JSON.parse(blob));
     });
+
     mod.get_property = new Sk.builtin.func(function(name) {
         Sk.builtin.pyCheckArgs("get_property", arguments, 1, 1);
         Sk.builtin.pyCheckType("name", "string", Sk.builtin.checkString(name));
@@ -465,21 +469,22 @@ var $sk_mod_instructor = function(name) {
     //variable used for accumulating complementary feedback AS A LIST OF PYTHON OBJECTS
     var accCompFeedback = [];
     /**
-     * Given source code as a string, generate a flatTree and store it in the local variable.
+     * Generates a flat ast tree and store it in the local variable.
      * This function is meant to be used to avoid extra coding by recreating every AST node type
      *
-     * @param {String} source - Python source code.
-     */
-    function generateFlatTree(source){
-        if (!(source in parses)) {
-            var parse = Sk.parse("__main__", source);
-            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
-        }
+     **/
+    function generateFlatTree(){
+        var parser = Sk.executionReports['parser'];
         //Tree's already been built, don't do anything else
         if(flatTree.length > 0){
             return;
         }
-        var ast = parses[source];
+        var ast;
+        if (parser.success) {
+            ast = parser.ast;
+        } else {
+            return;
+        }
         var visitor = new NodeVisitor();
         visitor.visit = function(node){
             flatTree.push(node);
@@ -494,7 +499,11 @@ var $sk_mod_instructor = function(name) {
         }
         visitor.visit(ast);
     }
-
+    /**
+     * This function checks if the given object is one of the Sk.builtin objects
+     * @param {object} obj - the object to be examined
+     * @return {boolean} true if the object is one of the Sk.builtin types
+    **/
     function isSkBuiltin(obj){
         return (obj instanceof Sk.builtin.dict) ||
             (obj instanceof Sk.builtin.list) ||
@@ -516,11 +525,15 @@ var $sk_mod_instructor = function(name) {
         var kvs;
         var i;
         var arr;
+        //@TODO: should theoretically check if the object is a pyhon dict or array with js objects
         if(isSkBuiltin(obj)){
+            //object is already python ready
             return obj;
         }else if (Object.prototype.toString.call(obj) === "[object Array]") {
+            //object is actually a javascript array
             arr = [];
             for (i = 0; i < obj.length; ++i) {
+                //for each object, convert it to a python object if it isn't one already
                 var subval = obj[i];
                 if(!isSkBuiltin(subval)){
                     arr.push(Sk.ffi.mixedRemapToPy(subval));
@@ -529,19 +542,19 @@ var $sk_mod_instructor = function(name) {
                 }
             }
             return new Sk.builtin.list(arr);
-        } else if (obj === null) {
+        } else if (obj === null) {//null object
             return Sk.builtin.none.none$;
         } else if (typeof obj === "object") {
             if(!isSkBuiltin(obj)){
-                kvs = [];
+                //assuming it's a standard dictionary
+                kvs = [];//Sk.builtin.dict uses an array of key-value,key-value...
                 for (k in obj) {
-                    if(!isSkBuiltin(k)){
-                        kvs.push(Sk.ffi.mixedRemapToPy(k));
-                    }else{
-                        kvs.push(k);
-                    }
+                    //convert the key if it needs to be converted
+                    kvs.push(Sk.ffi.mixedRemapToPy(k));
+                    //covert corresponding value if it needs to be converted
                     kvs.push(Sk.ffi.mixedRemapToPy(obj[k]));
                 }
+                //create the new dictionary
                 return new Sk.builtin.dict(kvs);
             }else{
                 return obj;
@@ -556,19 +569,8 @@ var $sk_mod_instructor = function(name) {
     }
 
     /**
-     * Given source code as a string, generates the mock AST nodes the instructor will be using
-     * note that this function doesn't return anything.
-     * @param {String} source - Python source code.
-     * @param {mod.AstNode} - returns the python version of the root node
+     * This function is called by instructors to construct the python version of the AST
     **/
-    mod.parse_program = new Sk.builtin.func(function(source) {
-        Sk.builtin.pyCheckArgs("parse_program", arguments, 1, 1);
-        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
-        source = source.v;
-        generateFlatTree(source);
-        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
-    });
-
     mod.parse_program = new Sk.builtin.func(function() {
         generateFlatTree(Sk.executionReports['verifier'].code);
         return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
@@ -583,6 +585,7 @@ var $sk_mod_instructor = function(name) {
         Sk.builtin.pyCheckType("feedback", "string", Sk.builtin.checkString(feedback));
         accInterruptFeedback.push(feedback);
     });
+
     /**@TODO: make this function affect the UI
      * Given a feedback string, records the complementary feedback string for later printing
      * @param {string} feedback - the piece of feedback to save
@@ -627,7 +630,6 @@ var $sk_mod_instructor = function(name) {
          * @param {string} key - the property the user is trying to look up
         **/
         $loc.__getattr__ = new Sk.builtin.func(function(self, key) {
-            console.log("getattr");
             var actualAstNode = flatTree[self.id];
             key = Sk.ffi.remapToJs(key);
             if(key in actualAstNode){
@@ -637,7 +639,6 @@ var $sk_mod_instructor = function(name) {
                     var childId = flatTree.indexOf(field[0]);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
                 }else if(field.constructor === Array){
-                    console.log("array handling");
                     var astNodeCount = 0
                     var fieldArray = [];
                     //this will likely always be a mixed array
@@ -646,19 +647,16 @@ var $sk_mod_instructor = function(name) {
                         //if AST node, use callism and push new object
                         if(subfield instanceof Object && "_astname" in subfield){//an AST node)
                             var childId = flatTree.indexOf(subfield);//get the relevant node
-                            console.log(childId);
                             fieldArray.push(Sk.misceval.callsimOrSuspend(mod.AstNode, childId));
                         }else{//else smart remap
-                            console.log(subfield);
                             var tranSubfield = mixedRemapToPy(subfield);
                             if(tranSubfield != undefined){
-                                console.log(tranSubfield);
                                 fieldArray.push(tranSubfield);
                             }
                         }
                     }
                     return new Sk.builtin.list(fieldArray);
-                }else if('v' in field){//probably already a python object
+                }else if(field instanceof Object && 'v' in field){//probably already a python object
                     return field;
                 }else if(field instanceof Object && "_astname" in field){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
