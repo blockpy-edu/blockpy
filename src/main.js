@@ -177,7 +177,7 @@ BlockPy.prototype.initModel = function(settings) {
             // boolean
             'mute_printer': ko.observable(false),
             // function
-            'completedCallback': undefined,
+            'completedCallback': settings.completedCallback,
             // boolean
             'server_connected': ko.observable(true)
         },
@@ -195,6 +195,7 @@ BlockPy.prototype.initModel = function(settings) {
             'parsons': ko.observable(false),
             'upload': ko.observable(false),
             'importable': ko.observable(false),
+            'has_files': ko.observable(false),
             'disable_algorithm_errors': ko.observable(false)
         },
         // Programs' actual code
@@ -342,6 +343,7 @@ BlockPy.prototype.initModelMethods = function() {
     this.model.moveTraceLast = function(index) { 
         execution.trace_step(execution.last_step()); };
     this.model.current_trace = ko.pureComputed(function() {
+        console.log(execution.trace(), execution.trace().length-1, execution.trace_step())
         return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
     });
     
@@ -417,7 +419,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.settings['disable_variable_types'](settings.disable_variable_types);
     this.model.settings['disable_timeout'](settings.disable_timeout);
     this.model.settings['developer'](settings.developer);
-    this.model.settings['completedCallback'] = settings.completedCallback;
+    if (settings.completedCallback) {
+        this.model.settings['completedCallback'] = settings.completedCallback;
+    }
     // Assignment
     if (assignment.modules) {
         var new_modules = expandArray(this.model.assignment['modules'](), 
@@ -434,6 +438,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.assignment['introduction'](assignment.introduction);
     if (assignment.initial_view) {
         this.model.assignment['initial_view'](assignment.initial_view);
+    }
+    if (assignment.has_files) {
+        this.model.assignment['has_files'](assignment.has_files);
     }
     this.model.assignment['parsons'](assignment.parsons);
     this.model.assignment['upload'](assignment.initial_view == 'Upload');

@@ -27,6 +27,7 @@
     <script type="text/javascript" src="libs/codemirror/htmlmixed.js"></script>
     <script type="text/javascript" src="libs/codemirror/xml.js"></script>
     <script type="text/javascript" src="libs/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="libs/stringify.js"></script>
     
     <!-- Summernote, a rich text editor -->
     <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
@@ -50,6 +51,7 @@
     <script type="text/javascript" src="src/python_errors.js"></script>
     <script type="text/javascript" src="src/ast_node_visitor.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_definitions.js"></script>
     <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>
     <script type="text/javascript" src="src/python_to_blockly.js"></script>
     <script type="text/javascript" src="src/imported.js"></script>
@@ -123,7 +125,7 @@
             {
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
-                'give_feedback': 'Ast()\nTypes()\nBehavior()\nTrace()\nIssues()\ncomplaint("Your code is awful.")',
+                'give_feedback': 'set_success()',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
@@ -135,7 +137,7 @@
             },
             // programs
             {
-                '__main__': 'class A():\n    pass\na = A()',
+                '__main__': 'ss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
             }
         )
         
