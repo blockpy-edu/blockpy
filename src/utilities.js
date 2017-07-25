@@ -1,4 +1,14 @@
 /**
+ * Determines if the element is in the list.
+ * @param {anything} needle - The element to look for.
+ * @param {Array} haystack - The list to search.
+ * @return {Boolean} Whether the element exists
+ */
+function arrayContains(needle, haystack) {
+    return haystack.indexOf(needle) > -1;
+}
+
+/**
  * Remove duplicate values from an array, preserving order.
  * Creates a new array, so is non-destructive.
  * Courtesy:

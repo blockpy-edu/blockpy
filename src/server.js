@@ -143,9 +143,8 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
                     } else {
                         console.error(response);
                         server.setStatus('Error', response.message);
-                        if (callback) {
+                        if (success && callback) {
                             callback(data);
-                            console.log(data, callback);
                         }
                     }
                 })

@@ -1,7 +1,3 @@
-function arrayContains(needle, haystack) {
-    return haystack.indexOf(needle) > -1;
-}
-
 function AbstractInterpreter(code, filename) {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
 }
@@ -57,58 +53,6 @@ AbstractInterpreter.prototype.processAst = function(ast) {
     
     //console.log(this.variables)
     this.postProcess();
-}
-
-AbstractInterpreter.prototype.BUILTINS = {'print': {"type": 'None'}, 
-                                'sum': {"type": "Num"},
-                                'round': {"type": "Num"},
-                                'range': {"type": "List", "subtype": {"type": "Num"} },
-                                'input': {"type": "Str"},
-                                'xrange': {"type": "List", "subtype": {"type": "Num"} },
-                                'reversed': {"type": "List"},
-                                'len': {"type": "Num"},
-                                'type': {"type": "Any"},
-                                'dir': {"type": "List"},
-                                'True': {"type": "Bool"}, 
-                                'False': {"type": "Bool"}, 
-                                'None': {"type": 'None'}}
-AbstractInterpreter.MODULES = {
-    'weather': {
-        'get_temperature': {"type": 'Num'},
-        'get_forecasts': {"type": "List", "empty": false, "component": {"type": 'Num'}},
-        'get_report': {"type": "Dict", "all_strings": true,
-                       "keys": {"temperature": {"type": 'Num'}, 
-                                "humidity": {"type": "Num"},
-                       "wind": {"type": "Num"}}},
-        'get_forecasted_reports': [{"temperature": 'Num', "humidity": "Num", "wind": "Num"}],
-        'get_all_forecasted_temperatures': [{'city': 'str', 'forecasts': ['int']}],
-        'get_highs_lows': {'highs': ['Num'], 'lows': ['Num']}
-    },
-    'image': {
-        
-    },
-    'stocks': {
-        'get_current': 'float',
-        'get_past': ['float'],
-    },
-    'earthquakes': {
-        'get': ['float'],
-        'get_both': [{'magnitude': 'float', 'depth': 'float'}],
-        'get_all': [{'magnitude': 'float', 'distance': 'float', 'gap': 'int', 
-                        'id': 'str', 'significance': 'int', 'time': 'int',
-                        'location': {'depth': 'float', 'latitude': 'float', 'longitude': 'float',
-                                     'location_description': 'str'}}]
-    },
-    'crime': {
-        'get_property_crimes': ['float'],
-        'get_violent_crimes': ['float'],
-        'get_both_crimes': ['float'],
-        'get_by_year': [{'state': 'str', 'violent': 'float', 'property': 'float', 'population': 'int'}],
-        'get_all': {}
-    },
-    'books': {
-        'get_all': [{'title': 'str', 'author': 'str', 'price': 'float', 'paperback': 'bool', 'page count': 'int'}]
-    }
 }
 
 AbstractInterpreter.prototype.newReport = function(parentFrame) {
@@ -352,9 +296,10 @@ AbstractInterpreter.prototype.isTypeEmptyList = function(name) {
     var type = this.getType(name);
     return (type !== null && type.type === "List") && (type.empty);
 }
-AbstractInterpreter.prototype.isTypeList = function(name) {
+AbstractInterpreter.prototype.isTypeSequence = function(name) {
     var type = this.getType(name);
-    return (type !== null && type.type === "List");
+    return (type !== null && 
+            arrayContains(type.type, this.TYPE_INHERITANCE['Sequence']));
 }
 
 AbstractInterpreter.prototype.visit = function(node) {
@@ -436,7 +381,7 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
         if (attribute.id.v in AbstractInterpreter.MODULES) {
             return AbstractInterpreter.MODULES[attribute.id.v];
         } else if (attribute.id.v in this.BUILTINS) {
-            return this.BUILTINS[attribute.id.v];
+            return this.BUILTINS[attribute.id.v].returns;
         } else {
             this.report["Unknown functions"].push({"name": attribute.attr, "position": this.getLocation(attribute)});
             return null;
@@ -581,6 +526,14 @@ AbstractInterpreter.prototype.visit_If = function(node) {
     this.currentBranchName = cbName;
 }
 
+AbstractInterpreter.prototype.unpackSequence = function(type) {
+    if (type.type == "List" && !type.empty) {
+        return type.subtype;
+    } else if (type.type == "Str") {
+        return {"type": "Str"};
+    }
+}
+
 AbstractInterpreter.prototype.visit_For = function(node) {
     this.loopStackId += 1;
     // Handle the iteration list
@@ -593,7 +546,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
             if (this.isTypeEmptyList(child.id.v)) {
                 this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
             }
-            if (!(this.isTypeList(child.id.v))) {
+            if (!(this.isTypeSequence(child.id.v))) {
                 this.report["Non-list iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
             }
             this.iterateVariable(child.id.v, this.getLocation(node));
@@ -605,8 +558,8 @@ AbstractInterpreter.prototype.visit_For = function(node) {
     }
     var iterType = this.typecheck(node.iter),
         iterSubtype = null;
-    if (iterType !== null && iterType.type == "List" && !iterType.empty) {
-        iterSubtype = iterType.subtype;
+    if (iterType !== null) {
+        iterSubtype = this.unpackSequence(iterType);
     }
     
     // Handle the iteration variable

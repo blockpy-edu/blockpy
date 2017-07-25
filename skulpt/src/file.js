@@ -26,7 +26,12 @@ Sk.builtin.file = function (name, mode, buffering) {
     } else {
         if (Sk.inBrowser) {  // todo:  Maybe provide a replaceable function for non-import files
             this.fileno = 10;
-            elem = document.getElementById(name.v);
+            var filename = "";
+            if (Sk.openFilenamePrefix) {
+                filename = Sk.openFilenamePrefix;
+            }
+            filename += name.v;
+            elem = document.getElementById(filename);
             if (elem == null) {
                 throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name.v + "'");
             } else {
@@ -64,7 +69,7 @@ Sk.builtin.file.prototype["$r"] = function () {
         "file '" +
         this.name +
         "', mode '" +
-        this.mode +
+        Sk.ffi.remapToJs(this.mode) +
         "'>");
 };
 

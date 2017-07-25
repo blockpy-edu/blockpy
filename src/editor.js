@@ -649,7 +649,9 @@ BlockPyEditor.prototype.highlightError = function(line) {
         this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
         this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
     }
-    this.codeMirror.addLineClass(line, 'text', 'editor-error-line');
+    if (line < this.codeMirror.lineCount()) {
+        this.codeMirror.addLineClass(line, 'text', 'editor-error-line');
+    }
     this.refreshBlockHighlight(line);
     this.previousLine = line;
 }
@@ -718,8 +720,10 @@ BlockPyEditor.prototype.unhighlightBlock = function() {
  */
 BlockPyEditor.prototype.unhighlightLines = function() {
     if (this.previousLine !== null) {
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        if (this.previousLine < this.codeMirror.lineCount()) {
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        }
     }
     this.previousLine = null;
 }

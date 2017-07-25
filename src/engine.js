@@ -42,6 +42,8 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     // Create an input box
     Sk.inputfunTakesPrompt = true;
     Sk.inputfun = this.inputFunction.bind(this);
+    // Allow file access
+    Sk.openFilenamePrefix = "sk-filename-";
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
@@ -188,6 +190,7 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     var engine = this;
+    var model = this.main.model;
     engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
@@ -196,11 +199,11 @@ BlockPyEngine.prototype.on_run = function() {
         engine.runInstructorCode('give_feedback', function() {
             var result = engine.main.components.feedback.presentFeedback();
             if (result == 'success' || result == 'no errors') {
-                engine.main.components.server.markSuccess(1.0);
+                engine.main.components.server.markSuccess(1.0, model.settings.completedCallback);
             } else {
-                engine.main.components.server.markSuccess(0.0);
+                engine.main.components.server.markSuccess(0.0, model.settings.completedCallback);
             }
-            engine.main.model.execution.status("complete");
+            model.execution.status("complete");
         });
     });
 }
@@ -318,6 +321,7 @@ BlockPyEngine.prototype.analyzeParse = function() {
         'behavior': this.abstractInterpreter.variablesNonBuiltin,
         'issues': this.abstractInterpreter.report
     }
+    console.log(report.analyzer)
     return true;
 }
 
