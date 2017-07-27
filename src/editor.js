@@ -48,6 +48,11 @@ function BlockPyEditor(main, tag) {
     this.initBlockly();
     this.initInstructor();
     
+    this.main.model.program.subscribe(function() {
+        editor.updateBlocksFromModel();
+        editor.updateTextFromModel();
+    });
+    
     var editor = this;
     
     // Handle mode switching
@@ -84,9 +89,8 @@ BlockPyEditor.prototype.initBlockly = function() {
         //editor.main.components.feedback.clearEditorErrors();
         editor.blockly.highlightBlock(null);
         editor.updateBlocks();
-        //editor.updateBlocks();
     });
-    this.main.model.program.subscribe(function() {editor.updateBlocksFromModel()});
+    
     this.main.model.settings.filename.subscribe(function() {
         /*if (editor.main.model.settings.editor() == "Blocks") {
             editor.updateBlocksFromModel()
@@ -168,7 +172,7 @@ BlockPyEditor.prototype.initText = function() {
         //editor.main.components.feedback.clearEditorErrors();
         editor.updateText()
     });
-    this.main.model.program.subscribe(function() {editor.updateTextFromModel()});
+
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
 };
