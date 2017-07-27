@@ -127,3 +127,4 @@ Blockly.WorkspaceSvg.prototype.shuffle = function() {
         y = y + randomInteger(5, maximal_increase);
     }
 }
+
