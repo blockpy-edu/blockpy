@@ -67,7 +67,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
 }
 BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
-    Sk.execLimit = null;
+    Sk.execLimit = undefined;
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = null;
     // Create the instructor module
