@@ -98,6 +98,15 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
+    /**
+     * Give complimentary feedback to the user
+     */
+    mod.log = new Sk.builtin.func(function(message) {
+        Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
+        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        console.log(Sk.ffi.remapToJs(message));
+    });
+    
     // get_ast()
     // get_trace()
     // get_types()
@@ -162,6 +171,19 @@ var $sk_mod_instructor = function(name) {
             console.log("AI Issues", self.issues);
         });
     }, 'Issues', []);
+    
+    // Provides `student` as an object with all the data that the student declared.
+    mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            var module = Sk.executionReports['student'].module.$d;
+            for (var key in module) {
+                if (module.hasOwnProperty(key)) {
+                    Sk.abstr.sattr(self, key, module[key], true);
+                }
+            }
+        });
+    }, 'StudentData', []);
+    mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);
     
     //---- Everything below this line is old stuff
     
