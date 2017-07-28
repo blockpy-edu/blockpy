@@ -350,7 +350,8 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
             report['student'] = {
                 'success': true,
                 'trace': engine.executionBuffer.trace,
-                'module': module
+                'module': module,
+                'output': engine.main.model.execution.output()
             }
             after();
             engine.executionEnd_();
