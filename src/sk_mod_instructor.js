@@ -99,7 +99,7 @@ var $sk_mod_instructor = function(name) {
     });
     
     /**
-     * Give complimentary feedback to the user
+     * Logs feedback to javascript console
      */
     mod.log = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
@@ -593,6 +593,8 @@ var $sk_mod_instructor = function(name) {
             return Sk.builtin.assk$(obj);
         } else if (typeof obj === "boolean") {
             return new Sk.builtin.bool(obj);
+        } else if(typeof obj === "function") {
+            return new Sk.builtin.str(obj.toString());
         }
     }
 
@@ -604,7 +606,7 @@ var $sk_mod_instructor = function(name) {
         return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
     });
 
-    /**@TODO: make this function affect the UI
+    /**
      * Given a feedback string, records the corrective feedback string for later printing
      * @param {string} feedback - the piece of feedback to save
     **/
@@ -614,7 +616,7 @@ var $sk_mod_instructor = function(name) {
         accInterruptFeedback.push(feedback);
     });
 
-    /**@TODO: make this function affect the UI
+    /**
      * Given a feedback string, records the complementary feedback string for later printing
      * @param {string} feedback - the piece of feedback to save
     **/
@@ -732,12 +734,26 @@ var $sk_mod_instructor = function(name) {
                         }
                     }
                     return new Sk.builtin.list(fieldArray);
-                }else if(field instanceof Object && 'v' in field){//probably already a python object
+                }else if(field instanceof Object && ('v' in field || 
+                        'n' in field || 's' in field)){//probably already a python object
                     return field;
                 }else if(field instanceof Object && "_astname" in field){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
-                }else{//hope this is a basic type
+                }else{
+                    switch(key){//looking for a function
+                        case "ctx"://a load or store
+                        case "ops"://an operator
+                        case "op"://an operator
+                            //the above 3 cases are functions, extract the function name
+                            console.log("hitting switch: " + field);
+                            field = field.toString();
+                            field = field.substring(("function").length + 1, field.length - 4);
+                            return Sk.ffi.remapToPy(field);
+                        default:
+                            break;
+                    }
+                    //hope this is a basic type
                     return Sk.ffi.remapToPy(field);
                 }
             }
