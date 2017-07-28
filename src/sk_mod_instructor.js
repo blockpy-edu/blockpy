@@ -177,7 +177,7 @@ var $sk_mod_instructor = function(name) {
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
             var module = Sk.executionReports['student'].module;
-            if (module.$d !== undefined) {
+            if (module !== undefined) {
                 module = module.$d;
                 for (var key in module) {
                     if (module.hasOwnProperty(key)) {

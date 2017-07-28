@@ -1,4 +1,5 @@
-import json
-
-print(json.encode(5))
-print(json.decode(5))
+list = [1,2,3,4] 
+count = 0 
+for list in var: 
+    count = count + list 
+print(count)
