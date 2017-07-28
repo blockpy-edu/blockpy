@@ -172,6 +172,7 @@ var $sk_mod_instructor = function(name) {
         });
     }, 'Issues', []);
     
+    /*
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
@@ -183,7 +184,7 @@ var $sk_mod_instructor = function(name) {
             }
         });
     }, 'StudentData', []);
-    mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);
+    mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);*/
     
     //---- Everything below this line is old stuff
     
@@ -605,7 +606,7 @@ var $sk_mod_instructor = function(name) {
      * @param {string} feedback - the piece of feedback to save
     **/
     mod.add_interrupt_feedback = new Sk.builtin.func(function(feedback) {
-        Sk.builtin.pyCheckArgs("add_iterupt_feedback", arguments, 1, 1);
+        Sk.builtin.pyCheckArgs("add_interupt_feedback", arguments, 1, 1);
         Sk.builtin.pyCheckType("feedback", "string", Sk.builtin.checkString(feedback));
         accInterruptFeedback.push(feedback);
     });
@@ -659,7 +660,11 @@ var $sk_mod_instructor = function(name) {
             var analyzer = Sk.executionReports['analyzer'];
             var typesList = analyzer.variables;
             var name = Sk.ffi.remapToJs(node.id);
-            return Sk.ffi.remapToPy(typesList[name]["type"]);
+            if (typesList[name] === undefined) {
+                return Sk.ffi.remapToPy(null);
+            } else {
+                return Sk.ffi.remapToPy(typesList[name]["type"]);
+            }
         }else{
             return Sk.ffi.remapToPy(null);
         }

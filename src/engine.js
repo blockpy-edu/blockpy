@@ -20,6 +20,7 @@ function BlockPyEngine(main) {
 }
 
 BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE_ITERATION = 'from instructor import *\ndef test_for_counting_problem():\n    if ast.has("For"):\n        set_success()';
 
 /**
  * Initializes the Python Execution engine and the Printer (console).
@@ -72,6 +73,7 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     Sk.afterSingleExecution = null;
     // Create the instructor module
     Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
+    Sk.builtinFiles['files']['src/lib/instructor_iteration.py'] = this.INSTRUCTOR_MODULE_CODE_ITERATION;
     // Mute everything
     Sk.skip_drawing = true;
     this.main.model.settings.mute_printer(true);
