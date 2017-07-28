@@ -61,6 +61,14 @@ AbstractInterpreter.prototype.BUILTINS = {
     'type': {"type": "Any"},
     'dir': {"type": "List"}
 };
+AbstractInterpreter.METHODS = {
+    "List": {
+        "append": {
+            "type": "Function",
+            "returns": {"type": "None"}
+        }
+    }
+}
 AbstractInterpreter.MODULES = {
     'weather': {
         'get_temperature': {"type": 'Num'},
