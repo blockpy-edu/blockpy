@@ -1,12 +1,11 @@
-.. function:: compliment(message)
-    
-    adds message (a string) to the array of complimentary feedback
-    
+   
 ```python
 compliment(message)
 ```
 
 message: string
+
+adds message (a string) to the array of complimentary feedback
 
 Python API
 sk_mod_instructor
