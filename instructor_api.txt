@@ -20,6 +20,9 @@ sk_mod_instructor
 		description: suppresses feedback of "type".  When also given a subtype, it instead suppresses feedback
 			of type-subtype.  Mutiple subtypes can be specified with multiple calls, each call
 			suppressing additional feedback
+	def get_output()
+		description: returns an array containing the student's output (if anything to console) as a string,
+			or an array of numbers in the case of plotting
 	def log(messsage)
 		description: prints message to the javascript console
 	class AST()

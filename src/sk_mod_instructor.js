@@ -176,6 +176,7 @@ var $sk_mod_instructor = function(name) {
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
+            console.log(Sk.executionReports['student']);
             var module = Sk.executionReports['student'].module;
             if (module !== undefined) {
                 module = module.$d;
@@ -564,7 +565,7 @@ var $sk_mod_instructor = function(name) {
                 //for each object, convert it to a python object if it isn't one already
                 var subval = obj[i];
                 if(!isSkBuiltin(subval)){
-                    arr.push(Sk.ffi.mixedRemapToPy(subval));
+                    arr.push(mixedRemapToPy(subval));
                 }else{
                     arr.push(subval)
                 }
@@ -578,9 +579,9 @@ var $sk_mod_instructor = function(name) {
                 kvs = [];//Sk.builtin.dict uses an array of key-value,key-value...
                 for (k in obj) {
                     //convert the key if it needs to be converted
-                    kvs.push(Sk.ffi.mixedRemapToPy(k));
+                    kvs.push(mixedRemapToPy(k));
                     //covert corresponding value if it needs to be converted
-                    kvs.push(Sk.ffi.mixedRemapToPy(obj[k]));
+                    kvs.push(mixedRemapToPy(obj[k]));
                 }
                 //create the new dictionary
                 return new Sk.builtin.dict(kvs);
@@ -597,6 +598,13 @@ var $sk_mod_instructor = function(name) {
             return new Sk.builtin.str(obj.toString());
         }
     }
+
+    /**
+     * This function coverts the output in the student report to a python array and returns it.
+    **/
+    mod.get_output = new Sk.builtin.func(function() {
+        return mixedRemapToPy(Sk.executionReports['student']['output']);
+    });
 
     /**
      * This function is called by instructors to construct the python version of the AST
