@@ -378,11 +378,17 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
+    if (!report['parser'].success) {
+        studentCode = 'pass';
+    }
     var instructorCode = this.main.model.programs[filename]();
-    instructorCode = 'def run_code():\n'+indent(studentCode)+'\n'+instructorCode;
+    instructorCode = 'def run_student():\n'+indent(studentCode)+'\n'+instructorCode;
     instructorCode = 'from instructor import *\n' + instructorCode;
     var engine = this;
-    report['instructor'] = {};
+    report['instructor'] = {
+        'compliments': [],
+        //'complete': false // Actually, let's use undefined for now.
+    };
     Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody(filename, false, instructorCode, true);
     }).then(

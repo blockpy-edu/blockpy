@@ -34,9 +34,7 @@ var $sk_mod_instructor = function(name) {
     mod.compliment = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("compliment", arguments, 1, 1);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        if(!Sk.executionReports.instructor.compliments){
-            Sk.executionReports.instructor.compliments = [];
-        }
+        
         Sk.executionReports.instructor.compliments.push(Sk.ffi.remapToJs(message));
     });
     /**
@@ -50,8 +48,8 @@ var $sk_mod_instructor = function(name) {
     /**
      * Let user know about an issue
      */
-    mod.correct = new Sk.builtin.func(function(message, priority, line) {
-        Sk.builtin.pyCheckArgs("correct", arguments, 1, 3);
+    mod.explain = new Sk.builtin.func(function(message, priority, line) {
+        Sk.builtin.pyCheckArgs("explain", arguments, 1, 3);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
         if (priority != undefined){
             Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(priority));
