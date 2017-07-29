@@ -1,34 +1,77 @@
-   
-```python
-compliment(message)
-```
+def compliment(message):
+    '''
+    Adds message to the list of complimentary feedback.
+    
+    Args:
+        message (str): The text string to display to the user in the Feedback 
+                       panel as complimentary feedback. This will appear as 
+                       a tooltip.
+        
+    '''
 
-message: string
+def set_success():
+    '''
+    Marks the problem as completely correct. This immediately ends execution 
+    by throwing a GracefulExit exception.
+    '''
 
-adds message (a string) to the array of complimentary feedback
+def explain(message, priority="medium", line=None):
+    '''
+    Gives student the message as corrective feedback (and higlights line 
+    number). If this function is called multiple times, the student is given the
+    first feedback of the highest priority found.
+    
+    Args:
+        message (str): The HTML string to display to the user in the Feedback
+                       panel as corrective feedback. 
+		priority (str): Either "low", "medium", or "high", indicating the
+                        ordering of the feedback if multiple occur.
+		line (int): The specific line number to highlight for the user.
+    '''
 
-Python API
-sk_mod_instructor
-	def compliment(message)
-		description: adds message (a string) to the array of complimentary feedback
-	def set_success()
-		description: marks the problem as completely correct
-	def correct(message, priority, line)
-		message: a string containing a message to give the student
-		priority (optional): a string, either "low", "medium", or "high"
-		line (optional): an integer containing a specific line number
-		description: Gives student message as corrective feedback (and higlights line number?).
-			If this function is called multiple times, the student is given the
-			first feedback of the highest priority found
-	def suppress(type, subtype)
-		type: a string that is one of the following: 'verifier', 'parser','analyzer','student'
-		subtype: given type is 'analyzer', is one of the following: 'Unconnected blocks',
-			'Iteration variable is iteration list',"Undefined variables","Possibly undefined variables"
-			"Unread variables","Overwritten variables","Empty iterations","Non-list iterations",
-			or "Incompatible types"
-		description: suppresses feedback of "type".  When also given a subtype, it instead suppresses feedback
-			of type-subtype.  Mutiple subtypes can be specified with multiple calls, each call
-			suppressing additional feedback
+def suppress(type, subtype):
+    '''
+    Suppresses feedback of the given "type".  When also given a subtype, it
+    instead suppresses the subtype (which is typically a specific error message
+    or type of exception). Multiple subtypes can be specified with multiple
+    calls, each call suppressing additional feedback.
+    
+    Args:
+        type (str): Either 'verifier', 'parser', 'analyzer', or 'student',
+                    corresponding to the phase of execution feedback that will
+                    be suppressed.
+        subtype (str): A specific type of exception (if 'student') or
+                       specific type of issue (if 'analyzer'). Available issues:
+                        - 'Unconnected blocks'
+                        - 'Iteration variable is iteration list'
+                        - "Undefined variables"
+                        - "Possibly undefined variables"
+                        - "Unread variables"
+                        - "Overwritten variables"
+                        - "Empty iterations"
+                        - "Non-list iterations"
+                        - "Incompatible types"
+    '''
+    
+def run_student():
+    '''
+    Reruns the students' submitted code ("__main__") as a function call.
+    This allows the instructor to run the student code under new conditions.
+    After a call to run_student(), the instructor will most likely want
+    to use get_output() or some other function to access the new state.
+    If the students' code failed to parse, then the body is instead replaced
+    with "pass" to prevent compilation errors.
+    '''
+
+def get_output():
+    '''
+    Returns a List containing the students' output. This can be used 
+    '''
+    
+def reset_output():
+    '''
+    '''
+    
 	def get_output()
 		description: returns an array containing the student's output (if anything to console) as a string,
 			or an array of numbers in the case of plotting
