@@ -61,22 +61,48 @@ def run_student():
     to use get_output() or some other function to access the new state.
     If the students' code failed to parse, then the body is instead replaced
     with "pass" to prevent compilation errors.
+    
+    Returns:
+        Exception or None: If the students' code fails for some reason, the
+                           raised exception is returned. Otherwise, the None
+                           value is returned.
     '''
 
 def get_output():
     '''
-    Returns a List containing the students' output. This can be used 
+    Returns a List containing the students' output from the last run. Note that
+    multiple invocations of run_student(), without calls to reset_output(), will
+    possibly result in duplicate output.
+    Different types of student output are represented differently:
+        - Print: Represented as strings WITHOUT the trailing newline.
+        - Plot: Represented as Lists of "Plot Dictionaries". Each call to 
+                plot(), hist(), and scatter() adds another "Plot Dictionary" to
+                the list, and the list is only "snipped off" when show() is
+                called. Each "Plot Dictionary" contains two fields:
+                    "type": One of "hist", "line", or "scatter".
+                    "data": A 1- or 2- dimensional list of numeric data.
+    
+    Returns:
+        list: The output that the students code generated on its last execution.
     '''
     
 def reset_output():
     '''
+    Removes any output generated on a previous run of the student code. This is
+    typically used between executions of the `run_student` function.
     '''
     
-	def get_output()
-		description: returns an array containing the student's output (if anything to console) as a string,
-			or an array of numbers in the case of plotting
-	def log(messsage)
-		description: prints message to the javascript console
+def log(message):
+    '''
+    Print the given message to the JS console in the browser. This is useful
+    for debugging purposes.
+    
+    Args:
+        message: The logging message. Any kind of data is allowable, and will
+                 be printed as JavaScript (using remapToJs).)
+    '''
+    
+    
 	class AST()
 		description: prints the AST to the javascript console
 	class Types()

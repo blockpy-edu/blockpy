@@ -101,7 +101,8 @@ var $sk_mod_instructor = function(name) {
      */
     mod.log = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
-        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        //Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+        console.log(message);
         console.log(Sk.ffi.remapToJs(message));
     });
     
@@ -596,12 +597,29 @@ var $sk_mod_instructor = function(name) {
             return new Sk.builtin.str(obj.toString());
         }
     }
-
+    
     /**
-     * This function coverts the output in the student report to a python array and returns it.
+     * This function coverts the output in the student report to a python 
+     * list and returns it.
     **/
     mod.get_output = new Sk.builtin.func(function() {
-        return mixedRemapToPy(Sk.executionReports['student']['output']);
+        Sk.builtin.pyCheckArgs("get_output", arguments, 0, 0);
+        if (Sk.executionReports['student'].success) {
+            return mixedRemapToPy(Sk.executionReports['student']['output']());
+        } else {
+            return Sk.ffi.remapToPy([]);
+        }
+    });
+    
+    /**
+     * This function resets the output, particularly useful if the student
+     * code is going to be rerun.
+     */
+    mod.reset_output = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("reset_output", arguments, 0, 0);
+        if (Sk.executionReports['student'].success) {
+            Sk.executionReports['student']['output'].removeAll();
+        }
     });
 
     /**
