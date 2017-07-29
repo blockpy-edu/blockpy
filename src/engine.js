@@ -351,7 +351,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
                 'success': true,
                 'trace': engine.executionBuffer.trace,
                 'module': module,
-                'output': engine.main.model.execution.output()
+                'output': engine.main.model.execution.output
             }
             after();
             engine.executionEnd_();
@@ -382,8 +382,9 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         studentCode = 'pass';
     }
     var instructorCode = this.main.model.programs[filename]();
-    instructorCode = 'def run_student():\n'+indent(studentCode)+'\n'+instructorCode;
+    instructorCode = 'def run_student():\n    try:\n'+indent(indent(studentCode))+'\n    except Exception as error:\n        return error\n    return None\n'+instructorCode;
     instructorCode = 'from instructor import *\n' + instructorCode;
+    console.log(instructorCode);
     var engine = this;
     report['instructor'] = {
         'compliments': [],
