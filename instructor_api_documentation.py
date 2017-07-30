@@ -184,32 +184,18 @@ student = StudentData()
 A top-level variable that holds all of the students' created data. 
 Acts as a convenient singleton for the code.
 '''
+
     
-            
-	def calls_function(source, name)
-		source: 
-		name: 
-		description: ???
-	def count_components(source, component)
-		source: 
-		component: 
-		description: ???
-	def no_nonlist_nums(source)
-		description: ???
-	def only_printing_properties(source)
-		description: ???
-	def parse_program()
-		description: returns the root node of the AST of the student code as an AstNode.
-			see class AstNode
-	def add_interrupt_feedback(feedback)
-		description: adds feedback to an internal javascript list of feedback that
-			can be posted to the javascript console when post_feedback is called
-	def add_comp_feedback(feedback)
-		description: adds feedback to an internal javascript list of feedback that
-			can be posted to the javascript console when post_feedback is called
-	def post_feedback()
-		description: outputs to the javascript console all feedback given with 
-			add_interrupt_feedback and add_comp_feedback
+def parse_program()
+    '''
+    Returns the root node of the AST of the student code as an AstNode.
+    See the AstNode class for more information.
+    
+    Returns:
+        AstNode: The root node of the AST
+    '''
+    
+
 	def def_use_error(node)
 		description: if node is an AST Name node and variable has not been initialized
 			returns false, otherwise returns true
