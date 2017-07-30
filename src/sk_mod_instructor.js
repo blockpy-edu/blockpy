@@ -198,7 +198,7 @@ var $sk_mod_instructor = function(name) {
             flatTree.push(node);
             /** Visit a node. **/
             var method_name = 'visit_' + node._astname;
-            console.log(flatTree.length - 1 + ": " + node._astname)
+            //console.log(flatTree.length - 1 + ": " + node._astname)
             if (method_name in this) {
                 return this[method_name](node);
             } else {

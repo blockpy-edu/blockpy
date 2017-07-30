@@ -20,7 +20,6 @@ function BlockPyEngine(main) {
 }
 
 BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
-BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE_ITERATION = 'from instructor import *\ndef test_for_counting_problem():\n    if ast.has("For"):\n        set_success()';
 
 /**
  * Initializes the Python Execution engine and the Printer (console).
@@ -62,6 +61,9 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     Sk.afterSingleExecution = this.step.bind(this);
     // Unlink the instructor module to prevent abuse
     delete Sk.builtinFiles['files']['src/lib/instructor.js'];
+    for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
+        delete Sk.builtinFiles['files']['src/lib/'+module_name];
+    }
     // Unmute everything
     Sk.skip_drawing = false;
     this.main.model.settings.mute_printer(false);
@@ -73,7 +75,9 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     Sk.afterSingleExecution = null;
     // Create the instructor module
     Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
-    Sk.builtinFiles['files']['src/lib/instructor_iteration.py'] = this.INSTRUCTOR_MODULE_CODE_ITERATION;
+    for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
+        Sk.builtinFiles['files']['src/lib/'+module_name] = $INSTRUCTOR_MODULES_EXTENDED[module_name];
+    }
     // Mute everything
     Sk.skip_drawing = true;
     this.main.model.settings.mute_printer(true);
