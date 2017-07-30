@@ -61,6 +61,9 @@ def run_student():
     to use get_output() or some other function to access the new state.
     If the students' code failed to parse, then the body is instead replaced
     with "pass" to prevent compilation errors.
+    If the students' code raises an exception, that exception is caught and
+    returned by the function. This is necessary to avoid the Instructor feedback
+    hijacking the runtime exceptions that students would see.
     
     Returns:
         Exception or None: If the students' code fails for some reason, the
@@ -102,6 +105,11 @@ def log(message):
                  be printed as JavaScript (using remapToJs).)
     '''
     
+def log_ast():
+    '''
+    Prints the AST to the JS console in the browser. This is useful for
+    debugging purposes.
+    '''
     
 	class AST()
 		description: prints the AST to the javascript console

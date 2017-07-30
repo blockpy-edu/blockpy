@@ -622,7 +622,9 @@ BlockPyEditor.prototype.previousLine = null;
  */
 BlockPyEditor.prototype.refreshHighlight = function() {
     if (this.previousLine !== null) {
-        this.codeMirror.addLineClass(this.previousLine, 'text', 'editor-error-line');
+        if (this.previousLine < this.codeMirror.lineCount()) {
+            this.codeMirror.addLineClass(this.previousLine, 'text', 'editor-error-line');
+        }
     }
     // TODO: Shouldn't this refresh the highlight in the block side too?
 }
@@ -635,10 +637,14 @@ BlockPyEditor.prototype.refreshHighlight = function() {
  */
 BlockPyEditor.prototype.highlightLine = function(line) {
     if (this.previousLine !== null) {
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        if (this.previousLine < this.codeMirror.lineCount()) {
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        }
     }
-    this.codeMirror.addLineClass(line, 'text', 'editor-active-line');
+    if (line < this.codeMirror.lineCount()) {
+        this.codeMirror.addLineClass(line, 'text', 'editor-active-line');
+    }
     this.previousLine = line;
 }
 
@@ -650,8 +656,10 @@ BlockPyEditor.prototype.highlightLine = function(line) {
  */
 BlockPyEditor.prototype.highlightError = function(line) {
     if (this.previousLine !== null) {
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-        this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        if (this.previousLine < this.codeMirror.lineCount()) {
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
+            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+        }
     }
     if (line < this.codeMirror.lineCount()) {
         this.codeMirror.addLineClass(line, 'text', 'editor-error-line');
