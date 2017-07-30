@@ -1,3 +1,5 @@
+## Core functions
+
 def compliment(message):
     '''
     Adds message to the list of complimentary feedback.
@@ -280,3 +282,17 @@ class AstNode():
         Returns:
             list of AstNode: The AstNodes descended from this one.
         '''
+        
+## instructor_utility.py
+
+def function_is_called(name):
+    '''
+    Returns whether the given function or method has been called from within
+    the students' code.
+    
+    Args:
+        name (str): The name of the function or method (e.g., "sum").
+    
+    Returns:
+        bool: Whether the function or method is called.
+    '''
