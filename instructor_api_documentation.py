@@ -296,3 +296,12 @@ def function_is_called(name):
     Returns:
         bool: Whether the function or method is called.
     '''
+    
+def only_printing_variables():
+    '''
+    Returns whether the students' code is only printing variables, as opposed
+    to the anything else (e.g., literal values).
+    
+    Returns:
+        bool: Whether any print function calls print non-variables.
+    '''
