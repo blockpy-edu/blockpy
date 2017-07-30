@@ -90,7 +90,7 @@ var $sk_mod_instructor = function(name) {
                 Sk.feedbackSuppressions[type][subtype] = true;
             } else if (Sk.feedbackSuppressions[type] !== false) {
                 Sk.feedbackSuppressions[type][subtype] = true;
-            }//@Austin Cory Bart @TODO: does this need a base case e.g. if Sk.feedbackSuppressions[type] === true, you set a boolean's field?
+            }
         } else {
             Sk.feedbackSuppressions[type] = true;
         }
@@ -101,8 +101,6 @@ var $sk_mod_instructor = function(name) {
      */
     mod.log = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
-        //Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        console.log(message);
         console.log(Sk.ffi.remapToJs(message));
     });
     
@@ -111,71 +109,26 @@ var $sk_mod_instructor = function(name) {
     // get_types()
     // get_types_raw()
     
-    //Enhanced feedback functions and objects starts here
-    mod.Ast = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            var parser = Sk.executionReports['parser'];
-            if (parser.success) {
-                self.ast = parser.ast;
+    var create_logger = function(phase, report_item) {
+        return new Sk.builtin.func(function() {
+            Sk.builtin.pyCheckArgs('log_'+report_item, arguments, 0, 0);
+            var report = Sk.executionReports[phase];
+            if (report.success) {
+                console.log(report[report_item]);
             } else {
-                self.ast = null;
+                console.log('Execution phase "'+phase+'" failed, '+report_item+' could not be found.');
             }
-            console.log("Parser AST", self.ast);
         });
-    }, 'Ast', []);
-    
-    mod.Types = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            var analyzer = Sk.executionReports['analyzer'];
-            if (analyzer.success) {
-                self.types = analyzer.variables;
-            } else {
-                self.types = null;
-            }
-            console.log("AI Types", self.types);
-        });
-    }, 'Types', []);
-    mod.Behavior = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            var analyzer = Sk.executionReports['analyzer'];
-            if (analyzer.success) {
-                self.behavior = analyzer.behavior;
-            } else {
-                self.behavior = null;
-            }
-            console.log("AI Behavior", self.behavior);
-        });
-    }, 'Behavior', []);
-    
-    mod.Trace = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            var student = Sk.executionReports['student'];
-            if (student.success) {
-                self.trace = student.trace;
-            } else {
-                self.trace = null;
-            }
-            console.log("Runtime Trace", self.trace);
-        });
-    }, 'Trace', []);
-    
-    mod.Issues = Sk.misceval.buildClass(mod, function($gbl, $loc) {
-        $loc.__init__ = new Sk.builtin.func(function(self) {
-            var analyzer = Sk.executionReports['analyzer'];
-            if (analyzer.success) {
-                self.issues = analyzer.issues;
-            } else {
-                self.issues = null;
-            }
-            console.log("AI Issues", self.issues);
-        });
-    }, 'Issues', []);
-    
+    };
+    mod.log_ast = create_logger('parser', 'ast');
+    mod.log_variables = create_logger('analyzer', 'variables');
+    mod.log_behavior = create_logger('analyzer', 'behavior');
+    mod.log_issues = create_logger('analyzer', 'issues');
+    mod.log_trace = create_logger('analyzer', 'student');
 
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
-            console.log(Sk.executionReports['student']);
             var module = Sk.executionReports['student'].module;
             if (module !== undefined) {
                 module = module.$d;

@@ -323,7 +323,6 @@ BlockPyEngine.prototype.analyzeParse = function() {
         'behavior': this.abstractInterpreter.variablesNonBuiltin,
         'issues': this.abstractInterpreter.report
     }
-    console.log(report.analyzer)
     return true;
 }
 
@@ -381,10 +380,16 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     if (!report['parser'].success) {
         studentCode = 'pass';
     }
-    var instructorCode = this.main.model.programs[filename]();
-    instructorCode = 'def run_student():\n    try:\n'+indent(indent(studentCode))+'\n    except Exception as error:\n        return error\n    return None\n'+instructorCode;
-    instructorCode = 'from instructor import *\n' + instructorCode;
-    console.log(instructorCode);
+    instructorCode = (
+        'from instructor import *\n'+
+        'def run_student():\n'+
+        '    try:\n'+
+        indent(indent(studentCode))+'\n'+
+        '    except Exception as error:\n'+
+        '        return error\n'+
+        '    return None\n'+
+        this.main.model.programs[filename]()
+    );
     var engine = this;
     report['instructor'] = {
         'compliments': [],
