@@ -1,6 +1,6 @@
 from instructor import *
 
-def is_function_called(name):
+def function_is_called(name):
     ast = parse_program()
     all_calls = ast.find_all('Call')
     count = 0
@@ -13,27 +13,21 @@ def is_function_called(name):
                 count += 1
     return count
     
-'''
+def no_nonlist_nums():
+    pass
     
-    mod.count_components = new Sk.builtin.func(function(source, component) {
-        Sk.builtin.pyCheckArgs("count_components", arguments, 2, 2);
-        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
-        Sk.builtin.pyCheckType("component", "string", Sk.builtin.checkString(component));
-        
-        source = source.v;
-        component = component.v;
-        
-        var ast_list = getParseList(source);
-        
-        var count = 0;
-        for (var i = 0, len = ast_list.length; i < len; i = i+1) {
-            if (ast_list[i]._astname == component) {
-                count = count+1;
-            }
-        }
-        
-        return Sk.ffi.remapToPy(count);
-    });
+def only_printing_variables():
+    ast = parse_program()
+    all_calls = ast.find_all('Call')
+    count = 0
+    for a_call in all_calls:
+        if a_call.func.ast_name == 'Name' and a_call.func.id == "print":
+            for arg in a_call.args:
+                if arg.ast_name != "Name":
+                    return False
+    return True
+    
+'''
     
     mod.no_nonlist_nums = new Sk.builtin.func(function(source) {
         Sk.builtin.pyCheckArgs("no_nonlist_nums", arguments, 1, 1);
@@ -50,16 +44,6 @@ def is_function_called(name):
             }
         }
         return Sk.ffi.remapToPy(false);
-    });
-
-    mod.only_printing_properties = new Sk.builtin.func(function(source) {
-        Sk.builtin.pyCheckArgs("only_printing_properties", arguments, 1, 1);
-        Sk.builtin.pyCheckType("source", "string", Sk.builtin.checkString(source));
-        
-        source = source.v;
-        
-        var non_var_list = getPrintedNonProperties(source);
-        return Sk.ffi.remapToPy(non_var_list.length == 0);
     });
 
 
@@ -95,40 +79,5 @@ def is_function_called(name):
         return nums;
     }
     
-    /**
-     * Given source code as a string, return a list of all of the AST elements
-     * that are being printed (using the print function) but are not variables.
-     *
-     * @param {String} source - Python source code.
-     * @returns {Array.<Object>} The list of AST elements that were found.
-     */
-    function getPrintedNonProperties(source) {
-        if (!(source in parses)) {
-            var parse = Sk.parse("__main__", source);
-            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
-        }
-        var ast = parses[source];
-        var visitor = new NodeVisitor();
-        var nonVariables = [];
-        visitor.visit_Call = function(node) {
-            var func = node.func;
-            var args = node.args;
-            if (func._astname == 'Name' && func.id.v == 'print') {
-                for (var i =0; i < args.length; i+= 1) {
-                    if (args[i]._astname != "Name") {
-                        nonVariables.push(args[i]);
-                    }
-                }
-            }
-            this.generic_visit(node);
-        }
-        visitor.visit(ast);
-        return nonVariables;
-    }
     
-    /**
-     * Skulpt function to iterate through the final state of
-     * all the variables in the program, and check to see if they have
-     * a given value.
-     */
  '''
