@@ -1,3 +1,12 @@
+'''
+This file documents the Python Instructor API. 
+The format is Google Style Python Docstrings, based on
+`http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html`
+
+
+'''
+
+
 ## Core functions
 
 def compliment(message):
