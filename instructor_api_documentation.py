@@ -186,7 +186,7 @@ Acts as a convenient singleton for the code.
 '''
 
     
-def parse_program()
+def parse_program():
     '''
     Returns the root node of the AST of the student code as an AstNode.
     See the AstNode class for more information.
@@ -196,30 +196,87 @@ def parse_program()
     '''
     
 
-	def def_use_error(node)
-		description: if node is an AST Name node and variable has not been initialized
-			returns false, otherwise returns true
-	class AstNode
-		def __init__(self, id)
-			description: This should NOT be used by an instructor, this is strictly used internally to
-				match up with the already parsed Skulpt AST. "id" is used as the index for the AST node
-				when doing an in-order traversal of the tree
-		def __eq__(self, other)
-			description: if other is an AstNode, checks whether they are the same AstNode.  If both nodes
-				originate from the same AST, then a return true will indicate it is the same node, and false
-				will indicate it's a different node. If it's not an AstNode, this will crash the program
-		def has(self, astNode)
-			description: returns true astNode is a Name astNode, or a number, AND if it is in the subtree of this node
-		def find_all(self, type)
-			type: a string denoting an AST node, e.g. "For", "Assign", "BinOp", etc.
-			description: returns all AstNodes in this node's subtrees that are an ast Node of type
-		data_type
-			if this node is a Name node, returns the first data type that this variable has taken on
-		ast_name
-			returns the type of ast node this node (e.g. Name, For, Assign, etc.)
-		Types of AST Nodes See greentree snakes API, which closely mimics our nodes, with some notable exceptions noted below
-			Assign
-				right now, Assign.targets returns a SINGLE AstNode instead of an array of AstNodes
-			For nodes with ops, only returns the FIRST operator, so no comparison operator chaining
+def def_use_error(node):
+    '''
+    Determines if the given AstNode (with the astname "Name"), and if so,
+    if the name associated with that node has not been initialized according
+    to the Analyzer.
+    
+    Args:
+        node (AstNode): The Name node to analyze.
+        
+    Returns:
+        bool: Returns whether the associated name has been initialized.
+    '''
+        
+class AstNode():
+    '''
+    A representation of the students' Abstract Syntax Tree. Can be traversed
+    and analyzed in order to make assertions about the students' code.
+    The fields of the AstNode, in addition to the two listed below, are the
+    fields listed in the Green Tree Snakes documentation.
+    
+    https://greentreesnakes.readthedocs.io/en/latest/nodes.html
+    
+    Attributes:
+        ast_name (str): The type of AST Node of this node (e.g. "Name", "For", 
+                        "Assign", etc.). For a complete list, see the Green Tree
+                        Snakes API, which closely mimics our own. 
+                        Some notable exceptions are:
+                            - Assign: Currently, Assign.targets returns a single
+                                      AstNode instead of a list.
+                            - Op Nodes: For nodes with an "ops" field, this
+                                        only returns the FIRST operator, so no
+                                        comparison operator chaining.
+        data_type 
+            if this node is a Name node, returns the first data type that this variable has taken on
+    '''
+    def __init__(self, id):
+        '''
+        This should NOT be used by an instructor, this is strictly used
+        internally to match up with the already parsed Skulpt AST.
+        
+        Args:
+            id (int): The index for the AST node when doing an in-order
+                      traversal of the tree.
+        '''
+        
+    def __eq__(self, other):
+        '''
+        If other is an AstNode, checks whether they are the same AstNode. If
+        both nodes originate from the same AST, then a return true will indicate
+        it is the same node, and false will indicate it's a different node. If
+        it's not an AstNode, this will crash the program
+        
+        Args:
+            other (AstNode): The other AstNode to compare to.
+        
+        Returns:
+            bool: A boolean indicating if they are equal.
+        '''
+        
+    def has(self, astNode):
+        '''
+        Returns whether the given astNode is a Name astNode (or a number) AND
+        if astNode node is in the subtree of this node.
+        
+        Args:
+            astNode (AstNode or int): The potential child node to find.
+            
+        Returns:
+            bool: Whether the node is a descendent.
+        '''
+        
+    def find_all(self, type):
+        '''
+        Returns all AstNodes in this node's subtrees that are an AstNode of the
+        given type.
+        
+        Args:
+            type (str): The ast name to search for ("For", "Assign", "BinOp", 
+                        etc.). A complete list of options can be found in the
+                        Green Tree Snakes documentation.
 
-
+        Returns:
+            list of AstNode: The AstNodes descended from this one.
+        '''
