@@ -129,132 +129,46 @@ var $sk_mod_instructor = function(name) {
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
-            var module = Sk.executionReports['student'].module;
-            if (module !== undefined) {
-                module = module.$d;
-                for (var key in module) {
-                    if (module.hasOwnProperty(key)) {
-                        Sk.abstr.sattr(self, key, module[key], true);
+            //self.data = Sk.builtin.dict();
+            var newDict = Sk.builtin.dict();
+            Sk.abstr.sattr(self, 'data', newDict, true);
+            self.module = Sk.executionReports['student'].module;
+            if (self.module !== undefined) {
+                self.module = self.module.$d;
+                for (var key in self.module) {
+                    if (self.module.hasOwnProperty(key)) {
+                        newDict.mp$ass_subscript(Sk.ffi.remapToPy(key), 
+                                                 self.module[key]);
                     }
                 }
+            } else {
+                self.module = {};
             }
         });
-    }, 'StudentData', []);
+        $loc.get_names_by_type = new Sk.builtin.func(function(self, type) {
+            Sk.builtin.pyCheckArgs("get_names_by_type", arguments, 2, 2);
+            var result = [];
+            for (var property in self.module) {
+                if (self.module[property].tp$name == type.tp$name) {
+                    result.push(Sk.ffi.remapToPy(property));
+                }
+            }
+            return Sk.builtin.list(result);
+        });
+    
+        $loc.get_values_by_type = new Sk.builtin.func(function(self, type) {
+            Sk.builtin.pyCheckArgs("get_values_by_type", arguments, 2, 2);
+            var result = [];
+            for (var property in self.module) {
+                if (self.module[property].tp$name == type.tp$name) {
+                    result.push(self.module[property]);
+                }
+            }
+            return Sk.builtin.list(result);
+        });
+    });
     mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);
     
-    //---- Everything below this line is old stuff
-    
-    /**
-     * Skulpt Exception that represents a Feedback object, to be rendered to the user
-     * when the feedback system finds a problem.
-     * 
-     * @param {Array} args - A list of optional arguments to pass to the Exception.
-     *                       Usually this will include a message for the user.
-     */
-    Sk.builtin.Feedback = function (args) {
-        var o;
-        if (!(this instanceof Sk.builtin.Feedback)) {
-            o = Object.create(Sk.builtin.Feedback.prototype);
-            o.constructor.apply(o, arguments);
-            return o;
-        }
-        Sk.builtin.Exception.apply(this, arguments);
-    };
-    Sk.abstr.setUpInheritance("Feedback", Sk.builtin.Feedback, Sk.builtin.Exception);
-    
-    /**
-     * Skulpt Exception that represents a Success object, to be thrown when the user
-     * completes their program successfully.
-     *
-     ** @param {Array} args - A list of optional arguments to pass to the Exception.
-     *                       Usually this will be empty.
-     */
-    Sk.builtin.Success = function (args) {
-        var o;
-        if (!(this instanceof Sk.builtin.Success)) {
-            o = Object.create(Sk.builtin.Success.prototype);
-            o.constructor.apply(o, arguments);
-            return o;
-        }
-        Sk.builtin.Exception.apply(this, arguments);
-    };
-    Sk.abstr.setUpInheritance("Success", Sk.builtin.Success, Sk.builtin.Exception);
-    
-    /**
-     * Skulpt Exception that represents a Finished object, to be thrown when the user
-     * completes their program successfully, but isn't in a problem with a "solution".
-     * This is useful for open-ended canvases where we still want to capture the students'
-     * code in Canvas.
-     *
-     ** @param {Array} args - A list of optional arguments to pass to the Exception.
-     *                       Usually this will be empty.
-     */
-    Sk.builtin.Finished = function (args) {
-        var o;
-        if (!(this instanceof Sk.builtin.Finished)) {
-            o = Object.create(Sk.builtin.Finished.prototype);
-            o.constructor.apply(o, arguments);
-            return o;
-        }
-        Sk.builtin.Exception.apply(this, arguments);
-    };
-    Sk.abstr.setUpInheritance("Finished", Sk.builtin.Finished, Sk.builtin.Exception);
-    
-    /**
-     * A Skulpt function that throws a Feedback exception, allowing us to give feedback
-     * to the user through the Feedback panel. This function call is done for aesthetic
-     * reasons, so that we are calling a function instead of raising an error. Still,
-     * exceptions allow us to break out of the control flow immediately, like a 
-     * return, so they are a good mechanism to use under the hood.
-     * 
-     * @param {String} message - The message to display to the user.
-     */
-    mod.set_feedback = new Sk.builtin.func(function(message) {
-        Sk.builtin.pyCheckArgs("set_feedback", arguments, 1, 1);
-        Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
-        throw new Sk.builtin.Feedback(message.v);
-    });
-    
-    /**
-     * A Skulpt function that throws a Finished exception. This will terminate the
-     * feedback analysis, but reports that the students' code was successful.
-     * This function call is done for aesthetic reasons, so that we are calling a
-     * function instead of raising an error. Still, exceptions allow us to break
-     * out of the control flow immediately, like a return would, so they are a
-     * good mechanism to use under the hood.
-     */
-    mod.set_finished = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("set_finished", arguments, 0, 0);
-        throw new Sk.builtin.Finished();
-    });
-    
-    // Memoization of previous parses - some mild redundancy to save time
-    // TODO: There's no evidence this is good, and could be a memory hog on big
-    // programs. Someone should investigate this. The assumption is that multiple
-    // helper functions might be using parses. But shouldn't we trim old parses?
-    // Perhaps a timed cache would work better.
-    var parses = {};
-    
-    /**
-     * Given source code as a string, return a flat list of all of the AST elements
-     * in the parsed source code.
-     *
-     * TODO: There's redundancy here, since the source code was previously parsed
-     * to run the file and to execute it. We should probably be able to do this just
-     * once and shave off time.
-     *
-     * @param {String} source - Python source code.
-     * @returns {Array.<Object>}
-     */
-    function getParseList(source) {
-        if (!(source in parses)) {
-            var parse = Sk.parse("__main__", source);
-            parses[source] = Sk.astFromParse(parse.cst, "__main__", parse.flags);
-        }
-        var ast = parses[source];
-        return (new NodeVisitor()).recursive_walk(ast);
-    }
-
     /**
      * Given source code as a string, return a list of all of the AST elements
      * that are Num (aka numeric literals) but that are not inside List elements.

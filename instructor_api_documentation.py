@@ -111,30 +111,81 @@ def log_ast():
     debugging purposes.
     '''
     
-	class AST()
-		description: prints the AST to the javascript console
-	class Types()
-		description: prints the student program type information to the javascript console
-	class Behavior()
-		description: prints the Abstract interpretor behavior information to the javascript console
-	class Trace()
-		description: prints the student trace information to the javascript console
-	class Issues
-		description: prints the Abstract interpretor issues information to the javascript console
-	class StudentData()
-		description: ???
-	def set_feedback(message) @deprecated
-		description: throws an exception as an internal error and prints feedback to the student
-	def set_finished()
-		description: throws an exception and grades the student's code as correct?
-	def get_value_by_name(name)
-		description: ???
-	def get_value_by_type(type)
-		description: ???
-	def parse_json(blob)
-		description: ???
-	def get_property(name)
-		description: ???
+def log_variables():
+    '''
+    Prints a mapping between the names of the programs' variables and their
+    estimated type (according to the abstract interpreter) to the JS console
+    in the browser. This is useful for debugging purposes.
+    '''
+    
+def log_behavior():
+    '''
+    Prints a list of each variables' read/write behavior to the JS console
+    in the browser. This is useful for debugging purposes.
+    '''
+    
+def log_trace():
+    '''
+    Prints a list of each step of the programs' execution to the JS console
+    in the browser. This is useful for debugging purposes.
+    '''
+    
+def log_issues():
+    '''
+    Prints a list of all found Abstract Interperter issues to the JS console
+    in the browser. This is useful for debugging purposes.
+    '''
+
+class StudentData():
+    '''
+    A class that wraps a dictionary of data created after the execution of
+    the students' code. 
+    A common use case for this is to require students to declare a particular
+    function, and then to access that function via the singleton instance of
+    this class.
+    
+    Attributes:
+        data (dict): A dictionary containing all the students' data. In other
+                     words, if they declare a variable named "alpha", you can
+                     access that variable's final value via
+    
+                        student['alpha']
+
+                     Because this is a dictionary, you can also test membership,
+                     access element dynamically, and anything else you may want.
+    '''
+    
+    def get_values_by_type(type):
+        '''
+        Returns a list of values from the students' data where each value
+        will have the given type.
+        
+        Args:
+            type (type): A python type (e.g., int or str) that will be used
+                         in the comparison. Does not respect inheritance!
+        Returns:
+            list: A list of the values with that type.
+        '''
+    
+    def get_names_by_type(type):
+        '''
+        Returns a list of the variable names from the students' data where each
+        variable's final value will have the given type.
+        
+        Args:
+            type (type): A python type (e.g., int or str) that will be used
+                         in the comparison. Does not respect inheritance!
+        Returns:
+            list of str: A list of the variables with that type.
+        '''
+
+student = StudentData()
+'''
+A top-level variable that holds all of the students' created data. 
+Acts as a convenient singleton for the code.
+'''
+    
+            
 	def calls_function(source, name)
 		source: 
 		name: 
