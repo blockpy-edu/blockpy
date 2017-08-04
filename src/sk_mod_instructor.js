@@ -390,10 +390,10 @@ var $sk_mod_instructor = function(name) {
             if(key in actualAstNode){
                 var field = actualAstNode[key];
                 //@TODO: check for flag to see if chain assignments are allowed, otherwise return first item
-                if(actualAstNode._astname == "Assign" && key == "targets"){//this means its an assignment node
+                if (actualAstNode._astname == "Assign" && key == "targets"){//this means its an assignment node
                     var childId = flatTree.indexOf(field[0]);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
-                }else if(field.constructor === Array){
+                } else if (field.constructor === Array){
                     var astNodeCount = 0
                     var fieldArray = [];
                     //this will likely always be a mixed array
@@ -411,10 +411,10 @@ var $sk_mod_instructor = function(name) {
                         }
                     }
                     return new Sk.builtin.list(fieldArray);
-                }else if(field instanceof Object && ('v' in field || 
+                } else if (field instanceof Object && ('v' in field || 
                         'n' in field || 's' in field)){//probably already a python object
                     return field;
-                }else if(field instanceof Object && "_astname" in field){//an AST node
+                } else if (field instanceof Object && "_astname" in field){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
                 }else{

@@ -401,7 +401,13 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.settings.server_connected(false);
     this.resetSystem();
     // Settings
-    this.model.settings['editor'](assignment.initial_view);
+    if (settings.filename) {
+        this.model.settings['filename'](settings.filename);
+    }
+    // Update the current filename ONLY if we're editing the __main__
+    if (this.model.settings['filename']() == '__main__') {
+        this.model.settings['editor'](assignment.initial_view);
+    }
     if (settings.instructor) {
         this.model.settings['instructor'](settings.instructor);
         this.model.settings['instructor_initial'](settings.instructor);
@@ -409,9 +415,6 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.settings['enable_blocks'](settings.blocks_enabled);
     this.model.settings['read_only'](settings.read_only);
     this.model.settings['show_settings'](settings.show_settings);
-    if (settings.filename) {
-        this.model.settings['filename'](settings.filename);
-    }
     this.model.settings['disable_semantic_errors'](
                     settings.disable_semantic_errors || 
                     assignment.disable_algorithmic_errors || 

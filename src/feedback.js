@@ -338,8 +338,10 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     var complaint = report['instructor'].complaint;
     var gentleComplaints = [];
+    if (complaint) {
+        moveElements(complaint, gentleComplaints, function(e) { return e.priority == 'student' });
+    }
     if (complaint && complaint.length) {
-        moveElements(complaint, gentleComplaints, function(e) { return e.name == 'student' });
         complaint.sort(BlockPyFeedback.sortPriorities);
         console.log(complaint);
         this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);

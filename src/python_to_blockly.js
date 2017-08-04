@@ -702,7 +702,7 @@ PythonToBlocks.prototype.If = function(node)
         }
     }
     
-    return block("controls_if", node.lineno, {
+    return block("controls_if_better", node.lineno, {
     }, IF_values, {
         "inline": "false"
     }, {
@@ -1559,7 +1559,7 @@ PythonToBlocks.prototype.List = function(node) {
     var elts = node.elts;
     var ctx = node.ctx;
     
-    return block("lists_create", node.lineno, {}, 
+    return block("lists_create_with", node.lineno, {}, 
         this.convertElements("ADD", elts)
     , {
         "inline": elts.length > 3 ? "false" : "true", 

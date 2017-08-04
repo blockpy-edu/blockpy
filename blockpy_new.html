@@ -126,7 +126,7 @@
             {
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
-                'give_feedback': 'from instructor_utility import *\nlog(is_top_level(find_function_calls("print")[0]))',
+                'give_feedback': 'ast=parse_program()\nlog(ast.find_all("Compare")[0].ops)\nlog_ast()',
                 'on_change': '',
                 'parsons': false,
                 'starting_code': '',
@@ -141,7 +141,7 @@
             // programs
             {
                 //'__main__': 'ss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
-                '__main__': 'a=0\nb=0',
+                '__main__': '1 < 2',
             }
         )
         
