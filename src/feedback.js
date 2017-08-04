@@ -277,6 +277,16 @@ BlockPyFeedback.prototype.printError = function(error) {
     this.main.components.server.logEvent('feedback', "Runtime", original);
 }
 
+/**
+ * Static method to convert a priority level into a number.
+ */
+BlockPyFeedback.priorityNumConvert = function(priority){
+    switch(priority){
+        case 'low': return 1;
+        case 'high': return 3;
+        default: case 'medium': return 2;
+    }
+};
 
 /**
  * Present any accumulated feedback
@@ -310,32 +320,15 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         console.log(report['instructor'].compliments);
     }
     var complaint = report['instructor'].complaint;
-    var priorityNumConvert = function(priority){
-        switch(priority){
-            case 'low':
-                priority = 1;
-                break;
-            case 'medium':
-                priority = 2;
-                break;
-            case 'high':
-                priority = 3;
-                break;
-            default:
-                priority = 2;
-                break;
-        }
-        return priority;
-    };
     if (complaint) {
-        complaint.sort(function(a, b){
-            var priorityA = priorityNumConvert(a.priority);
-            var priorityB = priorityNumConvert(b.priority);
-            if(priorityA > priorityB){
+        complaint.sort(function(a, b) {
+            var priorityA = BlockPyFeedback.priorityNumConvert(a.priority);
+            var priorityB = BlockPyFeedback.priorityNumConvert(b.priority);
+            if (priorityA > priorityB) {
                 return -1;
-            }else if(priorityB > priorityA){
+            } else if (priorityB > priorityA) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
         });

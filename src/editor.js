@@ -65,6 +65,13 @@ function BlockPyEditor(main, tag) {
         }
     });
     
+    // Handle Upload mode turned on
+    this.main.model.assignment.upload.subscribe(function(uploadsMode) {
+        if (uploadsMode) {
+            editor.setMode('Text');
+        }
+    });
+    
     // Have to force a manual block update
     //this.updateText();
     this.updateBlocksFromModel();
@@ -442,6 +449,9 @@ BlockPyEditor.prototype.showConversionError = function() {
 }
 
 BlockPyEditor.prototype.setBlocks = function(python_code) {
+    if (!this.areBlocksUpdating()) {
+        return false;
+    }
     var xml_code = "";
     if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
         var result = this.converter.convertSource(python_code);
@@ -542,6 +552,10 @@ BlockPyEditor.prototype.updateText = function() {
         this.resetBlockSilence();
     }
     this.silenceText = false;
+}
+
+BlockPyEditor.prototype.areBlocksUpdating = function() {
+    return !this.main.model.assignment.upload();
 }
 
 /**
