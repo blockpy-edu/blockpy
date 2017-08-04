@@ -48,12 +48,23 @@ function BlockPyEditor(main, tag) {
     this.initBlockly();
     this.initInstructor();
     
+    this.triggerOnChange = null;
+    var editor = this;
+    var firstEdit = true;
     this.main.model.program.subscribe(function() {
         editor.updateBlocksFromModel();
         editor.updateTextFromModel();
+        
+        if (editor.main.model.settings.filename() == "__main__" &&
+            !firstEdit) {
+            if (editor.triggerOnChange) {
+                clearTimeout(editor.triggerOnChange);
+            }
+            var engine = editor.main.components.engine;
+            editor.triggerOnChange = setTimeout(engine.on_change.bind(engine), 1000);
+        }
+        firstEdit = false;
     });
-    
-    var editor = this;
     
     // Handle mode switching
     this.main.model.settings.editor.subscribe(function() {editor.setMode()});

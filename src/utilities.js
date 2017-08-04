@@ -128,3 +128,17 @@ Blockly.WorkspaceSvg.prototype.shuffle = function() {
     }
 }
 
+/**
+ * Move elements from one array to another based on a conditional check.
+ * https://stackoverflow.com/questions/31887967/javascript-move-objects-from-one-array-to-another-best-approach
+ */
+function moveElements(source, target, moveCheck) {
+    for (var i = 0; i < source.length; i++) {
+        var element = source[i];
+        if (moveCheck(element)) {
+            source.splice(i, 1);
+            target.push(element);
+            i--;
+        }
+    } 
+}

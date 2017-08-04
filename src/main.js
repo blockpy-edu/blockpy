@@ -203,7 +203,7 @@ BlockPy.prototype.initModel = function(settings) {
             "__main__": ko.observable(''),
             "starting_code": ko.observable(''),
             "give_feedback": ko.observable(''),
-            "on_step": ko.observable(''),
+            "on_change": ko.observable(''),
             "answer": ko.observable('')
         },
         // Information about the current run of the program
@@ -454,6 +454,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.programs['__main__'](programs.__main__);
     this.model.programs['starting_code'](assignment.starting_code);
     this.model.programs['give_feedback'](assignment.give_feedback);
+    this.model.programs['on_change'](assignment.on_change);
     this.model.programs['answer'](assignment.answer);
     // Update Model
     // Reload blockly

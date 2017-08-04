@@ -195,6 +195,7 @@ BlockPyEngine.prototype.lastStep = function() {
  */
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
+    clearTimeout(this.main.components.editor.triggerOnChange);
     var engine = this;
     var model = this.main.model;
     engine.resetReports();
@@ -216,19 +217,24 @@ BlockPyEngine.prototype.on_run = function() {
 /**
  * Activated whenever the Python code changes
  */
-BlockPyEngine.prototype.on_step = function() {
-    this.main.model.execution.status("changing");
-    var FILENAME = 'on_step';
+BlockPyEngine.prototype.on_change = function() {
+    var FILENAME = 'on_change';
     // TODO: Do we actually want to skip if this is the case?
     // Skip if the instructor has not defined anything
     if (!this.main.model.programs[FILENAME]().trim()) {
         return false;
     }
+    this.main.model.execution.status("changing");
     // On step does not perform parse analysis by default or run student code
     var engine = this;
     engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
+    this.main.model.execution.suppressions['verifier'] = true;
+    this.main.model.execution.suppressions['analyzer'] = true;
+    this.main.model.execution.suppressions['student'] = true;
+    this.main.model.execution.suppressions['parser'] = true;
+    this.main.model.execution.suppressions['no errors'] = true;
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
         engine.main.model.execution.status("complete");
@@ -250,6 +256,7 @@ BlockPyEngine.prototype.resetReports = function() {
     suppress['parser'] = false;
     suppress['analyzer'] = false;
     suppress['student'] = false;
+    suppress['no errors'] = false;
 }
 
 BlockPyEngine.prototype.verifyCode = function() {
@@ -409,6 +416,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         },
         // Failure
         function (error) {
+            console.log(error);
             if (error.tp$name === 'GracefulExit') {
                 report['instructor']['success'] = true;
             } else {
