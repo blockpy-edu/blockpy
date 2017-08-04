@@ -80,7 +80,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         fr.onload = function(e) {
             main.setCode(e.target.result)
             main.components.server.logEvent('editor', 'upload')
-            main.components.engine.run();
+            main.components.engine.on_run();
             main.components.server.logEvent('editor', 'run')
         };
         fr.readAsText(files[0]);

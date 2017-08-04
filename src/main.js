@@ -443,7 +443,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
         this.model.assignment['has_files'](assignment.has_files);
     }
     this.model.assignment['parsons'](assignment.parsons);
-    this.model.assignment['upload'](assignment.initial_view == 'Upload');
+    this.model.assignment['upload'](assignment.upload);
     if (assignment.importable) {
         this.model.assignment['importable'](assignment.importable);
     }
