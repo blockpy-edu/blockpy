@@ -1,17 +1,30 @@
 from instructor import *
 
-def function_is_called(name):
+def is_top_level(ast_node):
+    ast = parse_program()
+    for element in ast.body:
+        if element.ast_name == 'Expr':
+            if element.value == ast_node:
+                return True
+        elif element == ast_node:
+            return True
+    return False
+
+def find_function_calls(name):
     ast = parse_program()
     all_calls = ast.find_all('Call')
-    count = 0
+    calls = []
     for a_call in all_calls:
         if a_call.func.ast_name == 'Attribute':
             if a_call.func.attr == name:
-                count += 1
+                calls.append(a_call)
         elif a_call.func.ast_name == 'Name':
             if a_call.func.id == name:
-                count += 1
-    return count
+                calls.append(a_call)
+    return calls
+
+def function_is_called(name):
+    return len(find_function_calls(name))
     
 def no_nonlist_nums():
     pass
