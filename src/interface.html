@@ -265,6 +265,19 @@
                             <div class='blockpy-presentation-body-editor'> 
                             </div>
                             
+                            <!-- Initial mode -->
+                            <label class='blockpy-presentation-text-first'>
+                            Initial View:
+                            <select data-bind="value: assignment.initial_view">
+                                <option value="Blocks" selected>Blocks</option>
+                                <option value="Text">Text</option>
+                                <option value="Split">Split</option>
+                                <option value="Instructor">Instructor</option>
+                                <option value="Upload">Upload</option>
+                            </select>
+                            </label>
+                            <br>
+                            
                             <!-- Parsons -->
                             <label class='blockpy-presentation-parsons-check'>
                             Parsons:
@@ -287,24 +300,12 @@
                                 Upload <input class="blockpy-presentation-upload" type="file" style="display: none;">
                             </label>
                             <ul>
+                            <!--
                                 <li>
                                     <a href="#" target="_blank">file.json<span class='glyphicon glyphicon-new-window'></span></a>
                                     <button class='btn btn-sm btn-danger'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                                </li>
+                                </li>-->
                             </ul>
-                            
-                            <!-- Initial mode -->
-                            <label class='blockpy-presentation-text-first'>
-                            Initial View:
-                            <select data-bind="value: assignment.initial_view">
-                                <option value="Blocks" selected>Blocks</option>
-                                <option value="Text">Text</option>
-                                <option value="Split">Split</option>
-                                <option value="Instructor">Instructor</option>
-                                <option value="Upload">Upload</option>
-                            </select>
-                            </label>
-                            <br>
                             
                             <label>Available Modules</lable>
                             <select class='blockpy-available-modules' multiple='multiple'
