@@ -236,6 +236,7 @@ BlockPyFeedback.prototype.prettyPrintError = function(error) {
         return error;
     } else {
         // A weird skulpt thing?
+        console.log(error);
         if (error.tp$str !== undefined) {
             return error.tp$str().v;
         } else {
@@ -289,6 +290,21 @@ BlockPyFeedback.priorityNumConvert = function(priority){
 };
 
 /**
+ * Static method to compare two priority labels.
+ */
+BlockPyFeedback.priorityComparator = function(a, b) {
+    var priorityA = BlockPyFeedback.priorityNumConvert(a.priority);
+    var priorityB = BlockPyFeedback.priorityNumConvert(b.priority);
+    if (priorityA > priorityB) {
+        return -1;
+    } else if (priorityB > priorityA) {
+        return 1;
+    } else {
+        return 0;
+    }
+};
+
+/**
  * Present any accumulated feedback
  */
 BlockPyFeedback.prototype.presentFeedback = function() {
@@ -311,8 +327,9 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     // Instructor
     if (!report['instructor'].success) {
-        this.internalError(report['instructor'].error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-        console.error(report['instructor'].error);
+        var error = report['instructor'].error;
+        this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        console.error(error);
         return 'instructor';
     }
     if (report['instructor'].compliments) {
@@ -320,18 +337,10 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         console.log(report['instructor'].compliments);
     }
     var complaint = report['instructor'].complaint;
-    if (complaint) {
-        complaint.sort(function(a, b) {
-            var priorityA = BlockPyFeedback.priorityNumConvert(a.priority);
-            var priorityB = BlockPyFeedback.priorityNumConvert(b.priority);
-            if (priorityA > priorityB) {
-                return -1;
-            } else if (priorityB > priorityA) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+    var gentleComplaints = [];
+    if (complaint && complaint.length) {
+        moveElements(complaint, gentleComplaints, function(e) { return e.name == 'student' });
+        complaint.sort(BlockPyFeedback.sortPriorities);
         console.log(complaint);
         this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);
         return 'instructor';
@@ -353,13 +362,23 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             return 'student';
         }
     }
+    // Gentle instructor feedback
+    if (gentleComplaints.length) {
+        this.instructorFeedback(gentleComplaints[0].name, 
+                                gentleComplaints[0].message, 
+                                gentleComplaints[0].line);
+        return 'instructor';
+    }
     //instructor completion flag
     if (report['instructor'].complete) {
         this.complete();
         return 'success';
     }
-    this.noErrors()
-    return 'no errors';
+    if (!suppress['no errors']) {
+        this.noErrors()
+        return 'no errors';
+    }
+    return 'completed';
 }
 
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {

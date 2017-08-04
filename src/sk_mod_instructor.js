@@ -52,7 +52,7 @@ var $sk_mod_instructor = function(name) {
         Sk.builtin.pyCheckArgs("explain", arguments, 1, 3);
         Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
         if (priority != undefined){
-            Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(priority));
+            Sk.builtin.pyCheckType("priority", "string", Sk.builtin.checkString(priority));
             priority = Sk.ffi.remapToJs(priority);
         } else {
             priority = 'medium';
@@ -72,6 +72,10 @@ var $sk_mod_instructor = function(name) {
             'line': line
         }
         Sk.executionReports.instructor.complaint.push(newComplaint);
+    });
+    
+    mod.gently = new Sk.builtin.func(function(message, line) {
+        return Sk.misceval.callsimOrSuspend(mod.explain, message, Sk.ffi.remapToPy('student'), line);
     });
     
     /**
