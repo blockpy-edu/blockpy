@@ -832,8 +832,9 @@ BlockPyEditor.CATEGORY_MAP = {
                   '</category>',
     'Decisions': '<category name="Decisions" colour="330">'+
                     '<block type="controls_if_better"></block>'+
-                    '<block type="controls_if"></block>'+
-                    '<block type="controls_if"><mutation else="1"></mutation></block>'+
+                    '<block type="controls_if_better"><mutation else="1"></mutation></block>'+
+                    //'<block type="controls_if"></block>'+
+                    //'<block type="controls_if"><mutation else="1"></mutation></block>'+
                     '<block type="logic_compare"></block>'+
                     '<block type="logic_operation"></block>'+
                     '<block type="logic_negate"></block>'+
@@ -892,7 +893,7 @@ BlockPyEditor.CATEGORY_MAP = {
                 '<block type="tuple_create"></block>'+
               '</category>',
     'Lists':    '<category name="Lists" colour="30">'+
-                    '<block type="lists_create"></block>'+
+                    //'<block type="lists_create"></block>'+
                     '<block type="lists_create_with">'+
                         '<value name="ADD0">'+
                           '<block type="math_number"><field name="NUM">0</field></block>'+

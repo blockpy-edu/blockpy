@@ -158,27 +158,7 @@ Blockly.Blocks['controls_if_better'] = {
    * @this Blockly.Block
    */
   updateShape_: function() {
-    // Delete everything.
-    if (!this.getInput('CONTROLS')) {
-        function changeShape(field, block, e) {
-            var rect = field.fieldGroup_.getBoundingClientRect();
-            var xPosition = e.clientX;
-            if (xPosition < rect.left+rect.width/3) {
-                console.log("ELSE");
-            } else if (xPosition < 2 *rect.left+rect.width/3) {
-                console.log("MINUS ELIF");
-            } else {
-                console.log("PLUS ELIF");
-            }
-        }
-        //var clickablePlusMinus = new Blockly.FieldClickImage("images/plus_minus_h.png", 24, 12, '', addField, '-0px');
-        var clickableCheck = new Blockly.FieldClickImage("images/plus_minus_blue.png", 36, 24, '', changeShape, '-2px');
-        //clickablePlusMinus.imageElement_.style.y = '-2px';
-        this.appendDummyInput('CONTROLS')
-            .appendField(clickableCheck)
-            //.appendField(clickablePlusMinus);
-    }
-    
+    // Delete everything.    
     if (this.getInput('ELSE')) {
       this.removeInput('ELSE');
     }

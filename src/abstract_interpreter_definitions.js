@@ -12,7 +12,7 @@ AbstractInterpreter.prototype.BUILTINS = {
         "type": "Function",
         "returns": {"type": "None"},
         "parameters": [
-            {"type": "Str", "var": true}
+            {"type": "Any", "var": true}
         ]
     },
     "sum": {
@@ -53,6 +53,13 @@ AbstractInterpreter.prototype.BUILTINS = {
         "parameters": [
             {"type": "Num"},
             {"type": "Num", "optional": true}
+        ]
+    },
+    "str": {
+        "type": "Function",
+        "returns": {"type": "Str"},
+        "parameters": [
+            {"type": "Any"}
         ]
     },
     'input': {"type": "Str"},
