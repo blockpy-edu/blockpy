@@ -343,7 +343,7 @@ BlockPy.prototype.initModelMethods = function() {
     this.model.moveTraceLast = function(index) { 
         execution.trace_step(execution.last_step()); };
     this.model.current_trace = ko.pureComputed(function() {
-        console.log(execution.trace(), execution.trace().length-1, execution.trace_step())
+        //console.log(execution.trace(), execution.trace().length-1, execution.trace_step())
         return execution.trace()[Math.min(execution.trace().length-1, execution.trace_step())];
     });
     
@@ -364,6 +364,12 @@ BlockPy.prototype.initModelMethods = function() {
             }
         }
     }
+    
+    this.model.areBlocksUpdating = ko.pureComputed(function() {
+        return (!this.assignment.upload() &&
+                (this.settings.filename() == "__main__" ||
+                 this.settings.filename() == "starting_code"))
+    }, this.model);
     
     // For performance reasons, batch notifications for execution handling.
     // I'm not even sure these have any value any more.

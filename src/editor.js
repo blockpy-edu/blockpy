@@ -460,7 +460,7 @@ BlockPyEditor.prototype.showConversionError = function() {
 }
 
 BlockPyEditor.prototype.setBlocks = function(python_code) {
-    if (!this.areBlocksUpdating()) {
+    if (!this.main.model.areBlocksUpdating()) {
         return false;
     }
     var xml_code = "";
@@ -563,10 +563,6 @@ BlockPyEditor.prototype.updateText = function() {
         this.resetBlockSilence();
     }
     this.silenceText = false;
-}
-
-BlockPyEditor.prototype.areBlocksUpdating = function() {
-    return !this.main.model.assignment.upload();
 }
 
 /**
