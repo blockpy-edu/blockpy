@@ -423,7 +423,6 @@ var $sk_mod_instructor = function(name) {
                         case "ops"://an operator
                         case "op"://an operator
                             //the above 3 cases are functions, extract the function name
-                            console.log("hitting switch: " + field);
                             field = field.toString();
                             field = field.substring(("function").length + 1, field.length - 4);
                             return Sk.ffi.remapToPy(field);

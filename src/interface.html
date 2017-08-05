@@ -154,7 +154,8 @@
             
             <div class="btn-group" data-toggle="buttons" data-bind="visible: !assignment.upload()">
                 <label class="btn btn-default blockpy-mode-set-blocks" 
-                       data-bind="css: {active: settings.editor() == 'Blocks'}">
+                       data-bind="css: {active: settings.editor() == 'Blocks',
+                                        disabled: !areBlocksUpdating()}">
                     <span class='glyphicon glyphicon-th-large'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> Blocks
                 </label>
@@ -165,7 +166,8 @@
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
                 </label>-->
                 <label class="btn btn-default blockpy-mode-set-split"
-                       data-bind="css: {active: settings.editor() == 'Split'}">
+                       data-bind="css: {active: settings.editor() == 'Split',
+                                        disabled: !areBlocksUpdating()}">
                     <span class='glyphicon glyphicon-resize-horizontal'></span>
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Split
                 </label>

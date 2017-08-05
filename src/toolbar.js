@@ -41,17 +41,27 @@ BlockPyToolbar.prototype.activateToolbar = function() {
             main.components.editor.blockly.shuffle();
         }
     });
-    this.tag.find('.blockpy-mode-set-blocks').click(function() {
-        main.components.server.logEvent('editor', 'blocks')
-        main.model.settings.editor("Blocks");
+    this.tag.find('.blockpy-mode-set-blocks').click(function(event) {
+        if (main.model.areBlocksUpdating()) {
+            main.components.server.logEvent('editor', 'blocks')
+            main.model.settings.editor("Blocks");
+        } else {
+            event.preventDefault();
+            return false;
+        }
     });
     /*this.tag.find('.blockpy-mode-set-instructor').click(function() {
         main.model.settings.editor("Instructor");
         main.components.server.logEvent('editor', 'instructor')
     });*/
-    this.tag.find('.blockpy-mode-set-split').click(function() {
-        main.model.settings.editor("Split");
-        main.components.server.logEvent('editor', 'split')
+    this.tag.find('.blockpy-mode-set-split').click(function(event) {
+        if (main.model.areBlocksUpdating()) {
+            main.model.settings.editor("Split");
+            main.components.server.logEvent('editor', 'split')
+        } else {
+            event.preventDefault();
+            return false;
+        }
     });
     this.tag.find('.blockpy-toolbar-import').click(function() {
         main.components.corgis.openDialog();
