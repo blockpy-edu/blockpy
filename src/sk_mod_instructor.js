@@ -393,7 +393,7 @@ var $sk_mod_instructor = function(name) {
                 if (actualAstNode._astname == "Assign" && key == "targets"){//this means its an assignment node
                     var childId = flatTree.indexOf(field[0]);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
-                } else if (field.constructor === Array && key != "ops"){
+                } else if (field.constructor === Array){
                     var astNodeCount = 0
                     var fieldArray = [];
                     //this will likely always be a mixed array
@@ -417,7 +417,7 @@ var $sk_mod_instructor = function(name) {
                 } else if (field instanceof Object && "_astname" in field){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
-                }else{
+                } else {
                     switch(key){//looking for a function
                         case "ctx"://a load or store
                         case "ops"://an operator
@@ -450,9 +450,9 @@ var $sk_mod_instructor = function(name) {
             var nodeId = self.id;
             var thisNode = flatTree[nodeId];
             //got a number instead of an AST node
-            if(Sk.builtin.checkNumber(pyAstNode)){
+            if (Sk.builtin.checkNumber(pyAstNode)){
                 rawNum = Sk.ffi.remapToJs(pyAstNode);
-            }else{//assume it's an AST node
+            } else {//assume it's an AST node
                 //@TODO: should handle exceptions/do type checking
                 var otherId = Sk.ffi.remapToJs(pyAstNode.id);
                 var otherNode = flatTree[otherId];
@@ -464,10 +464,10 @@ var $sk_mod_instructor = function(name) {
 
             var hasVar = false;
             var visitor = new NodeVisitor();
-            if(rawVariableName != null){
+            if (rawVariableName != null){
                 visitor.visit_Name = function(node){
                     var otherRawName = Sk.ffi.remapToJs(node.id);
-                    if(rawVariableName == otherRawName){
+                    if (rawVariableName == otherRawName){
                         hasVar = true;
                         return;
                     }
@@ -475,10 +475,10 @@ var $sk_mod_instructor = function(name) {
                 }
             }
 
-            if(rawNum != null){
+            if (rawNum != null){
                 visitor.visit_Num = function(node){
                     var otherNum = Sk.ffi.remapToJs(node.n);
-                    if(rawNum == otherNum){
+                    if (rawNum == otherNum){
                         hasVar = true;
                         return;
                     }
