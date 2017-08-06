@@ -149,22 +149,41 @@ var $sk_mod_instructor = function(name) {
                 self.module = {};
             }
         });
-        $loc.get_names_by_type = new Sk.builtin.func(function(self, type) {
-            Sk.builtin.pyCheckArgs("get_names_by_type", arguments, 2, 2);
+        $loc.get_names_by_type = new Sk.builtin.func(function(self, type, exclude_builtins) {
+            Sk.builtin.pyCheckArgs("get_names_by_type", arguments, 2, 3);
+            if (exclude_builtins === undefined) {
+                exclude_builtins = true;
+            } else {
+                Sk.builtin.pyCheckType("exclude_builtins", "boolean", Sk.builtin.checkBool(exclude_builtins));
+                exclude_builtins = Sk.ffi.remapToJs(exclude_builtins);
+            }
             var result = [];
             for (var property in self.module) {
                 if (self.module[property].tp$name == type.tp$name) {
+                    console.log(exclude_builtins);
+                    if (exclude_builtins && property.startsWith("__")) {
+                        continue;
+                    }
                     result.push(Sk.ffi.remapToPy(property));
                 }
             }
             return Sk.builtin.list(result);
         });
     
-        $loc.get_values_by_type = new Sk.builtin.func(function(self, type) {
-            Sk.builtin.pyCheckArgs("get_values_by_type", arguments, 2, 2);
+        $loc.get_values_by_type = new Sk.builtin.func(function(self, type, exclude_builtins) {
+            Sk.builtin.pyCheckArgs("get_values_by_type", arguments, 2, 3);
+            if (exclude_builtins === undefined) {
+                exclude_builtins = true;
+            } else {
+                Sk.builtin.pyCheckType("exclude_builtins", "boolean", Sk.builtin.checkBool(exclude_builtins));
+                exclude_builtins = Sk.ffi.remapToJs(exclude_builtins);
+            }
             var result = [];
             for (var property in self.module) {
                 if (self.module[property].tp$name == type.tp$name) {
+                    if (exclude_builtins && property.startsWith("__")) {
+                        continue;
+                    }
                     result.push(self.module[property]);
                 }
             }

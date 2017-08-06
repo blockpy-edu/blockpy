@@ -332,7 +332,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         console.error(error);
         return 'instructor';
     }
-    if (report['instructor'].compliments) {
+    if (report['instructor'].compliments && report['instructor'].compliments.length) {
         //this.compliment(report['instructor'].compliments);
         console.log(report['instructor'].compliments);
     }
