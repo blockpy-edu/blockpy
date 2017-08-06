@@ -223,7 +223,7 @@ var $sk_mod_instructor = function(name) {
             (obj instanceof Sk.builtin.bool) ||
             (obj instanceof Sk.builtin.int_) ||
             (obj instanceof Sk.builtin.float_) ||
-            (obj instanceof Sk.builtin.lng);
+            (obj instanceof Sk.builtin.lng) || (obj instanceof Sk.builtin.str);
     }
     /**
      * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
