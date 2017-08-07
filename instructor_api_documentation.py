@@ -241,6 +241,9 @@ class AstNode():
                                         comparison operator chaining.
         data_type 
             if this node is a Name node, returns the first data type that this variable has taken on
+        next_tree
+            For the AST node to which this node belongs, returns the next node in that AST that is NOT
+            in this node's subtree.
     '''
     def __init__(self, id):
         '''
