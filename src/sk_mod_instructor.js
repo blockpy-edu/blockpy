@@ -213,6 +213,10 @@ var $sk_mod_instructor = function(name) {
     }
     /**
      * This function checks if the given object is one of the Sk.builtin objects
+     * TODO: make this so we don't have to explicitly put out eveyr option
+     *          one possible thing we could do is get a string version of the 
+     *          of the constructor and look for the substring "return new Sk.builtin"
+     *          But I don't know how reliable that is.  Rather, it's kind of hackish.
      * @param {object} obj - the object to be examined
      * @return {boolean} true if the object is one of the Sk.builtin types
     **/
@@ -224,6 +228,8 @@ var $sk_mod_instructor = function(name) {
             (obj instanceof Sk.builtin.int_) ||
             (obj instanceof Sk.builtin.float_) ||
             (obj instanceof Sk.builtin.lng) || (obj instanceof Sk.builtin.str);
+        //var cons_str = obj.constructor + "";
+        //return cons_str.indexOf("return new Sk.builtin") !== -1;
     }
     /**
      * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
@@ -351,6 +357,25 @@ var $sk_mod_instructor = function(name) {
             return Sk.ffi.remapToPy(null);
         }
     }
+    /**
+     * When passed a python AST node, returns the next node that isn't in this node's
+     * subtree.  If such a node does not exist, returns Sk.ffi.remapToPy(null)
+    **/
+    function getNextTree(self){
+        var visitor = new NodeVisitor();
+        var currentId = self.id;//-1 to offset first iteration
+        visitor.visit = function(node) {
+            currentId += 1;
+            /** Visit a node. **/
+            var method_name = 'visit_' + node._astname;
+            return this.generic_visit(node);
+        }
+        visitor.visit(flatTree[currentId]);
+        if(currentId > flatTree.length){
+            return Sk.ffi.remapToPy(null);
+        }
+        return Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
+    }
 
     /**
      * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
@@ -383,6 +408,9 @@ var $sk_mod_instructor = function(name) {
             if(key == "data_type"){
                 //if it's a name node, returns the data type, otherwise returns null
                 return checkNameNodeType(actualAstNode);
+            }
+            if(key == "next_tree"){
+                return getNextTree(self);
             }
             if(key == "ast_name"){
                 key = "_astname";
@@ -497,9 +525,9 @@ var $sk_mod_instructor = function(name) {
         **/
         $loc.find_all = new Sk.builtin.func(function(self, type) {
             var items = [];
-            var visitor = new NodeVisitor();
             var currentId = self.id - 1;
             var funcName = 'visit_' + Sk.ffi.remapToJs(type);
+            var visitor = new NodeVisitor();
             visitor.visit = function(node) {
                 currentId += 1;
                 /** Visit a node. **/
