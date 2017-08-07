@@ -462,10 +462,18 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
         this.model.assignment['disable_algorithm_errors'](assignment.disable_algorithm_errors);
     }
     // Programs
-    this.model.programs['__main__'](programs.__main__);
-    this.model.programs['starting_code'](assignment.starting_code);
-    this.model.programs['give_feedback'](assignment.give_feedback);
-    this.model.programs['on_change'](assignment.on_change);
+    if (programs.__main__ !== undefined) {
+        this.model.programs['__main__'](programs.__main__);
+    }
+    if (assignment.starting_code !== undefined) {
+        this.model.programs['starting_code'](assignment.starting_code);
+    }
+    if (assignment.give_feedback !== undefined) {
+        this.model.programs['give_feedback'](assignment.give_feedback);
+    }
+    if (assignment.on_change !== undefined) {
+        this.model.programs['on_change'](assignment.on_change);
+    }
     this.model.programs['answer'](assignment.answer);
     // Update Model
     // Reload blockly
