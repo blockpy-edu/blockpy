@@ -196,7 +196,8 @@ BlockPy.prototype.initModel = function(settings) {
             'upload': ko.observable(false),
             'importable': ko.observable(false),
             'has_files': ko.observable(false),
-            'disable_algorithm_errors': ko.observable(false)
+            'disable_algorithm_errors': ko.observable(false),
+            'disable_timeout': ko.observable(false)
         },
         // Programs' actual code
         'programs': {
@@ -426,7 +427,8 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
                     assignment.disable_algorithmic_errors || 
                     false);
     this.model.settings['disable_variable_types'](settings.disable_variable_types);
-    this.model.settings['disable_timeout'](settings.disable_timeout);
+    this.model.settings['disable_timeout'](settings.disable_timeout || 
+                                           assignment.disable_timeout);
     this.model.settings['developer'](settings.developer);
     if (settings.completedCallback) {
         this.model.settings['completedCallback'] = settings.completedCallback;

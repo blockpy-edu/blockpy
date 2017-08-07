@@ -40,7 +40,7 @@ AbstractInterpreter.prototype.processAst = function(ast) {
     this.variableTypes = {};
     this.variablesNonBuiltin = {};
     for (var name in this.BUILTINS) {
-        this.setVariable(name, this.BUILTINS[name]);
+        this.setVariable(name, this.BUILTINS[name], true);
     }
     
     // OLD
@@ -130,7 +130,6 @@ function otherBranch(branch) {
 AbstractInterpreter.prototype.postProcess = function() {
     for (var name in this.variables) {
         if (!(name in this.BUILTINS)) {
-            //console.log("STARTING", name, this.source)
             var trace = this.variables[name];
             this.variablesNonBuiltin[name] = trace.slice();
             //console.log(name, this.variablesNonBuiltin[name])
@@ -354,7 +353,7 @@ AbstractInterpreter.prototype.typecheck = function(value) {
         case "BinOp":
             var left = this.typecheck(value.left),
                 right = this.typecheck(value.right);
-            if (left === null || right === null) {
+            if (left === null || right === null || left === undefined || right === undefined) {
                 return null;
             } else if (left.type != right.type) {
                 this.report["Incompatible types"].push({"left": left, "right": right, "operation": value.op.name, "position": this.getLocation(value)});

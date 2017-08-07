@@ -327,6 +327,7 @@ BlockPyEngine.prototype.analyzeParse = function() {
             'success': false,
             'error': error
         }
+        return false;
     }
     report['analyzer'] = {
         'success': true,
