@@ -32,6 +32,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.parsons.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.importable.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
     model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
     model.execution.show_trace.subscribe(function(newValue) { server.logEvent('trace', newValue); });
@@ -165,6 +166,7 @@ BlockPyServer.prototype.saveAssignment = function() {
         data['initial'] = model.assignment.initial_view();
         data['importable'] = model.assignment.importable();
         data['disable_algorithm_errors'] = model.assignment.disable_algorithm_errors();
+        data['disable_timeout'] = model.assignment.disable_timeout();
         data['name'] = model.assignment.name();
         data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
         
