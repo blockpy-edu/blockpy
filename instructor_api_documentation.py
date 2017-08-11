@@ -30,14 +30,25 @@ def explain(message, priority="medium", line=None):
     '''
     Gives student the message as corrective feedback (and higlights line 
     number). If this function is called multiple times, the student is given the
-    first feedback of the highest priority found.
+    first feedback of the highest priority found. By default, this overrides
+    the analyzer and runtime errors that are given - if you want to avoid overriding
+    those, then use `gently`.
     
     Args:
         message (str): The HTML string to display to the user in the Feedback
                        panel as corrective feedback. 
 		priority (str): Either "low", "medium", or "high", indicating the
-                        ordering of the feedback if multiple occur.
+                        ordering of the feedback if multiple occur. Also "student"
+			is an option to put it after the analyzer and runtime
+			errors.
 		line (int): The specific line number to highlight for the user.
+    '''
+
+def gently(message):
+    '''
+    Gives students the message as corrective feedback, at a priority level
+    below the analyzer and runtime errors - that way, it can be used to
+    more "gently" guide the student.
     '''
 
 def suppress(type, subtype):
