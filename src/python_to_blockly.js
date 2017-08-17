@@ -1488,16 +1488,28 @@ PythonToBlocks.prototype.Subscript = function(node)
     var slice = node.slice;
     var ctx = node.ctx;
     
-    if (slice.value._astname == "Str") {
-        return block("dict_get_literal", node.lineno, {
-            "ITEM": this.Str_value(slice.value)
+    if (slice._astname == "Index") {
+        if (slice.value._astname == "Str") {
+            return block("dict_get_literal", node.lineno, {
+                "ITEM": this.Str_value(slice.value)
+            }, {
+                "DICT": this.convert(value)
+            });
+        } else if (slice.value._astname == "Num") {
+            return block("lists_index", node.lineno, {}, {
+                "ITEM": this.convert(slice.value),
+                "LIST": this.convert(value),
+            });
+        }
+    } else if (slice._astname == "Slice") {
+        return block("lists_getSublist", node.lineno, {
+            "WHERE1": "FROM_START",
+            "WHERE2": "FROM_END"
         }, {
-            "DICT": this.convert(value)
-        });
-    } else if (slice.value._astname == "Num") {
-        return block("lists_index", node.lineno, {}, {
-            "ITEM": this.convert(slice.value),
-            "LIST": this.convert(value),
+            "LIST": this.convert(value)
+        }, {}, {
+            "AT1": this.convert(slice.lower),
+            "AT2": this.convert(slice.upper)
         });
     }
     

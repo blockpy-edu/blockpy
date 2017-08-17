@@ -303,7 +303,7 @@ Blockly.Blocks['lists_indexOf'] = {
     this.setColour(Blockly.Blocks.lists.HUE);
     this.setOutput(true, 'Number');
     this.appendValueInput('VALUE')
-        .setCheck('Array')
+        .setCheck(['Array', 'String'])
         .appendField(Blockly.Msg.LISTS_INDEX_OF_INPUT_IN_LIST);
     this.appendValueInput('FIND')
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'END');
@@ -329,7 +329,7 @@ Blockly.Blocks['lists_index'] = {
             .setCheck('Number')
             .appendField("get");
         this.appendValueInput('LIST')
-            .setCheck('Array')
+            .setCheck(['Array', 'String'])
             .appendField("th item of");
         this.setInputsInline(true);
         this.setOutput(true);
@@ -354,7 +354,8 @@ Blockly.Blocks['lists_getIndex'] = {
          [Blockly.Msg.LISTS_GET_INDEX_FROM_END, 'FROM_END'],
          [Blockly.Msg.LISTS_GET_INDEX_FIRST, 'FIRST'],
          [Blockly.Msg.LISTS_GET_INDEX_LAST, 'LAST'],
-         [Blockly.Msg.LISTS_GET_INDEX_RANDOM, 'RANDOM']];
+         [Blockly.Msg.LISTS_GET_INDEX_RANDOM, 'RANDOM']
+         ];
     this.setHelpUrl(Blockly.Msg.LISTS_GET_INDEX_HELPURL);
     this.setColour(Blockly.Blocks.lists.HUE);
     var modeMenu = new Blockly.FieldDropdown(MODE, function(value) {
@@ -673,7 +674,7 @@ Blockly.Blocks['lists_getSublist'] = {
     this.setHelpUrl(Blockly.Msg.LISTS_GET_SUBLIST_HELPURL);
     this.setColour(Blockly.Blocks.lists.HUE);
     this.appendValueInput('LIST')
-        .setCheck('Array')
+        .setCheck(['Array', "String"])
         .appendField(Blockly.Msg.LISTS_GET_SUBLIST_INPUT_IN_LIST);
     this.appendDummyInput('AT1');
     this.appendDummyInput('AT2');

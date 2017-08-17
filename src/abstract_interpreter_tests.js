@@ -99,6 +99,7 @@
         
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
+        ['def int_func(x):\n\treturn 5\nint_func(10)', [], []]
     ];
     
     var errors = 0;
