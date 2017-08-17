@@ -166,3 +166,7 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     opacity: 0.5;
     z-index: 10000;
 }
+
+.blockpy-feedback-original {
+    white-space: pre-wrap;
+}
