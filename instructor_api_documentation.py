@@ -217,6 +217,14 @@ def parse_program():
         AstNode: The root node of the AST
     '''
     
+def get_program():
+    '''
+    Returns the students' code as a string.
+    
+    Returns:
+        String: The string representation of the student code.
+    '''
+    
 
 def def_use_error(node):
     '''

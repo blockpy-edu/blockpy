@@ -331,6 +331,14 @@ var $sk_mod_instructor = function(name) {
             Sk.executionReports['student']['output'].removeAll();
         }
     });
+    
+    /**
+     * This function is called by instructors to get the students' code as a string.
+    **/
+    mod.get_program = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_program", arguments, 0, 0);
+        return Sk.ffi.remapToPy(Sk.executionReports['verifier'].code);
+    });
 
     /**
      * This function is called by instructors to construct the python version of the AST
