@@ -311,7 +311,7 @@ AbstractInterpreter.prototype.getLast = function(name) {
 }
 
 AbstractInterpreter.prototype.getType = function(name) {
-    this.getLast(name).currentType;
+    return this.getLast(name).currentType;
 }
 
 AbstractInterpreter.prototype.isTypeEmptyList = function(name) {

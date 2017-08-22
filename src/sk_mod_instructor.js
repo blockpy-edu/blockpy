@@ -344,8 +344,12 @@ var $sk_mod_instructor = function(name) {
      * This function is called by instructors to construct the python version of the AST
     **/
     mod.parse_program = new Sk.builtin.func(function() {
-        generateFlatTree(Sk.executionReports['verifier'].code);
-        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+        if (Sk.executionReports['verifier'].success) {
+            generateFlatTree(Sk.executionReports['verifier'].code);
+            return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+        } else {
+            return Sk.builtin.none.none$;
+        }
     });
 
     mod.def_use_error = new Sk.builtin.func(function(py_node) {
@@ -404,6 +408,20 @@ var $sk_mod_instructor = function(name) {
         }
         return Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
     }
+    
+    /**
+     * TODO: Make this a subclass of AstNode that can be returned when a user
+             parses a broken program. This would fail silently for most kinds
+             of traversals (e.g., "ast.find_all" or "ast.body"). Perhaps it
+             has some kind of special flag.
+     */
+    mod.CorruptedAstNode = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            self.id = -1;
+            self.type = '';
+            Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
+        });
+    });
 
     /**
      * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
