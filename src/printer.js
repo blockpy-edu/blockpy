@@ -74,8 +74,8 @@ BlockPyPrinter.prototype.print = function(lineText) {
     var lineNumber = this.main.components.engine.executionBuffer.line_number;
     // Perform any necessary cleaning
     if (lineText !== "\n") {
+        this.main.model.execution.output.push(lineText.slice(0, -1));
         var encodedText = encodeHTML(lineText);
-        this.main.model.execution.output.push(encodedText.trim());
         if (!(this.main.model.settings.mute_printer())) {
             var lineContainer = $("<div class='blockpy-printer-output' >");
             var lineData = $("<samp></samp>", {
