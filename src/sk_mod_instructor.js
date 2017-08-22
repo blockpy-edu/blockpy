@@ -503,8 +503,8 @@ var $sk_mod_instructor = function(name) {
                         default:
                             break;
                     }
-                    console.log(field)
-                    console.log(mixedRemapToPy(field));
+                    //console.log(field)
+                    //console.log(mixedRemapToPy(field));
                     //hope this is a basic type
                     return mixedRemapToPy(field);
                 }
