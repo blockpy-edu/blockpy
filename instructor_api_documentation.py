@@ -39,8 +39,8 @@ def explain(message, priority="medium", line=None):
                        panel as corrective feedback. 
 		priority (str): Either "low", "medium", or "high", indicating the
                         ordering of the feedback if multiple occur. Also "student"
-			is an option to put it after the analyzer and runtime
-			errors.
+                        is an option to put it after the analyzer and runtime
+                        errors, and "verifier" will put it before syntax errors.
 		line (int): The specific line number to highlight for the user.
     '''
 
