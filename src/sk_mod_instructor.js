@@ -468,6 +468,8 @@ var $sk_mod_instructor = function(name) {
                     var childId = flatTree.indexOf(field[0]);//get the relevant node
                     //console.log("Assign and targets case!" + childId);
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
+                } else if (field === null) {
+                    return Sk.ffi.remapToPy(null);
                 } else if (field.constructor === Array && key != "ops"){
                     var astNodeCount = 0
                     var fieldArray = [];
