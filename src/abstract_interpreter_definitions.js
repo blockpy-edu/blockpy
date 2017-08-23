@@ -74,6 +74,12 @@ AbstractInterpreter.METHODS = {
             "type": "Function",
             "returns": {"type": "None"}
         }
+    },
+    "Str": {
+        "strip": {
+            "type": "Function",
+            "returns": {"type": "Str"}
+        }
     }
 }
 AbstractInterpreter.MODULES = {
