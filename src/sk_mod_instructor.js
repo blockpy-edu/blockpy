@@ -331,14 +331,25 @@ var $sk_mod_instructor = function(name) {
             Sk.executionReports['student']['output'].removeAll();
         }
     });
+    
+    /**
+     * This function is called by instructors to get the students' code as a string.
+    **/
+    mod.get_program = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_program", arguments, 0, 0);
+        return Sk.ffi.remapToPy(Sk.executionReports['verifier'].code);
+    });
 
     /**
      * This function is called by instructors to construct the python version of the AST
     **/
     mod.parse_program = new Sk.builtin.func(function() {
-        generateFlatTree(Sk.executionReports['verifier'].code);
-        console.log(flatTree);
-        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+        if (Sk.executionReports['verifier'].success) {
+            generateFlatTree(Sk.executionReports['verifier'].code);
+            return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+        } else {
+            return Sk.builtin.none.none$;
+        }
     });
 
     mod.def_use_error = new Sk.builtin.func(function(py_node) {
@@ -397,6 +408,20 @@ var $sk_mod_instructor = function(name) {
         }
         return Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
     }
+    
+    /**
+     * TODO: Make this a subclass of AstNode that can be returned when a user
+             parses a broken program. This would fail silently for most kinds
+             of traversals (e.g., "ast.find_all" or "ast.body"). Perhaps it
+             has some kind of special flag.
+     */
+    mod.CorruptedAstNode = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self) {
+            self.id = -1;
+            self.type = '';
+            Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
+        });
+    });
 
     /**
      * Returns javascript equivalent string representation of python operator given a function that represents
@@ -600,6 +625,8 @@ var $sk_mod_instructor = function(name) {
                     var childId = flatTree.indexOf(field[0]);//get the relevant node
                     //console.log("Assign and targets case!" + childId);
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
+                } else if (field === null) {
+                    return Sk.ffi.remapToPy(null);
                 } else if (field.constructor === Array && key != "ops"){
                     var astNodeCount = 0
                     var fieldArray = [];
@@ -634,8 +661,8 @@ var $sk_mod_instructor = function(name) {
                         default:
                             break;
                     }
-                    console.log(field)
-                    console.log(mixedRemapToPy(field));
+                    //console.log(field)
+                    //console.log(mixedRemapToPy(field));
                     //hope this is a basic type
                     return mixedRemapToPy(field);
                 }

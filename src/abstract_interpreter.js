@@ -43,6 +43,8 @@ AbstractInterpreter.prototype.processAst = function(ast) {
         this.setVariable(name, this.BUILTINS[name], true);
     }
     
+    this.functionContext = null;
+    
     // OLD
     //this.frameIndex = 0;
     //this.rootFrame = this.newFrame(null);
@@ -80,13 +82,17 @@ AbstractInterpreter.prototype._initializeVariable = function(name) {
         this.variables[name] = [];
     }
 }
-AbstractInterpreter.prototype._newBehavior = function(method, type, position, currentType) {
+AbstractInterpreter.prototype._newBehavior = function(method, type, position, currentType, returnType) {
+    if (returnType === undefined) {
+        returnType = null;
+    }
     return {"method": method, 
             "type": type, 
             "loop": this.loopStackId, 
             "parentName": this.currentBranchName,
             "position": position, 
-            "currentType": currentType};
+            "currentType": currentType,
+            "returnType": returnType};
 }
 
 AbstractInterpreter.prototype.setVariable = function(name, type, position) {
@@ -96,6 +102,17 @@ AbstractInterpreter.prototype.setVariable = function(name, type, position) {
 AbstractInterpreter.prototype.setIterVariable = function(name, type, position) {
     this._initializeVariable(name);
     this.variables[name].push(this._newBehavior("set_iterate", type, position, type));
+}
+AbstractInterpreter.prototype.setReturnVariable = function(name, type, position) {
+    this._initializeVariable(name);
+    this.variables[name].push({
+        "method": "set_returns",
+        "type": this.getLast(name).type,
+        "parentName": this.getLast(name).parentName,
+        "position": position,
+        "currentType": this.getLast(name).type,
+        "returnType": type,
+    });
 }
 AbstractInterpreter.prototype.updateVariable = function(name, type, position) {
     this._initializeVariable(name);
@@ -223,6 +240,8 @@ AbstractInterpreter.prototype.postProcess = function() {
                                     result["was read"] = "yes"
                                 }
                             }
+                        } else if (node["method"] == "set_returns") {
+                            
                         } else if (node["method"] == "read" || node["method"] == "iterate") {
                             if (result["was set"] == "no") {
                                 report['Undefined variables'].push({"name": name, "position": node.position});
@@ -281,14 +300,18 @@ AbstractInterpreter.prototype.testTypeEquality = function(left, right) {
     }
 }
 
-AbstractInterpreter.prototype.getType = function(name) {
+AbstractInterpreter.prototype.getLast = function(name) {
     if (name in this.variables) {
         var trace = this.variables[name];
         if (trace != undefined && trace.length > 0) {
-            return trace[trace.length-1].currentType;
+            return trace[trace.length-1];
         }
     }
-    return null;
+    return {'currentType': null, 'returnType': null};
+}
+
+AbstractInterpreter.prototype.getType = function(name) {
+    return this.getLast(name).currentType;
 }
 
 AbstractInterpreter.prototype.isTypeEmptyList = function(name) {
@@ -479,12 +502,19 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
 
 AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
     this.setVariable(node.name.v, {"type": "Function"}, this.getLocation(node))
+    this.functionContext = node.name.v;
     var args = node.args.args;
     for (var i = 0; i < args.length; i++) {
         var arg = args[i];
         var name = Sk.ffi.remapToJs(arg.id);
         this.setVariable(name, {}, this.getLocation(node))
     }
+    this.generic_visit(node);
+}
+AbstractInterpreter.prototype.visit_Return = function(node) {
+    this.setReturnVariable(this.functionContext, 
+                           this.typecheck(node.value), 
+                           this.getLocation(node));
     this.generic_visit(node);
 }
 

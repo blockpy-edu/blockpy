@@ -31,3 +31,4 @@ PythonToBlocks.KNOWN_ATTR_FUNCTIONS['count'] = function(func, args, keywords, st
                     "HAYSTACK": this.convert(func.value)
                 }, {"inline": "true"});
 }
+
