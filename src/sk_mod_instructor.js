@@ -232,7 +232,7 @@ var $sk_mod_instructor = function(name) {
     }
     /**
      * This function checks if the given object is one of the Sk.builtin objects
-     * TODO: make this so we don't have to explicitly put out eveyr option
+     * TODO: make this so we don't have to explicitly put out every option
      *          one possible thing we could do is get a string version of the 
      *          of the constructor and look for the substring "return new Sk.builtin"
      *          But I don't know how reliable that is.  Rather, it's kind of hackish.
@@ -346,6 +346,7 @@ var $sk_mod_instructor = function(name) {
     mod.parse_program = new Sk.builtin.func(function() {
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
+            console.log(flatTree);
             return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         } else {
             return Sk.builtin.none.none$;
@@ -513,7 +514,7 @@ var $sk_mod_instructor = function(name) {
             var consArray = [];
             var expConsArray = []
             var consRegex = /-?(?:\d{1,})\.?(?:\d{1,})?/;
-            var varRegex = /[a-zA-Z_]\w{1,}/;
+            var varRegex = new RegExp(/[a-zA-Z_]\w{1,}/,'g');
             var extracts = expr.match(consRegex);
             for(var i = 0; i < extracts.length; i += 1){
                 var cons = extracts[i] * 1;
@@ -522,7 +523,13 @@ var $sk_mod_instructor = function(name) {
                 expConsArray.push(cons + mag * -1);
                 expConsArray.push(cons + mag);
             }
-            var compVar = expr.match(varRegex);
+            var compVarArray = expr.match(varRegex);
+            var compVar = [];
+            for(var i = 0; i < compVarArray.length; i += 1){
+                if(compVar.indexOf(compVarArray[i]) == -1){
+                    compVar.push(compVarArray[i]);
+                }
+            }
             if(compVar.length != 1){
                 console.log("too many variables");
                 return Sk.ffi.remapToPy(null);
@@ -530,6 +537,7 @@ var $sk_mod_instructor = function(name) {
                 compVar = "varPlaceHolder";
             }
             expr = expr.replace(varRegex, "varPlaceHolder");
+            console.log(expr);
             //build sudent expression
             var otherExpr = "";
             var prevWasOp = false;
