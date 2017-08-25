@@ -39,7 +39,20 @@ def only_printing_variables():
                 if arg.ast_name != "Name":
                     return False
     return True
-    
+
+def find_prior_initializations(node):
+    if node.ast_name != "Name":
+        return None
+    ast = parse_program()
+    assignments = ast.find_all("Assign")
+    cur_line_no = node.lineno
+    all_assignments = []
+    for assignment in assignments:
+        if assignment.has(node):
+            if assignment.lineno < cur_line_no:
+                all_assignments.append(assignment)
+    return all_assignments
+
 '''
     
     mod.no_nonlist_nums = new Sk.builtin.func(function(source) {
