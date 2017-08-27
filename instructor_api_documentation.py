@@ -291,7 +291,8 @@ class AstNode():
     def has(self, astNode):
         '''
         Returns whether the given astNode is a Name astNode (or a number) AND
-        if astNode node is in the subtree of this node.
+        if the name of the variable associated with astNode node is in the
+        subtree of this node.
         
         Args:
             astNode (AstNode or int): The potential child node to find.
@@ -313,7 +314,19 @@ class AstNode():
         Returns:
             list of AstNode: The AstNodes descended from this one.
         '''
-        
+    def numeric_logic_check(self, mag, expr):
+        '''
+        Returns whether the numerical logical expression represented by the AST self likely
+        equivalent to the numerical logical expression represented by expr.
+        Args:
+            mag (number): a tolerance value with which to check against. This is used for checking
+                            boundary conditions
+            expr (string): A string written in JAVASCRIPT syntax that is equivalent to the logic
+                            that you want self to be equivalent to. Eval is run on this string
+        Returns:
+            None: This means that either there was more than one variable in expr or self,
+                    that self wasn't a Compare or BoolOp node, or that 
+        '''
 ## instructor_utility.py
 
 def function_is_called(name):
@@ -335,4 +348,13 @@ def only_printing_variables():
     
     Returns:
         bool: Whether any print function calls print non-variables.
+    '''
+def find_prior_initializations(node):
+    '''
+    Given a name ast node at a specific location in code, returns a list of
+    all previous assignments that have written to that name
+
+    Returns:
+        None if node is not a Name node, otherwise returns a (possibly empty)
+        list
     '''
