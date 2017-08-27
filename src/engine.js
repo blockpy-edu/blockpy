@@ -196,6 +196,7 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
+    this.main.components.server.logEvent('editor', 'run')
     var engine = this;
     var model = this.main.model;
     engine.resetReports();
@@ -238,6 +239,7 @@ BlockPyEngine.prototype.on_change = function() {
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
         engine.main.model.execution.status("complete");
+        this.main.components.server.logEvent('editor', 'change')
     });
 }
 
