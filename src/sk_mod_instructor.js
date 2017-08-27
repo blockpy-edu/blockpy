@@ -232,7 +232,7 @@ var $sk_mod_instructor = function(name) {
     }
     /**
      * This function checks if the given object is one of the Sk.builtin objects
-     * TODO: make this so we don't have to explicitly put out eveyr option
+     * TODO: make this so we don't have to explicitly put out every option
      *          one possible thing we could do is get a string version of the 
      *          of the constructor and look for the substring "return new Sk.builtin"
      *          But I don't know how reliable that is.  Rather, it's kind of hackish.
@@ -346,6 +346,7 @@ var $sk_mod_instructor = function(name) {
     mod.parse_program = new Sk.builtin.func(function() {
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
+            console.log(flatTree);
             return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         } else {
             return Sk.builtin.none.none$;
@@ -424,6 +425,60 @@ var $sk_mod_instructor = function(name) {
     });
 
     /**
+     * Returns javascript equivalent string representation of python operator given a function that represents
+     * a python operator
+    **/
+    function transPyOps(field){
+        var op = field.name;
+        console.log("op is: " + op);
+        var transOp = null;
+        switch(op){
+            case "Add":
+                transOp = "+";
+                break;
+            case "Div":
+                transOp = "/";
+                break;
+            case "Mult":
+                transOp = "*";
+                break;
+            case "Sub":
+                transOp = "-";
+                break;
+            case "Gt":
+                transOp = ">";
+                break;
+            case "Lt":
+                transOp = "<";
+                break;
+            case "LtE":
+                transOp = "<=";
+                break;
+            case "GtE":
+                transOp = ">=";
+                break;
+            case "And":
+                transOp = "&&";
+                break;
+            case "Or":
+                transOp = "||";
+                break;
+            case "Not":
+                transOp = "!";
+                break;
+            case "Eq":
+                transOp = "==";
+                break;
+            case "NotEq":
+                transOp = "!=";
+                break;
+            default:
+                break;
+        }
+        return transOp;
+    }
+
+    /**
      * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
      * is called first
      * @property {number} self.id - the javascript id number of this object
@@ -441,7 +496,117 @@ var $sk_mod_instructor = function(name) {
         $loc.__eq__ = new Sk.builtin.func(function(self, other){
             return Sk.ffi.remapToPy(self.id == other.id);
         });
-        
+
+        /**
+         * If this node is a Compare or BoolOp node, sees if the logic in expr (a javascript string being a logical statement)
+         * matches the logic of self.  This assumes that we are only comparing numerical values to a single variable
+         * @property {number} mag - the order of magnitude that should be added to numbers to check logic, 1 is usually
+         * a good value, especially when working with the set of integers.
+        **/
+        $loc.numeric_logic_check = new Sk.builtin.func(function(self, mag, expr){
+            if(self.type != "Compare" && self.type != "BoolOp"){
+                console.log("incorrect node type: " + self.type);
+                return Sk.ffi.remapToPy(null);
+            }
+            expr = Sk.ffi.remapToJs(expr);
+            var actualAstNode = flatTree[self.id];
+            //test values for the boolean expression
+            var consArray = [];
+            var expConsArray = []
+            var consRegex = /-?(?:\d{1,})\.?(?:\d{1,})?/;
+            var varRegex = new RegExp(/[a-zA-Z_]\w{1,}/,'g');
+            var extracts = expr.match(consRegex);
+            for(var i = 0; i < extracts.length; i += 1){
+                var cons = extracts[i] * 1;
+                consArray.push(cons);
+                expConsArray.push(cons);
+                expConsArray.push(cons + mag * -1);
+                expConsArray.push(cons + mag);
+            }
+            var compVarArray = expr.match(varRegex);
+            var compVar = [];
+            for(var i = 0; i < compVarArray.length; i += 1){
+                if(compVar.indexOf(compVarArray[i]) == -1){
+                    compVar.push(compVarArray[i]);
+                }
+            }
+            if(compVar.length != 1){
+                console.log("too many variables");
+                return Sk.ffi.remapToPy(null);
+            }else{
+                compVar = "varPlaceHolder";
+            }
+            expr = expr.replace(varRegex, "varPlaceHolder");
+            console.log(expr);
+            //build sudent expression
+            var otherExpr = "";
+            var prevWasOp = false;
+            var boolOpstack = [];
+            var studentVars = [];
+            var fastFail = false;
+            var visitor = new NodeVisitor();
+            visitor.visit_BoolOp = function(node){
+                otherExpr += "(";
+                var values = node.values;
+                for(var i = 0; i < values.length; i += 1){
+                    this.visit(values[i]);
+                    if(i < values.length - 1){
+                        otherExpr += transPyOps(node.op);
+                    }
+                }
+                otherExpr += ")";
+            }
+            visitor.visit_Name = function(node){
+                if(studentVars.length == 0){
+                    studentVars.push(node.id);
+                }
+                if(studentVars.indexOf(node.id) == -1){
+                    var fastFail = true;
+                }
+                otherExpr += compVar + " ";
+            }
+            visitor.visit_Num = function(node){
+                otherExpr += Sk.ffi.remapToJs(node.n) + " ";
+            }
+            visitor.visit_Compare = function(node){
+                //left op comp op comp
+                otherExpr += "(";
+                this.visit(node.left);
+                var comparators = node.comparators;
+                var ops = node.ops;
+                for(var i = 0; i < comparators.length; i += 1){
+                    if(i % 2 == 1){
+                        otherExpr = " && ";
+                        this.visit(comparators[i-1]);
+                    }
+                    otherExpr += transPyOps(ops[i]);
+                    this.visit(comparators[i]);
+
+                }
+                otherExpr += ")";
+            }
+            visitor.visit(actualAstNode);
+            var varPlaceHolder = 0;
+            if(fastFail){
+                console.log("fast fail!");
+                return Sk.ffi.remapToPy(null);
+            }
+            console.log(expr);
+            console.log(otherExpr);
+            var otherCons = otherExpr.match(consRegex);
+            for(var i =0 ; i < otherCons.length; i += 1){
+                if(consArray.indexOf(otherCons[i] * 1) == -1){
+                    return Sk.ffi.remapToPy(false);
+                }
+            }
+            for(var i = 0; i < expConsArray.length; i += 1){
+                varPlaceHolder = expConsArray[i];
+                if(eval(expr) != eval(otherExpr)){
+                    return Sk.ffi.remapToPy(false);
+                }
+            }
+            return Sk.ffi.remapToPy(true);
+        });
         /**
          * This function dynamically looks to see if the ast node has a given property and does
          * remapping where it can
@@ -499,8 +664,7 @@ var $sk_mod_instructor = function(name) {
                         case "ops"://an operator
                         case "op"://an operator
                             //the above 3 cases are functions, extract the function name
-                            field = field.toString();
-                            field = field.substring(("function").length + 1, field.length - 4);
+                            field = field.name;
                             return Sk.ffi.remapToPy(field);
                         default:
                             break;
