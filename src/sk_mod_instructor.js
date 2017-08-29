@@ -404,7 +404,7 @@ var $sk_mod_instructor = function(name) {
             return this.generic_visit(node);
         }
         visitor.visit(flatTree[currentId]);
-        if(currentId > flatTree.length){
+        if(currentId >= flatTree.length){
             return Sk.ffi.remapToPy(null);
         }
         return Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
@@ -594,10 +594,11 @@ var $sk_mod_instructor = function(name) {
             console.log(expr);
             console.log(otherExpr);
             var otherCons = otherExpr.match(consRegex);
-            for(var i =0 ; i < otherCons.length; i += 1){
-                if(consArray.indexOf(otherCons[i] * 1) == -1){
-                    return Sk.ffi.remapToPy(false);
-                }
+            for(var i = 0; i < otherCons.length; i += 1){
+                var cons = otherCons[i] * 1;
+                expConsArray.push(cons);
+                expConsArray.push(cons + mag * -1);
+                expConsArray.push(cons + mag);
             }
             for(var i = 0; i < expConsArray.length; i += 1){
                 varPlaceHolder = expConsArray[i];

@@ -317,7 +317,8 @@ class AstNode():
     def numeric_logic_check(self, mag, expr):
         '''
         Returns whether the numerical logical expression represented by the AST self likely
-        equivalent to the numerical logical expression represented by expr.
+        equivalent to the numerical logical expression represented by expr.  Likely is determined by
+        testing boundary conditions
         Args:
             mag (number): a tolerance value with which to check against. This is used for checking
                             boundary conditions
@@ -325,7 +326,11 @@ class AstNode():
                             that you want self to be equivalent to. Eval is run on this string
         Returns:
             None: This means that either there was more than one variable in expr or self,
-                    that self wasn't a Compare or BoolOp node, or that 
+                    that self wasn't a Compare or BoolOp node, or that
+            True: This means that self matched all detectable edge cases testing between expr and self within
+                    the specified tolerance mag.
+            False: This means that self and expr didn't return the same thing for one of the automatically
+                    generated test inputs.
         '''
 ## instructor_utility.py
 
