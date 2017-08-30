@@ -430,7 +430,6 @@ var $sk_mod_instructor = function(name) {
     **/
     function transPyOps(field){
         var op = field.name;
-        console.log("op is: " + op);
         var transOp = null;
         switch(op){
             case "Add":
@@ -505,7 +504,6 @@ var $sk_mod_instructor = function(name) {
         **/
         $loc.numeric_logic_check = new Sk.builtin.func(function(self, mag, expr){
             if(self.type != "Compare" && self.type != "BoolOp"){
-                console.log("incorrect node type: " + self.type);
                 return Sk.ffi.remapToPy(null);
             }
             expr = Sk.ffi.remapToJs(expr);
@@ -531,13 +529,11 @@ var $sk_mod_instructor = function(name) {
                 }
             }
             if(compVar.length != 1){
-                console.log("too many variables");
                 return Sk.ffi.remapToPy(null);
             }else{
                 compVar = "varPlaceHolder";
             }
             expr = expr.replace(varRegex, "varPlaceHolder");
-            console.log(expr);
             //build sudent expression
             var otherExpr = "";
             var prevWasOp = false;
@@ -545,13 +541,18 @@ var $sk_mod_instructor = function(name) {
             var studentVars = [];
             var fastFail = false;
             var visitor = new NodeVisitor();
+            visitor.visit_BinOp = function(node){
+                this.visit(node.left);
+                otherExpr += transPyOps(node.op);
+                this.visit(node.right);
+            }
             visitor.visit_BoolOp = function(node){
                 otherExpr += "(";
                 var values = node.values;
                 for(var i = 0; i < values.length; i += 1){
                     this.visit(values[i]);
                     if(i < values.length - 1){
-                        otherExpr += transPyOps(node.op);
+                        otherExpr += transPyOps(node.op) + " ";
                     }
                 }
                 otherExpr += ")";
@@ -576,7 +577,7 @@ var $sk_mod_instructor = function(name) {
                 var ops = node.ops;
                 for(var i = 0; i < comparators.length; i += 1){
                     if(i % 2 == 1){
-                        otherExpr = " && ";
+                        otherExpr += " && ";
                         this.visit(comparators[i-1]);
                     }
                     otherExpr += transPyOps(ops[i]);
@@ -588,11 +589,8 @@ var $sk_mod_instructor = function(name) {
             visitor.visit(actualAstNode);
             var varPlaceHolder = 0;
             if(fastFail){
-                console.log("fast fail!");
                 return Sk.ffi.remapToPy(null);
             }
-            console.log(expr);
-            console.log(otherExpr);
             var otherCons = otherExpr.match(consRegex);
             for(var i = 0; i < otherCons.length; i += 1){
                 var cons = otherCons[i] * 1;
