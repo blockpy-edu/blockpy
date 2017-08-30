@@ -1,7 +1,7 @@
 from instructor_utility import *
 import instructor_append as append_api
 #################8.2 Start#######################
-def list_length_3_or_more():
+def wrong_list_length_8_2():
     ast = parse_program()
     assignments = ast.find_all("Assign")
     for assignment in assignments:
