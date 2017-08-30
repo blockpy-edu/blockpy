@@ -1097,7 +1097,9 @@ var outputList = [];
 //print("-----");
 //print(input);
 //print("-----");
-Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s, output: function(text) {if (text !== "\\n") {outputList.push(text); print(text) }} });
+Sk.configure({syspath:["%s"], read:read, python3:%s, debugging:%s
+, output: function(text) {if (text !== "\\n") {outputList.push(text); print(text); }}
+ });
 Sk.misceval.asyncToPromise(function() {
     return Sk.importMain("%s", %s, true);
 }).then(function (data) {
@@ -1107,7 +1109,8 @@ Sk.misceval.asyncToPromise(function() {
     //  JSON.stringify(data.$d);
     // Source code
     //  input
-    //print("-----");
+    print("-----");
+    //print(outputList)
 }, function(e) {
     print("UNCAUGHT EXCEPTION: " + e);
     print(e.stack);

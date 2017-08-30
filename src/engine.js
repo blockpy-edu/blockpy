@@ -404,6 +404,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         this.main.model.programs[filename]()
     );
+    var line_count = instructorCode.split(/\r\n|\r|\n/).length;
     var engine = this;
     report['instructor'] = {
         'compliments': [],
@@ -425,6 +426,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
             } else {
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
+                report['instructor']['line_offset'] = line_count;
             }
             after();
         }

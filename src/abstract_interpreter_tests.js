@@ -99,7 +99,10 @@
         
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
-        ['def int_func(x):\n\treturn 5\nint_func(10)', [], []]
+        ['def int_func(x):\n\treturn 5\nint_func(10)', [], []],
+        
+        // Built-ins
+        ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']]
     ];
     
     var errors = 0;
@@ -109,6 +112,7 @@
             nones = unit_tests[i][1],
             somes = unit_tests[i][2];
         analyzer.processCode(source);
+        //console.log(source);
         if (analyzer.report.error !== false) {
             console.error("AI Tests: Error message in "+nones[j], "\n"+source, "\n"+analyzer.report.error);
             errors += 1;

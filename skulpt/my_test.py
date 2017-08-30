@@ -1,5 +1,5 @@
-list = [1,2,3,4] 
-count = 0 
-for list in var: 
-    count = count + list 
-print(count)
+class A():
+    def __init__(self):
+        self.value = 5
+    
+a = A()
