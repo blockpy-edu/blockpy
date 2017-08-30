@@ -61,6 +61,25 @@ def wrong_accumulator_initialization_placement_8_3():
     if is_placed_wrong:
         explain("The property to hold the sum of the episode lengths (sum_length) must be initialized before the iteration which uses this property.")
     return is_placed_wrong 
+def wrong_iteration_body_8_3():
+    ast = parse_program()
+    assignments = ast.find_all("Assign")
+    is_placed_wrong = True
+    lineno = None
+    for assignment in assignments:
+        right = assignment.value
+        left = assignment.targets
+        if left.id == "sum_length" and right.ast_name == "BinOp" and right.op == "Add":
+            lineno = left.lineno
+    loops = ast.find_all("For")
+    for loop in loops:
+        if lineno == None: 
+            break
+        if loop.lineno < lineno:
+            is_placed_wrong = False
+    if is_placed_wrong:
+        explain("The addition of each episode length to the total length is not in the correct place.")
+    return is_placed_wrong
 def wrong_print_8_3():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -142,7 +161,7 @@ def wrong_should_be_counting():#This doesn't do as it is intended to do!
             for binop in binops:
                 if binop.has(iter_prop) and binop.op == "Add":
                     explain("This problem asks for the number of items in the list not the total of all the values in the list.")
-def wrong_should_be_summing():#this doesn't do as it is intended to do!
+def wrong_should_be_summing():
     ast = parse_program()
     for_loops = ast.find_all("For")
     for loop in for_loops:
@@ -231,7 +250,7 @@ def missing_zero_initialization():
                     accu_init = True
                     break
     if accu_init == False and accumulator != None:
-        explain("The addition on the first iteration step is not correct because the property <b>%s</b> does not have an initial value." %(accumulator.id,accumulator.id))
+        explain("The addition on the first iteration step is not correct because the property <b>%s</b> has not been initialized to an appropriate initial value" %(accumulator.id))
         return False
     return True
 #################AVERAGE START###############
