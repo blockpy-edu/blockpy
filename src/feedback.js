@@ -344,6 +344,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Instructor
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
+        //report['instructor']['line_offset']
         this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
         console.error(error);
         return 'instructor';
