@@ -31,7 +31,7 @@ BlockPyFeedback.prototype.buildTraceTable = function() {
     var execution = this.main.model.execution;
     execution.show_trace(true);
     execution.trace_step(execution.last_step());
-    this.main.components.server.logEvent('editor', 'trace')
+    this.main.components.server.logEvent('editor', 'trace');
 }
 
 /**
@@ -344,6 +344,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Instructor
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
+        //report['instructor']['line_offset']
         this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
         console.error(error);
         return 'instructor';

@@ -460,6 +460,14 @@ AbstractInterpreter.prototype.visit_Call = function(node) {
         this.generic_visit(node);
     }
 }
+/*
+AbstractInterpreter.prototype.visit_Print = function(node) {
+    for (var i = 0, len = node.values.length; i < len; i++) {
+        var value = node.values[i];
+        this.visit(value);
+    }
+    //this.generic_visit(node);
+}*/
 AbstractInterpreter.prototype.visit_Assign = function(node) {
     var typeValue = this.typecheck(node.value);
     this.visit(node.value);
@@ -497,6 +505,11 @@ AbstractInterpreter.prototype.visit_Name = function(node) {
     if (node.ctx.prototype._astname === "Load") {
         this.readVariable(node.id.v, this.getLocation(node));
     }
+    this.generic_visit(node);
+}
+
+AbstractInterpreter.prototype.visit_BinOp = function(node) {
+    this.typecheck(node);
     this.generic_visit(node);
 }
 
