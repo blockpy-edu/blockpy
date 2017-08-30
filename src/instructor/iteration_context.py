@@ -850,7 +850,7 @@ def wrong_debug_10_6():
     else:
         append_calls = append_api.find_append_in(loops[0])
         if len(append_calls) != None:
-        	bad_change = True
+            bad_change = True
     if not bad_change:
         item = loops[0].target
         list1 = loops[0].iter
