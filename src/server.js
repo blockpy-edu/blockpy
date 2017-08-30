@@ -34,7 +34,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
-    model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
+    //model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
     model.execution.show_trace.subscribe(function(newValue) { server.logEvent('trace', newValue); });
     model.execution.trace_step.subscribe(function(newValue) { server.logEvent('trace_step', newValue); });
 };

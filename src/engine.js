@@ -196,6 +196,7 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
+    this.main.components.server.logEvent('editor', 'run')
     var engine = this;
     var model = this.main.model;
     engine.resetReports();
@@ -238,6 +239,7 @@ BlockPyEngine.prototype.on_change = function() {
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
         engine.main.model.execution.status("complete");
+        this.main.components.server.logEvent('editor', 'change')
     });
 }
 
@@ -402,6 +404,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         this.main.model.programs[filename]()
     );
+    var line_count = instructorCode.split(/\r\n|\r|\n/).length;
     var engine = this;
     report['instructor'] = {
         'compliments': [],
@@ -423,6 +426,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
             } else {
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
+                report['instructor']['line_offset'] = line_count;
             }
             after();
         }

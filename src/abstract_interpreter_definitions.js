@@ -39,6 +39,13 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Num"}
         ]
     },
+    "float": {
+        "type": "Function",
+        "returns": {"type": "Num"},
+        "parameters": [
+            {"type": ["Str", "Num", "Bool"]}
+        ]
+    },
     "range": {
         "type": "Function",
         "returns": {"type": "List", "subtype": {"type": "Num"}},
