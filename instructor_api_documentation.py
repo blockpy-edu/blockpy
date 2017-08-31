@@ -317,7 +317,8 @@ class AstNode():
     def numeric_logic_check(self, mag, expr):
         '''
         Returns whether the numerical logical expression represented by the AST self likely
-        equivalent to the numerical logical expression represented by expr.
+        equivalent to the numerical logical expression represented by expr.  Likely is determined by
+        testing boundary conditions
         Args:
             mag (number): a tolerance value with which to check against. This is used for checking
                             boundary conditions
@@ -325,7 +326,11 @@ class AstNode():
                             that you want self to be equivalent to. Eval is run on this string
         Returns:
             None: This means that either there was more than one variable in expr or self,
-                    that self wasn't a Compare or BoolOp node, or that 
+                    that self wasn't a Compare or BoolOp node, or that
+            True: This means that self matched all detectable edge cases testing between expr and self within
+                    the specified tolerance mag.
+            False: This means that self and expr didn't return the same thing for one of the automatically
+                    generated test inputs.
         '''
 ## instructor_utility.py
 
@@ -357,4 +362,219 @@ def find_prior_initializations(node):
     Returns:
         None if node is not a Name node, otherwise returns a (possibly empty)
         list
+    '''
+##instructor_filter
+def missing_if_in_for():
+    '''
+    '''
+def append_not_in_if():
+    '''
+    '''
+##iteration_context
+def list_length_3_or_more():
+    '''
+    '''
+def missing_list_initialization_8_2():
+    '''
+    '''
+def wrong_list_initialization_placement_8_3():
+    '''
+    '''
+def wrong_accumulator_initialization_placement_8_3():
+    '''
+    '''
+def wrong_iteration_body_8_3():
+    '''
+    '''
+def wrong_print_8_3():
+    '''
+    '''
+def missing_target_slot_empty_8_4():
+    '''
+    '''
+def missing_addition_slot_empty_8_4():
+    '''
+    '''
+def wrong_names_not_agree_8_4():
+    '''
+    '''
+def wrong_should_be_counting():
+    '''
+    '''
+def wrong_should_be_summing():
+    '''
+    '''
+def wrong_cannot_sum_list():
+    '''
+    '''
+def missing_no_print():
+    '''
+    '''
+def missing_counting_list():
+    '''
+    '''
+def missing_summing_list():
+    '''
+    '''
+def missing_zero_initialization():
+    '''
+    '''
+def missing_average():
+    '''
+    '''
+def warning_average_in_iteration():
+    '''
+    '''
+def wrong_average_demoninator():
+    '''
+    '''
+def wrong_average_numerator():
+    '''
+    '''
+def wrong_compare_list():
+    '''
+    '''
+def wrong_for_inside_if():
+    '''
+    '''
+def wrong_list_initialization_9_1():
+    '''
+    '''
+def wrong_accumulator_initialization_9_1():
+    '''
+    '''
+def wrong_accumulation_9_1():
+    '''
+    '''
+def wrong_list_initialization_placement_9_1():
+    '''
+    '''
+def wrong_accumulator_initialization_placement_9_1():
+    '''
+    '''
+def wrong_iteration_body_9_1():
+    '''
+    '''
+def wrong_print_9_1():
+    '''
+    '''
+def wrong_list_initialization_9_2():
+    '''
+    '''
+def wrong_accumulator_initialization_9_2():
+    '''
+    '''
+def wrong_accumulation_9_2():
+    '''
+    '''
+def wrong_list_initialization_placement_9_2():
+    '''
+    '''
+def wrong_accumulator_initialization_placement_9_2():
+    '''
+    '''
+def wrong_iteration_body_9_2():
+    '''
+    '''
+def wrong_decision_body_9_2():
+    '''
+    '''
+def wrong_print_9_2():
+    '''
+    '''
+def wrong_comparison_9_6():
+    '''
+    '''
+def wrong_conversion_10_2():
+    '''
+    '''
+def wrong_filter_condition_10_3():
+    '''
+    '''
+def wrong_and_filter_condition_10_4():
+    '''
+    '''
+def wrong_nested_filter_condition_10_4():
+    '''
+    '''
+def wrong_conversion_problem_10_5():
+    '''
+    '''
+def wrong_filter_problem_atl1_10_5():
+    '''
+    '''
+def wrong_filter_problem_atl2_10_5():
+    '''
+    '''
+def wrong_append_problem_atl1_10_5():
+    '''
+    '''
+def wrong_append_problem_atl2_10_5():
+    '''
+    '''
+def wrong_debug_10_6():
+    '''
+    '''
+def wrong_debug_10_7():
+    '''
+    '''
+##instructor_histogram
+def histogram_missing():
+    '''
+    '''
+def plot_show_missing():
+    '''
+    '''
+def histogram_argument_not_list():
+    '''
+    '''
+def histogram_wrong_list():
+    '''
+    '''
+##instructor_append
+def find_append_in(node):
+    '''
+    '''
+def missing_append_in_iteration():
+    '''
+    '''
+def wrong_not_append_to_list():
+    '''
+    '''
+def missing_append_list_initialization():
+    '''
+    '''
+def wrong_append_list_initiatization():
+    '''
+    '''
+def append_list_wrong_slot():
+    '''
+    '''
+##instructor_iteration
+def all_for_loops():
+    '''
+    '''
+def wrong_target_is_list():
+    '''
+    '''
+def wrong_list_repeated_in_for():
+    '''
+    '''
+def missing_iterator_initialization():
+    '''
+    '''
+def wrong_iterator_not_list():
+    '''
+    '''
+def missing_target_slot_empty():
+    '''
+    '''
+def list_not_initialized_on_run():
+    '''
+    '''
+def list_initialization_misplaced():
+    '''
+    '''
+def missing_for_slot_empty():
+    '''
     '''
