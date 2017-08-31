@@ -1301,7 +1301,6 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
     } else if (name in PythonToBlocks.KNOWN_ATTR_FUNCTIONS) {
         return PythonToBlocks.KNOWN_ATTR_FUNCTIONS[name].bind(this)(func, args, keywords, starargs, kwargs, node)
     } else {
-        console.log(func, args, keywords, starargs, kwargs);
         heights = this.getChunkHeights(node);
         extractedSource = this.getSourceCode(arrayMin(heights), arrayMax(heights));
         var col_endoffset = node.col_endoffset;
@@ -1502,7 +1501,6 @@ PythonToBlocks.prototype.Subscript = function(node)
             });
         }
     } else if (slice._astname == "Slice") {
-        console.log(slice);
         var k = block("lists_getSublist", node.lineno, {
             "WHERE1": "FROM_START",
             "WHERE2": "FROM_START"
@@ -1514,7 +1512,6 @@ PythonToBlocks.prototype.Subscript = function(node)
             "@at1": "true", 
             "@at2": "true", 
         });
-        console.log(k);
         return k;
     }
     
