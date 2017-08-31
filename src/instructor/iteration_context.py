@@ -1,6 +1,7 @@
 from instructor_utility import *
+import instructor_append as append_api
 #################8.2 Start#######################
-def list_length_3_or_more():
+def wrong_list_length_8_2():
     ast = parse_program()
     assignments = ast.find_all("Assign")
     for assignment in assignments:
@@ -15,7 +16,7 @@ def missing_list_initialization_8_2():
     isMissing = True
     for assignment in assignments:
         right = assignment.value
-        left = assignment.target
+        left = assignment.targets
         if left.id == "shopping_cart":
             if right.ast_name == "List":
                 isMissing = False
@@ -31,7 +32,7 @@ def wrong_list_initialization_placement_8_3():
     lineno = None
     for assignment in assignments:
         right = assignment.value
-        left = assignment.target
+        left = assignment.targets
         if left.id == "episode_length_list":
             lineno = left.lineno
     loops = ast.find_all("For")
@@ -48,16 +49,37 @@ def wrong_accumulator_initialization_placement_8_3():
     lineno = None
     for assignment in assignments:
         right = assignment.value
-        left = assignment.target
-        if left.id == "sum_length":
+        left = assignment.targets
+        if left.id == "sum_length" and right.ast_name == "Num" and right.n == 0:
             lineno = left.lineno
     loops = ast.find_all("For")
     for loop in loops:
+        if lineno == None: 
+            break
         if loop.lineno > lineno:
             is_placed_wrong = False
     if is_placed_wrong:
         explain("The property to hold the sum of the episode lengths (sum_length) must be initialized before the iteration which uses this property.")
     return is_placed_wrong 
+def wrong_iteration_body_8_3():
+    ast = parse_program()
+    assignments = ast.find_all("Assign")
+    is_placed_wrong = True
+    lineno = None
+    for assignment in assignments:
+        right = assignment.value
+        left = assignment.targets
+        if left.id == "sum_length" and right.ast_name == "BinOp" and right.op == "Add":
+            lineno = left.lineno
+    loops = ast.find_all("For")
+    for loop in loops:
+        if lineno == None: 
+            break
+        if loop.lineno < lineno:
+            is_placed_wrong = False
+    if is_placed_wrong:
+        explain("The addition of each episode length to the total length is not in the correct place.")
+    return is_placed_wrong
 def wrong_print_8_3():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -65,12 +87,14 @@ def wrong_print_8_3():
     for_loc = []
     wrong_print_placement = True
     for loop in for_loops:
-        for_loc.append(loop.next_tree.lineno)
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
     calls = ast.find_all("Call")
     for call in calls:
         if call.func.id == "print":
             for loc in for_loc:
-                if call.lineno >= loc.lineno:
+                if call.func.lineno >= loc:
                     wrong_print_placement = False
                     break
             if not wrong_print_placement:
@@ -93,7 +117,7 @@ def missing_addition_slot_empty_8_4():
     ast = parse_program()
     assignments = ast.find_all("Assign")
     for assignment in assignments:
-        left = assignment.target
+        left = assignment.targets
         right = assignment.value
         if left.id == "sum_pages":
             binOp = right.find_all("BinOp")
@@ -120,24 +144,23 @@ def wrong_names_not_agree_8_4():
                     lhs = assignment.targets
                     if lhs.ast_name == "Name" and lhs.id == "sum_pages":
                         for binop in binops:
-                            if binop.has(lhs) and binop == "Add":
+                            if binop.has(lhs) and binop.op == "Add":
                                 if not binop.has(iter_prop):
                                     explain("Each value of name(%s) must be added to %s." %(iter_prop.id, lhs.id))
                                     return True
     return False
 #################8.4 End#######################
-def wrong_should_be_counting():
+def wrong_should_be_counting():#This doesn't do as it is intended to do!
     ast = parse_program()
     for_loops = ast.find_all("For")
     for loop in for_loops:
+        iter_prop = loop.target
         assignments = loop.find_all("Assign")
         for assignment in assignments:
             binops = assignment.find_all("BinOp")
-            if len(binops) > 0:
-                lhs = assignment.targets
-                for binop in binops:
-                    if binop.has(lhs) and binop.op == "Add":
-                        explain("This problem asks for the number of items in the list not the total of all the values in the list.")
+            for binop in binops:
+                if binop.has(iter_prop) and binop.op == "Add":
+                    explain("This problem asks for the number of items in the list not the total of all the values in the list.")
 def wrong_should_be_summing():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -227,9 +250,10 @@ def missing_zero_initialization():
                     accu_init = True
                     break
     if accu_init == False and accumulator != None:
-        explain("The property <b>%s</b> does not have an initial value. The addition on the first iteration step is not correct because the property <b>%s</b> does not have an initial value." %(accumulator.id,accumulator.id))
+        explain("The addition on the first iteration step is not correct because the property <b>%s</b> has not been initialized to an appropriate initial value" %(accumulator.id))
         return False
     return True
+#################AVERAGE START###############
 def missing_average():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -237,7 +261,9 @@ def missing_average():
     has_average = False
     for_loc = []
     for loop in for_loops:
-        for_loc.append(loop.next_tree.lineno)
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
     if has_for:
         assignments = ast.find_all("Assign")
         if len(assignments) > 0:
@@ -264,7 +290,7 @@ def missing_average():
                         break
     if not has_average:
         explain("An average value is not computed")
-def average_in_iteration():
+def warning_average_in_iteration():
     ast = parse_program()
     for_loops = ast.find_all("For")
     for loop in for_loops:
@@ -285,7 +311,10 @@ def wrong_average_demoninator():
     loc_array = []
     for loop in for_loops:
         iter_prop = loop.target
-        loc = loop.next_tree.lineno
+        end_node = loop.next_tree
+        if end_node == None:
+            continue
+        loc = end_node.lineno
         assignments = loop.find_all("Assign")
         for assignment in assignments:
             if assignment.has(1):
@@ -315,7 +344,7 @@ def wrong_average_demoninator():
             break
     if denominator_wrong:
         explain("The average is not calculated correctly.")
-    return numerator_wrong
+    return denominator_wrong
 def wrong_average_numerator():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -323,7 +352,10 @@ def wrong_average_numerator():
     loc_array = []
     for loop in for_loops:
         iter_prop = loop.target
-        loc = loop.next_tree.lineno
+        end_node = loop.next_tree
+        if end_node == None:
+            continue
+        loc = end_node.lineno
         assignments = loop.find_all("Assign")
         for assignment in assignments:
             if assignment.has(iter_prop):
@@ -354,6 +386,7 @@ def wrong_average_numerator():
     if numerator_wrong:
         explain("The average is not calculated correctly.")
     return numerator_wrong
+########################AVERAGE END###########################
 def wrong_compare_list():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -384,21 +417,7 @@ def wrong_for_inside_if():
     if if_inside_for:
         explain("The iteration should not be inside the decision block.")
     return if_inside_for
-def wrong_converstion_problem_10_5():
-    ast = parse_program()
-    loops = ast.find_all("For")
-    is_wrong_conversion = True
-    for loop in loops:
-        iter_prop = loop.target
-        binops = loop.find_all("BinOp")
-        for binop in binops:
-            if binop.op == "Mult" and binop.has(iter_prop) and binop.has(0.62):
-                is_wrong_conversion = False
-                break
-        if not is_wrong_conversion:
-            break
-    if is_wrong_conversion:
-        explain("The conversion from kilometers to miles is not correct.")
+###########################9.1 START############################
 def wrong_list_initialization_9_1():
     ast = parse_program()
     assignments = ast.find_all("Assign")
@@ -455,10 +474,11 @@ def wrong_list_initialization_placement_9_1():
         if assignment.targets.id == "rainfall_list":
             list_init = assignment
             break
-    for loop in loops:
-        if loop.lineno > list_init.lineno:
-            init_after_loop = True
-            break
+    if list_init != None:
+        for loop in loops:
+            if loop.lineno > list_init.lineno:
+                init_after_loop = True
+                break
     if list_init == None or not init_after_loop:
         explain("The list of rainfall amount (rainfall_list) must be initialized before the iteration that uses this list.")
 def wrong_accumulator_initialization_placement_9_1():
@@ -498,18 +518,22 @@ def wrong_print_9_1():
     for_loc = []
     wrong_print_placement = True
     for loop in for_loops:
-        for_loc.append(loop.next_tree.lineno)
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
     calls = ast.find_all("Call")
     for call in calls:
         if call.func.id == "print":
             for loc in for_loc:
-                if call.lineno >= loc.lineno:
+                if call.func.lineno >= loc:
                     wrong_print_placement = False
                     break
             if not wrong_print_placement:
                 break
     if wrong_print_placement:
         explain("The output of the total rainfall amount is not in the correct place. The total rainfall should be output only once after the total rainfall has been computed.")
+###########################9.1 END############################
+###########################9.2 START############################
 def wrong_list_initialization_9_2():
     ast = parse_program()
     assignments = ast.find_all("Assign")
@@ -587,10 +611,11 @@ def wrong_accumulator_initialization_placement_9_2():
         if assignment.targets.id == "rainfall_count":
             list_init = assignment
             break
-    for loop in loops:
-        if loop.lineno > list_init.lineno:
-            init_after_loop = True
-            break
+    if list_init != None:
+        for loop in loops:
+            if loop.lineno > list_init.lineno:
+                init_after_loop = True
+                break
     if list_init == None or not init_after_loop:
         explain("The property for the count of the number of days having rain (rainfall_count) must be initialized before the iteration which uses this property.")
 def wrong_iteration_body_9_2():
@@ -635,12 +660,14 @@ def wrong_print_9_2():
     for_loc = []
     wrong_print_placement = True
     for loop in for_loops:
-        for_loc.append(loop.next_tree.lineno)
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
     calls = ast.find_all("Call")
     for call in calls:
         if call.func.id == "print":
             for loc in for_loc:
-                if call.lineno >= loc.lineno:
+                if call.func.lineno >= loc:
                     wrong_print_placement = False
                     break
             if not wrong_print_placement:
@@ -648,6 +675,42 @@ def wrong_print_9_2():
     if wrong_print_placement:
         explain("The output of the total number of days with rainfall is not in the correct place. The total number of days should be output only once after the total number of days has been computed.")
     return wrong_print_placement
+###########################9.2 END############################
+###########################9.6 START############################
+def wrong_comparison_9_6():
+    ast = parse_program()
+    if_blocks = ast.find_all("If")
+    if_error = False
+    for if_block in if_blocks:
+        if not if_block.has(80):
+            if_error = True
+            break
+        elif not if_block.test.numeric_logic_check(1, "var > 80"):
+            if_error = True
+            break
+    if if_error:
+        explain("In this problem you should be finding temperatures above 80 degrees.")
+    return if_error
+###########################9.6 END############################
+###########################10.2 START############################
+def wrong_conversion_10_2():
+    ast = parse_program()
+    loops = ast.find_all("For")
+    has_conversion = False
+    conversion_var = ""
+    for loop in loops:
+        binops = loop.find_all("BinOp")
+        iter_prop = loop.target
+        conversion_var = iter_prop.id
+        for binop in binops:
+            if binop.has(iter_prop) and binop.has(0.4) and binop.op == "Mult":
+                conversion_var = iter_prop.id
+                has_conversion = True
+                break
+    if conversion_var != "" and not has_conversion:
+        explain("The conversion of %s to inches is not correct." %(conversion_var))
+###########################10.2 END############################
+###########################10.3 START############################
 def wrong_filter_condition_10_3():
     ast = parse_program()
     loops = ast.find_all("For")
@@ -662,6 +725,8 @@ def wrong_filter_condition_10_3():
     if not correct_if:
         explain("The condition used to filter the year when artists died is not correct.")
     return not correct_if
+###########################10.3 END############################
+###########################10.4 START############################
 def wrong_and_filter_condition_10_4():
     ast = parse_program()
     loops = ast.find_all("For")
@@ -696,44 +761,122 @@ def wrong_nested_filter_condition_10_4():
     if not correct_if:
         explain("The decisions used to filter the temperatures into the specified range of temperatures is not correct.")
     return not correct_if
-def wrong_append_10_5():
+###########################10.4 END############################
+#########################10.5 START###############################
+def wrong_conversion_problem_10_5():
     ast = parse_program()
     loops = ast.find_all("For")
-    correct_append = False
+    is_wrong_conversion = False
     for loop in loops:
+        iter_prop = loop.target
+        binops = loop.find_all("BinOp")
+        for binop in binops:
+            if not (binop.op == "Mult" and binop.has(iter_prop) and binop.has(0.62)):
+                is_wrong_conversion = True
+                break
+        if is_wrong_conversion:
+            break
+    if is_wrong_conversion:
+        log("wrong_conversion_problem_10_5")
+        explain("The conversion from kilometers to miles is not correct.")
+def wrong_filter_problem_atl1_10_5():
+    ast = parse_program()
+    loops = ast.find_all("For")
+    correct_filter = False
+    for loop in loops:
+        iter_prop = loop.target
+        if_blocks = loop.find_all("If")
+        for if_block in if_blocks:
+            cond = if_block.test
+            append_list = append_api.find_append_in(if_block)
+            for append in append_list:
+                expr = append.args[0]
+                #this check seens unnecessary
+                if expr.ast_name == "BinOp" and expr.op == "Mult" and expr.has(0.62) and expr.has(iter_prop):
+                    if not cond.numeric_logic_check(0.1, "var * 0.62 > 10"):
+                        log("wrong_filter_problem_atl1_10_5")
+                        explain("You are not correctly filtering out values from the list.")
+def wrong_filter_problem_atl2_10_5():
+    ast = parse_program()
+    loops = ast.find_all("For")
+    correct_filter = False
+    for loop in loops:
+        iter_prop = loop.target
         assignments = loop.find_all("Assign")
         if_blocks = loop.find_all("If")
         for assignment in assignments:
             for if_block in if_blocks:
-                if assignment.lineno > if_block.lineno:
-                    break
-                appendList = []
-                calls = if_block.find_all("Call")
-                for node in calls:
-                    if node.func.attr == "append":
-                        appendList.append(node)
-                for append in appendList:
-                    if append.args[0].id == assignment.targets.id:
-                        correct_append = True
-                if correct_append:
-                    break
-            if correct_append:
-                break
-        if correct_append:
-            break
-    if not correct_append:
-        explain("The earthquake depth appended to the list is not correct")
-    return not correct_append
-def wrong_debug_10_6():
+                if if_block.lineno > assignment.lineno:
+                    miles = assignment.targets
+                    expr = assignment.value
+                    cond = if_block.test
+                    append_list = append_api.find_append_in(if_block)
+                    for append in append_list:
+                        if append.has(miles):
+                            if expr.ast_name == "BinOp" and expr.op == "Mult" and expr.has(0.62) and expr.has(iter_prop):
+                                if not cond.numeric_logic_check(0.1, "var > 10"):
+                                    log("wrong_filter_problem_atl2_10_5")
+                                    explain("You are not correctly filtering out values from the list.")
+def wrong_append_problem_atl1_10_5():
     ast = parse_program()
     loops = ast.find_all("For")
-    appendList = []
-    calls = if_block.find_all("Call")
-    for node in calls:
-        if node.func.attr == "append":
-            appendList.append(node)
+    correct_filter = False
+    for loop in loops:
+        iter_prop = loop.target
+        if_blocks = loop.find_all("If")
+        for if_block in if_blocks:
+            cond = if_block.test
+            append_list = append_api.find_append_in(if_block)
+            for append in append_list:
+                expr = append.args[0]
+                #this is an approximation of what's written in the code because we don't have tree matching
+                cond_binops = cond.find_all("BinOp")
+                if len(cond_binops) == 1:
+                    if not (expr.ast_name == "BinOp" and expr.op == "Mult" and expr.has(0.62) and expr.has(iter_prop)):
+                        #if not cond.numeric_logic_check(0.1, "var * 0.62 > 10"):#in theory should check this
+                        log("wrong_append_problem_atl1_10_5")
+                        explain("You are not appending the correct values.")
+def wrong_append_problem_atl2_10_5():
+    ast = parse_program()
+    loops = ast.find_all("For")
+    correct_filter = False
+    for loop in loops:
+        iter_prop = loop.target
+        assignments = loop.find_all("Assign")
+        if_blocks = loop.find_all("If")
+        for assignment in assignments:
+            for if_block in if_blocks:
+                if if_block.lineno > assignment.lineno:
+                    miles = assignment.targets
+                    expr = assignment.value
+                    cond = if_block.test
+                    append_list = append_api.find_append_in(if_block)
+                    for append in append_list:
+                        append_var = append.args[0]
+                        if expr.ast_name == "BinOp" and expr.op == "Mult" and expr.has(0.62) and expr.has(iter_prop):
+                            if cond.numeric_logic_check(0.1, "var > 10"):
+                                if append_var.ast_name == "Name" and append_var.id != miles.id:
+                                    log("wrong_append_problem_atl2_10_5")
+                                    explain("You are not appending the correct values")
+#########################10.5 END###############################
+def wrong_debug_10_6():
+    ast = parse_program()
     #cheating because using length of 1
-    if loops[0] == None or calls[0] == None or loops[0].iter.id != "quakes" or calls[0].value.id != "quakes_in_miles":
+    loops = ast.find_all("For")
+    bad_change = False
+    if len(loops) != 1:
+        bad_change = True
+    else:
+        append_calls = append_api.find_append_in(loops[0])
+        if len(append_calls) != None:
+            bad_change = True
+    if not bad_change:
+        item = loops[0].target
+        list1 = loops[0].iter
+        list2 = append_calls[0].func.value.id
+        if list1.id != "quakes" or list2.id != "quakes_in_miles":
+            bad_change = True
+    if bad_change:
         explain("This is not one of the two changes needed. Undo the change and try again.")
 def wrong_debug_10_7():
     ast = parse_program()

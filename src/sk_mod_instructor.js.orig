@@ -232,7 +232,7 @@ var $sk_mod_instructor = function(name) {
     }
     /**
      * This function checks if the given object is one of the Sk.builtin objects
-     * TODO: make this so we don't have to explicitly put out every option
+     * TODO: make this so we don't have to explicitly put out eveyr option
      *          one possible thing we could do is get a string version of the 
      *          of the constructor and look for the substring "return new Sk.builtin"
      *          But I don't know how reliable that is.  Rather, it's kind of hackish.
@@ -344,13 +344,18 @@ var $sk_mod_instructor = function(name) {
      * This function is called by instructors to construct the python version of the AST
     **/
     mod.parse_program = new Sk.builtin.func(function() {
+<<<<<<< HEAD
+        generateFlatTree(Sk.executionReports['verifier'].code);
+        console.log(flatTree);
+        return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
+=======
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
-            console.log(flatTree);
             return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         } else {
             return Sk.builtin.none.none$;
         }
+>>>>>>> refs/remotes/origin/Summer2017
     });
 
     mod.def_use_error = new Sk.builtin.func(function(py_node) {
@@ -404,7 +409,7 @@ var $sk_mod_instructor = function(name) {
             return this.generic_visit(node);
         }
         visitor.visit(flatTree[currentId]);
-        if(currentId >= flatTree.length){
+        if(currentId > flatTree.length){
             return Sk.ffi.remapToPy(null);
         }
         return Sk.misceval.callsimOrSuspend(mod.AstNode, currentId);
@@ -430,6 +435,7 @@ var $sk_mod_instructor = function(name) {
     **/
     function transPyOps(field){
         var op = field.name;
+        console.log("op is: " + op);
         var transOp = null;
         switch(op){
             case "Add":
@@ -504,6 +510,7 @@ var $sk_mod_instructor = function(name) {
         **/
         $loc.numeric_logic_check = new Sk.builtin.func(function(self, mag, expr){
             if(self.type != "Compare" && self.type != "BoolOp"){
+                console.log("incorrect node type: " + self.type);
                 return Sk.ffi.remapToPy(null);
             }
             expr = Sk.ffi.remapToJs(expr);
@@ -512,7 +519,7 @@ var $sk_mod_instructor = function(name) {
             var consArray = [];
             var expConsArray = []
             var consRegex = /-?(?:\d{1,})\.?(?:\d{1,})?/;
-            var varRegex = new RegExp(/[a-zA-Z_]\w{1,}/,'g');
+            var varRegex = /[a-zA-Z_]\w{1,}/;
             var extracts = expr.match(consRegex);
             for(var i = 0; i < extracts.length; i += 1){
                 var cons = extracts[i] * 1;
@@ -521,14 +528,9 @@ var $sk_mod_instructor = function(name) {
                 expConsArray.push(cons + mag * -1);
                 expConsArray.push(cons + mag);
             }
-            var compVarArray = expr.match(varRegex);
-            var compVar = [];
-            for(var i = 0; i < compVarArray.length; i += 1){
-                if(compVar.indexOf(compVarArray[i]) == -1){
-                    compVar.push(compVarArray[i]);
-                }
-            }
+            var compVar = expr.match(varRegex);
             if(compVar.length != 1){
+                console.log("too many variables");
                 return Sk.ffi.remapToPy(null);
             }else{
                 compVar = "varPlaceHolder";
@@ -541,18 +543,13 @@ var $sk_mod_instructor = function(name) {
             var studentVars = [];
             var fastFail = false;
             var visitor = new NodeVisitor();
-            visitor.visit_BinOp = function(node){
-                this.visit(node.left);
-                otherExpr += transPyOps(node.op);
-                this.visit(node.right);
-            }
             visitor.visit_BoolOp = function(node){
                 otherExpr += "(";
                 var values = node.values;
                 for(var i = 0; i < values.length; i += 1){
                     this.visit(values[i]);
                     if(i < values.length - 1){
-                        otherExpr += transPyOps(node.op) + " ";
+                        otherExpr += transPyOps(node.op);
                     }
                 }
                 otherExpr += ")";
@@ -577,7 +574,7 @@ var $sk_mod_instructor = function(name) {
                 var ops = node.ops;
                 for(var i = 0; i < comparators.length; i += 1){
                     if(i % 2 == 1){
-                        otherExpr += " && ";
+                        otherExpr = " && ";
                         this.visit(comparators[i-1]);
                     }
                     otherExpr += transPyOps(ops[i]);
@@ -589,14 +586,16 @@ var $sk_mod_instructor = function(name) {
             visitor.visit(actualAstNode);
             var varPlaceHolder = 0;
             if(fastFail){
+                console.log("fast fail!");
                 return Sk.ffi.remapToPy(null);
             }
+            console.log(expr);
+            console.log(otherExpr);
             var otherCons = otherExpr.match(consRegex);
-            for(var i = 0; i < otherCons.length; i += 1){
-                var cons = otherCons[i] * 1;
-                expConsArray.push(cons);
-                expConsArray.push(cons + mag * -1);
-                expConsArray.push(cons + mag);
+            for(var i =0 ; i < otherCons.length; i += 1){
+                if(consArray.indexOf(otherCons[i] * 1) == -1){
+                    return Sk.ffi.remapToPy(false);
+                }
             }
             for(var i = 0; i < expConsArray.length; i += 1){
                 varPlaceHolder = expConsArray[i];
