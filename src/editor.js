@@ -100,6 +100,8 @@ BlockPyEditor.prototype.initBlockly = function() {
                                     scrollbars: this.main.model.constants.blocklyScrollbars, 
                                     readOnly: this.main.model.settings.read_only(),
                                     zoom: {enabled: false},
+                                    oneBasedIndex: false,
+                                    comments: false,
                                     toolbox: this.updateToolbox(false)});
     // Register model changer
     var editor = this;
