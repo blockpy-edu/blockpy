@@ -1,4 +1,10 @@
 from instructor_utility import *
+def append_group():
+    missing_append_in_iteration()
+    wrong_not_append_to_list()
+    missing_append_list_initialization()
+    wrong_append_list_initiatization()
+    append_list_wrong_slot()
 def find_append_in(node):
     appendList = []
     calls = node.find_all("Call")
