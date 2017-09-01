@@ -1,4 +1,13 @@
 from instructor import *
+def iteration_group():
+    wrong_target_is_list()
+    wrong_list_repeated_in_for()
+    missing_iterator_initialization()
+    wrong_iterator_not_list()
+    missing_target_slot_empty()
+    list_not_initialized_on_run()
+    list_initialization_misplaced()
+    missing_for_slot_empty()
 def all_for_loops():
     ast = parse_program()
     return ast.find_all("For")

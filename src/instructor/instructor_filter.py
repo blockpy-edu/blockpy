@@ -1,4 +1,7 @@
 from instructor_utility import *
+def filter_group():
+    missing_if_in_for()
+    append_not_in_if()
 '''
 Name: missing_if_in_for
 Pattern:
