@@ -1,4 +1,9 @@
 from instructor_utility import *
+def histogram_group():
+    histogram_missing()
+    plot_show_missing()
+    histogram_argument_not_list()
+    histogram_wrong_list()
 '''
 Name: histogram_missing
 Pattern:
