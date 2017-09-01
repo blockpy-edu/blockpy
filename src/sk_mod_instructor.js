@@ -304,7 +304,7 @@ var $sk_mod_instructor = function(name) {
         } else if (typeof obj === "boolean") {
             return new Sk.builtin.bool(obj);
         } else if(typeof obj === "function") {
-            return new Sk.builtin.str(obj.toString());
+            return new Sk.builtin.str(obj.name);
         }
     }
     
@@ -663,8 +663,7 @@ var $sk_mod_instructor = function(name) {
                         case "ops"://an operator
                         case "op"://an operator
                             //the above 3 cases are functions, extract the function name
-                            field = field.name;
-                            return Sk.ffi.remapToPy(field);
+                            return mixedRemapToPy(field);
                         default:
                             break;
                     }
