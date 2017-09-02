@@ -29,9 +29,9 @@ def unit_test(name, *tests):
             for test in tests:
                 inp = test[:-1]
                 out = test[-1]
-                message = "Your <code>curve_grade</code> function did not produce the correct output for the value {}.<br>Expected: {}<br>Recieved: {}"
+                message = "Your <code>{}</code> function did not produce the correct output for the values {}.<br>Expected: <code>{}</code><br>Recieved: <code>{}</code>"
                 test_out = the_function(*inp)
-                message = message.format(inp, out, test_out)
+                message = message.format(name, ', '.join(["<code>{}</code>".format(i) for i in inp]), out, test_out)
                 if out != test_out:
                     gently(message)
             else:
