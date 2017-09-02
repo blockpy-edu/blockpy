@@ -391,7 +391,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
-    if (!report['parser'].success) {
+    if (!report['parser'].success || !report['verifier'].success) {
         studentCode = 'pass';
     }
     instructorCode = (
@@ -404,6 +404,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         this.main.model.programs[filename]()
     );
+    console.log(instructorCode)
     var line_count = instructorCode.split(/\r\n|\r|\n/).length;
     var engine = this;
     report['instructor'] = {
