@@ -408,6 +408,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     var engine = this;
     report['instructor'] = {
         'compliments': [],
+        'filename': filename
         //'complete': false // Actually, let's use undefined for now.
     };
     Sk.misceval.asyncToPromise(function() {
