@@ -25,7 +25,6 @@ def match_signature(name, length, *parameters):
 def unit_test(name, *tests):
     if name in student.data:
         the_function = student.data[name]
-        debug(the_function)
         if callable(the_function):
             for test in tests:
                 inp = test[:-1]
