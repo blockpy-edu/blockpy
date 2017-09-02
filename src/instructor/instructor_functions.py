@@ -11,8 +11,8 @@ def match_signature(name, length, *parameters):
             elif found_length > length:
                 gently("The function named <code>{}</code> has more parameters ({}) than expected ({}).".format(name, found_length, length))
             elif parameters:
-                for parameter, arg in zip(parameter_names, a_def.args.args):
-                    if arg != parameter:
+                for parameter, arg in zip(parameters, a_def.args.args):
+                    if arg.id != parameter:
                         gently("Error in definition of <code>{}</code>. Expected a parameter named {}, instead found {}.".format(name, parameter, arg))
                 else:
                     return a_def
@@ -22,16 +22,15 @@ def match_signature(name, length, *parameters):
         gently("No function named <code>{}</code> was found.".format(name))
     return None
     
-def unit_test(name, tests):
+def unit_test(name, *tests):
     if name in student.data:
         the_function = student.data[name]
+        debug(the_function)
         if callable(the_function):
             for test in tests:
-                inp = test[0]
-                out = test[1]
+                inp = test[:-1]
+                out = test[-1]
                 message = "Your <code>curve_grade</code> function did not produce the correct output for the value {}.<br>Expected: {}<br>Recieved: {}"
-                if len(test) == 3:
-                    message = test[2]
                 test_out = the_function(*inp)
                 message = message.format(inp, out, test_out)
                 if out != test_out:
