@@ -236,7 +236,6 @@ BlockPyFeedback.prototype.prettyPrintError = function(error) {
         return error;
     } else {
         // A weird skulpt thing?
-        console.log(error);
         if (error.tp$str !== undefined) {
             return error.tp$str().v;
         } else {
@@ -323,6 +322,9 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Error in Instructor Feedback code
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
+        if (error.traceback[0].filename == report['instructor'].filename) {
+            error.traceback[0].lineno -= report['instructor']['line_offset'];
+        }
         //report['instructor']['line_offset']
         this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
         console.error(error);

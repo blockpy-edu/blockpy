@@ -203,7 +203,7 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 return result;
             })(this.branchTree[null], null);
-            console.log("TT", this.source, traceTree)
+            //console.log("TT", this.source, traceTree)
             
             var SETTINGS = ["was set", "was read", "was overwritten"],
                 report = this.report,
