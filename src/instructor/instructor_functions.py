@@ -29,9 +29,13 @@ def unit_test(name, *tests):
             for test in tests:
                 inp = test[:-1]
                 out = test[-1]
-                message = "Your <code>{}</code> function did not produce the correct output for the values {}.<br>Expected: <code>{}</code><br>Recieved: <code>{}</code>"
+                tip = ""
+                if isinstance(out, tuple):
+                    tip = "<br><br>"+out[1]
+                    out = out[0]
+                message = "Your <code>{}</code> function did not produce the correct output for the values {}.<br>Expected: <code>{}</code><br>Actual: <code>{}</code>{}"
                 test_out = the_function(*inp)
-                message = message.format(name, ', '.join(["<code>{}</code>".format(i) for i in inp]), out, test_out)
+                message = message.format(name, ', '.join(["<code>{}</code>".format(repr(i)) for i in inp]), repr(out), repr(test_out), tip)
                 if out != test_out:
                     gently(message)
             else:
