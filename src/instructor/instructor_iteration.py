@@ -8,6 +8,10 @@ def iteration_group():
     list_not_initialized_on_run()
     list_initialization_misplaced()
     missing_for_slot_empty()
+def iteration_group_on_change():
+    wrong_target_is_list()
+    wrong_list_repeated_in_for()
+    wrong_iterator_not_list()
 def all_for_loops():
     ast = parse_program()
     return ast.find_all("For")
