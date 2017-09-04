@@ -47,6 +47,7 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
+    Sk.analyzeParse = this.analyzeParse.bind(this);
 }
 
 /**
@@ -239,7 +240,7 @@ BlockPyEngine.prototype.on_change = function() {
     engine.runInstructorCode(FILENAME, function() {
         engine.main.components.feedback.presentFeedback()
         engine.main.model.execution.status("complete");
-        this.main.components.server.logEvent('editor', 'change')
+        engine.main.components.server.logEvent('editor', 'change')
     });
 }
 

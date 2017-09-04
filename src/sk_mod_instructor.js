@@ -360,6 +360,13 @@ var $sk_mod_instructor = function(name) {
             return Sk.builtin.none.none$;
         }
     });
+    
+    /**
+     * This function is called by instructors to construct the python version of the AST
+    **/
+    mod.analyze_program = new Sk.builtin.func(function() {
+        Sk.analyzeParse();
+    });
 
     mod.def_use_error = new Sk.builtin.func(function(py_node) {
        var id = py_node.id;

@@ -207,6 +207,12 @@ A top-level variable that holds all of the students' created data.
 Acts as a convenient singleton for the code.
 '''
 
+def analyze_program():
+    '''
+    Triggers the analyzer to run so that type information can be available
+    on the AST nodes.
+    '''
+
     
 def parse_program():
     '''
