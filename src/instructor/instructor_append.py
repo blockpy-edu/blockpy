@@ -1,4 +1,6 @@
 from instructor_utility import *
+def append_group_on_change():
+    wrong_not_append_to_list()
 def append_group():
     missing_append_in_iteration()
     wrong_not_append_to_list()
