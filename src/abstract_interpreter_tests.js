@@ -100,6 +100,14 @@
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
         ['def int_func(x):\n\treturn 5\nint_func(10)', [], []],
+        // Function with subtypes
+        ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first([1]))', ['Incompatible types'], []],
+        ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(["1"]))', [], ['Incompatible types']],
+        ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(1))', [], ['Incompatible types']],
+        ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first("1"))', [], ['Incompatible types']],
+        // Out of scope
+        ['def x(parameter):\n    return parameter\nparameter\nx(0)', [], ['Read out of scope']],
+        ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
         
         // Built-ins
         ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']]

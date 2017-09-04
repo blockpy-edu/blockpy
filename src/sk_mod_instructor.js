@@ -108,6 +108,14 @@ var $sk_mod_instructor = function(name) {
         console.log(Sk.ffi.remapToJs(message));
     });
     
+    /**
+     * Logs debug to javascript console
+     */
+    mod.debug = new Sk.builtin.func(function(message) {
+        Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
+        console.log(message);
+    });
+    
     // get_ast()
     // get_trace()
     // get_types()
@@ -160,7 +168,7 @@ var $sk_mod_instructor = function(name) {
             var result = [];
             for (var property in self.module) {
                 if (self.module[property].tp$name == type.tp$name) {
-                    console.log(exclude_builtins);
+                    //console.log(exclude_builtins);
                     if (exclude_builtins && property.startsWith("__")) {
                         continue;
                     }
@@ -346,7 +354,7 @@ var $sk_mod_instructor = function(name) {
     mod.parse_program = new Sk.builtin.func(function() {
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
-            console.log(flatTree);
+            //console.log(flatTree);
             return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         } else {
             return Sk.builtin.none.none$;
@@ -425,8 +433,8 @@ var $sk_mod_instructor = function(name) {
     });
 
     /**
-     * Returns javascript equivalent string representation of python operator given a function that represents
-     * a python operator
+     * Returns javascript equivalent string representation of python operator
+     * given a function that represents a python operator.
     **/
     function transPyOps(field){
         var op = field.name;
@@ -490,6 +498,7 @@ var $sk_mod_instructor = function(name) {
             self.id = Sk.ffi.remapToJs(id);//note that id is passed from PYTHON as a default type already
             self.type = flatTree[self.id]._astname;
             //Sk.abstr.sattr(self, 'type', Sk.ffi.remapToPy(self.type), true);
+            
         });
 
         $loc.__eq__ = new Sk.builtin.func(function(self, other){
@@ -606,6 +615,13 @@ var $sk_mod_instructor = function(name) {
             }
             return Sk.ffi.remapToPy(true);
         });
+        
+        $loc.__str__ = new Sk.builtin.func(function(self) {
+            return Sk.ffi.remapToPy('<AST '+self.type+'>');
+        });
+        $loc.__repr__ = new Sk.builtin.func(function(self) {
+            return Sk.ffi.remapToPy('<AST '+self.type+'>');
+        });
         /**
          * This function dynamically looks to see if the ast node has a given property and does
          * remapping where it can
@@ -615,17 +631,21 @@ var $sk_mod_instructor = function(name) {
         $loc.__getattr__ = new Sk.builtin.func(function(self, key) {
             var actualAstNode = flatTree[self.id];
             key = Sk.ffi.remapToJs(key);
-            if(key == "data_type"){
+            if (key == "data_type"){
                 //if it's a name node, returns the data type, otherwise returns null
                 return checkNameNodeType(actualAstNode);
             }
-            if(key == "next_tree"){
+            if (key == "next_tree"){
                 return getNextTree(self);
             }
-            if(key == "ast_name"){
+            if (key == "ast_name"){
                 key = "_astname";
             }
-            if(key in actualAstNode){
+            if (key == "_name"){
+                key = "name";
+            }
+            
+            if (key in actualAstNode){
                 var field = actualAstNode[key];
                 //@TODO: check for flag to see if chain assignments are allowed, otherwise return first item
                 if (actualAstNode._astname == "Assign" && key == "targets"){//this means its an assignment node
