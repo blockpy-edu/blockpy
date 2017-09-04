@@ -222,7 +222,9 @@ var $sk_mod_instructor = function(name) {
         if (parser.success) {
             ast = parser.ast;
         } else {
-            return;
+            var filename = "__main__"
+            var parse = Sk.parse(filename,"");
+            ast = Sk.astFromParse(parse.cst, filename, parse.flags);
         }
         var visitor = new NodeVisitor();
         visitor.visit = function(node){
