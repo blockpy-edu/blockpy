@@ -63,20 +63,15 @@ def wrong_accumulator_initialization_placement_8_3():
     return is_placed_wrong 
 def wrong_iteration_body_8_3():
     ast = parse_program()
-    assignments = ast.find_all("Assign")
     is_placed_wrong = True
-    lineno = None
-    for assignment in assignments:
-        right = assignment.value
-        left = assignment.targets
-        if left.id == "sum_length" and right.ast_name == "BinOp" and right.op == "Add":
-            lineno = left.lineno
     loops = ast.find_all("For")
     for loop in loops:
-        if lineno == None: 
-            break
-        if loop.lineno < lineno:
-            is_placed_wrong = False
+        assignments = loop.find_all("Assign")
+        for assignment in assignments:
+            right = assignment.value
+            left = assignment.targets
+            if left.id == "sum_length" and right.ast_name == "BinOp" and right.op == "Add":
+                is_placed_wrong = False
     if is_placed_wrong:
         explain("The addition of each episode length to the total length is not in the correct place.")
     return is_placed_wrong
@@ -304,7 +299,7 @@ def warning_average_in_iteration():
                     denominator = binop.right
                     if numerator.ast_name == "Name" and denominator.ast_name == "Name":
                         explain("An average value is best computed after the properties name %s(total) and name(%s) are completely known rather than recomputing the average on each iteration." %(numerator.id,denominator.id))
-def wrong_average_demoninator():
+def wrong_average_denominator():
     ast = parse_program()
     for_loops = ast.find_all("For")
     count_vars = []

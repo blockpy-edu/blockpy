@@ -521,7 +521,7 @@ var $sk_mod_instructor = function(name) {
             var consArray = [];
             var expConsArray = []
             var consRegex = /-?(?:\d{1,})\.?(?:\d{1,})?/;
-            var varRegex = new RegExp("[a-zA-Z_]\w{1,}",'g');
+            var varRegex = /[a-zA-Z_]\w{1,}/g;
             var extracts = expr.match(consRegex);
             for(var i = 0; i < extracts.length; i += 1){
                 var cons = extracts[i] * 1;
