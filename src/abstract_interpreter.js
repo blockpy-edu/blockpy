@@ -1,3 +1,22 @@
+/**
+ * Python Abstract Interpreter for Student Code
+ *
+ *
+ * PAISC uses a number of simplifications of the Python language.
+ *  * Variables cannot change type
+ *  * Variables cannot be deleted
+ *  * Complex types have to be homogenous
+ *  * No introspection or reflective characteristics
+ *  * No dunder methods
+ *  * No closures (maybe?)
+ *  * No global variables
+ *  * No multiple inheritance
+ *
+ * Additionally, it reads the following as issues:
+ *  * Cannot read a variable without having first written to it.
+ *  * Cannot rewrite a variable unless it has been read.
+ */
+
 function AbstractInterpreter(code, filename) {
     NodeVisitor.apply(this, Array.prototype.slice.call(arguments));
 }
@@ -43,7 +62,8 @@ AbstractInterpreter.prototype.processAst = function(ast) {
         this.setVariable(name, this.BUILTINS[name], true);
     }
     
-    this.functionContext = null;
+    this.currentScope = null;
+    this.scopeContexts = {};
     
     // OLD
     //this.frameIndex = 0;
@@ -73,7 +93,8 @@ AbstractInterpreter.prototype.newReport = function(parentFrame) {
             "Type changes": [],
             "Iteration variable is iteration list": [],
             "Unknown functions": [],
-            "Incompatible types": []
+            "Incompatible types": [],
+            'Read out of scope': []
         }
 }
 
@@ -90,6 +111,7 @@ AbstractInterpreter.prototype._newBehavior = function(method, type, position, cu
             "type": type, 
             "loop": this.loopStackId, 
             "parentName": this.currentBranchName,
+            "scope": this.currentScope,
             "position": position, 
             "currentType": currentType,
             "returnType": returnType};
@@ -111,6 +133,7 @@ AbstractInterpreter.prototype.setReturnVariable = function(name, type, position)
         "parentName": this.getLast(name).parentName,
         "position": position,
         "currentType": this.getLast(name).type,
+        "scope": this.currentScope,
         "returnType": type,
     });
 }
@@ -187,7 +210,9 @@ AbstractInterpreter.prototype.postProcess = function() {
                 previousType = null,
                 testTypeEquality = this.testTypeEquality.bind(this),
                 overwrittenLine = null,
-                variableTypes = this.variableTypes;
+                variableTypes = this.variableTypes,
+                isInScope = this.isInScope.bind(this),
+                firstScope = undefined;
             var finalState = (function walkState(nodes, previous) {
                 var result;
                 if (previous === null) {
@@ -199,6 +224,11 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 for (var i = 0, len = nodes.length; i < len; i += 1) {
                     var node = nodes[i];
+                    if (firstScope === undefined) {
+                        firstScope = node.scope;
+                    } else if (!isInScope(firstScope, node.scope)) {
+                        report['Read out of scope'].push({"name": name, "position": node.position})
+                    }
                     if (node.type !== null && node.type !== undefined && !(name in variableTypes)) {
                         variableTypes[name] = node.type;
                     }
@@ -308,6 +338,14 @@ AbstractInterpreter.prototype.getLast = function(name) {
         }
     }
     return {'currentType': null, 'returnType': null};
+}
+
+AbstractInterpreter.prototype.isInScope = function(firstScope, currentScope) {
+    var checkingScope = firstScope;
+    while (currentScope != checkingScope && checkingScope != null) {
+        checkingScope = this.scopeContexts[checkingScope];
+    }
+    return currentScope == checkingScope;
 }
 
 AbstractInterpreter.prototype.getType = function(name) {
@@ -514,18 +552,25 @@ AbstractInterpreter.prototype.visit_BinOp = function(node) {
 }
 
 AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
-    this.setVariable(node.name.v, {"type": "Function"}, this.getLocation(node))
-    this.functionContext = node.name.v;
+    var functionName = node.name.v;
+    this.setVariable(functionName, {"type": "Function"}, this.getLocation(node))
+    // Manage scope
+    var oldScope = this.currentScope;
+    this.scopeContexts[functionName] = this.currentScope;
+    this.currentScope = functionName;
+    // Process arguments
     var args = node.args.args;
     for (var i = 0; i < args.length; i++) {
         var arg = args[i];
         var name = Sk.ffi.remapToJs(arg.id);
-        this.setVariable(name, {}, this.getLocation(node))
+        this.setVariable(name, {"type": "Argument"}, this.getLocation(node))
     }
     this.generic_visit(node);
+    // Return scope
+    this.currentScope = oldScope;
 }
 AbstractInterpreter.prototype.visit_Return = function(node) {
-    this.setReturnVariable(this.functionContext, 
+    this.setReturnVariable(this.currentScope, 
                            this.typecheck(node.value), 
                            this.getLocation(node));
     this.generic_visit(node);
