@@ -487,7 +487,7 @@ def wrong_accumulator_initialization_placement_9_1():
             list_init = assignment
             break
     for loop in loops:
-        if loop.lineno > list_init.lineno:
+        if list_init != None and loop.lineno > list_init.lineno:
             init_after_loop = True
             break
     if list_init == None or not init_after_loop:
@@ -537,7 +537,7 @@ def wrong_list_initialization_9_2():
         if assignment.targets.id == "rainfall_list":
             call = assignment.find_all("Call")
             if len(call) == 1:
-                args = call.args
+                args = call[0].args
                 if len(args) == 3:
                     if args[0] == "Precipitation" and args[1] == "Location" and args[2] == "Blacksburg, VA":
                         has_call = True
