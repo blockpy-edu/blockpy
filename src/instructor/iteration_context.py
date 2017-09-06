@@ -36,6 +36,19 @@ def wrong_list_is_constant_8_2():
                 break
     if isNumber:
         explain("You must set shoppping_cart to a list of values not to a single number.")
+def list_all_zeros_8_2():
+    ast = parse_program()
+    lists = ast.find_all("List")
+    is_all_zero = True
+    for init_list in lists:
+        for node in init_list.elts:
+            if node.ast_name == "Num" and node.n != 0:
+                is_all_zero = False
+                break
+        if is_all_zero:
+            break
+    if is_all_zero:
+        explain("Try seeing what happens when you change the numbers in the list.")
 #################8.2 End#######################
 #################8.3 Start#######################
 def wrong_list_initialization_placement_8_3():
