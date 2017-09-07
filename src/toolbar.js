@@ -20,6 +20,10 @@ function BlockPyToolbar(main, tag) {
     this.activateToolbar();
 }
 
+BlockPyToolbar.prototype.notifyFeedbackUpdate = function() {
+    this.tag.find(".blockpy-toolbar-feedback").show().fadeOut(5000);
+}
+
 /**
  * Register click events for more complex toolbar actions.
  */
@@ -91,7 +95,6 @@ BlockPyToolbar.prototype.activateToolbar = function() {
             main.setCode(e.target.result)
             main.components.server.logEvent('editor', 'upload')
             main.components.engine.on_run();
-            main.components.server.logEvent('editor', 'run')
         };
         fr.readAsText(files[0]);
     });

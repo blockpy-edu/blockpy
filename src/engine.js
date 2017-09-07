@@ -197,7 +197,6 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
-    this.main.components.server.logEvent('editor', 'run')
     var engine = this;
     var model = this.main.model;
     engine.resetReports();
@@ -215,6 +214,7 @@ BlockPyEngine.prototype.on_run = function() {
             model.execution.status("complete");
         });
     });
+    this.main.components.server.logEvent('engine', 'on_run')
 }
 /**
  * Activated whenever the Python code changes
@@ -229,6 +229,7 @@ BlockPyEngine.prototype.on_change = function() {
     this.main.model.execution.status("changing");
     // On step does not perform parse analysis by default or run student code
     var engine = this;
+    var feedback = this.main.components.feedback;
     engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
@@ -238,10 +239,15 @@ BlockPyEngine.prototype.on_change = function() {
     this.main.model.execution.suppressions['parser'] = true;
     this.main.model.execution.suppressions['no errors'] = true;
     engine.runInstructorCode(FILENAME, function() {
-        engine.main.components.feedback.presentFeedback()
+        var feedback_type = feedback.presentFeedback();
+        if (feedback_type != 'completed') {
+            if (!feedback.isFeedbackVisible()) {
+                engine.main.components.toolbar.notifyFeedbackUpdate();
+            }
+        }
         engine.main.model.execution.status("complete");
-        engine.main.components.server.logEvent('editor', 'change')
     });
+    engine.main.components.server.logEvent('engine', 'on_change')
 }
 
 /**
