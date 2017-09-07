@@ -23,6 +23,32 @@ def missing_list_initialization_8_2():
                 break
     if isMissing:
         explain("You must set the property shopping_cart to a list containing the prices of items in the shopping cart.")
+def wrong_list_is_constant_8_2():
+    ast = parse_program()
+    assignments = ast.find_all("Assign")
+    isNumber = False
+    for assignment in assignments:
+        right = assignment.value
+        left = assignment.targets
+        if left.id == "shopping_cart":
+            if right.ast_name == "Num":
+                isNumber = True
+                break
+    if isNumber:
+        explain("You must set shoppping_cart to a list of values not to a single number.")
+def list_all_zeros_8_2():
+    ast = parse_program()
+    lists = ast.find_all("List")
+    is_all_zero = True
+    for init_list in lists:
+        for node in init_list.elts:
+            if node.ast_name == "Num" and node.n != 0:
+                is_all_zero = False
+                break
+        if is_all_zero:
+            break
+    if is_all_zero:
+        explain("Try seeing what happens when you change the numbers in the list.")
 #################8.2 End#######################
 #################8.3 Start#######################
 def wrong_list_initialization_placement_8_3():
@@ -141,10 +167,18 @@ def wrong_names_not_agree_8_4():
                         for binop in binops:
                             if binop.has(lhs) and binop.op == "Add":
                                 if not binop.has(iter_prop):
-                                    explain("Each value of name(%s) must be added to %s." %(iter_prop.id, lhs.id))
+                                    explain("Each value of %s must be added to %s." %(iter_prop.id, lhs.id))
                                     return True
     return False
 #################8.4 End#######################
+def wrong_modifying_list_8_6():
+    ast = parse_program()
+    list_init = ast.find_all("List")
+    true_sum = 0
+    for value in list_init[0].elts:
+        true_sum = value.n + true_sum
+    if true_sum != sum([2.9, 1.5, 2.3, 6.1]):
+        explain("Don't modify the list")
 def wrong_should_be_counting():#This doesn't do as it is intended to do!
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -248,6 +282,15 @@ def missing_zero_initialization():
         explain("The addition on the first iteration step is not correct because the property <b>%s</b> has not been initialized to an appropriate initial value" %(accumulator.id))
         return False
     return True
+def wrong_printing_list():
+    ast = parse_program()
+    for_loops = ast.find_all("For")
+    calls = ast.find_all("Call")
+    log(calls)
+    for call in calls:
+        if call.func.id == "print":
+            if call.args[0].ast_name == "Name" and call.args[0].data_type != "Num":
+                explain("You should be printing a single value.")
 #################AVERAGE START###############
 def missing_average():
     ast = parse_program()
@@ -423,7 +466,7 @@ def wrong_list_initialization_9_1():
             if len(call) == 1:
                 args = call[0].args
                 if len(args) == 3:
-                    if args[0] == "Precipitation" and args[1] == "Location" and args[2] == "Blacksburg, VA":
+                    if args[0].s == "Precipitation" and args[1].s == "Location" and args[2].s == "Blacksburg, VA":
                         has_call = True
                         break
     if not has_call:
@@ -487,7 +530,7 @@ def wrong_accumulator_initialization_placement_9_1():
             list_init = assignment
             break
     for loop in loops:
-        if loop.lineno > list_init.lineno:
+        if list_init != None and loop.lineno > list_init.lineno:
             init_after_loop = True
             break
     if list_init == None or not init_after_loop:
@@ -537,7 +580,7 @@ def wrong_list_initialization_9_2():
         if assignment.targets.id == "rainfall_list":
             call = assignment.find_all("Call")
             if len(call) == 1:
-                args = call.args
+                args = call[0].args
                 if len(args) == 3:
                     if args[0] == "Precipitation" and args[1] == "Location" and args[2] == "Blacksburg, VA":
                         has_call = True

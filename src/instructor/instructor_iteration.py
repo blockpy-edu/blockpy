@@ -87,3 +87,23 @@ def missing_for_slot_empty():
             break
     if is_missing:
         explain("You must fill in the empty slot in the iteration.")
+def wrong_target_reassigned():
+    ast = parse_program()
+    for_loops = all_for_loops()
+    is_reassigned = False
+    iter_props = []
+    for loop in for_loops:
+        iter_props.append(loop.target)
+    assignments = ast.find_all("Assign")
+    off_prop = ""
+    for assignment in assignments:
+        left = assignment.targets
+        for iter_prop in iter_props:
+            if left.id == iter_prop.id:
+                off_prop = left.id
+                is_reassigned = True
+                break
+        if is_reassigned:
+            break
+    if is_reassigned:
+        explain("The property %s has been reassigned. The iteration property shouldn't be reassigned" %(off_prop))
