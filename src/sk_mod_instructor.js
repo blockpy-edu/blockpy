@@ -59,6 +59,7 @@ var $sk_mod_instructor = function(name) {
         }
         if (line !== undefined) {
             Sk.builtin.pyCheckType("line", "integer", Sk.builtin.checkInt(line));
+            line = Sk.ffi.remapToJs(line);
         } else {
             line = null;
         }
