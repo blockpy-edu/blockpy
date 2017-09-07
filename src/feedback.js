@@ -212,7 +212,7 @@ BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
     this.original.hide();
     this.body.html(message);
     this.main.model.status.error("feedback");
-    if (line !== undefined) {
+    if (line !== undefined && line != null) {
         this.main.components.editor.highlightError(line-1);
     }
     this.main.components.server.logEvent('feedback', "Instructor Feedback", name+"\n|\n"+"\n|\n"+message);
@@ -367,7 +367,6 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     if (complaint && complaint.length) {
         complaint.sort(BlockPyFeedback.sortPriorities);
-        console.log(complaint);
         this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);
         return 'instructor';
     }
@@ -406,6 +405,15 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     return 'completed';
 }
+
+BlockPyFeedback.prototype.OPERATION_DESCRIPTION = {
+    "Pow": "an exponent",
+    "Add": "an addition",
+    "Mul": "a multiplication",
+    "Sub": "a subtraction",
+    "Div": "a division",
+    "Mod": "a modulo"
+};
 
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     var report = this.main.model.execution.reports['analyzer'].issues;
@@ -447,12 +455,7 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress["Incompatible types"] && report["Incompatible types"].length >= 1) {
         var variable = report["Incompatible types"][0];
-        op = {"Pow": "an exponent",
-              "Add": "an addition",
-              "Mul": "a multiplication",
-              "Sub": "a subtraction",
-              "Div": "a division",
-              "Mod": "a modulo"}[variable.operation];
+        op = this.OPERATION_DESCRIPTION[variable.operation];
         this.semanticError("Incompatible types", "You used "+op+" operation with a "+variable.left.type+" and a "+variable.right.type+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
         return true;
     }
