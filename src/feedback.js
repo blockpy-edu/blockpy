@@ -59,13 +59,15 @@ BlockPyFeedback.prototype.error = function(html) {
  * Clears any output currently in the feedback area. Also resets the printer and
  * any highlighted lines in the editor.
  */
-BlockPyFeedback.prototype.clear = function() {
+BlockPyFeedback.prototype.clear = function(printer) {
     this.title.html("Ready");
     this.original.hide();
     this.body.html("");
     this.main.model.status.error("none");
     this.main.components.editor.unhighlightLines();
-    this.main.components.printer.resetPrinter()
+    if (printer !== undefined && printer) {
+        this.main.components.printer.resetPrinter()
+    }
 };
 
 /**
@@ -316,7 +318,7 @@ BlockPyFeedback.priorityComparator = function(a, b) {
  * Present any accumulated feedback
  */
 BlockPyFeedback.prototype.presentFeedback = function() {
-    this.clear();
+    this.clear(false);
     var report = this.main.model.execution.reports;
     var suppress = this.main.model.execution.suppressions;
     
