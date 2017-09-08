@@ -20,7 +20,7 @@ def missing_append_in_iteration():
     for loop in for_loops:
         if len(find_append_in(loop)):
             return False
-    explain("You must construct a list by appending values one at a time to the list.")
+    explain("You must construct a list by appending values one at a time to the list.<br><br><i>(app_in_iter)<i></br>")
     return True
 def wrong_not_append_to_list():
     ast = parse_program()
@@ -30,7 +30,7 @@ def wrong_not_append_to_list():
         for node in append_nodes:
             listNode = node.func.value
             if listNode.data_type != "List":
-                explain("Values can only be appended to a list. The property name(%s) is either not initialized or is confused with another property." %(listNode.id))
+                explain("Values can only be appended to a list. The property <code>%s</code> is either not initialized or is confused with another property.<br><br><i>(app_not_list)<i></br>" %(listNode.id))
 def missing_append_list_initialization():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -47,7 +47,7 @@ def missing_append_list_initialization():
                 found_init = True
                 break
         if found_init == False:
-            explain("The list property name(%s) must be initialized." %(append_var.id))
+            explain("The list property <code>%s</code> must be initialized.<br><br><i>(no_app_list_init)<i></br>" %(append_var.id))
             return True
     return False
 
@@ -70,7 +70,7 @@ def wrong_append_list_initiatization():
                 else:#or if its not even a list
                     init_fail = True
             if init_fail:
-                explain("The list property name(%s) is not initialized correctly." %(append_var.id))
+                explain("The list property <code>%s</code> is not initialized correctly.<br><br><i>(app_list_init)<i></br>" %(append_var.id))
                 return
 def append_list_wrong_slot():
     ast = parse_program()
@@ -80,4 +80,4 @@ def append_list_wrong_slot():
         caller = append_call.func.value
         if arg.ast_name == "Name":
             if arg.data_type == "List":
-                explain("You should not append a list (%s) to %s." %(arg.id, caller.id))
+                explain("You should not append a list (<code>%s</code>) to <code>%s</code>.<br><br><i>(app_list_slot)<i></br>" %(arg.id, caller.id))
