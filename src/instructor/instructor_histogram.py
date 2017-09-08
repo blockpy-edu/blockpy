@@ -23,7 +23,7 @@ def histogram_missing():
             plotting = True
             break
     if plotting == False:
-        explain("The program should display a histogram.")
+        explain("The program should display a histogram.<br><br><i>(histo_missing)<i></br>")
     return not plotting
 '''
 Name: plot_show_missing
@@ -42,7 +42,7 @@ def plot_show_missing():
             plotting = True
             break
     if plotting == False:
-        explain("The plot must be explicitly shown to appear in the Printer area.")
+        explain("The plot must be explicitly shown to appear in the Printer area.<br><br><i>(plot_show_missing)<i></br>")
     return not plotting
 '''
 Name: histogram_argument_not_list
@@ -64,7 +64,7 @@ def histogram_argument_not_list():
                 arg_name = arg.id
                 break
     if arg_name != "":
-        explain("Making a histogram requires a list; %s is not a list." %(arg_name))
+        explain("Making a histogram requires a list; <code>%s</code> is not a list.<br><br><i>(hist_arg_not_list)<i></br>" %(arg_name))
     return arg_name != ""
 '''
 Name: histogram_wrong_list
@@ -108,5 +108,5 @@ def histogram_wrong_list():
                 all_proper_plot = False
                 break
     if not all_proper_plot:
-        explain("The list created in the iteration is not the list being used to create the histogram.")
+        explain("The list created in the iteration is not the list being used to create the histogram.<br><br><i>(histo_wrong_list)<i></br>")
     return not all_proper_plot
