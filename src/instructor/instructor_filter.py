@@ -21,7 +21,7 @@ def missing_if_in_for():
         for if_block in ifs:
             if if_block.has(iter_prop):
                 return False
-    explain("The arrangement of decision and iteration is not correct for the filter pattern.")
+    explain("The arrangement of decision and iteration is not correct for the filter pattern.<br><br><i>(missing_if_in_for)<i></br>")
     return True
 '''
 Name: append_not_in_if
@@ -41,5 +41,5 @@ def append_not_in_if():
         for node in calls:
             if node.func.attr == "append":
                 return False
-    explain("Only items satisfying some condition should be appended to the list.")
+    explain("Only items satisfying some condition should be appended to the list.<br><br><i>(app_not_in_if)<i></br>")
     return True
