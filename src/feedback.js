@@ -23,6 +23,15 @@ function BlockPyFeedback(main, tag) {
     this.original.hide();
 };
 
+BlockPyFeedback.prototype.isFeedbackVisible = function () {
+    var top_of_element = this.tag.offset().top;
+    var bottom_of_element = this.tag.offset().top + this.tag.outerHeight();
+    var bottom_of_screen = $(window).scrollTop() + $(window).height();
+    var top_of_screen = $(window).scrollTop(); 
+    //bottom_of_element -= 40; // User friendly padding
+    return ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element));
+}
+
 /**
  * Reload the trace table, showing it if it was hidden and
  * resetting its position to the last step.
@@ -53,7 +62,7 @@ BlockPyFeedback.prototype.error = function(html) {
 BlockPyFeedback.prototype.clear = function() {
     this.title.html("Ready");
     this.original.hide();
-    this.body.html("Run your program to get feedback.");
+    this.body.html("");
     this.main.model.status.error("none");
     this.main.components.editor.unhighlightLines();
     this.main.components.printer.resetPrinter()
@@ -203,7 +212,7 @@ BlockPyFeedback.prototype.instructorFeedback = function(name, message, line) {
     this.original.hide();
     this.body.html(message);
     this.main.model.status.error("feedback");
-    if (line !== undefined) {
+    if (line !== undefined && line != null) {
         this.main.components.editor.highlightError(line-1);
     }
     this.main.components.server.logEvent('feedback', "Instructor Feedback", name+"\n|\n"+"\n|\n"+message);
@@ -307,6 +316,7 @@ BlockPyFeedback.priorityComparator = function(a, b) {
  * Present any accumulated feedback
  */
 BlockPyFeedback.prototype.presentFeedback = function() {
+    this.clear();
     var report = this.main.model.execution.reports;
     var suppress = this.main.model.execution.suppressions;
     
@@ -357,7 +367,6 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     if (complaint && complaint.length) {
         complaint.sort(BlockPyFeedback.sortPriorities);
-        console.log(complaint);
         this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);
         return 'instructor';
     }
@@ -397,6 +406,15 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     return 'completed';
 }
 
+BlockPyFeedback.prototype.OPERATION_DESCRIPTION = {
+    "Pow": "an exponent",
+    "Add": "an addition",
+    "Mul": "a multiplication",
+    "Sub": "a subtraction",
+    "Div": "a division",
+    "Mod": "a modulo"
+};
+
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     var report = this.main.model.execution.reports['analyzer'].issues;
     var suppress = this.main.model.execution.suppressions['analyzer'] || {};
@@ -413,31 +431,32 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress["Undefined variables"] && report["Undefined variables"].length >= 1) {
         var variable = report["Undefined variables"][0];
-        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been initialized.", variable.position.line)
+        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been given a value.", variable.position.line)
         return true;
     } else if (!suppress["Possibly undefined variables"] && report["Possibly undefined variables"].length >= 1) {
         var variable = report["Possibly undefined variables"][0];
-        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was read on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been initialized. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been given a value. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
         return true;
     } else if (!suppress["Unread variables"] && report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        this.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was set, but was never used after that.", null)
+        this.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was given a value, but was never used after that.", null)
         return true;
     } else if (!suppress["Overwritten variables"] && report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
-        this.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was set, but before it could be read it was changed on line "+variable.position.line+". It is unnecessary to change an existing variable's value without reading it first.", variable.position.line)
+        this.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was given a value, but <code>"+variable.name+"</code> was changed on line "+variable.position.line+" before it was used. One of the times that you gave <code>"+variable.name+"</code> a value was incorrect.", variable.position.line)
         return true;
     } else if (!suppress["Empty iterations"] && report["Empty iterations"].length >= 1) {
         var variable = report["Empty iterations"][0];
-        this.semanticError("Iterating over empty list", "The property <code>"+variable.name+"</code> was set as an empty list, and then you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        this.semanticError("Iterating over empty list", "The property <code>"+variable.name+"</code> was set as an empty list, and then you attempted to use it in an iteration on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
         return true;
     } else if (!suppress["Non-list iterations"] && report["Non-list iterations"].length >= 1) {
         var variable = report["Non-list iterations"][0];
-        this.semanticError("Iterating over non-list", "The property <code>"+variable.name+"</code> is not a list, but you attempted to iterate over it on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        this.semanticError("Iterating over non-list", "The property <code>"+variable.name+"</code> is not a list, but you used it in the iteration on line "+variable.position.line+". You should only iterate over lists.", variable.position.line)
         return true;
     } else if (!suppress["Incompatible types"] && report["Incompatible types"].length >= 1) {
         var variable = report["Incompatible types"][0];
-        this.semanticError("Incompatible types", "You attempted to "+variable.operation+" a "+variable.left.type+" and a "+variable.right.type+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
+        op = this.OPERATION_DESCRIPTION[variable.operation];
+        this.semanticError("Incompatible types", "You used "+op+" operation with a "+variable.left.type+" and a "+variable.right.type+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
         return true;
     }
     return false;

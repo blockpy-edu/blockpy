@@ -59,6 +59,7 @@ var $sk_mod_instructor = function(name) {
         }
         if (line !== undefined) {
             Sk.builtin.pyCheckType("line", "integer", Sk.builtin.checkInt(line));
+            line = Sk.ffi.remapToJs(line);
         } else {
             line = null;
         }
@@ -356,7 +357,7 @@ var $sk_mod_instructor = function(name) {
     mod.parse_program = new Sk.builtin.func(function() {
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
-            console.log(flatTree);
+            //console.log(flatTree);
             return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         } else {
             return Sk.builtin.none.none$;
