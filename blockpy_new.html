@@ -103,7 +103,7 @@
         blockpy = new BlockPy({
             'blocklyPath': "blockly/",
             'attachmentPoint': document.getElementById('blockpy-div'),
-            'instructor': getQueryParams()["instructor"]=="true" || true,
+            'instructor': !getQueryParams()["instructor"] || getQueryParams()["instructor"]=="true",
             'developer': true,
             'editor': 'Split',
             'urls': {
@@ -129,7 +129,7 @@
                 //'give_feedback': 'from instructor_functions import *\nsuppress("analyzer", "Incompatible types")\nmatch_signature("curve_grade", 1, "old")\nunit_test("curve_grade", (64, True), (0, 0), (100, 100))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
                 'give_feedback': '',
-                'on_change': 'ast = parse_program()\ndebug(ast.find_all("Name")[0].data_type)',
+                'on_change': 'gently("Test")',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
