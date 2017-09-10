@@ -388,6 +388,8 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
     );
 }
 
+var NEW_LINE_REGEX = /\r\n|\r|\n/;
+
 /**
  * Run the instructor code
  */
@@ -401,6 +403,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     if (!report['parser'].success || !report['verifier'].success) {
         studentCode = 'pass';
     }
+    var instructorCode = this.main.model.programs[filename]();
+    var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
         'from instructor import *\n'+
         'def run_student():\n'+
@@ -409,13 +413,13 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    except Exception as error:\n'+
         '        return error\n'+
         '    return None\n'+
-        this.main.model.programs[filename]()
+        instructorCode
     );
-    var line_count = instructorCode.split(/\r\n|\r|\n/).length;
+    lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
     var engine = this;
     report['instructor'] = {
         'compliments': [],
-        'filename': filename
+        'filename': filename+".py"
         //'complete': false // Actually, let's use undefined for now.
     };
     Sk.misceval.asyncToPromise(function() {
@@ -434,7 +438,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
             } else {
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
-                report['instructor']['line_offset'] = line_count;
+                report['instructor']['line_offset'] = lineOffset;
             }
             after();
         }
