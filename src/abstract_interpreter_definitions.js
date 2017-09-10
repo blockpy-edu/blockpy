@@ -69,9 +69,22 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Any"}
         ]
     },
+    "int": {
+        "type": "Function",
+        "returns": {"type": "Num"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
+    "len": {
+        "type": "Function",
+        "returns": {"type": "Num"},
+        "parameters": [
+            {"type": "Sequence"}
+        ]
+    },
     'input': {"type": "Str"},
     'reversed': {"type": "List"},
-    'len': {"type": "Num"},
     'type': {"type": "Any"},
     'dir': {"type": "List"}
 };
