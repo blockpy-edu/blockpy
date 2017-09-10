@@ -355,13 +355,19 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Error in Instructor Feedback code
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
-        if (error.traceback[0].filename == report['instructor'].filename) {
-            error.traceback[0].lineno -= report['instructor']['line_offset'];
+        if (error.traceback[0].filename == "__main__.py") {
+            this.printError(report['instructor'].error);
+            return 'student';
+        } else {
+            console.log("I", error.traceback[0].lineno, report['instructor'].line_offset);
+            if (error.traceback[0].filename == report['instructor'].filename) {
+                error.traceback[0].lineno -= report['instructor']['line_offset'];
+            }
+            //report['instructor']['line_offset']
+            this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+            console.error(error);
+            return 'instructor';
         }
-        //report['instructor']['line_offset']
-        this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-        console.error(error);
-        return 'instructor';
     }
     if (report['instructor'].compliments && report['instructor'].compliments.length) {
         //this.compliment(report['instructor'].compliments);
