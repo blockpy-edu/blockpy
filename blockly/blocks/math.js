@@ -68,7 +68,7 @@ Blockly.Blocks['math_arithmetic'] = {
         {
           "type": "input_value",
           "name": "A",
-          "check": "Number"
+          "check": ["Number", "String"]
         },
         {
           "type": "field_dropdown",
@@ -84,7 +84,7 @@ Blockly.Blocks['math_arithmetic'] = {
         {
           "type": "input_value",
           "name": "B",
-          "check": "Number"
+          "check": ["Number", "String"]
         }
       ],
       "inputsInline": true,

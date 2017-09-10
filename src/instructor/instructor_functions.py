@@ -1,5 +1,7 @@
 from instructor import *
 
+DELTA = 0.001
+
 def match_signature(name, length, *parameters):
     ast = parse_program()
     defs = ast.find_all('FunctionDef')
@@ -36,7 +38,11 @@ def unit_test(name, *tests):
                 message = "Your <code>{}</code> function did not produce the correct output for the values {}.<br>Expected: <code>{}</code><br>Actual: <code>{}</code>{}"
                 test_out = the_function(*inp)
                 message = message.format(name, ', '.join(["<code>{}</code>".format(repr(i)) for i in inp]), repr(out), repr(test_out), tip)
-                if out != test_out:
+                if (isinstance(out, float) and 
+                    isinstance(test_out, (float, int)) and
+                    abs(out-test_out) < DELTA):
+                    continue
+                elif out != test_out:
                     gently(message)
                     return None
             else:

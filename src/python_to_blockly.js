@@ -1501,18 +1501,19 @@ PythonToBlocks.prototype.Subscript = function(node)
             });
         }
     } else if (slice._astname == "Slice") {
-        var k = block("lists_getSublist", node.lineno, {
+        return block("lists_getSublist", node.lineno, {
             "WHERE1": "FROM_START",
             "WHERE2": "FROM_START"
         }, {
             "LIST": this.convert(value),
-            "AT1": this.convert(slice.lower),
-            "AT2": this.convert(slice.upper)
+            "AT1": (slice.lower == null) ? 
+                    null : this.convert(slice.lower),
+            "AT2": (slice.upper == null) ?
+                    null : this.convert(slice.upper),
         }, {}, {
             "@at1": "true", 
             "@at2": "true", 
         });
-        return k;
     }
     
     throw new Error("This kind of subscript is not supported.");
