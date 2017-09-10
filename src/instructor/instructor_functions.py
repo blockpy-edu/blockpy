@@ -15,7 +15,7 @@ def match_signature(name, length, *parameters):
             elif parameters:
                 for parameter, arg in zip(parameters, a_def.args.args):
                     if arg.id != parameter:
-                        gently("Error in definition of <code>{}</code>. Expected a parameter named {}, instead found {}.".format(name, parameter, arg))
+                        gently("Error in definition of <code>{}</code>. Expected a parameter named {}, instead found {}.".format(name, parameter, arg.id))
                 else:
                     return a_def
             else:
