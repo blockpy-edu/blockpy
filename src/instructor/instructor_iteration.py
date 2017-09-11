@@ -39,8 +39,10 @@ def missing_iterator_initialization():
     for loop in for_loops:
         list_prop = loop.iter
         if list_prop.ast_name != "List" and (list_prop.data_type != "List" or def_use_error(list_prop)):
-            #compliment("Made a list initialization")
-            explain("The property <code>%s</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>" %(list_prop.id))
+            if list_prop.id == "___":
+                explain("The slot to hold a list in the iteration is empty.<br><br><i>(no_iter_init-blank)<i></br>" %(list_prop.id))
+            else:
+                explain("The property <code>%s</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>" %(list_prop.id))
             return True
     return False
 #TODO: We need to cover the different cases for these
