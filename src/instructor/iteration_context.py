@@ -200,6 +200,21 @@ def wrong_should_be_summing():
             for binop in binops:
                 if binop.has(1) and binop.op == "Add":
                     explain("This problem asks for the total of all the values in the list not the number of items in the list.<br><br><i>(not_sum)<i></br>")
+def missing_addition_slot_empty():
+    ast = parse_program()
+    assignments = ast.find_all("Assign")
+    for assignment in assignments:
+        left = assignment.targets
+        right = assignment.value
+        binOp = right.find_all("BinOp")
+        if len(binOp) == 1:
+            binOp = binOp[0]
+            if binOp.op == "Add":
+                if binOp.left.ast_name == "Name" and binOp.right.ast_name == "Name":
+                    if binOp.left.id == "___" or binOp.right.id == "___":
+                        explain("You must fill in the empty slot in the addition.<br><br><i>(add_empty)<i></br>")
+                        return True
+    return False
 def wrong_cannot_sum_list():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -279,7 +294,7 @@ def missing_zero_initialization():
                     accu_init = True
                     break
     if accu_init == False and accumulator != None:
-        explain("The addition on the first iteration step is not correct because the property <code>%s</code> has not been initialized to an appropriate initial value<br><br><i>(miss_zero_init)<i></br>" %(accumulator.id))
+        explain("The addition on the first iteration step is not correct because either the property <code>%s</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>" %(accumulator.id))
         return False
     return True
 def wrong_printing_list():
