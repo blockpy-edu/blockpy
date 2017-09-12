@@ -788,7 +788,7 @@ def wrong_conversion_10_2():
         iter_prop = loop.target
         conversion_var = iter_prop.id
         for binop in binops:
-            if binop.has(iter_prop) and binop.has(0.4) and binop.op == "Mult":
+            if binop.has(iter_prop) and binop.has(0.04) and binop.op == "Mult":
                 conversion_var = iter_prop.id
                 has_conversion = True
                 break
