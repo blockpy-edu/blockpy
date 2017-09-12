@@ -307,6 +307,7 @@ def wrong_printing_list():
             if call.args[0].ast_name == "Name" and call.args[0].data_type != "Num":
                 explain("You should be printing a single value.<br><br><i>(list_print)<i></br>")
 #################AVERAGE START###############
+'''
 def missing_average():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -341,6 +342,37 @@ def missing_average():
                     if right.id != left.id and right.id != lhs.id and left.id != lhs.id:
                         has_average = True
                         break
+    if not has_average:
+        explain("An average value is not computed.<br><br><i>(no_avg)<i></br>")
+'''
+def missing_average():
+    ast = parse_program()
+    for_loops = ast.find_all("For")
+    has_for = len(for_loops) > 0
+    has_average = False
+    for_loc = []
+    for loop in for_loops:
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
+    if has_for:
+        binops = ast.find_all("BinOp")
+        for binop in binops:
+            if binop.op != "Div":
+                continue
+            is_after = False
+            for lineno in for_loc:
+                if lineno <= binop.lineno:
+                    is_after = True
+                    break
+            if not is_after:
+                break
+            right = binop.right
+            left = binop.left
+            if right.ast_name == "Name" and left.ast_name == "Name":
+                if right.id != left.id:
+                    has_average = True
+                    break
     if not has_average:
         explain("An average value is not computed.<br><br><i>(no_avg)<i></br>")
 def warning_average_in_iteration():
