@@ -359,7 +359,6 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             this.printError(report['instructor'].error);
             return 'student';
         } else {
-            console.log("I", error.traceback[0].lineno, report['instructor'].line_offset);
             if (error.traceback[0].filename == report['instructor'].filename) {
                 error.traceback[0].lineno -= report['instructor']['line_offset'];
             }
