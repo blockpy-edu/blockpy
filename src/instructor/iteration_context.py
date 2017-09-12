@@ -980,3 +980,26 @@ def wrong_debug_10_7():
     if_blocks = ast.find_all("If")
     if len(if_blocks) > 1 or if_blocks[0].test.left.id != "book":
         explain("This is not the change needed. Undo the change and try again.<br><br><i>(debug_10.7)<i></br>")
+#########################PLOTTING###############################
+def plot_group_error():
+    output = get_output()
+    if len(output) > 1:
+        explain("You should only be printing/plotting one thing!<br><br><i>(print_one)<i></br>")
+        return True
+    elif len(output) == 0:
+        explain("The algorithm is plotting an empty list. Check your logic.<br><br><i>(blank_plot)<i></br>")
+        return True
+    elif not isinstance(output[0], list):
+        explain("You should be plotting, not printing!<br><br><i>(printing)<i></br>")
+        return True
+    elif len(output[0]) != 1:
+        explain("You should only be plotting one thing!<br><br><i>(one_plot)<i></br>")
+        return True
+def all_labels_present():
+    x_labels = len(find_function_calls("xlabel"))
+    y_labels = len(find_function_calls("ylabel"))
+    titles = len(find_function_calls("title"))
+    if x_labels < 1 or y_labels < 1 or titles < 1:
+        explain("Make sure you supply labels to all your axes and provide a title")
+        return False
+    return True
