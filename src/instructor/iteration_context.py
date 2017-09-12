@@ -171,6 +171,14 @@ def wrong_names_not_agree_8_4():
                                     return True
     return False
 #################8.4 End#######################
+def wrong_modifying_list_8_5():
+    ast = parse_program()
+    list_init = ast.find_all("List")
+    true_sum = 0
+    for value in list_init[0].elts:
+        true_sum = value.n + true_sum
+    if true_sum != sum([20473, 27630, 17849, 19032, 16378]):
+        explain("Don't modify the list<br><br><i>(mod_list_8.5)<i></br>")
 def wrong_modifying_list_8_6():
     ast = parse_program()
     list_init = ast.find_all("List")
@@ -502,6 +510,13 @@ def wrong_for_inside_if():
     if if_inside_for:
         explain("The iteration should not be inside the decision block.<br><br><i>(for_in_if)<i></br>")
     return if_inside_for
+def iterator_is_function():
+    ast = parse_program()
+    for_loops = all_for_loops()
+    for loop in for_loops:
+        list_prop = loop.iter
+        if list_prop.ast_name == "Call":
+            explain("You should make a property for the list instead of using a function call for the list<br><br><i>(iter_is_func)<i></br>")
 ###########################9.1 START############################
 def wrong_list_initialization_9_1():
     ast = parse_program()
