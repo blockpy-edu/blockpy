@@ -153,6 +153,10 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     border-bottom: 1px dashed rgba(1,1,1,.1);
 }
 
+.blockpy-read-only .CodeMirror-scroll {
+    background-color: #E5E5E5;
+}
+
 .blockpy-overlay {
     position: fixed;
     top: 0;
