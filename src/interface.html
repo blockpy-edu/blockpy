@@ -148,7 +148,8 @@
             
             <button type='button' class='btn blockpy-run' style='float:left',
                 data-bind='css: execution.status() == "running" ? "btn-info" :
-                                execution.status() == "error" ? "btn-danger" : "btn-success" ' >
+                                execution.status() == "error" ? "btn-danger" : "btn-success",
+                           visible: settings.instructor() || !assignment.upload()' >
                 <span class='glyphicon glyphicon-play'></span> Run
             </button>
             
@@ -177,19 +178,22 @@
                     <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
                 </label>
             </div>
-            <button type='button' class='btn btn-default blockpy-toolbar-reset' data-bind="visible: !assignment.upload()">
+            <button type='button' class='btn btn-default blockpy-toolbar-reset' 
+                    data-bind="visible: !assignment.upload()">
                 <span class='glyphicon glyphicon-refresh'></span> Reset
             </button>
             <!--<button type='button' class='btn btn-default blockpy-toolbar-capture'>
                 <span class='glyphicon glyphicon-picture'></span> Capture
             </button>-->
-            <button type='button' class='btn btn-default blockpy-toolbar-import' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
+            <button type='button' class='btn btn-default blockpy-toolbar-import' 
+                    data-bind="visible: settings.instructor() || (!assignment.upload() && assignment.importable())">
                 <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
             </button>
             <label class="btn btn-default btn-file">
-                Upload <input class="blockpy-toolbar-upload" type="file" style="display: none;">
+                <span class='glyphicon glyphicon-upload'></span> Upload
+                <input class="blockpy-toolbar-upload" type="file" style="display: none;">
             </label>
-            <button type='button' class='btn btn-default blockpy-toolbar-history' data-bind="visible: !assignment.upload() && (assignment.importable() || settings.instructor())">
+            <button type='button' class='btn btn-default blockpy-toolbar-history'>
                 <span class='glyphicon glyphicon-hourglass'></span> History
             </button>
             <button type='button' class='btn btn-default blockpy-toolbar-instructor' data-bind="visible: settings.instructor">
@@ -203,7 +207,7 @@
                 <span class='glyphicon glyphicon-list-alt'></span> English
             </button>
             -->
-            <div data-bind="visible: settings.instructor() & !assignment.upload()"
+            <div data-bind="visible: settings.instructor()"
                  style='clear:both'>
             <div class="btn-group blockpy-toolbar-filename-picker" data-toggle="buttons">
                 <label class="btn btn-default btn-sm blockpy-set-filename" 

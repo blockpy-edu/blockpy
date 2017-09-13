@@ -381,6 +381,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     if (suppress['analyzer'] !== true) {//if a subtype is specified, or no suppression requested, present feedback
         if (!report['analyzer'].success) {
             this.internalError(report['analyzer'].error, "Analyzer Error", "Error in analyzer. Please show the above message to an instructor!");
+            return 'analyzer';
         }
         var wasPresented = this.presentAnalyzerFeedback();
         if (wasPresented) {

@@ -119,7 +119,7 @@
             // settings
             {
                 'editor': 'Text',
-                'read_only': false,
+                'read_only': getQueryParams()["upload"]=="true",
                 'disable_semantic_errors': false,
             },
             // assignment
@@ -127,16 +127,16 @@
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.2",
                 //'give_feedback': 'from instructor_functions import *\nsuppress("analyzer", "Incompatible types")\nmatch_signature("curve_grade", 1, "old")\nunit_test("curve_grade", (64, True), (0, 0), (100, 100))',
-                'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
+                //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
-                //'give_feedback': '',
+                'give_feedback': 'set_success()',
                 'on_change': '',
                 //'on_change': 'gently("Test")',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
                 'initial_view': 'Text',
-                'upload': false,
+                'upload': getQueryParams()["upload"]=="true",
                 'modules': {
                     'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples'],
                     'removed': []
