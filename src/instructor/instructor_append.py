@@ -30,7 +30,7 @@ def wrong_not_append_to_list():
         for node in append_nodes:
             listNode = node.func.value
             if listNode.data_type != "List":
-                explain("Values can only be appended to a list. The property <code>%s</code> is either not initialized or is confused with another property.<br><br><i>(app_not_list)<i></br>" %(listNode.id))
+                explain("Values can only be appended to a list. The property <code>%s</code> is either not initialized, not initialized correctly, or is confused with another property.<br><br><i>(app_not_list)<i></br>" %(listNode.id))
 def missing_append_list_initialization():
     ast = parse_program()
     for_loops = ast.find_all("For")

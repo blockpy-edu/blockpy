@@ -171,6 +171,14 @@ def wrong_names_not_agree_8_4():
                                     return True
     return False
 #################8.4 End#######################
+def wrong_modifying_list_8_5():
+    ast = parse_program()
+    list_init = ast.find_all("List")
+    true_sum = 0
+    for value in list_init[0].elts:
+        true_sum = value.n + true_sum
+    if true_sum != sum([20473, 27630, 17849, 19032, 16378]):
+        explain("Don't modify the list<br><br><i>(mod_list_8.5)<i></br>")
 def wrong_modifying_list_8_6():
     ast = parse_program()
     list_init = ast.find_all("List")
@@ -307,6 +315,7 @@ def wrong_printing_list():
             if call.args[0].ast_name == "Name" and call.args[0].data_type != "Num":
                 explain("You should be printing a single value.<br><br><i>(list_print)<i></br>")
 #################AVERAGE START###############
+'''
 def missing_average():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -341,6 +350,37 @@ def missing_average():
                     if right.id != left.id and right.id != lhs.id and left.id != lhs.id:
                         has_average = True
                         break
+    if not has_average:
+        explain("An average value is not computed.<br><br><i>(no_avg)<i></br>")
+'''
+def missing_average():
+    ast = parse_program()
+    for_loops = ast.find_all("For")
+    has_for = len(for_loops) > 0
+    has_average = False
+    for_loc = []
+    for loop in for_loops:
+        end_node = loop.next_tree
+        if end_node != None:
+            for_loc.append(end_node.lineno)
+    if has_for:
+        binops = ast.find_all("BinOp")
+        for binop in binops:
+            if binop.op != "Div":
+                continue
+            is_after = False
+            for lineno in for_loc:
+                if lineno <= binop.lineno:
+                    is_after = True
+                    break
+            if not is_after:
+                break
+            right = binop.right
+            left = binop.left
+            if right.ast_name == "Name" and left.ast_name == "Name":
+                if right.id != left.id:
+                    has_average = True
+                    break
     if not has_average:
         explain("An average value is not computed.<br><br><i>(no_avg)<i></br>")
 def warning_average_in_iteration():
@@ -470,6 +510,13 @@ def wrong_for_inside_if():
     if if_inside_for:
         explain("The iteration should not be inside the decision block.<br><br><i>(for_in_if)<i></br>")
     return if_inside_for
+def iterator_is_function():
+    ast = parse_program()
+    for_loops = all_for_loops()
+    for loop in for_loops:
+        list_prop = loop.iter
+        if list_prop.ast_name == "Call":
+            explain("You should make a property for the list instead of using a function call for the list<br><br><i>(iter_is_func)<i></br>")
 ###########################9.1 START############################
 def wrong_list_initialization_9_1():
     ast = parse_program()
@@ -756,7 +803,7 @@ def wrong_conversion_10_2():
         iter_prop = loop.target
         conversion_var = iter_prop.id
         for binop in binops:
-            if binop.has(iter_prop) and binop.has(0.4) and binop.op == "Mult":
+            if binop.has(iter_prop) and binop.has(0.04) and binop.op == "Mult":
                 conversion_var = iter_prop.id
                 has_conversion = True
                 break
@@ -933,3 +980,26 @@ def wrong_debug_10_7():
     if_blocks = ast.find_all("If")
     if len(if_blocks) > 1 or if_blocks[0].test.left.id != "book":
         explain("This is not the change needed. Undo the change and try again.<br><br><i>(debug_10.7)<i></br>")
+#########################PLOTTING###############################
+def plot_group_error():
+    output = get_output()
+    if len(output) > 1:
+        explain("You should only be printing/plotting one thing!<br><br><i>(print_one)<i></br>")
+        return True
+    elif len(output) == 0:
+        explain("The algorithm is plotting an empty list. Check your logic.<br><br><i>(blank_plot)<i></br>")
+        return True
+    elif not isinstance(output[0], list):
+        explain("You should be plotting, not printing!<br><br><i>(printing)<i></br>")
+        return True
+    elif len(output[0]) != 1:
+        explain("You should only be plotting one thing!<br><br><i>(one_plot)<i></br>")
+        return True
+def all_labels_present():
+    x_labels = len(find_function_calls("xlabel"))
+    y_labels = len(find_function_calls("ylabel"))
+    titles = len(find_function_calls("title"))
+    if x_labels < 1 or y_labels < 1 or titles < 1:
+        explain("Make sure you supply labels to all your axes and provide a title")
+        return False
+    return True
