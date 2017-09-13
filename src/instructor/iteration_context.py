@@ -512,7 +512,7 @@ def wrong_for_inside_if():
     return if_inside_for
 def iterator_is_function():
     ast = parse_program()
-    for_loops = all_for_loops()
+    for_loops = ast.find_all("For")
     for loop in for_loops:
         list_prop = loop.iter
         if list_prop.ast_name == "Call":

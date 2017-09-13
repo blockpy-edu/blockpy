@@ -65,7 +65,7 @@ def histogram_argument_not_list():
                 break
     if arg_name != "":
         if arg_name == "___":
-            explain("Making a histogram requires a list.<br><br><i>(hist_arg_not_list_blank)<i></br>")
+            explain("Making a histogram requires a list; the list is missing.<br><br><i>(hist_arg_not_list_blank)<i></br>")
         else:
             explain("Making a histogram requires a list; <code>%s</code> is not a list.<br><br><i>(hist_arg_not_list)<i></br>" %(arg_name))
     return arg_name != ""
