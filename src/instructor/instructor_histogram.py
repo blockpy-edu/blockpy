@@ -1,8 +1,8 @@
 from instructor_utility import *
 def histogram_group():
+    histogram_argument_not_list()
     histogram_missing()
     plot_show_missing()
-    histogram_argument_not_list()
     histogram_wrong_list()
 '''
 Name: histogram_missing
@@ -64,7 +64,10 @@ def histogram_argument_not_list():
                 arg_name = arg.id
                 break
     if arg_name != "":
-        explain("Making a histogram requires a list; <code>%s</code> is not a list.<br><br><i>(hist_arg_not_list)<i></br>" %(arg_name))
+        if arg_name == "___":
+            explain("Making a histogram requires a list.<br><br><i>(hist_arg_not_list_blank)<i></br>")
+        else:
+            explain("Making a histogram requires a list; <code>%s</code> is not a list.<br><br><i>(hist_arg_not_list)<i></br>" %(arg_name))
     return arg_name != ""
 '''
 Name: histogram_wrong_list
