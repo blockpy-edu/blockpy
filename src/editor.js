@@ -67,7 +67,15 @@ function BlockPyEditor(main, tag) {
     });
     
     // Handle mode switching
-    this.main.model.settings.editor.subscribe(function() {editor.setMode()});
+    var settings = this.main.model.settings;
+    settings.editor.subscribe(function() {editor.setMode()});
+    var updateReadOnly = function() {
+        var newValue = settings.read_only && !settings.instructor();
+        editor.codeMirror.setOption('readOnly', newValue);
+        tag.toggleClass("blockpy-read-only", newValue);
+    };
+    settings.read_only.subscribe(updateReadOnly);
+    settings.instructor.subscribe(updateReadOnly);
     
     // Handle filename switching
     this.main.model.settings.filename.subscribe(function (name) {
@@ -177,6 +185,7 @@ BlockPyEditor.prototype.initText = function() {
                                                 singleLineStringErrors: false
                                         },
                                         readOnly: this.main.model.settings.read_only(),
+                                        showCursorWhenSelecting: true,
                                         lineNumbers: true,
                                         firstLineNumber: 1,
                                         indentUnit: 4,
@@ -191,6 +200,7 @@ BlockPyEditor.prototype.initText = function() {
     this.codeMirror.on("change", function() {
         //editor.main.components.feedback.clearEditorErrors();
         editor.updateText()
+        editor.unhighlightLines();
     });
 
     // Ensure that it fills the editor area
@@ -436,6 +446,8 @@ BlockPyEditor.prototype.setMode = function(mode) {
         this.setModeToSplit();
     } else if (mode == 'Instructor') {
         this.setModeToInstructor();
+    } else if (mode == 'Upload') {
+        this.setModeToText();
     } else {
         this.main.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.")
     }
@@ -761,6 +773,18 @@ BlockPyEditor.prototype.unhighlightLines = function() {
         }
     }
     this.previousLine = null;
+}
+
+/**
+ * Removes any highlight in the text code editor.
+ *
+ */
+BlockPyEditor.prototype.unhighlightAllLines = function() {
+    var editor = this.codeMirror;
+    var count = editor.lineCount(), i;
+    for (i = 0; i < count; i++) {
+        editor.removeLineClass(i, 'text', 'editor-error-line');
+    }
 }
 
 /**

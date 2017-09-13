@@ -359,7 +359,6 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             this.printError(report['instructor'].error);
             return 'student';
         } else {
-            console.log("I", error.traceback[0].lineno, report['instructor'].line_offset);
             if (error.traceback[0].filename == report['instructor'].filename) {
                 error.traceback[0].lineno -= report['instructor']['line_offset'];
             }
@@ -382,6 +381,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     if (suppress['analyzer'] !== true) {//if a subtype is specified, or no suppression requested, present feedback
         if (!report['analyzer'].success) {
             this.internalError(report['analyzer'].error, "Analyzer Error", "Error in analyzer. Please show the above message to an instructor!");
+            return 'analyzer';
         }
         var wasPresented = this.presentAnalyzerFeedback();
         if (wasPresented) {
