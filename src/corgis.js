@@ -1,4 +1,5 @@
 _IMPORTED_DATASETS = {};
+_IMPORTED_COMPLETE_DATASETS = {};
 
 /**
  * Module that connects to the CORGIS datasets and manages interactions
@@ -62,13 +63,15 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
         this.main.model.status.dataset_loading.push(name);
         // Actually get data
         var get_dataset = $.getScript(root+'_dataset.js');
+        var get_complete = $.getScript(root+'_complete.js');
         var get_skulpt = $.get(root+'_skulpt.js', function(data) {
             Sk.builtinFiles['files']['src/lib/'+slug+'/__init__.js'] = data;
         });
         var get_blockly = $.getScript(root+'_blockly.js');
         // On completion, update menus.
         var corgis = this;
-        $.when(get_dataset, get_skulpt, get_blockly).done(function() {
+        $.when(get_dataset, get_skulpt, 
+               get_blockly, get_complete).done(function() {
             corgis.loadedDatasets.push(slug);
             if (silently) {
                 corgis.main.model.settings.server_connected(false);
@@ -81,7 +84,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
             }
             corgis.main.model.status.dataset_loading.pop();
         });
-        url_retrievals.push(get_dataset, get_skulpt, get_blockly);
+        url_retrievals.push(get_dataset, get_skulpt, get_blockly, get_complete);
     }
     return url_retrievals;
 }

@@ -55,7 +55,7 @@ BlockPyEngine.prototype.configureSkulpt = function() {
  */
 BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
-    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 5000;
+    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 10000;
     // Identify the location to put new charts
     Sk.console = this.main.components.printer.getConfiguration();
     // Stepper! Executed after every statement.
@@ -432,10 +432,10 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         },
         // Failure
         function (error) {
-            console.log(error);
             if (error.tp$name === 'GracefulExit') {
                 report['instructor']['success'] = true;
             } else {
+                console.log(error);
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
                 report['instructor']['line_offset'] = lineOffset;
