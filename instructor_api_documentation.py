@@ -369,6 +369,27 @@ def find_prior_initializations(node):
         None if node is not a Name node, otherwise returns a (possibly empty)
         list
     '''
+    
+def prevent_builtin_usage(names):
+    '''
+    Checks that a given list of function names are not being called, and
+    explains a warning if they are. Also prevents against simply redeclaring
+    the function_names.
+    
+    Args:
+        names (list of str): A list of the function names to check for.
+    
+    Returns:
+        None: No usages occurred
+        str: The name of the first function that was used.
+    '''
+
+def prevent_advanced_iteration():
+    '''
+    Checks that the program does not use While loops or any of the built-in
+    functions for processing lists (e.g., sum or len).
+    '''
+    
 ##instructor_filter
 def missing_if_in_for():
     '''
