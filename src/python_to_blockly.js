@@ -300,7 +300,7 @@ function block(type, lineNumber, fields, values, settings, mutations, statements
             var mutationValue = mutations[mutation];
             if (mutation.charAt(0) == '@') {
                 newMutation.setAttribute(mutation.substr(1), mutationValue);
-            } else if (mutationValue.constructor === Array) {
+            } else if (mutationValue != null && mutationValue.constructor === Array) {
                 for (var i = 0; i < mutationValue.length; i++) {
                     var mutationNode = document.createElement(mutation);
                     mutationNode.setAttribute("name", mutationValue[i]);
@@ -308,8 +308,14 @@ function block(type, lineNumber, fields, values, settings, mutations, statements
                 }
             } else {
                 var mutationNode = document.createElement("arg");
-                mutationNode.setAttribute("name", mutation);
-                mutationNode.appendChild(mutationValue);
+                if (mutation.charAt(0) == '*') {
+                    mutationNode.setAttribute("name", "");
+                } else {
+                    mutationNode.setAttribute("name", mutation);
+                }                
+                if (mutationValue !== null) {
+                    mutationNode.appendChild(mutationValue);
+                }
                 newMutation.appendChild(mutationNode);
             }
         }
@@ -1394,10 +1400,10 @@ PythonToBlocks.prototype.Call = function(node) {
                     var argumentsMutation = {"@name": this.identifier(func.id)};
                     for (var i = 0; i < args.length; i+= 1) {
                         argumentsNormal["ARG"+i] = this.convert(args[i]);
-                        argumentsMutation[i] = this.convert(args[i]);
+                        argumentsMutation["*"+i] = this.convert(args[i]);
                     }
                     return block("procedures_callreturn", node.lineno, {}, argumentsNormal, {
-                        "inline": "false"
+                        "inline": "true"
                     }, argumentsMutation);
             }
         // Direct function call

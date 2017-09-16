@@ -645,25 +645,34 @@ Blockly.Blocks['procedures_callnoreturn'] = {
    */
   updateShape_: function() {
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = this.getField('ARGNAME' + i);
-      if (field) {
-        // Ensure argument name is up to date.
-        // The argument name field is deterministic based on the mutation,
-        // no need to fire a change event.
-        Blockly.Events.disable();
-        try {
-          field.setValue(this.arguments_[i]);
-        } finally {
-          Blockly.Events.enable();
+        if (this.arguments_[i] != "") {
+          var field = this.getField('ARGNAME' + i);
+          if (field) {
+            // Ensure argument name is up to date.
+            // The argument name field is deterministic based on the mutation,
+            // no need to fire a change event.
+            Blockly.Events.disable();
+            try {
+              field.setValue(this.arguments_[i]);
+            } finally {
+              Blockly.Events.enable();
+            }
+          } else {
+            // Add new input.
+            field = new Blockly.FieldLabel(this.arguments_[i]);
+            var input = this.appendValueInput('ARG' + i)
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField(field, 'ARGNAME' + i);
+            input.init();
+          }
+        } else {
+            if (!this.getInput('ARG' + i)) {
+                var input = this.appendValueInput('ARG' + i)
+                    .setAlign(Blockly.ALIGN_RIGHT);
+                    //.appendField(field, 'ARGNAME' + i);
+                input.init();
+            }
         }
-      } else {
-        // Add new input.
-        field = new Blockly.FieldLabel(this.arguments_[i]);
-        var input = this.appendValueInput('ARG' + i)
-            .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(field, 'ARGNAME' + i);
-        input.init();
-      }
     }
     // Remove deleted inputs.
     while (this.getInput('ARG' + i)) {
@@ -671,6 +680,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       i++;
     }
     // Add 'with:' if there are parameters, remove otherwise.
+    /*
     var topRow = this.getInput('TOPROW');
     if (topRow) {
       if (this.arguments_.length) {
@@ -684,6 +694,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         }
       }
     }
+    */
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
@@ -729,7 +740,10 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     for (var i = 0; i < this.arguments_.length; i++) {
       if (Blockly.Names.equals(oldName, this.arguments_[i])) {
         this.arguments_[i] = newName;
-        this.getField('ARGNAME' + i).setValue(newName);
+        var argname = this.getField('ARGNAME' + i);
+        if (argname) {
+            argname.setValue(newName);
+        }
       }
     }
   },
