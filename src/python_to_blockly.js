@@ -1328,11 +1328,11 @@ PythonToBlocks.prototype.CallAttribute = function(func, args, keywords, starargs
         var argumentsMutation = {"@name": name};
         for (var i = 0; i < args.length; i+= 1) {
             argumentsNormal["ARG"+i] = this.convert(args[i]);
-            argumentsMutation[i] = this.convert(args[i]);
+            argumentsMutation["*"+i] = this.convert(args[i]);
         }
         var methodCall = block("procedures_callreturn", node.lineno, {
         }, argumentsNormal, {
-            "inline": "false"
+            "inline": "true"
         }, argumentsMutation);
         
         return block("attribute_access", node.lineno, {}, {
