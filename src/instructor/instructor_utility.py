@@ -52,6 +52,34 @@ def find_prior_initializations(node):
             if assignment.lineno < cur_line_no:
                 all_assignments.append(assignment)
     return all_assignments
+    
+def prevent_builtin_usage(function_names):
+    # Prevent direction calls
+    ast = parse_program()
+    all_calls = ast.find_all('Call')
+    for a_call in all_calls:
+        if a_call.func.ast_name == 'Name':
+            if a_call.func.id in function_names:
+                explain("You cannot use the builtin function <code>{}</code>.".format(a_call.func.id))
+                return a_call.func.id
+    # Prevent tricky redeclarations!
+    names = ast.find_all('Name')
+    seen = set()
+    for name in names:
+        if name.id not in seen:
+            if name.ctx == "Load" and name.id in function_names:
+                explain("You cannot use the builtin function <code>{}</code>. If you are naming a variable, consider a more specific name.".format(name.id))
+            seen.add(name.id)
+            return name.id
+    return None
+    
+def prevent_advanced_iteration():
+    ast = parse_program()
+    if ast.find_all('While'):
+        explain("You should not use a <code>while</code> loop to solve this problem.")
+    prevent_builtin_usage(['sum', 'map', 'filter', 'reduce', 'len', 'max', 'min',
+                           'max', 'sorted', 'all', 'any', 'getattr', 'setattr',
+                           'eval', 'exec', 'iter'])
 
 '''
     
