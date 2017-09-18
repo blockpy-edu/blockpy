@@ -21,7 +21,7 @@ def wrong_target_is_list():
     for loop in for_loops:
         iter_prop = loop.target
         if iter_prop.ast_name == "Name" and iter_prop.data_type == "List":
-            explain('The property <code>%s</code> is a list and should not be placed in the iteration property slot of the "for" block<br><br><i>(target_is_list)<i></br>.' % (iter_prop.id))
+            explain('The property <code>{0!s}</code> is a list and should not be placed in the iteration property slot of the "for" block<br><br><i>(target_is_list)<i></br>.' % (iter_prop.id))
     return False
 #this conflics with list_in_wrong_slot_in_for
 def wrong_list_repeated_in_for():
@@ -30,7 +30,7 @@ def wrong_list_repeated_in_for():
         iter_prop = loop.target
         list_prop = loop.iter
         if iter_prop.ast_name == "Name" and list_prop.ast_name == "Name" and iter_prop.id == list_prop.id and iter_prop.data_type == "List":
-            explain('The <code>%s</code> property can only appear once in the "for" block <br><br><i>(list_repeat)<i></br>' % (list_prop.id))
+            explain('The <code>{0!s}</code> property can only appear once in the "for" block <br><br><i>(list_repeat)<i></br>' % (list_prop.id))
     return False
 #this isn't consistent with the pattern you wrote
 def missing_iterator_initialization():
@@ -40,9 +40,9 @@ def missing_iterator_initialization():
         list_prop = loop.iter
         if list_prop.ast_name != "List" and (list_prop.data_type != "List" or def_use_error(list_prop)):
             if list_prop.id == "___":
-                explain("The slot to hold a list in the iteration is empty.<br><br><i>(no_iter_init-blank)<i></br>" %(list_prop.id))
+                explain("The slot to hold a list in the iteration is empty.<br><br><i>(no_iter_init-blank)<i></br>".format(list_prop.id))
             else:
-                explain("The property <code>%s</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>" %(list_prop.id))
+                explain("The property <code>{0!s}</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>".format(list_prop.id))
             return True
     return False
 #TODO: We need to cover the different cases for these
@@ -52,7 +52,7 @@ def wrong_iterator_not_list():
         list_prop = loop.iter
         if list_prop.ast_name != "List" and list_prop.data_type != "List" and list_prop.id != "___":
             if list_prop.ast_name == "Name":
-                explain("The property <code>%s</code> has been set to something that is not a list but is placed in the iteration block that must be a list.<br><br><i>(iter_not_list)<i></br>" % (list_prop.id))
+                explain("The property <code>{0!s}</code> has been set to something that is not a list but is placed in the iteration block that must be a list.<br><br><i>(iter_not_list)<i></br>" % (list_prop.id))
                 return True
     return False
 def missing_target_slot_empty():
@@ -108,4 +108,4 @@ def wrong_target_reassigned():
         if is_reassigned:
             break
     if is_reassigned:
-        explain("The property <code>%s</code> has been reassigned. The iteration property shouldn't be reassigned<br><br><i>(target_reassign)<i></br>" %(off_prop))
+        explain("The property <code>{0!s}</code> has been reassigned. The iteration property shouldn't be reassigned<br><br><i>(target_reassign)<i></br>".format(off_prop))
