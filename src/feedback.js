@@ -345,11 +345,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     if (!suppress['parser'] && !report['parser'].success) {
         var parserReport = report['parser'].error;
-        var codeLine = '.';
-        if (parserReport.args.v.length > 3) {
-            codeLine = ', where it says:<br><code>'+parserReport.args.v[3][2]+'</code>';
-        }
-        this.editorError(parserReport, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ parserReport.args.v[2]+codeLine, parserReport.args.v[2]);
+        this.convertSkulptSyntax(parserReport);
         return 'parser';
     }
     // Error in Instructor Feedback code
@@ -412,6 +408,16 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         return 'no errors';
     }
     return 'completed';
+}
+
+BlockPyFeedback.prototype.convertSkulptSyntax = function(skulptError) {
+    var convertedError = Sk.ffi.remapToJs(skulptError.args);
+    console.log(convertedError);
+    var codeLine = '.';
+    if (convertedError.length > 3 && convertedError[4]) {
+        codeLine = ', where it says:<br><code>'+convertedError[4]+'</code>';
+    }
+    this.editorError(skulptError, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ convertedError[2]+codeLine, convertedError[2]);
 }
 
 BlockPyFeedback.prototype.OPERATION_DESCRIPTION = {

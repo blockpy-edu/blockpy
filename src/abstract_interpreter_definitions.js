@@ -103,6 +103,12 @@ AbstractInterpreter.METHODS = {
     }
 }
 AbstractInterpreter.MODULES = {
+    'parking': {
+        'now': { 'type': 'ParkingTime'},
+        'Time': { 'type': 'ParkingTime'},
+        'Day': { 'type': 'ParkingDay'},
+        'today': { 'type': 'ParkingDay'}
+    },
     'weather': {
         'get_temperature': {"type": 'Num'},
         'get_forecasts': {"type": "List", "empty": false, "component": {"type": 'Num'}},
