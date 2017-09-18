@@ -118,7 +118,7 @@
         blockpy.setAssignment(
             // settings
             {
-                'editor': 'Text',
+                'editor': 'Split',
                 'read_only': getQueryParams()["upload"]=="true",
                 'disable_semantic_errors': false,
             },
@@ -135,7 +135,7 @@
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Text',
+                'initial_view': 'Split',
                 'upload': getQueryParams()["upload"]=="true",
                 'modules': {
                     'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples'],
@@ -147,7 +147,8 @@
                 //'__main__': 'ss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
                 //'__main__': 'print("Hello world"[1:5])',
                 //'__main__': 'a = 0\nprint(a)',
-                '__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
+                //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
+                '__main__': 'round(float("9.5", ___))',
                 //'__main__': 'print("Banana"[:int(len("Banana")/2)])',
                 //'__main__': 'def curve_grade(old):\n    return (old ** .5) * 10\n\nprint(90, "becomes", curve_grade(90))\nprint(50, "becomes", curve_grade(50))\nprint(20, "becomes", curve_grade(20))'
                 //'__main__': 'print(1 != 2 and 2 != 1)'

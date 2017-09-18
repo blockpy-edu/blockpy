@@ -198,6 +198,7 @@ BlockPyEngine.prototype.on_run = function() {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
     var engine = this;
+    var feedback = engine.main.components.feedback;
     var model = this.main.model;
     engine.resetReports();
     engine.verifyCode();
@@ -205,7 +206,10 @@ BlockPyEngine.prototype.on_run = function() {
     engine.analyzeParse();
     engine.runStudentCode(function() {
         engine.runInstructorCode('give_feedback', function() {
-            var result = engine.main.components.feedback.presentFeedback();
+            if (!feedback.isFeedbackVisible()) {
+                engine.main.components.toolbar.notifyFeedbackUpdate();
+            }
+            var result = feedback.presentFeedback();
             if (result == 'success' || result == 'no errors') {
                 engine.main.components.server.markSuccess(1.0, model.settings.completedCallback);
             } else {
@@ -240,10 +244,8 @@ BlockPyEngine.prototype.on_change = function() {
     this.main.model.execution.suppressions['no errors'] = true;
     engine.runInstructorCode(FILENAME, function() {
         var feedback_type = feedback.presentFeedback();
-        if (feedback_type != 'completed') {
-            if (!feedback.isFeedbackVisible()) {
-                engine.main.components.toolbar.notifyFeedbackUpdate();
-            }
+        if (!feedback.isFeedbackVisible()) {
+            engine.main.components.toolbar.notifyFeedbackUpdate();
         }
         engine.main.model.execution.status("complete");
     });
