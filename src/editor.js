@@ -470,7 +470,7 @@ BlockPyEditor.prototype.setText = function(code) {
 
 BlockPyEditor.prototype.showConversionError = function() {
     var error = this.blocksFailed;
-    this.main.components.feedback.editorError(error, "While attempting to convert the Python code into blocks, I found a syntax error. In other words, your Python code has a spelling or grammatical mistake. You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ error.args.v[2]+', where it says:<br><code>'+error.args.v[3][2]+'</code>', error.args.v[2]);
+    this.main.components.feedback.convertSkulptSyntax(error);
 }
 
 BlockPyEditor.prototype.setBlocks = function(python_code) {
