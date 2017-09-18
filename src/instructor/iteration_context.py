@@ -167,7 +167,7 @@ def wrong_names_not_agree_8_4():
                         for binop in binops:
                             if binop.has(lhs) and binop.op == "Add":
                                 if not binop.has(iter_prop):
-                                    explain("Each value of <code>%s</code> must be added to <code>%s</code>.<br><br><i>(name_agree_8.4)<i></br>" %(iter_prop.id, lhs.id))
+                                    explain("Each value of <code>{0!s}</code> must be added to <code>{0!s}</code>.<br><br><i>(name_agree_8.4)<i></br>".format(iter_prop.id, lhs.id))
                                     return True
     return False
 #################8.4 End#######################
@@ -302,7 +302,7 @@ def missing_zero_initialization():
                     accu_init = True
                     break
     if accu_init == False and accumulator != None:
-        explain("The addition on the first iteration step is not correct because either the property <code>%s</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>" %(accumulator.id))
+        explain("The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(accumulator.id))
         return False
     return True
 def wrong_printing_list():
@@ -396,7 +396,7 @@ def warning_average_in_iteration():
                     numerator = binop.left
                     denominator = binop.right
                     if numerator.ast_name == "Name" and denominator.ast_name == "Name":
-                        explain("An average value is best computed after the properties name <code>%s</code>(total) and <code>%s</code> are completely known rather than recomputing the average on each iteration.<br><br><i>(avg_in_iter)<i></br>" %(numerator.id,denominator.id))
+                        explain("An average value is best computed after the properties name <code>{0!s}</code>(total) and <code>{0!s}</code> are completely known rather than recomputing the average on each iteration.<br><br><i>(avg_in_iter)<i></br>".format(numerator.id,denominator.id))
 def wrong_average_denominator():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -496,7 +496,7 @@ def wrong_compare_list():
         if is_comparing_list:
             break
     if is_comparing_list:
-        explain("Each item in the list <code>%s</code> must be compared one item at a time.<br><br><i>(comp_list)<i></br>" %(offending_list))
+        explain("Each item in the list <code>{0!s}</code> must be compared one item at a time.<br><br><i>(comp_list)<i></br>".format(offending_list))
     return is_comparing_list
 def wrong_for_inside_if():
     ast = parse_program()
@@ -808,7 +808,7 @@ def wrong_conversion_10_2():
                 has_conversion = True
                 break
     if conversion_var != "" and not has_conversion:
-        explain("The conversion of <code>%s</code> to inches is not correct.<br><br><i>(conv_10.2)<i></br>" %(conversion_var))
+        explain("The conversion of <code>{0!s}</code> to inches is not correct.<br><br><i>(conv_10.2)<i></br>".format(conversion_var))
 ###########################10.2 END############################
 ###########################10.3 START############################
 def wrong_filter_condition_10_3():
@@ -980,6 +980,25 @@ def wrong_debug_10_7():
     if_blocks = ast.find_all("If")
     if len(if_blocks) > 1 or if_blocks[0].test.left.id != "book":
         explain("This is not the change needed. Undo the change and try again.<br><br><i>(debug_10.7)<i></br>")
+#########################.....###############################
+def wrong_initialization_in_iteration():
+	ast = parse_program()
+	loops = ast.find_all("For")
+	init_in_loop = False
+	target = None
+	for loop in loops:
+		assignments = loop.find_all("Assign")
+		for assignment in assignments:
+			target = assignment.targets
+			value = assignment.value
+			names = value.find_all("Name")
+			if len(names) == 0:
+				init_in_loop = True
+				break
+		if init_in_loop:
+			break
+	if init_in_loop:
+		explain("You only need to initialize <code>{0!s}</code> once. Remember that statements in an iteration block happens multiple times".format(target.id))
 #########################PLOTTING###############################
 def plot_group_error():
     output = get_output()
