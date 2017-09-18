@@ -30,7 +30,7 @@ def wrong_not_append_to_list():
         for node in append_nodes:
             listNode = node.func.value
             if listNode.data_type != "List":
-                explain("Values can only be appended to a list. The property <code>%s</code> is either not initialized, not initialized correctly, or is confused with another property.<br><br><i>(app_not_list)<i></br>" %(listNode.id))
+                explain("Values can only be appended to a list. The property <code>{0!s}</code> is either not initialized, not initialized correctly, or is confused with another property.<br><br><i>(app_not_list)<i></br>".format(listNode.id))
 def missing_append_list_initialization():
     ast = parse_program()
     for_loops = ast.find_all("For")
@@ -47,7 +47,7 @@ def missing_append_list_initialization():
                 found_init = True
                 break
         if found_init == False:
-            explain("The list property <code>%s</code> must be initialized.<br><br><i>(no_app_list_init)<i></br>" %(append_var.id))
+            explain("The list property <code>{0!s}</code> must be initialized.<br><br><i>(no_app_list_init)<i></br>".format(append_var.id))
             return True
     return False
 
@@ -70,7 +70,7 @@ def wrong_append_list_initiatization():
                 else:#or if its not even a list
                     init_fail = True
             if init_fail:
-                explain("The list property <code>%s</code> is not initialized correctly.<br><br><i>(app_list_init)<i></br>" %(append_var.id))
+                explain("The list property <code>{0!s}</code> is not initialized correctly.<br><br><i>(app_list_init)<i></br>".format(append_var.id))
                 return
 def append_list_wrong_slot():
     ast = parse_program()
@@ -80,4 +80,4 @@ def append_list_wrong_slot():
         caller = append_call.func.value
         if arg.ast_name == "Name":
             if arg.data_type == "List":
-                explain("You should not append a list (<code>%s</code>) to <code>%s</code>.<br><br><i>(app_list_slot)<i></br>" %(arg.id, caller.id))
+                explain("You should not append a list (<code>{0!s}</code>) to <code>{0!s}</code>.<br><br><i>(app_list_slot)<i></br>".format(arg.id, caller.id))
