@@ -80,4 +80,4 @@ def append_list_wrong_slot():
         caller = append_call.func.value
         if arg.ast_name == "Name":
             if arg.data_type == "List":
-                explain("You should not append a list (<code>{0!s}</code>) to <code>{0!s}</code>.<br><br><i>(app_list_slot)<i></br>".format(arg.id, caller.id))
+                explain("You should not append a list (<code>{0!s}</code>) to <code>{1!s}</code>.<br><br><i>(app_list_slot)<i></br>".format(arg.id, caller.id))
