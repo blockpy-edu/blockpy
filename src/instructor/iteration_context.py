@@ -167,7 +167,7 @@ def wrong_names_not_agree_8_4():
                         for binop in binops:
                             if binop.has(lhs) and binop.op == "Add":
                                 if not binop.has(iter_prop):
-                                    explain("Each value of <code>{0!s}</code> must be added to <code>{0!s}</code>.<br><br><i>(name_agree_8.4)<i></br>".format(iter_prop.id, lhs.id))
+                                    explain("Each value of <code>{0!s}</code> must be added to <code>{1!s}</code>.<br><br><i>(name_agree_8.4)<i></br>".format(iter_prop.id, lhs.id))
                                     return True
     return False
 #################8.4 End#######################
@@ -396,7 +396,7 @@ def warning_average_in_iteration():
                     numerator = binop.left
                     denominator = binop.right
                     if numerator.ast_name == "Name" and denominator.ast_name == "Name":
-                        explain("An average value is best computed after the properties name <code>{0!s}</code>(total) and <code>{0!s}</code> are completely known rather than recomputing the average on each iteration.<br><br><i>(avg_in_iter)<i></br>".format(numerator.id,denominator.id))
+                        explain("An average value is best computed after the properties name <code>{0!s}</code>(total) and <code>{1!s}</code> are completely known rather than recomputing the average on each iteration.<br><br><i>(avg_in_iter)<i></br>".format(numerator.id,denominator.id))
 def wrong_average_denominator():
     ast = parse_program()
     for_loops = ast.find_all("For")
