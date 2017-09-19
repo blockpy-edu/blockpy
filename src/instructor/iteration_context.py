@@ -175,9 +175,10 @@ def wrong_modifying_list_8_5():
     ast = parse_program()
     list_init = ast.find_all("List")
     true_sum = 0
-    for value in list_init[0].elts:
-        true_sum = value.n + true_sum
-    if true_sum != sum([20473, 27630, 17849, 19032, 16378]):
+    if len(list_init) != 0:
+        for value in list_init[0].elts:
+            true_sum = value.n + true_sum
+    if true_sum != sum([20473, 27630, 17849, 19032, 16378]) or len(list_init) == 0:
         explain("Don't modify the list<br><br><i>(mod_list_8.5)<i></br>")
 def wrong_modifying_list_8_6():
     ast = parse_program()
@@ -644,7 +645,7 @@ def wrong_list_initialization_9_2():
             if len(call) == 1:
                 args = call[0].args
                 if len(args) == 3:
-                    if args[0] == "Precipitation" and args[1] == "Location" and args[2] == "Blacksburg, VA":
+                    if args[0].s == "Precipitation" and args[1].s == "Location" and args[2].s == "Blacksburg, VA":
                         has_call = True
                         break
     if not has_call:
@@ -982,23 +983,34 @@ def wrong_debug_10_7():
         explain("This is not the change needed. Undo the change and try again.<br><br><i>(debug_10.7)<i></br>")
 #########################.....###############################
 def wrong_initialization_in_iteration():
-	ast = parse_program()
-	loops = ast.find_all("For")
-	init_in_loop = False
-	target = None
-	for loop in loops:
-		assignments = loop.find_all("Assign")
-		for assignment in assignments:
-			target = assignment.targets
-			value = assignment.value
-			names = value.find_all("Name")
-			if len(names) == 0:
-				init_in_loop = True
-				break
-		if init_in_loop:
-			break
-	if init_in_loop:
-		explain("You only need to initialize <code>{0!s}</code> once. Remember that statements in an iteration block happens multiple times".format(target.id))
+    ast = parse_program()
+    loops = ast.find_all("For")
+    init_in_loop = False
+    target = None
+    for loop in loops:
+        assignments = loop.find_all("Assign")
+        for assignment in assignments:
+            target = assignment.targets
+            value = assignment.value
+            names = value.find_all("Name")
+            if len(names) == 0:
+                init_in_loop = True
+                break
+        if init_in_loop:
+            break
+    if init_in_loop:
+        explain("You only need to initialize <code>{0!s}</code> once. Remember that statements in an iteration block happens multiple times".format(target.id))
+def wrong_duplicate_var_in_add():
+    ast = parse_program()
+    binops = ast.find_all("BinOp")
+    for binop in binops:
+        left = binop.left
+        right = binop.right
+        if left.ast_name == "Name" and right.ast_name == "Name":
+            if left.id == right.id:
+                explain("You are adding the same variable twice; you need two different variables in your addition.<br><br><i>(dup_var)<i></br>")
+                retur True
+    return False
 #########################PLOTTING###############################
 def plot_group_error():
     output = get_output()
