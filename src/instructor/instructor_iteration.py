@@ -8,6 +8,7 @@ def iteration_group():
     wrong_iterator_not_list()
     missing_target_slot_empty()
     missing_for_slot_empty()
+    wrong_target_reassigned()
 def iteration_group_on_change():
     wrong_target_is_list()
     wrong_list_repeated_in_for()

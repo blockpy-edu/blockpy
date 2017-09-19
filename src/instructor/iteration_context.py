@@ -983,23 +983,34 @@ def wrong_debug_10_7():
         explain("This is not the change needed. Undo the change and try again.<br><br><i>(debug_10.7)<i></br>")
 #########################.....###############################
 def wrong_initialization_in_iteration():
-	ast = parse_program()
-	loops = ast.find_all("For")
-	init_in_loop = False
-	target = None
-	for loop in loops:
-		assignments = loop.find_all("Assign")
-		for assignment in assignments:
-			target = assignment.targets
-			value = assignment.value
-			names = value.find_all("Name")
-			if len(names) == 0:
-				init_in_loop = True
-				break
-		if init_in_loop:
-			break
-	if init_in_loop:
-		explain("You only need to initialize <code>{0!s}</code> once. Remember that statements in an iteration block happens multiple times".format(target.id))
+    ast = parse_program()
+    loops = ast.find_all("For")
+    init_in_loop = False
+    target = None
+    for loop in loops:
+        assignments = loop.find_all("Assign")
+        for assignment in assignments:
+            target = assignment.targets
+            value = assignment.value
+            names = value.find_all("Name")
+            if len(names) == 0:
+                init_in_loop = True
+                break
+        if init_in_loop:
+            break
+    if init_in_loop:
+        explain("You only need to initialize <code>{0!s}</code> once. Remember that statements in an iteration block happens multiple times".format(target.id))
+def wrong_duplicate_var_in_add():
+    ast = parse_program()
+    binops = ast.find_all("BinOp")
+    for binop in binops:
+        left = binop.left
+        right = binop.right
+        if left.ast_name == "Name" and right.ast_name == "Name":
+            if left.id == right.id:
+                explain("You are adding the same variable twice; you need two different variables in your addition.<br><br><i>(dup_var)<i></br>")
+                retur True
+    return False
 #########################PLOTTING###############################
 def plot_group_error():
     output = get_output()
