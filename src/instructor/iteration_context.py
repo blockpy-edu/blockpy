@@ -257,7 +257,7 @@ def missing_counting_list():
                     if binop.has(lhs) and binop.has(1) and binop.op == "Add":
                         has_count = True
     if not has_count:
-        explain("Need to find the total number of items in the list.<br><br><i>(miss_count_list)<i></br>")
+        explain("Count the total number of items in the list using iteration.<br><br><i>(miss_count_list)<i></br>")
 def missing_summing_list():
     ast = parse_program()
     has_total = False
@@ -277,7 +277,7 @@ def missing_summing_list():
                     if binop.has(lhs) and binop.has(iter_prop) and binop.op == "Add":
                         has_total = True
     if not has_total:
-        explain("Need to find the total of all list elements.<br><br><i>(miss_sum_list)<i></br>")
+        explain("Count the total of all list elements using iteration.<br><br><i>(miss_sum_list)<i></br>")
 def missing_zero_initialization():
     ast = parse_program()
     for_loops = ast.find_all("For")
