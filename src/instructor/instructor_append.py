@@ -3,9 +3,9 @@ def append_group_on_change():
     wrong_not_append_to_list()
 def append_group():
     missing_append_in_iteration()
-    wrong_not_append_to_list()
     missing_append_list_initialization()
     wrong_append_list_initiatization()
+    wrong_not_append_to_list()
     append_list_wrong_slot()
 def find_append_in(node):
     appendList = []

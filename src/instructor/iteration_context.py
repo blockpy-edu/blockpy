@@ -175,9 +175,10 @@ def wrong_modifying_list_8_5():
     ast = parse_program()
     list_init = ast.find_all("List")
     true_sum = 0
-    for value in list_init[0].elts:
-        true_sum = value.n + true_sum
-    if true_sum != sum([20473, 27630, 17849, 19032, 16378]):
+    if len(list_init) != 0:
+        for value in list_init[0].elts:
+            true_sum = value.n + true_sum
+    if true_sum != sum([20473, 27630, 17849, 19032, 16378]) or len(list_init) == 0:
         explain("Don't modify the list<br><br><i>(mod_list_8.5)<i></br>")
 def wrong_modifying_list_8_6():
     ast = parse_program()
@@ -644,7 +645,7 @@ def wrong_list_initialization_9_2():
             if len(call) == 1:
                 args = call[0].args
                 if len(args) == 3:
-                    if args[0] == "Precipitation" and args[1] == "Location" and args[2] == "Blacksburg, VA":
+                    if args[0].s == "Precipitation" and args[1].s == "Location" and args[2].s == "Blacksburg, VA":
                         has_call = True
                         break
     if not has_call:

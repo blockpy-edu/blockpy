@@ -1,12 +1,12 @@
 from instructor import *
 def iteration_group():
+    list_initialization_misplaced()
     wrong_target_is_list()
     wrong_list_repeated_in_for()
     missing_iterator_initialization()
+    list_not_initialized_on_run()
     wrong_iterator_not_list()
     missing_target_slot_empty()
-    list_not_initialized_on_run()
-    list_initialization_misplaced()
     missing_for_slot_empty()
 def iteration_group_on_change():
     wrong_target_is_list()
@@ -74,7 +74,7 @@ def list_initialization_misplaced():
     for loop in for_loops:
         list_prop = loop.iter
         if list_prop.data_type == "List" and def_use_error(list_prop):
-            explain("Initialization is a list but either wrong place or redefined<br><br><i>(list_init_misplaced)<i></br>")
+            explain("Initialization is a list but either in the wrong place or redefined<br><br><i>(list_init_misplaced)<i></br>")
 def missing_for_slot_empty():
     for_loops = all_for_loops()
     is_missing = False
