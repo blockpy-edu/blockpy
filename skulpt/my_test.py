@@ -1,5 +1,3 @@
-class A():
-    def __init__(self):
-        self.value = 5
-    
-a = A()
+range(1)
+
+print(range)
