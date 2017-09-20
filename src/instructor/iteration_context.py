@@ -1009,7 +1009,7 @@ def wrong_duplicate_var_in_add():
         if left.ast_name == "Name" and right.ast_name == "Name":
             if left.id == right.id:
                 explain("You are adding the same variable twice; you need two different variables in your addition.<br><br><i>(dup_var)<i></br>")
-                retur True
+                return True
     return False
 #########################PLOTTING###############################
 def plot_group_error():
