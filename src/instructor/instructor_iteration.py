@@ -75,7 +75,7 @@ def list_initialization_misplaced():
     for loop in for_loops:
         list_prop = loop.iter
         if list_prop.data_type == "List" and def_use_error(list_prop):
-            explain("Initialization is a list but either in the wrong place or redefined<br><br><i>(list_init_misplaced)<i></br>")
+            explain("Initialization of <code>{0!s}</code> is a list but either in the wrong place or redefined<br><br><i>(list_init_misplaced)<i></br>".format(list_prop.id))
 def missing_for_slot_empty():
     for_loops = all_for_loops()
     is_missing = False
