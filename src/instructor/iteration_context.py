@@ -224,6 +224,7 @@ def missing_addition_slot_empty():
                         explain("You must fill in the empty slot in the addition.<br><br><i>(add_empty)<i></br>")
                         return True
     return False
+
 def wrong_cannot_sum_list():
     ast = parse_program()
     for_loops = ast.find_all("For")
