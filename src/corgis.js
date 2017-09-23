@@ -64,6 +64,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
         // Actually get data
         var get_dataset = $.getScript(root+'_dataset.js');
         var get_complete = $.getScript(root+'_complete.js');
+        // Load get_complete silently in the background
         var get_skulpt = $.get(root+'_skulpt.js', function(data) {
             Sk.builtinFiles['files']['src/lib/'+slug+'/__init__.js'] = data;
         });
@@ -71,7 +72,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
         // On completion, update menus.
         var corgis = this;
         $.when(get_dataset, get_skulpt, 
-               get_blockly, get_complete).done(function() {
+               get_blockly).done(function() {
             corgis.loadedDatasets.push(slug);
             if (silently) {
                 corgis.main.model.settings.server_connected(false);
@@ -84,7 +85,7 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
             }
             corgis.main.model.status.dataset_loading.pop();
         });
-        url_retrievals.push(get_dataset, get_skulpt, get_blockly, get_complete);
+        url_retrievals.push(get_dataset, get_skulpt, get_blockly);
     }
     return url_retrievals;
 }

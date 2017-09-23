@@ -127,7 +127,9 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
         data['status'] = success;
         this.main.components.editor.getPngFromBlocks(function(pngData, img) {
             data['image'] = pngData;
-            img.remove();
+            if (img.remove) {
+                img.remove();
+            }
             server.setStatus('Saving');
             // Trigger request
             $.post(model.constants.urls.save_success, data, 
