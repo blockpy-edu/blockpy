@@ -110,6 +110,78 @@ def prevent_advanced_iteration():
                            'max', 'sorted', 'all', 'any', 'getattr', 'setattr',
                            'eval', 'exec', 'iter'])
 
+COMPARE_OP_NAMES = {
+    "==": "Eq", 
+    "<": "Lt", 
+    "<=": "Lte", 
+    ">=": "Gte", 
+    ">": "Gt", 
+    "!=": "NotEq", 
+    "is": "Is", 
+    "is not": "IsNot", 
+    "in": "In", 
+    "not in": "NotIn"}
+BOOL_OP_NAMES = {
+    "and": "And",
+    "or": "Or"}
+BIN_OP_NAMES = {
+    "+": "Add",
+    "-": "Sub",
+    "*": "Mult",
+    "/": "Div",
+    "//": "FloorDiv",
+    "%": "Mod",
+    "**": "Pow",
+    ">>": "LShift",
+    "<<": "RShift",
+    "|": "BitOr",
+    "^": "BitXor",
+    "&": "BitAnd",
+    "@": "MatMult"}
+UNARY_OP_NAMES = {
+    "+=": "UAdd",
+    "-=": "USub",
+    "not": "Not",
+    "~": "Invert"
+}
+def ensure_operation(op_name, root=None):
+    if root is None:
+        root = parse_program()
+    result = find_operation(op_name, root)
+    if result == False:
+        gently("You are not using the <code>{}</code> operator.".format(op_name))
+    return result
+def prevent_operation(op_name, root=None):
+    if root is None:
+        root = parse_program()
+    result = find_operation(op_name, root)
+    if result != False:
+        gently("You may not use the <code>{}</code> operator.".format(op_name))
+    return result
+    
+def find_operation(op_name, root):    
+    if op_name in COMPARE_OP_NAMES:
+        compares = root.find_all("Compare")
+        for compare in compares:
+            for op in compare.ops:
+                if op == COMPARE_OP_NAMES[op_name]:
+                    return compare
+    elif op_name in BOOL_OP_NAMES:
+        boolops = root.find_all("BoolOp")
+        for boolop in boolops:
+            if boolop.op == BOOL_OP_NAMES[op_name]:
+                return boolop
+    elif op_name in BIN_OP_NAMES:
+        binops = root.find_all("BinOp")
+        for binop in binops:
+            if binop.op == BIN_OP_NAMES[op_name]:
+                return binop
+    elif op_name in UNARY_OP_NAMES:
+        unaryops = root.find_all("UnaryOp")
+        for unaryop in unaryops:
+            if unaryop.op == UNARY_OP_NAMES[op_name]:
+                return unaryop
+    return False
 '''
     
     mod.no_nonlist_nums = new Sk.builtin.func(function(source) {
