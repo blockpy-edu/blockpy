@@ -73,6 +73,35 @@ def prevent_builtin_usage(function_names):
             return name.id
     return None
     
+def prevent_literal(*literals):
+    ast = parse_program()
+    str_values = [s.s for s in ast.find_all("Str")]
+    num_values = [n.n for n in ast.find_all("Num")]
+    for literal in literals:
+        if isinstance(literal, (int, float)):
+            if literal in num_values:
+                explain("Do not use the literal value <code>{}</code> in your code.".format(repr(literal)))
+                return literal
+        elif isinstance(literal, str):
+            if literal in str_values:
+                explain("Do not use the literal value <code>{}</code> in your code.".format(repr(literal)))
+                return literal
+    return False
+def ensure_literal(*literals):
+    ast = parse_program()
+    str_values = [s.s for s in ast.find_all("Str")]
+    num_values = [n.n for n in ast.find_all("Num")]
+    for literal in literals:
+        if isinstance(literal, (int, float)):
+            if literal not in num_values:
+                explain("You need the literal value <code>{}</code> in your code.".format(repr(literal)))
+                return literal
+        elif isinstance(literal, str):
+            if literal not in str_values:
+                explain("You need the literal value <code>{}</code> in your code.".format(repr(literal)))
+                return literal
+    return False
+    
 def prevent_advanced_iteration():
     ast = parse_program()
     if ast.find_all('While'):
