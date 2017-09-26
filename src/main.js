@@ -360,8 +360,8 @@ BlockPy.prototype.initModelMethods = function() {
         return function() {
             if (type == "List") {
                 var output = exact_value.$r().v;
-                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
-                window.open('data:application/json;' + result);
+                var newWindow = window.open('about:blank', "_blank");
+                newWindow.document.body.innerHTML += "<code>"+output+"</code>";
             }
         }
     }
