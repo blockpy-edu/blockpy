@@ -130,7 +130,8 @@
                 //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
                 //'give_feedback': 'set_success()',
-                'give_feedback': "from instructor_utility import *\nensure_operation('in')",
+                //'give_feedback': "from instructor_utility import *\nensure_operation('in')",
+                'give_feedback': 'reset_output()\nqueue_input("Test")\nrun_student()\nlog(get_output())',
                 //'give_feedback': 'ast = parse_program()\nassignments = ast.find_all("Assign")\nfor assignment in assignments:\n    if assignment.targets.id == "parking_allowed":\n        log(assignment.targets.data_type)',
                 'on_change': '',
                 //'on_change': 'gently("Test")',
@@ -151,7 +152,7 @@
                 //'__main__': 'a = 0\nprint(a)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
                 //'__main__': 'round(float("9.5", ___))',
-                '__main__': 'a = range(1000)\na',
+                '__main__': 'print(input("Prompt:"))',
                 //'__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'
                 //'__main__': 'print("Banana"[:int(len("Banana")/2)])',
                 //'__main__': 'def curve_grade(old):\n    return (old ** .5) * 10\n\nprint(90, "becomes", curve_grade(90))\nprint(50, "becomes", curve_grade(50))\nprint(20, "becomes", curve_grade(20))'

@@ -343,6 +343,12 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
+    mod.queue_input = new Sk.builtin.func(function(input) {
+        Sk.builtin.pyCheckArgs("queue_input", arguments, 1, 1);
+        Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
+        Sk.queuedInput.push(Sk.ffi.remapToJs(input));
+    });
+    
     /**
      * This function is called by instructors to get the students' code as a string.
     **/
