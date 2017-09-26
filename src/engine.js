@@ -39,15 +39,14 @@ BlockPyEngine.prototype.configureSkulpt = function() {
         // Function to handle loading in new files
         read: this.readFile.bind(this)
     });
-    // Create an input box
-    Sk.inputfunTakesPrompt = true;
-    Sk.inputfun = this.inputFunction.bind(this);
     // Allow file access
     Sk.openFilenamePrefix = "sk-filename-";
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
     Sk.analyzeParse = this.analyzeParse.bind(this);
+    // Allow input box
+    Sk.inputfunTakesPrompt = true;
 }
 
 /**
@@ -68,6 +67,8 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Unmute everything
     Sk.skip_drawing = false;
     this.main.model.settings.mute_printer(false);
+    // Create an input box
+    Sk.inputfun = this.inputFunction.bind(this);
 }
 BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
@@ -82,6 +83,9 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Mute everything
     Sk.skip_drawing = true;
     this.main.model.settings.mute_printer(true);
+    // Disable input box
+    Sk.queuedInput = [];
+    Sk.inputfun = this.inputMockFunction.bind(this);
 }
 
 /**
@@ -126,6 +130,15 @@ BlockPyEngine.prototype.inputFunction = function(promptMessage) {
         });
         result.input.focus();
         return submittedPromise;
+    } else {
+        return "";
+    }
+}
+
+BlockPyEngine.prototype.inputMockFunction = function(promptMessage) {
+    if (Sk.queuedInput.length) {
+        var next = Sk.queuedInput.pop();
+        return next;
     } else {
         return "";
     }
