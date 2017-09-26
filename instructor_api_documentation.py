@@ -111,6 +111,16 @@ def get_output():
         list: The output that the students code generated on its last execution.
     '''
     
+def queue_input(input):
+    '''
+    Add a new string to be set as input when the "input" function is called.
+    You can repeatedly queue_input to satisfy loops, too.
+    If there are no queued inputs, a blank string will be returned.
+    
+    Args:
+        input (str): The string to queue for input.
+    '''
+    
 def reset_output():
     '''
     Removes any output generated on a previous run of the student code. This is
