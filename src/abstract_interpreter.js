@@ -676,6 +676,65 @@ AbstractInterpreter.prototype.visit_For = function(node) {
 }
 
 
+AbstractInterpreter.prototype.visit_ListComp = function(node) {
+    this.loopStackId += 1;
+    var generators = node.generators;
+    for (var i = 0, len = generators.length; i < len; i++) {
+        this.visit(generators[i]);
+    }
+    var elt = node.elt;
+    this.visit(elt);
+}
+
+AbstractInterpreter.prototype.visit_comprehension = function(node) {
+    // Handle the iteration list
+    var walked = this.walk(node.iter),
+        iterationList = null;
+    for (var i = 0, len = walked.length; i < len; i++) {
+        var child = walked[i];
+        if (child._astname === "Name" && child.ctx.prototype._astname === "Load") {
+            iterationList = child.id.v;
+            if (this.isTypeEmptyList(child.id.v)) {
+                this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
+            }
+            if (!(this.isTypeSequence(child.id.v))) {
+                this.report["Non-list iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
+            }
+            this.iterateVariable(child.id.v, this.getLocation(node));
+        } else if (child._astname === "List" && child.elts.length === 0) {
+            this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
+        } else {
+            this.visit(child);
+        }
+    }
+    var iterType = this.typecheck(node.iter),
+        iterSubtype = null;
+    if (iterType !== null) {
+        iterSubtype = this.unpackSequence(iterType);
+    }
+    
+    // Handle the iteration variable
+    walked = this.walk(node.target);
+    var iterationVariable = null;
+    for (var i = 0, len = walked.length; i < len; i++) {
+        var child = walked[i];
+        if (child._astname === "Name" && child.ctx.prototype._astname === "Store") {
+            iterationVariable = node.target.id.v;
+            this.setIterVariable(node.target.id.v, iterSubtype, this.getLocation(node));
+        } else {
+            this.visit(child);
+        }
+    }
+    
+    if (iterationVariable && iterationList && iterationList == iterationVariable) {
+        this.report["Iteration variable is iteration list"].push({"name": iterationList, "position": this.getLocation(node)});
+    }
+
+    // Handle the bodies
+    for (var i = 0, len = node.ifs; i < len; i++) {
+        this.visit(node.ifs[i]);
+    }
+}
 
 
 var filename = '__main__.py';
