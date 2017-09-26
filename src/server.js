@@ -114,7 +114,7 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
                this.defaultResponse.bind(this))
          .fail(this.defaultFailure.bind(this));
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Log Event)");
     }
 }
 
@@ -154,7 +154,7 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
              .fail(server.defaultFailure.bind(server));
         });
     } else {
-        server.setStatus('Offline', "Server is not connected!");
+        server.setStatus('Offline', "Server is not connected! (Mark Success)");
     }
 };
 
@@ -182,7 +182,7 @@ BlockPyServer.prototype.saveAssignment = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Save Assignment)");
     }
 }
 
@@ -208,7 +208,7 @@ BlockPyServer.prototype.saveCode = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Save Code)");
     }
 }
 
@@ -231,7 +231,7 @@ BlockPyServer.prototype.getHistory = function(callback) {
                })
          .fail(server.defaultFailure.bind(server));
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Get History)");
         callback([]);
     }
 }
@@ -281,7 +281,7 @@ BlockPyServer.prototype.walkOldCode = function() {
             );
             //server.defaultFailure.bind(server));
         } else {
-            this.setStatus('Offline', "Server is not connected!");
+            this.setStatus('Offline', "Server is not connected! (Walk Old Code)");
         }
     }
 }
@@ -323,6 +323,6 @@ BlockPyServer.prototype.loadAssignment = function(assignment_id) {
             server.defaultFailure()
          });
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Load Assignment)");
     }
 }
