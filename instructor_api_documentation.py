@@ -340,6 +340,23 @@ class AstNode():
         '''
 ## instructor_utility.py
 
+def ensure_literal(*literals):
+    '''
+    Raises an Explanation if the literal values (strings, ints, floats) are not
+    in the source code.
+    
+    Returns: Returns False if the literals were all in the code, otherwise
+             returns the first missing literal value.
+    '''
+def prevent_literal(*literals):
+    '''
+    Raises an Explanation if the literal values (strings, ints, floats) are
+    in the source code.
+    
+    Returns: Returns False if the literals were not in the code, otherwise
+             returns the first present literal value.
+    '''
+
 def function_is_called(name):
     '''
     Returns whether the given function or method has been called from within
