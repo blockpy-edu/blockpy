@@ -588,3 +588,7 @@ BlockPyEngine.prototype.executionEnd_ = function() {
         this.onExecutionEnd();
     }
 };
+
+if (typeof exports !== 'undefined') {
+    exports.BlockPyEngine = BlockPyEngine
+}

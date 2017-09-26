@@ -1,3 +1,16 @@
+nodejs_in = [
+         "src/front.js",
+         "src/utilities.js",
+         "src/python_errors.js",
+         "src/ast_node_visitor.js",
+         "src/abstract_interpreter.js",
+         "src/abstract_interpreter_definitions.js",
+         "src/sk_mod_instructor_extended.js",
+         "src/sk_mod_instructor.js",
+         "src/feedback.js",
+         "src/printer.js",
+         "src/engine.js",
+            ]
 
 js_in = ["src/front.js",
          "src/utilities.js",
@@ -29,9 +42,9 @@ js_in = ["src/front.js",
          "src/server.js",
          "src/presentation.js",
          "src/editor.js",
-         'src/corgis.js',
-         'src/history.js',
-         'src/english.js',
+         "src/corgis.js",
+         "src/history.js",
+         "src/english.js",
          "src/feedback.js",
          "src/toolbar.js",
          "src/engine.js",
@@ -41,9 +54,10 @@ css_in = ['src/blockpy.css']
 #js_out = 'kennel_dist/blockpy.js'
 #css_out = 'kennel_dist/blockpy.css'
 js_out = r'dist/blockpy.js'
+nodejs_out = r'dist/blockpy_node.js'
 css_out = r'dist/blockpy.css'
 
-for files_in, file_out in [ (js_in, js_out), (css_in, css_out) ]:
+for files_in, file_out in [ (js_in, js_out), (css_in, css_out), (nodejs_in, nodejs_out) ]:
     with open(file_out, 'w') as outfile:
         for fname in files_in:
             with open(fname) as infile:
