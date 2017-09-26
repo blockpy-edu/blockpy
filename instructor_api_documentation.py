@@ -345,7 +345,9 @@ def ensure_literal(*literals):
     Raises an Explanation if the literal values (strings, ints, floats) are not
     in the source code.
     
-    Returns: Returns False if the literals were all in the code, otherwise
+    Args:
+        *literals (int, float or str): Any literal value.
+    Returns: False if the literals were all in the code, otherwise
              returns the first missing literal value.
     '''
 def prevent_literal(*literals):
@@ -353,8 +355,33 @@ def prevent_literal(*literals):
     Raises an Explanation if the literal values (strings, ints, floats) are
     in the source code.
     
-    Returns: Returns False if the literals were not in the code, otherwise
+    Args:
+        *literals (int, float or str): Any literal value.
+    Returns: False if the literals were not in the code, otherwise
              returns the first present literal value.
+    '''
+    
+def ensure_operation(op_name, root=None):
+    '''
+    Gently rebukes if the given operator is not found in the source code.
+    
+    Args:
+        op_name (str): The name of the operator, as it is written in Python
+                       (e.g., "==" and not "Eq"). Works for BoolOps, BinOps,
+                       UnaryOps, and Compares.
+    Returns: False if the operator was not in the code, otherwise returns the
+             first AST node apperance of the operator.
+    '''
+def prevent_operation(op_name, root=None):
+    '''
+    Gently rebukes if the given operator is found in the source code.
+    
+    Args:
+        op_name (str): The name of the operator, as it is written in Python
+                       (e.g., "==" and not "Eq"). Works for BoolOps, BinOps,
+                       UnaryOps, and Compares.
+    Returns: False if the operator was not in the code, otherwise returns the
+             first AST node apperance of the operator.
     '''
 
 def function_is_called(name):
