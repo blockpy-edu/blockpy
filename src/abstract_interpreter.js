@@ -386,16 +386,18 @@ AbstractInterpreter.prototype.typecheck = function(value) {
                 var key_type = this.typecheck(value.keys[i]);
                 literals = literals && (key_type.type == "Str");
             }
+            var key_type, value_type;
             if (literals) {
                 var components = {};
                 for (var i = 0, len = value.keys.length; i < len; i++) {
-                    var key_type = this.typecheck(value.keys[i]);
-                    var value_type = this.typecheck(value.values[i]);
+                    key_type = this.typecheck(value.keys[i]);
+                    value_type = this.typecheck(value.values[i]);
                     components[value.keys[i].s.v] = {"key": key_type, "value": value_type};
                 }
-                return {"type": "Dict", "literals": true, "subtypes": components};
+                return {"type": "Dict", "literals": true, "subtypes": components, 
+                        "key": key_type, "value": value_type};
             } else {
-                var key_type = {"type": "Unknown"}, value_type = {"type": "Unknown"};
+                key_type = {"type": "Unknown"}, value_type = {"type": "Unknown"};
                 if (value.keys.length > 0) {
                     key_type = this.typecheck(value.keys[0]);
                     value_type = this.typecheck(value.values[0]);
@@ -429,21 +431,36 @@ AbstractInterpreter.prototype.typecheck = function(value) {
 AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
     if (attribute._astname == "Attribute") {
         var result = this.walkAttributeChain(attribute.value);
-        if (result == null) {
+        var methodName = attribute.attr.v;
+        if (methodName == "items") {
+            var dict = this.typecheck(attribute.value);
+            if (dict.type == "Dict") {
+                return {
+                    "type": "List",
+                    "subtype": {
+                        "type": "Tuple",
+                        "subtypes": [dict.key_type, dict.value_type]
+                    }
+                }
+            } else {
+                return null;
+            }
+        } else if (result == null) {
             return null;
-        } else if (attribute.attr.v in result) {
-            return result[attribute.attr.v];
+        } else if (methodName in result) {
+            return result[methodName];
         } else {
-            this.report["Unknown functions"].push({"name": attribute.attr.v, "position": this.getLocation(attribute)});
+            this.report["Unknown functions"].push({"name": methodName, "position": this.getLocation(attribute)});
             return null;
         }
     } else if (attribute._astname == "Name") {
-        if (attribute.id.v in AbstractInterpreter.MODULES) {
+        var functionName = attribute.id.v;
+        if (functionName in AbstractInterpreter.MODULES) {
             return AbstractInterpreter.MODULES[attribute.id.v];
-        } else if (attribute.id.v in this.BUILTINS) {
-            return this.BUILTINS[attribute.id.v].returns;
+        } else if (functionName in this.BUILTINS) {
+            return this.BUILTINS[functionName].returns;
         } else {
-            this.report["Unknown functions"].push({"name": attribute.attr, "position": this.getLocation(attribute)});
+            this.report["Unknown functions"].push({"name": functionName, "position": this.getLocation(attribute)});
             return null;
         }
     }
@@ -621,6 +638,12 @@ AbstractInterpreter.prototype.unpackSequence = function(type) {
     }
 }
 
+AbstractInterpreter.prototype.unpackSequenceType = function(type, i) {
+    if (type.type == "Tuple") {
+        return type.subtypes[i];
+    }
+}
+
 AbstractInterpreter.prototype.visit_For = function(node) {
     this.loopStackId += 1;
     // Handle the iteration list
@@ -638,7 +661,7 @@ AbstractInterpreter.prototype.visit_For = function(node) {
             }
             this.iterateVariable(child.id.v, this.getLocation(node));
         } else if (child._astname === "List" && child.elts.length === 0) {
-            this.report["Empty iterations"].push({"name": child.id.v, "position": this.getLocation(node)});
+            this.report["Empty iterations"].push({"name": "[]", "position": this.getLocation(node)});
         } else {
             this.visit(child);
         }
@@ -650,17 +673,23 @@ AbstractInterpreter.prototype.visit_For = function(node) {
     }
     
     // Handle the iteration variable
-    walked = this.walk(node.target);
     var iterationVariable = null;
-    for (var i = 0, len = walked.length; i < len; i++) {
-        var child = walked[i];
-        if (child._astname === "Name" && child.ctx.prototype._astname === "Store") {
-            iterationVariable = node.target.id.v;
-            this.setIterVariable(node.target.id.v, iterSubtype, this.getLocation(node));
+    var that = this;
+    var recursivelyVisitIteration = function(subnode, subtype, loc) {
+        if (subnode._astname === "Name" && subnode.ctx.prototype._astname === "Store") {
+            if (iterationVariable == null) {
+                iterationVariable = subnode.id.v;
+            }
+            that.setIterVariable(subnode.id.v, subtype, loc);
+        } else if (subnode._astname == 'Tuple' || subnode._astname == "List") {
+            for (var i = 0, len = subnode.elts.length; i < len; i++) {
+                recursivelyVisitIteration(subnode.elts[i], that.unpackSequenceType(subtype, i), loc);
+            }
         } else {
-            this.visit(child);
+            this.visit(subnode);
         }
-    }
+    };
+    recursivelyVisitIteration(node.target, iterSubtype, this.getLocation(node));
     
     if (iterationVariable && iterationList && iterationList == iterationVariable) {
         this.report["Iteration variable is iteration list"].push({"name": iterationList, "position": this.getLocation(node)});
