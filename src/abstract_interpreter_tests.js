@@ -110,7 +110,12 @@
         ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
         
         // Built-ins
-        ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']]
+        ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']],
+        
+        // Double iteration
+        ['for x,y in [(1,2), (3,4)]:\n    x, y', ['Undefined variables'], []],
+        ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x, y', ['Undefined variables'], []],
+        ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x+"", y+0', ['Undefined variables', "Incompatible types"], []],
     ];
     
     var errors = 0;
