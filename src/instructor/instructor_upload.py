@@ -1,9 +1,10 @@
 import re
+from instructor import *
 
 # Feedback for author's name
 def check_author_name_on_header():
     code = get_program()
-    m_author = re.search('Author: \w+', code)
+    m_author = re.search('Author: \\w+', code)
     if not m_author:
         gently("You need to add your name to the author field at the top of the file.")
         
