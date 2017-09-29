@@ -19,7 +19,7 @@ def check_output_on_header(expected_output):
     code = get_program()
     expected_output = str(expected_output)
     between_stars = code.split("*****")[2].strip()
-    between_stars = "\n".join([x.strip() for x in between_stars.split("\n")])
+    between_stars = "\\n".join([x.strip() for x in between_stars.split("\\n")])
     if 'REPLACE THIS TEXT WITH THE OUTPUT OF THIS PROGRAM' in between_stars:
         gently("In your code, you need to 'REPLACE THIS TEXT WITH THE OUTPUT OF THIS PROGRAM'")
     elif not expected_output in between_stars:
@@ -27,6 +27,6 @@ def check_output_on_header(expected_output):
 
 def check_print_output(correct_output):
     correct_output = str(correct_output)
-    output = "\n".join(get_output())
+    output = "\\n".join(get_output())
     if not correct_output in output:
         gently("You are not doing the correct calculation")
