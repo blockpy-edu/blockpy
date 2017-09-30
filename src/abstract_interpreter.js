@@ -434,7 +434,7 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
         var methodName = attribute.attr.v;
         if (methodName == "items") {
             var dict = this.typecheck(attribute.value);
-            if (dict.type == "Dict") {
+            if (dict != null && dict.type == "Dict") {
                 return {
                     "type": "List",
                     "subtype": {
@@ -524,20 +524,28 @@ AbstractInterpreter.prototype.visit_Print = function(node) {
     //this.generic_visit(node);
 }*/
 AbstractInterpreter.prototype.visit_Assign = function(node) {
-    var typeValue = this.typecheck(node.value);
+    var typeValue = this.typecheck(node.value),
+        loc = this.getLocation(node),
+        that = this;
     this.visit(node.value);
     this.visitList(node.targets);
     for (var i = 0, len = node.targets.length; i < len; i++) {
-        var walked = this.walk(node.targets[i]);
-        for (var j = 0, len = walked.length; j < len; j++) {
-            var targetChild = walked[j];
-            if (targetChild._astname == "Tuple") {
-                // TODO: Check if is an iterable (list, tuple, dict, set) literal or variable
-            } else if (targetChild._astname == "Name") {
-                this.setVariable(targetChild.id.v, typeValue, this.getLocation(node));
+        var recursivelyVisitAssign = function(target, currentTypeValue) {
+            if (target._astname === "Name" && target.ctx.prototype._astname === "Store") {
+                that.setVariable(target.id.v, currentTypeValue, loc);
+            } else if (target._astname == 'Tuple' || target._astname == "List") {
+                for (var i = 0, len = target.elts.length; i < len; i++) {
+                    recursivelyVisitAssign(target.elts[i], 
+                                           that.unpackSequenceType(currentTypeValue, i), 
+                                           loc);
+                }
+            } else {
+                this.visit(target);
             }
         }
+        recursivelyVisitAssign(node.targets[i], typeValue);
     }
+    
 }
 AbstractInterpreter.prototype.visit_Import = function(node) {
     for (var i = 0, len = node.names.length; i < len; i++) {

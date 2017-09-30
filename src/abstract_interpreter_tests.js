@@ -116,6 +116,9 @@
         ['for x,y in [(1,2), (3,4)]:\n    x, y', ['Undefined variables'], []],
         ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x, y', ['Undefined variables'], []],
         ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x+"", y+0', ['Undefined variables', "Incompatible types"], []],
+        
+        // Tuple, Multiple Assignment
+        ['a,b = 1,2\n1+a\nb', ['Incompatible types'], []],
     ];
     
     var errors = 0;
