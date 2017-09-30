@@ -639,7 +639,9 @@ AbstractInterpreter.prototype.unpackSequence = function(type) {
 }
 
 AbstractInterpreter.prototype.unpackSequenceType = function(type, i) {
-    if (type.type == "Tuple") {
+    if (type == null) {
+        return null;
+    } else if (type.type == "Tuple") {
         return type.subtypes[i];
     }
 }

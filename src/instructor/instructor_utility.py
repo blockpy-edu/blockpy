@@ -139,8 +139,8 @@ BIN_OP_NAMES = {
     "&": "BitAnd",
     "@": "MatMult"}
 UNARY_OP_NAMES = {
-    "+=": "UAdd",
-    "-=": "USub",
+    #"+=": "UAdd",
+    #"-=": "USub",
     "not": "Not",
     "~": "Invert"
 }

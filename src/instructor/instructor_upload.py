@@ -26,8 +26,7 @@ def check_output_on_header(expected_output):
     elif not expected_output in between_stars:
         gently("The output you copied between the *****, seems to be incorrect. You may have copied it into the wrong location, or it is incomplete.")
 
-def check_print_output(correct_output):
-    correct_output = str(correct_output)
-    output = "\\n".join(get_output())
-    if not correct_output in output:
-        gently("You are not doing the correct calculation")
+def check_print_output(multiple_lines):
+    for line in multiple_lines:
+        if line not in get_output():
+            gently("You are not doing the correct calculation")
