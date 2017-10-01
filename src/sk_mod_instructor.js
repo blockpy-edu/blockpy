@@ -370,6 +370,26 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
+    mod.had_execution_time_error = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("had_execution_time_error", arguments, 0, 0);
+        return !Sk.executionReports['student'].success && 
+                Sk.executionReports['student'].error &&
+                Sk.executionReports['student'].error.tp$name == 'TimeLimitError';
+    });
+    
+    var backupTime = null;
+    mod.limit_execution_time = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("limit_execution_time", arguments, 0, 0);
+        backupTime = Sk.execLimit;
+        if (Sk.execLimitFunction) {
+            Sk.execLimit = Sk.execLimitFunction();
+        }
+    });
+    mod.unlimit_execution_time = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("unlimit_execution_time", arguments, 0, 0);
+        Sk.execLimit = backupTime;
+    });
+    
     /**
      * This function is called by instructors to construct the python version of the AST
     **/
