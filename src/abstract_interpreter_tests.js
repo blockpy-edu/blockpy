@@ -119,6 +119,9 @@
         
         // Tuple, Multiple Assignment
         ['a,b = 1,2\n1+a\nb', ['Incompatible types'], []],
+        
+        // Sets
+        ['a = set([1,2,3])\nprint(a)', ['Undefined variables'], []],
     ];
     
     var errors = 0;
