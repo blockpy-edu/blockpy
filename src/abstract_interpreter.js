@@ -638,6 +638,11 @@ AbstractInterpreter.prototype.visit_If = function(node) {
     this.currentBranchName = cbName;
 }
 
+AbstractInterpreter.prototype.visit_While = function(node) {
+    this.visit_If(node);
+    // This probably doesn't work for orelse bodies, but who actually uses those.
+}
+
 AbstractInterpreter.prototype.unpackSequence = function(type) {
     if (type.type == "List" && !type.empty) {
         return type.subtype;

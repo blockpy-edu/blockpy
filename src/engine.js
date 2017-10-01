@@ -54,7 +54,11 @@ BlockPyEngine.prototype.configureSkulpt = function() {
  */
 BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
-    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 10000;
+    var settings = this.main.model.settings;
+    Sk.execLimitFunction = function() { 
+        return settings.disable_timeout() ? null : 10000; 
+    };
+    Sk.execLimit = Sk.execLimitFunction();
     // Identify the location to put new charts
     Sk.console = this.main.components.printer.getConfiguration();
     // Stepper! Executed after every statement.
@@ -423,10 +427,13 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     instructorCode = (
         'from instructor import *\n'+
         'def run_student():\n'+
+        '    limit_execution_time()\n'+
         '    try:\n'+
         indent(indent(studentCode))+'\n'+
         '    except Exception as error:\n'+
+        '        unlimit_execution_time()\n'+
         '        return error\n'+
+        '    unlimit_execution_time()\n'+
         '    return None\n'+
         instructorCode
     );

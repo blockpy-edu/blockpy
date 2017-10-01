@@ -122,6 +122,10 @@
         
         // Sets
         ['a = set([1,2,3])\nprint(a)', ['Undefined variables'], []],
+        
+        // While
+        ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',
+         ['Unread variables'], []],
     ];
     
     var errors = 0;
