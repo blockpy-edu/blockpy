@@ -43,7 +43,7 @@ engine = new blockpy.BlockPyEngine({
         },
         'programs': {
             '__main__': v => 'a = 0\nprint(a)',
-            'give_feedback': v => 'log(student.data)',
+            'give_feedback': v => 'from instructor import *\nlog(student.data)',
         },
         'settings': {
             'disable_timeout': x => false,
