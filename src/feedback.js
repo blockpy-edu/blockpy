@@ -475,3 +475,7 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     }
     return false;
 }
+
+if (typeof exports !== 'undefined') {
+    exports.BlockPyFeedback = BlockPyFeedback;
+}

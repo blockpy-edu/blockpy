@@ -8,7 +8,14 @@ var trace = function() {
     
 };
 trace.removeAll = x => x;
-engine = new blockpy.BlockPyEngine({
+mockFeedback = {
+    'isFeedbackVisible': x => true,
+    'clear': x => x,
+    'presentFeedback': x => blockpy.BlockPyFeedback.prototype.presentFeedback.bind(mockFeedback)(x),
+    'presentAnalyzerFeedback': x => blockpy.BlockPyFeedback.prototype.presentAnalyzerFeedback.bind(mockFeedback)(x),
+    'instructorFeedback': (name, message, line) => console.log(name, message, line),
+}
+main = {
     'components': {
         'printer': {
             'print': e => console.log("PRINTED", e),
@@ -22,10 +29,7 @@ engine = new blockpy.BlockPyEngine({
             'logEvent': x => x,
             'markSuccess': x => x,
         },
-        'feedback': {
-            'isFeedbackVisible': x => true,
-            'presentFeedback': x => console.log(x),
-        },
+        'feedback': mockFeedback,
         'toolbar': {
             
         }
@@ -42,14 +46,16 @@ engine = new blockpy.BlockPyEngine({
             'show_trace': x => x,
         },
         'programs': {
-            '__main__': v => 'a = 0\nprint(a)',
-            'give_feedback': v => 'from instructor import *\nlog(student.data)',
+            '__main__': v => 'a = "Words"\nprint(a)',
+            'give_feedback': v => 'from instructor import *\ngently("You have failed.")',
         },
         'settings': {
             'disable_timeout': x => false,
             'mute_printer': x => this['mute_printer'] = x,
         }
     }
-});
+};
+main.components.feedback.main = main;
+engine = new blockpy.BlockPyEngine(main);
 result = engine.on_run();
-console.log(engine)
+main.components.feedback
