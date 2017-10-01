@@ -69,6 +69,13 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Any"}
         ]
     },
+    "set": {
+        "type": "Function",
+        "returns": {"type": "Set"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
     "int": {
         "type": "Function",
         "returns": {"type": "Num"},
