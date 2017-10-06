@@ -69,7 +69,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
         delete Sk.builtinFiles['files']['src/lib/'+module_name];
     }
     // Unmute everything
-    Sk.skip_drawing = false;
+    Sk.console.skipDrawing = false;
     this.main.model.settings.mute_printer(false);
     // Create an input box
     Sk.inputfun = this.inputFunction.bind(this);
@@ -85,7 +85,7 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
         Sk.builtinFiles['files']['src/lib/'+module_name] = $INSTRUCTOR_MODULES_EXTENDED[module_name];
     }
     // Mute everything
-    Sk.skip_drawing = true;
+    Sk.console.skipDrawing = true;
     this.main.model.settings.mute_printer(true);
     // Disable input box
     Sk.queuedInput = [];
