@@ -180,6 +180,7 @@ var $builtinmodule = function(name) {
         if (extents['xMin'] === undefined || extents['yMin'] === undefined) {
             return;
         }
+        
         var yAxisBuffer;
         
         // Establish x/y scalers and axes
@@ -524,15 +525,17 @@ var $builtinmodule = function(name) {
             stylestring = Sk.ffi.remapToJs(args[2]);
         }
         
-        var xdataSampled = [], ydataSampled = [];
-        var LENGTH = xdata.length, RATE = LENGTH / dot_limit;
-        for (var i = 0; i < dot_limit; i+= 1) {
-            var index = Math.floor((i+Math.random())*RATE);
-            xdataSampled.push(xdata[index])
-            ydataSampled.push(ydata[index]);
+        if (xdata.length > dot_limit) {
+            var xdataSampled = [], ydataSampled = [];
+            var LENGTH = xdata.length, RATE = LENGTH / dot_limit;
+            for (var i = 0; i < dot_limit; i+= 1) {
+                var index = Math.floor((i+Math.random())*RATE);
+                xdataSampled.push(xdata[index])
+                ydataSampled.push(ydata[index]);
+            }
+            xdata = xdataSampled;
+            ydata = ydataSampled;
         }
-        xdata = xdataSampled;
-        ydata = ydataSampled;
         
         if (Sk.console.skipDrawing) {
             return;
