@@ -110,6 +110,11 @@ AbstractInterpreter.METHODS = {
     }
 }
 AbstractInterpreter.MODULES = {
+    'random': {
+        'randint': { "type": "Function", "returns": {"type": "Num"}},
+        'choice': { "type": "Function", "returns": {"type": "Any"}},
+        'shuffle': { "type": "Function", "returns": {"type": "None"}},
+    },
     'parking': {
         'now': { 'type': 'ParkingTime'},
         'Time': { 'type': 'ParkingTime'},

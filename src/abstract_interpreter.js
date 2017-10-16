@@ -540,7 +540,7 @@ AbstractInterpreter.prototype.visit_Assign = function(node) {
                                            loc);
                 }
             } else {
-                this.visit(target);
+                that.visit(target);
             }
         }
         recursivelyVisitAssign(node.targets[i], typeValue);
@@ -556,9 +556,17 @@ AbstractInterpreter.prototype.visit_Import = function(node) {
 }
 AbstractInterpreter.prototype.visit_ImportFrom = function(node) {
     for (var i = 0, len = node.names.length; i < len; i++) {
-        var module = node.module === null ? node.names[i] : node.module + node.names[i];
-        var asname = module.asname === null ? module.name : module.asname;
-        this.setVariable(asname.v, {"type": "Module"}, this.getLocation(node));
+        if (node.module === null) {
+            var alias = node.names[i];
+            var asname = alias.asname === null ? alias.name : alias.asname;
+            this.setVariable(asname.v, {"type": "Any"}, this.getLocation(node));
+        } else {
+            var moduleName = node.module.v;
+            var alias = node.names[i];
+            var asname = alias.asname === null ? alias.name : alias.asname;
+            var type = AbstractInterpreter.MODULES[moduleName];
+            this.setVariable(asname.v, type, this.getLocation(node));
+        }
     }
 }
 

@@ -1,3 +1,5 @@
-range(1)
+import requests
 
-print(range)
+print("Before")
+print(requests.get('https://pastebin.com/raw/V7tWn1Rj'))
+print("After")

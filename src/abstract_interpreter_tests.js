@@ -123,6 +123,9 @@
         // Sets
         ['a = set([1,2,3])\nprint(a)', ['Undefined variables'], []],
         
+        // Dictionaries
+        ['a = {}\na[1] = 0', [], []],
+        
         // While
         ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',
          ['Unread variables'], []],

@@ -198,6 +198,7 @@ BlockPyFeedback.prototype.internalError = function(original, name, message) {
     this.main.model.status.error("internal");
     this.main.components.printer.print("Internal error! Please show this to an instructor!");
     this.main.components.server.logEvent('feedback', "Internal Error", name+"\n|\n"+original+"\n|\n"+message);
+    console.error(original);
 }
 
 /**
