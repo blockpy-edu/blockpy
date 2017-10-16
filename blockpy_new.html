@@ -68,6 +68,7 @@
     <script type="text/javascript" src="src/blockly_blocks/tuple.js"></script>
     <script type="text/javascript" src="src/blockly_blocks/turtles.js"></script>
     <script type="text/javascript" src="src/blockly_blocks/text.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/plots.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
     <script type="text/javascript" src="src/printer.js"></script>
@@ -152,7 +153,10 @@
                 //'__main__': 'a = 0\nprint(a)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
                 //'__main__': 'round(float("9.5", ___))',
-                '__main__': "import matplotlib.pyplot as plt\nplt.scatter([1, 2, 3],[4, 5, 6])\nplt.show()",
+                //'__main__': "import matplotlib.pyplot as plt\nplt.scatter([1, 2, 3],[4, 5, 6])\nplt.show()",
+                //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
+                '__main__': "print(open('example.txt').read())"
+                //'__main__': "from random import randint\nprint(5+randint(1,10))"
                 //'__main__': 'print(input("Prompt:"))',
                 //'__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'
                 //'__main__': 'print("Banana"[:int(len("Banana")/2)])',

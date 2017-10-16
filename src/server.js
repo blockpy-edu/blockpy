@@ -34,6 +34,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.files.subscribe(function(e) { server.saveAssignment(); });
     //model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
     model.execution.show_trace.subscribe(function(newValue) { server.logEvent('trace', newValue); });
     model.execution.trace_step.subscribe(function(newValue) { server.logEvent('trace_step', newValue); });
@@ -171,6 +172,7 @@ BlockPyServer.prototype.saveAssignment = function() {
         data['disable_timeout'] = model.assignment.disable_timeout();
         data['name'] = model.assignment.name();
         data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
+        data['files'] = model.assignment.files().join(','); // TODO: hackish, broken if ',' is in name
         
         var server = this;
         this.setStatus('Saving');
@@ -324,5 +326,39 @@ BlockPyServer.prototype.loadAssignment = function(assignment_id) {
          });
     } else {
         this.setStatus('Offline', "Server is not connected! (Load Assignment)");
+    }
+}
+
+/**
+ * This function can be used to load files and web resources.
+ */
+BlockPyServer.prototype.loadFile = function(filename, type, callback, errorCallback) {
+    var model = this.main.model;
+    var server = this;
+    if (model.server_is_connected('load_file')) {
+        var data = this.createServerData();
+        data['filename'] = filename;
+        data['type'] = type;
+        this.setStatus('Loading');
+        $.post(model.constants.urls.load_file, data, 
+                function(response) {
+                    if (response.success) {
+                        callback(response.data);
+                        server.setStatus('Loaded');
+                        server.hideOverlay();
+                    } else {
+                        errorCallback(response.message);
+                        server.setStatus('Failure', response.message);
+                        server.hideOverlay();
+                    }
+               })
+         .fail(function(e, textStatus, errorThrown) {
+            errorCallback("Server failure! Report to instructor");
+            console.error(errorThrown);
+            server.defaultFailure()
+         });
+    } else {
+        errorCallback("No file server available.");
+        this.setStatus('Offline', "Server is not connected! (Load File)");
     }
 }

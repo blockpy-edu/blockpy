@@ -237,8 +237,6 @@ BlockPyEditor.prototype.initInstructor = function() {
     
     this.availableModules = this.tag.find('.blockpy-available-modules');
     this.availableModules.multiSelect({ selectableOptgroup: true });
-    
-    
 }
 
 /**

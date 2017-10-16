@@ -17,6 +17,8 @@ function BlockPyEngine(main) {
     // Keeps track of the tracing while the program is executing
     this.executionBuffer = {};
     this.abstractInterpreter = new AbstractInterpreter();
+    
+    this.openedFiles = {};
 }
 
 BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
@@ -41,6 +43,9 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     });
     // Allow file access
     Sk.openFilenamePrefix = "sk-filename-";
+    Sk.inBrowser = this.openFile.bind(this);
+    // Proxy requests
+    Sk.requestsGet = this.openURL.bind(this);
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
@@ -145,6 +150,57 @@ BlockPyEngine.prototype.inputMockFunction = function(promptMessage) {
         return next;
     } else {
         return "";
+    }
+}
+
+/**
+ * @param {skulpt Str} name - The filename as a Skulpt string.
+ */
+BlockPyEngine.prototype.openFile = function(name) {
+    var filename = Sk.openFilenamePrefix || "";
+    filename += name;
+    elem = document.getElementById(filename);
+    if (elem == null) {
+        if (name in this.openedFiles) {
+            return this.openedFiles[name];
+        } else {
+            throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name + "'");
+        }
+    } else {
+        if (elem.nodeName.toLowerCase() == "textarea") {
+            return elem.value;
+        } else {
+            return elem.textContent;
+        }
+    }
+}
+
+
+BlockPyEngine.prototype.openURL = function(url, type) {
+    var server = this.main.components.server;
+    var openedFiles = this.openedFiles;
+    return new Promise( function(resolve, reject) {
+        if (url in openedFiles) {
+            resolve(openedFiles[url]);
+        } else {
+            server.loadFile(url, type, function(contents) {
+                openedFiles[url] = contents;
+                resolve(contents);
+            }, function(message) {
+                reject(new Sk.builtin.IOError("Cannot access url: "+url+" because "+message));
+            })
+        }
+    });
+}
+
+BlockPyEngine.prototype.loadAllFiles = function() {
+    var names = this.main.model.assignment.files();
+    var feedback = this.main.components.feedback;
+    for (var i = 0; i < names.length; ++i) {
+        this.openURL(names[i], 'file')
+            .then(function() {}, function(e) {
+                feedback.internalError(e, "FileLoadError", "The file failed to load on the server.")
+            });
     }
 }
 
