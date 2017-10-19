@@ -352,7 +352,11 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Error in Instructor Feedback code
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
-        if (error.traceback[0].filename == "__main__.py") {
+        if (!error.traceback) {
+            this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+            console.error(error);
+            return 'instructor';
+        } else if (error.traceback[0].filename == "__main__.py") {
             this.printError(report['instructor'].error);
             return 'student';
         } else {

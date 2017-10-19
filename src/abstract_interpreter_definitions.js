@@ -3,6 +3,8 @@ AbstractInterpreter.prototype.TYPE_INHERITANCE = {
     "Num": ["Int", "Float"]
 }
 AbstractInterpreter.prototype.BUILTINS = {
+    //
+    'KeyError': {"type": "Exception"},
     // Values
     'True': {"type": "Bool"}, 
     'False': {"type": "Bool"}, 
