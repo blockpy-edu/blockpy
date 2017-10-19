@@ -445,6 +445,19 @@ AbstractInterpreter.prototype.walkAttributeChain = function(attribute) {
             } else {
                 return null;
             }
+        } else if (methodName == "split") {
+            var a_string = this.typecheck(attribute.value);
+            if (a_string != null && a_string.type == "Str") {
+                return {
+                    "type": "List",
+                    "empty": "false",
+                    "subtype": {
+                        "type": "Str",
+                    }
+                }
+            } else {
+                return null;
+            }
         } else if (result == null) {
             return null;
         } else if (methodName in result) {
