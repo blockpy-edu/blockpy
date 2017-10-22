@@ -132,7 +132,9 @@
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
                 //'give_feedback': 'set_success()',
                 //'give_feedback': "from instructor_utility import *\nensure_operation('in')",
-                'give_feedback': 'reset_output()\nqueue_input("Test")\nrun_student()\nlog(get_output())',
+                //'give_feedback': 'reset_output()\nqueue_input("Test")\nrun_student()\nlog(get_output())',
+                //'give_feedback': "from instructor_files import *\nfiles_not_handled_correctly('example.txt')",
+                'give_feedback': "from instructor_imports import *\nensure_imports('math', 'random')",
                 //'give_feedback': 'ast = parse_program()\nassignments = ast.find_all("Assign")\nfor assignment in assignments:\n    if assignment.targets.id == "parking_allowed":\n        log(assignment.targets.data_type)',
                 'on_change': '',
                 //'on_change': 'gently("Test")',
@@ -155,7 +157,8 @@
                 //'__main__': 'round(float("9.5", ___))',
                 //'__main__': "import matplotlib.pyplot as plt\nplt.scatter([1, 2, 3],[4, 5, 6])\nplt.show()",
                 //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
-                '__main__': "print(open('example.txt').read())"
+                //'__main__': "print(open('example.txt').read())"
+                '__main__': "import math\nmath\nfrom random import choice\nchoice"
                 //'__main__': "from random import randint\nprint(5+randint(1,10))"
                 //'__main__': 'print(input("Prompt:"))',
                 //'__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'

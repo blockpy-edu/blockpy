@@ -5,6 +5,7 @@ AbstractInterpreter.prototype.TYPE_INHERITANCE = {
 AbstractInterpreter.prototype.BUILTINS = {
     //
     'KeyError': {"type": "Exception"},
+    'IOError': {"type": "Exception"},
     // Values
     'True': {"type": "Bool"}, 
     'False': {"type": "Bool"}, 
