@@ -560,6 +560,31 @@ AbstractInterpreter.prototype.visit_Assign = function(node) {
     }
     
 }
+AbstractInterpreter.prototype.visit_With = function(node) {
+    this.visit(node.context_expr);
+    this.visitList(node.optional_vars);
+    var typeValue = this.typecheck(node.context_expr),
+        loc = this.getLocation(node),
+        that = this;
+    var recursivelyVisitVars = function(target, currentTypeValue) {
+        if (target._astname === "Name" && target.ctx.prototype._astname === "Store") {
+            that.setVariable(target.id.v, currentTypeValue, loc);
+        } else if (target._astname == 'Tuple' || target._astname == "List") {
+            for (var i = 0, len = target.elts.length; i < len; i++) {
+                recursivelyVisitVars(target.elts[i], 
+                                     that.unpackSequenceType(currentTypeValue, i), 
+                                     loc);
+            }
+        } else {
+            that.visit(target);
+        }
+    }
+    recursivelyVisitVars(node.optional_vars, typeValue);
+    // Handle the bodies
+    for (var i = 0, len = node.body.length; i < len; i++) {
+        this.visit(node.body[i]);
+    }
+}
 AbstractInterpreter.prototype.visit_Import = function(node) {
     for (var i = 0, len = node.names.length; i < len; i++) {
         var module = node.names[i];

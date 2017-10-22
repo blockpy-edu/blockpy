@@ -66,6 +66,12 @@
                 <!--Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors"><br>-->
                 
                 <!--Disable Typed Blocks: <input type='checkbox' data-bind="checked: settings.disable_variable_types"><br>-->
+                <div class='pull-right'>
+                <label>AID:</label> <span data-bind="text: assignment.assignment_id"></span>
+                <label>GID:</label> <span data-bind="text: assignment.group_id"></span>
+                <label>SID:</label> <span data-bind="text: assignment.student_id"></span>
+                <label>CID:</label> <span data-bind="text: assignment.course_id"></span>
+                </div>
                 
                 <label class='pull-right'>
                 Disable Timeout: <input type='checkbox' data-bind="checked: settings.disable_timeout"><br>
@@ -80,6 +86,8 @@
                 Auto-save:
                 <input type='checkbox' data-bind="checked:settings.auto_upload"><br>
                 </label>
+                
+                <br>
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>

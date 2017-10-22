@@ -202,16 +202,16 @@ Sk.builtin.file.prototype["truncate"] = new Sk.builtin.func(function truncate(se
 });
 
 Sk.builtin.file.prototype["write"] = new Sk.builtin.func(function write(self, str) {
-    var mode = Sk.ffi.remapToJs(self.mode);
-    if (mode === "w" || mode === "wb" || mode === "a" || mode === "ab") {
-        if (self.fileno === 1) {
-            Sk.output(Sk.ffi.remapToJs(str));
-        } else {
-            goog.asserts.fail();
-        }
+    //var mode = Sk.ffi.remapToJs(self.mode);
+    if (self.fileno === 1) {
+        Sk.output(Sk.ffi.remapToJs(str));
     } else {
         goog.asserts.fail();
     }
+    /*if (mode === "w" || mode === "wb" || mode === "a" || mode === "ab") {
+    } else {
+        goog.asserts.fail();
+    }*/
 });
 
 

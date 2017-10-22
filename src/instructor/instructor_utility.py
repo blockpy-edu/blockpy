@@ -9,6 +9,15 @@ def is_top_level(ast_node):
         elif element == ast_node:
             return True
     return False
+    
+def no_nested_function_definitions():
+    ast = parse_program()
+    defs = ast.find_all('FunctionDef')
+    for a_def in defs:
+        if not is_top_level(a_def):
+            gently("You have defined a function inside of another block. For instance, you may have placed it inside another function definition, or inside of a loop. Do not nest your function definition!")
+            return False
+    return True
 
 def find_function_calls(name):
     ast = parse_program()

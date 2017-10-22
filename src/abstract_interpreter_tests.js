@@ -129,6 +129,9 @@
         // While
         ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',
          ['Unread variables'], []],
+         
+        // With
+        ['with open("A") as a:\n    print(a)', ['Undefined variables'], []],
     ];
     
     var errors = 0;

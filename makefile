@@ -6,4 +6,4 @@ merge:
 build:
 	python build.py
 update_kennel:
-	python merge.py ; cd ../kennel ; py3 manage.py update_blockpy ; cd ../blockpy
+	python merge.py ; cd ../kennel ; C:/Users/acbart/Anaconda3/python.exe manage.py update_blockpy ; cd ../blockpy
