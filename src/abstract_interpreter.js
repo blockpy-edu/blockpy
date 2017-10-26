@@ -413,6 +413,13 @@ AbstractInterpreter.prototype.typecheck = function(value) {
         case "Call":
             var funcType = this.walkAttributeChain(value.func);
             return funcType;
+        case "ListComp":
+            return { "type": "List", "empty": false, "subtype": this.typecheck(value.elt)};
+        case "SetComp":
+            return { "type": "Set", "empty": false, "subtype": this.typecheck(value.elt)};
+        case "DictComp":
+            return {"type": "Dict", "literals": false, 
+                    "key": this.typecheck(value.key), "value": this.typecheck(value.value)};
         case "BinOp":
             var left = this.typecheck(value.left),
                 right = this.typecheck(value.right);

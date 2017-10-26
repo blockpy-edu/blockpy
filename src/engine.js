@@ -45,7 +45,8 @@ BlockPyEngine.prototype.configureSkulpt = function() {
     Sk.openFilenamePrefix = "sk-filename-";
     Sk.inBrowser = this.openFile.bind(this);
     // Proxy requests
-    Sk.requestsGet = this.openURL.bind(this);
+    var engine = this;
+    Sk.requestsGet = function(filename) { return engine.openURL(filename, 'url')};
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;

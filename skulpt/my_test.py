@@ -1,2 +1,2 @@
-with open('my_test.py') as o:
-    print(o.read())
+from pprint import pprint
+pprint({1:2, "T": 5})
