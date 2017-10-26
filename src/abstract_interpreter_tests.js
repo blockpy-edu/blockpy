@@ -132,6 +132,9 @@
          
         // With
         ['with open("A") as a:\n    print(a)', ['Undefined variables'], []],
+        
+        // List comprehensions
+        ['a = [5 for x in range(100)]\nfor i in a:\n    5+i', ['Non-list iterations', 'Incompatible types'], []],
     ];
     
     var errors = 0;

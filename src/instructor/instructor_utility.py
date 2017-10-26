@@ -62,6 +62,18 @@ def find_prior_initializations(node):
                 all_assignments.append(assignment)
     return all_assignments
     
+def prevent_unused_result():
+    ast = parse_program()
+    exprs = ast.find_all('Expr')
+    for expr in exprs:
+        if expr.value.ast_name == "Call":
+            a_call = expr.value
+            if a_call.func.ast_name == 'Attribute':
+                if a_call.func.attr == 'append':
+                    pass
+                elif a_call.func.attr in ('replace', 'strip', 'lstrip', 'rstrip'):
+                    gently("Remember! You cannot modify a string directly. Instead, you should assign the result back to the string variable.")
+    
 def prevent_builtin_usage(function_names):
     # Prevent direction calls
     ast = parse_program()
