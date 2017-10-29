@@ -27,13 +27,13 @@ Sk.builtin.file = function (name, mode, buffering) {
         if (Sk.inBrowser) {  // todo:  Maybe provide a replaceable function for non-import files
             this.fileno = 10;
             this.data$ = Sk.inBrowser(this.name);
+            this.lineList = this.data$.split("\n");
         } else {
             this.fileno = 11;
             this.data$ = Sk.read(name.v);
+            this.lineList = this.data$.split("\n");
+            this.lineList = this.lineList.slice(0, -1);
         }
-
-        this.lineList = this.data$.split("\n");
-        this.lineList = this.lineList.slice(0, -1);
 
         for (i in this.lineList) {
             this.lineList[i] = this.lineList[i] + "\n";

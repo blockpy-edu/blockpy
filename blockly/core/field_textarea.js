@@ -178,7 +178,11 @@ Blockly.FieldTextArea.prototype.render_ = function() {
     if (!this.visible_ || !this.textElement_) {
         return;
     }
-    this.size_.width = this.textElement_.getBBox().width + 5;
+    try {
+        this.size_.width = this.textElement_.getBBox().width + 5;
+    } catch (e) {
+        this.size_.width = this.textElement_.textContent.length*8 + 5;
+    }
     this.size_.height= (this.text_.split(/\n/).length ||1)*20 + (Blockly.BlockSvg.SEP_SPACE_Y+5) ;
     if (this.borderRect_) {
         this.borderRect_.setAttribute('width',
