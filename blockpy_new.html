@@ -106,7 +106,7 @@
             'attachmentPoint': document.getElementById('blockpy-div'),
             'instructor': !getQueryParams()["instructor"] || getQueryParams()["instructor"]=="true",
             'developer': true,
-            'editor': 'Split',
+            'editor': getQueryParams()["mode"] || 'Split',
             'urls': {
                 'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
                 //'walk_old_code': 'http://localhost:8000/walk_code/',
@@ -119,7 +119,7 @@
         blockpy.setAssignment(
             // settings
             {
-                'editor': 'Split',
+                'editor': getQueryParams()["mode"] || 'Split',
                 'read_only': getQueryParams()["upload"]=="true",
                 'disable_semantic_errors': false,
             },
@@ -142,7 +142,7 @@
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Split',
+                'initial_view': getQueryParams()["mode"] || 'Split',
                 'upload': getQueryParams()["upload"]=="true",
                 'modules': {
                     'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples'],
@@ -156,7 +156,7 @@
                 //'__main__': 'a = 0\nprint(a)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
                 //'__main__': 'round(float("9.5", ___))',
-                '__main__': "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3],[4, 5, 6])\nplt.show()",
+                '__main__': getQueryParams()["code"] || "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3],[4, 5, 6])\nplt.show()",
                 //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
                 //'__main__': "print(open('example.txt').read())"
                 //'__main__': "import math\nmath\nfrom random import choice\nchoice"

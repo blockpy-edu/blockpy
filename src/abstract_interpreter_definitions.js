@@ -79,6 +79,20 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Any"}
         ]
     },
+    "list": {
+        "type": "Function",
+        "returns": {"type": "List"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
+    "dict": {
+        "type": "Function",
+        "returns": {"type": "Dict"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
     "int": {
         "type": "Function",
         "returns": {"type": "Num"},
