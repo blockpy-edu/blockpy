@@ -1,3 +1,4 @@
+# BlockPy stuff
 Thumbs.db
 ignore/
 kennel_dist/
@@ -8,6 +9,15 @@ research/
 test_corgis/
 advertising/*.mp4
 ~*.pptx
+
+# Node Stuff
+pids
+*.pid
+*.seed
+*.pid.lock
+node_modules/
+jspm_packages/
+.npm
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
