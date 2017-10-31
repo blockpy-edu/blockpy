@@ -68,7 +68,7 @@ var $builtinmodule = function(name) {
     }
 
     // may need to create a clone of this to have more control/options
-    str = stringify(jsobj, stringify_opts);
+    str = JSON.stringify(jsobj, stringify_opts, kwargs.indent || 1);
 
     return new Sk.builtin.str(str);
   };
@@ -93,6 +93,24 @@ var $builtinmodule = function(name) {
 
   loads_f.co_kwargs = true;
   mod.loads = new Sk.builtin.func(loads_f);
+  
+  var load_f = function(kwa) {
+      Sk.builtin.pyCheckArgs("load", arguments, 1, Infinity, true, false);
+      
+      var args   = Array.prototype.slice.call(arguments, 1),
+        kwargs = new Sk.builtins.dict(kwa),
+        str, obj, file;
+    
+      kwargs = Sk.ffi.remapToJs(kwargs);
+      file   = args[0];
+      str    = Sk.misceval.callsim(Sk.builtin.file.prototype['read'], file).v;
+      obj    = JSON.parse(str);
+      
+      return Sk.ffi.remapToPy(obj);
+  }
+  
+  load_f.co_kwargs = true;
+  mod.load = new Sk.builtin.func(load_f);
 
   return mod;
 };

@@ -70,10 +70,10 @@ var print_f = function function_print(kwa) {
 
     if(kw_list.file !== null) {
         // currently not tested, though it seems that we need to see how we should access the write function in a correct manner
-        Sk.misceval.callsim(kw_list.file.write, kw_list.file, new Sk.builtin.str(s)); // callsim to write function
+        return Sk.misceval.callsim(kw_list.file.write, kw_list.file, new Sk.builtin.str(s)); // callsim to write function
     } else {
         var sys = Sk.importModule("sys");
-        Sk.misceval.apply(sys["$d"]["stdout"]["write"], undefined, undefined, undefined, [sys["$d"]["stdout"], new Sk.builtin.str(s)]);
+        return Sk.misceval.apply(sys["$d"]["stdout"]["write"], undefined, undefined, undefined, [sys["$d"]["stdout"], new Sk.builtin.str(s)]);
     }
 
     // ToDo:
@@ -81,7 +81,10 @@ var print_f = function function_print(kwa) {
 };
 
 print_f.co_kwargs = true;
-print_f.co_name = Sk.builtin.str('print');
+print_f.co_name = new Sk.builtin.str('print');
 Sk.builtin.print = new Sk.builtin.func(print_f);
 
 Sk.builtin.print.__doc__ = new Sk.builtin.str("print(value, ..., sep=' ', end='\\n', file=sys.stdout, flush=False)\n\nPrints the values to a stream, or to sys.stdout by default.\nOptional keyword arguments:\nfile:  a file-like object (stream); defaults to the current sys.stdout.\nsep:   string inserted between values, default a space.\nend:   string appended after the last value, default a newline.\nflush: whether to forcibly flush the stream.");
+
+
+Sk.builtin.input.co_name = new Sk.builtin.str('input');

@@ -110,7 +110,31 @@
         ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
         
         // Built-ins
-        ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']]
+        ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']],
+        
+        // Double iteration
+        ['for x,y in [(1,2), (3,4)]:\n    x, y', ['Undefined variables'], []],
+        ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x, y', ['Undefined variables'], []],
+        ['record = {"A": 5, "B": 6}\nfor x,y in record.items():\n    x+"", y+0', ['Undefined variables', "Incompatible types"], []],
+        
+        // Tuple, Multiple Assignment
+        ['a,b = 1,2\n1+a\nb', ['Incompatible types'], []],
+        
+        // Sets
+        ['a = set([1,2,3])\nprint(a)', ['Undefined variables'], []],
+        
+        // Dictionaries
+        ['a = {}\na[1] = 0', [], []],
+        
+        // While
+        ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',
+         ['Unread variables'], []],
+         
+        // With
+        ['with open("A") as a:\n    print(a)', ['Undefined variables'], []],
+        
+        // List comprehensions
+        ['a = [5 for x in range(100)]\nfor i in a:\n    5+i', ['Non-list iterations', 'Incompatible types'], []],
     ];
     
     var errors = 0;

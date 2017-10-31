@@ -180,6 +180,7 @@ var $builtinmodule = function(name) {
         if (extents['xMin'] === undefined || extents['yMin'] === undefined) {
             return;
         }
+        
         var yAxisBuffer;
         
         // Establish x/y scalers and axes
@@ -425,12 +426,17 @@ var $builtinmodule = function(name) {
     };
     mod.clf = new Sk.builtin.func(clf_f);
 
-    UNSUPPORTED = ["semilogx", "semilogy", "specgram", "stackplot", "stem", "step", "streamplot", "tricontour", "tricontourf", "tripcolor", "triplot", "vlines", "xcorr", "barbs", "cla", "grid", "legend", "table", "text", "annotate", "ticklabel_format", "locator_params", "tick_params", "margins", "autoscale", "autumn", "cool", "copper", "flag", "gray", "hot", "hsv", "jet", "pink", "prism", "spring", "summer", "winter", "spectral", "hlines", "loglog", "magnitude_spectrum", "pcolor", "pcolormesh", "phase_spectrum", "pie", "plot_date", "psd", "quiver", "quiverkey", "findobj", "switch_backend", "isinteractive", "ioff", "ion", "pause", "rc", "rc_context", "rcdefaults", "gci", "sci", "xkcd", "figure", "gcf", "get_fignums", "get_figlabels", "get_current_fig_manager", "connect", "disconnect", "close", "savefig", "ginput", "waitforbuttonpress", "figtext", "suptitle", "figimage", "figlegend", "hold", "ishold", "over", "delaxes", "sca", "gca", "subplot", "subplots", "subplot2grid", "twinx", "twiny", "subplots_adjust", "subplot_tool", "tight_layout", "box", "xlim", "ylim", "xscale", "yscale", "xticks", "yticks", "minorticks_on", "minorticks_off", "rgrids", "thetagrids", "plotting", "get_plot_commands", "colors", "colormaps", "_setup_pyplot_info_docstrings", "colorbar", "clim", "set_cmap", "imread", "imsave", "matshow", "polar", "plotfile", "_autogen_docstring", "acorr", "arrow", "axhline", "axhspan", "axvline", "axvspan", "bar", "barh", "broken_barh", "boxplot", "cohere", "clabel", "contour", "contourf", "csd", "errorbar", "eventplot", "fill", "fill_between", "fill_betweenx", "hexbin", "hist2d", 'axis']
+    UNSUPPORTED = ["semilogx", "semilogy", "specgram", "stackplot", "stem", "step", "streamplot", "tricontour", "tricontourf", "tripcolor", "triplot", "vlines", "xcorr", "barbs", "cla", "grid", "table", "text", "annotate", "ticklabel_format", "locator_params", "tick_params", "margins", "autoscale", "autumn", "cool", "copper", "flag", "gray", "hot", "hsv", "jet", "pink", "prism", "spring", "summer", "winter", "spectral", "hlines", "loglog", "magnitude_spectrum", "pcolor", "pcolormesh", "phase_spectrum", "pie", "plot_date", "psd", "quiver", "quiverkey", "findobj", "switch_backend", "isinteractive", "ioff", "ion", "pause", "rc", "rc_context", "rcdefaults", "gci", "sci", "xkcd", "figure", "gcf", "get_fignums", "get_figlabels", "get_current_fig_manager", "connect", "disconnect", "close", "savefig", "ginput", "waitforbuttonpress", "figtext", "suptitle", "figimage", "figlegend", "hold", "ishold", "over", "delaxes", "sca", "gca", "subplot", "subplots", "subplot2grid", "twinx", "twiny", "subplots_adjust", "subplot_tool", "tight_layout", "box", "xlim", "ylim", "xscale", "yscale", "xticks", "yticks", "minorticks_on", "minorticks_off", "rgrids", "thetagrids", "plotting", "get_plot_commands", "colors", "colormaps", "_setup_pyplot_info_docstrings", "colorbar", "clim", "set_cmap", "imread", "imsave", "matshow", "polar", "plotfile", "_autogen_docstring", "acorr", "arrow", "axhline", "axhspan", "axvline", "axvspan", "bar", "barh", "broken_barh", "boxplot", "cohere", "clabel", "contour", "contourf", "csd", "errorbar", "eventplot", "fill", "fill_between", "fill_betweenx", "hexbin", "hist2d", 'axis']
     for (var i = 0; i < UNSUPPORTED.length; i+= 1) {
         mod[UNSUPPORTED[i]] = new Sk.builtin.func(function() {
             throw new Sk.builtin.NotImplementedError(UNSUPPORTED[i]+" is not yet implemented");
         });
     }
+    
+    var legend_f = function() {
+        return Sk.builtin.none.none$;
+    }
+    mod.legend = new Sk.builtin.func(legend_f);
     
     var hist_f = function(kwa) {
         // Parse arguments
@@ -524,15 +530,17 @@ var $builtinmodule = function(name) {
             stylestring = Sk.ffi.remapToJs(args[2]);
         }
         
-        var xdataSampled = [], ydataSampled = [];
-        var LENGTH = xdata.length, RATE = LENGTH / dot_limit;
-        for (var i = 0; i < dot_limit; i+= 1) {
-            var index = Math.floor((i+Math.random())*RATE);
-            xdataSampled.push(xdata[index])
-            ydataSampled.push(ydata[index]);
+        if (xdata.length > dot_limit) {
+            var xdataSampled = [], ydataSampled = [];
+            var LENGTH = xdata.length, RATE = LENGTH / dot_limit;
+            for (var i = 0; i < dot_limit; i+= 1) {
+                var index = Math.floor((i+Math.random())*RATE);
+                xdataSampled.push(xdata[index])
+                ydataSampled.push(ydata[index]);
+            }
+            xdata = xdataSampled;
+            ydata = ydataSampled;
         }
-        xdata = xdataSampled;
-        ydata = ydataSampled;
         
         if (Sk.console.skipDrawing) {
             return;

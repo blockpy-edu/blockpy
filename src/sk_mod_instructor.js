@@ -343,6 +343,12 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
+    mod.queue_input = new Sk.builtin.func(function(input) {
+        Sk.builtin.pyCheckArgs("queue_input", arguments, 1, 1);
+        Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
+        Sk.queuedInput.push(Sk.ffi.remapToJs(input));
+    });
+    
     /**
      * This function is called by instructors to get the students' code as a string.
     **/
@@ -362,6 +368,26 @@ var $sk_mod_instructor = function(name) {
         } else {
             return Sk.builtin.none.none$;
         }
+    });
+    
+    mod.had_execution_time_error = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("had_execution_time_error", arguments, 0, 0);
+        return !Sk.executionReports['student'].success && 
+                Sk.executionReports['student'].error &&
+                Sk.executionReports['student'].error.tp$name == 'TimeLimitError';
+    });
+    
+    var backupTime = null;
+    mod.limit_execution_time = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("limit_execution_time", arguments, 0, 0);
+        backupTime = Sk.execLimit;
+        if (Sk.execLimitFunction) {
+            Sk.execLimit = Sk.execLimitFunction();
+        }
+    });
+    mod.unlimit_execution_time = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("unlimit_execution_time", arguments, 0, 0);
+        Sk.execLimit = backupTime;
     });
     
     /**

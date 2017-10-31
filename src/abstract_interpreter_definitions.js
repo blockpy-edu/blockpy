@@ -3,6 +3,9 @@ AbstractInterpreter.prototype.TYPE_INHERITANCE = {
     "Num": ["Int", "Float"]
 }
 AbstractInterpreter.prototype.BUILTINS = {
+    //
+    'KeyError': {"type": "Exception"},
+    'IOError': {"type": "Exception"},
     // Values
     'True': {"type": "Bool"}, 
     'False': {"type": "Bool"}, 
@@ -69,6 +72,27 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Any"}
         ]
     },
+    "set": {
+        "type": "Function",
+        "returns": {"type": "Set"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
+    "list": {
+        "type": "Function",
+        "returns": {"type": "List"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
+    "dict": {
+        "type": "Function",
+        "returns": {"type": "Dict"},
+        "parameters": [
+            {"type": "Any"}
+        ]
+    },
     "int": {
         "type": "Function",
         "returns": {"type": "Num"},
@@ -103,6 +127,11 @@ AbstractInterpreter.METHODS = {
     }
 }
 AbstractInterpreter.MODULES = {
+    'random': {
+        'randint': { "type": "Function", "returns": {"type": "Num"}},
+        'choice': { "type": "Function", "returns": {"type": "Any"}},
+        'shuffle': { "type": "Function", "returns": {"type": "None"}},
+    },
     'parking': {
         'now': { 'type': 'ParkingTime'},
         'Time': { 'type': 'ParkingTime'},

@@ -14,8 +14,8 @@ var $builtinmodule = function (name) {
     var response = function ($gbl, $loc) {
 
         // ------------------------------------------------------------
-        $loc.__init__ = new Sk.builtin.func(function (self, xhr) {
-            self.data$ = xhr.responseText;
+        $loc.__init__ = new Sk.builtin.func(function (self, data) {
+            self.data$ = data;
             self.lineList = self.data$.split("\n");
             self.lineList = self.lineList.slice(0, -1);
             for (var i = 0; i < self.lineList.length; i++) {
@@ -23,7 +23,7 @@ var $builtinmodule = function (name) {
             }
             self.currentLine = 0;
             self.pos$ = 0;
-            Sk.abstr.sattr(self, 'content', self.data$, true);
+            Sk.abstr.sattr(self, 'text', Sk.ffi.remapToPy(self.data$), true);
         });
 
 
@@ -32,7 +32,7 @@ var $builtinmodule = function (name) {
             return Sk.ffi.remapToPy('<Response>');
         });
         
-
+        $loc.__repr__ = $loc.__str__;
 
         // ------------------------------------------------------------
         $loc.__iter__ = new Sk.builtin.func(function (self) {
@@ -114,20 +114,29 @@ var $builtinmodule = function (name) {
      */
     request.get = new Sk.builtin.func(function (url, data, timeout) {
         var prom = new Promise(function(resolve, reject) {
-            var xmlhttp = new XMLHttpRequest();
-            
-            xmlhttp.addEventListener("loadend", function (e) {
-                resolve(Sk.misceval.callsim(request.Response, xmlhttp));
-            });
-
-            if (!data) {
-                xmlhttp.open("GET", url.v);
-                xmlhttp.send(null);
+            if (Sk.requestsGet) {
+                Sk.requestsGet(Sk.ffi.remapToJs(url), data, timeout).then(function(result) {
+                    resolve(Sk.misceval.callsim(request.Response, result));
+                }, function(err) {
+                    reject(err);
+                    //resolve(Sk.misceval.callsim(request.Response, err));
+                });
             } else {
-                xmlhttp.open("POST", url.v);
-                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xmlhttp.setRequestHeader("Content-length", data.v.length);
-                xmlhttp.send(data.v);
+                var xmlhttp = new XMLHttpRequest();
+                
+                xmlhttp.addEventListener("loadend", function (e) {
+                    resolve(Sk.misceval.callsim(request.Response, xmlhttp.responseText));
+                });
+
+                if (!data) {
+                    xmlhttp.open("GET", url.v);
+                    xmlhttp.send(null);
+                } else {
+                    xmlhttp.open("POST", url.v);
+                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xmlhttp.setRequestHeader("Content-length", data.v.length);
+                    xmlhttp.send(data.v);
+                }
             }
         });
 
@@ -135,7 +144,8 @@ var $builtinmodule = function (name) {
 
         susp.resume = function() {
             if (susp.data["error"]) {
-                throw new Sk.builtin.IOError(susp.data["error"].message);
+                //throw new Sk.builtin.IOError(susp.data["error"].message);
+                throw susp.data["error"];
             } else {
                 return resolution;
             }
@@ -148,7 +158,8 @@ var $builtinmodule = function (name) {
                 return value;
             }, function(err) {
                 resolution = "";
-                return err;
+                throw err;
+                //return err;
             })
         };
 

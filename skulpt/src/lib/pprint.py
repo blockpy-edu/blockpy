@@ -1,1 +1,4 @@
-raise NotImplementedError("pprint is not yet implemented in Skulpt")
+import json
+
+def pprint(obj, indent=1):
+    print(json.dumps(obj))

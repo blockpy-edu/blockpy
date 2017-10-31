@@ -1,3 +1,2 @@
-range(1)
-
-print(range)
+from pprint import pprint
+pprint({1:2, "T": 5})

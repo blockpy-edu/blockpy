@@ -1,22 +1,61 @@
-var jsdom = require('jsdom'),
-    window = jsdom.jsdom().defaultView;
-
-jsdom.jQueryify(window, "./libs/jquery.js", function(){
-    var $ = window.$; 
-})
-
-//require("./libs/jquery.js");
-require("./libs/jquery-ui.min.js");
-require("./libs/jquery.hotkeys.js");
-require("./libs/jquery.multi-select.js");
-require("./libs/d3.min.js");
-require("./libs/math.0.19.0.min.js");
-require("./libs/bootstrap.min.js");
-require("./libs/bootstrap-wysiwyg.js");
-require("./libs/mindmup-editabletable.js");
-require("./libs/codemirror/codemirror.js");
-require("./libs/codemirror/python.js");
-require("./libs/codemirror/htmlmixed.js");
-require("./libs/codemirror/xml.js");
-require("./libs/knockout-3.4.0.js");
-require('./dist/blockpy.js')
+Blockly = {};
+Blockly.WorkspaceSvg = new function() {};
+Blockly.WorkspaceSvg.prototype = {};
+skulpt = require('./skulpt/dist/skulpt.min.js')
+skulpt_libs = require('./skulpt/dist/skulpt-stdlib.js')
+blockpy = require('./dist/blockpy_node.js')
+var trace = function() {
+    
+};
+trace.removeAll = x => x;
+mockFeedback = {
+    'isFeedbackVisible': x => true,
+    'clear': x => x,
+    'presentFeedback': x => blockpy.BlockPyFeedback.prototype.presentFeedback.bind(mockFeedback)(x),
+    'presentAnalyzerFeedback': x => blockpy.BlockPyFeedback.prototype.presentAnalyzerFeedback.bind(mockFeedback)(x),
+    'instructorFeedback': (name, message, line) => console.log(name, message, line),
+}
+main = {
+    'components': {
+        'printer': {
+            'print': e => console.log("PRINTED", e),
+            'resetPrinter': e => console.log("PRINTER RESET"),
+            'getConfiguration': blockpy.BlockPyPrinter.getDisabledConfiguration,
+        },
+        'editor': {
+            'triggerOnChange': 0
+        },
+        'server': {
+            'logEvent': x => x,
+            'markSuccess': x => x,
+        },
+        'feedback': mockFeedback,
+        'toolbar': {
+            
+        }
+    },
+    'model': {
+        'execution': {
+            'reports': {},
+            'suppressions': {},
+            'status': v => this['status'] = v,
+            'trace': trace,
+            'step': x => x,
+            'last_step': x => x,
+            'line_number': x => x,
+            'show_trace': x => x,
+        },
+        'programs': {
+            '__main__': v => 'a = "Words"\nprint(a)',
+            'give_feedback': v => 'from instructor import *\ngently("You have failed.")',
+        },
+        'settings': {
+            'disable_timeout': x => false,
+            'mute_printer': x => this['mute_printer'] = x,
+        }
+    }
+};
+main.components.feedback.main = main;
+engine = new blockpy.BlockPyEngine(main);
+result = engine.on_run();
+main.components.feedback

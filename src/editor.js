@@ -70,7 +70,7 @@ function BlockPyEditor(main, tag) {
     var settings = this.main.model.settings;
     settings.editor.subscribe(function() {editor.setMode()});
     var updateReadOnly = function() {
-        var newValue = settings.read_only() && !settings.instructor();
+        var newValue = !!(settings.read_only() && !settings.instructor());
         editor.codeMirror.setOption('readOnly', newValue);
         tag.toggleClass("blockpy-read-only", newValue);
     };
@@ -237,8 +237,6 @@ BlockPyEditor.prototype.initInstructor = function() {
     
     this.availableModules = this.tag.find('.blockpy-available-modules');
     this.availableModules.multiSelect({ selectableOptgroup: true });
-    
-    
 }
 
 /**

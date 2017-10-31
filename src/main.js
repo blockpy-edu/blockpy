@@ -184,6 +184,7 @@ BlockPy.prototype.initModel = function(settings) {
         // Assignment level settings
         'assignment': {
             'modules': ko.observableArray(BlockPy.DEFAULT_MODULES),
+            'files': ko.observableArray([]),
             'assignment_id': ko.observable(null),
             'student_id': null,
             'course_id': null,
@@ -195,7 +196,6 @@ BlockPy.prototype.initModel = function(settings) {
             'parsons': ko.observable(false),
             'upload': ko.observable(false),
             'importable': ko.observable(false),
-            'has_files': ko.observable(false),
             'disable_algorithm_errors': ko.observable(false),
             'disable_timeout': ko.observable(false)
         },
@@ -360,8 +360,8 @@ BlockPy.prototype.initModelMethods = function() {
         return function() {
             if (type == "List") {
                 var output = exact_value.$r().v;
-                var result = (window.btoa?'base64,'+btoa(JSON.stringify(output)):JSON.stringify(output));
-                window.open('data:application/json;' + result);
+                var newWindow = window.open('about:blank', "_blank");
+                newWindow.document.body.innerHTML += "<code>"+output+"</code>";
             }
         }
     }
@@ -378,6 +378,25 @@ BlockPy.prototype.initModelMethods = function() {
     execution.step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
     execution.last_step.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
     execution.line_number.extend({ rateLimit: { timeout: 20, method: "notifyWhenChangesStop" } });
+    
+    // Handle Files
+    var self = this;
+    this.model.removeFile = function() {
+        self.model.assignment.files.remove(this.valueOf());
+        delete self.components.engine.openedFiles[this];
+    }
+    this.model.viewFile = function() {
+        var contents = self.components.engine.openedFiles[this];
+        var newWindow = window.open('about:blank', "_blank");
+        newWindow.document.body.innerHTML += "<pre>"+contents+"</pre>";
+    }
+    this.model.addFile = function() {
+        var name = prompt("Please enter the filename.");
+        if (name !== null) {
+            self.model.assignment.files.push(name);
+            self.components.engine.openURL(name, 'file');
+        }
+    }
 }
 
 /**
@@ -440,6 +459,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
                                     assignment.modules.removed || []);
         this.model.assignment['modules'](new_modules);
     }
+    if (assignment.files) {
+        this.model.assignment['files'](assignment.files);
+    }
     this.model.assignment['assignment_id'](assignment.assignment_id);
     this.model.assignment['group_id'] = assignment.group_id;
     this.model.assignment['student_id'] = assignment.student_id;
@@ -482,6 +504,8 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.components.editor.reloadIntroduction();
     this.model.settings.server_connected(true)
     this.components.corgis.loadDatasets(true);
+    this.components.engine.loadAllFiles(true);
+    this.components.server.setStatus('Loaded');
 }
 
 /**

@@ -1,4 +1,5 @@
 import os
+import re
 
 with open('src/interface.html', 'r') as input, open('src/interface.js', 'w') as output:
     contents = input.read()

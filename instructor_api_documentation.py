@@ -111,6 +111,16 @@ def get_output():
         list: The output that the students code generated on its last execution.
     '''
     
+def queue_input(input):
+    '''
+    Add a new string to be set as input when the "input" function is called.
+    You can repeatedly queue_input to satisfy loops, too.
+    If there are no queued inputs, a blank string will be returned.
+    
+    Args:
+        input (str): The string to queue for input.
+    '''
+    
 def reset_output():
     '''
     Removes any output generated on a previous run of the student code. This is
@@ -339,6 +349,50 @@ class AstNode():
                     generated test inputs.
         '''
 ## instructor_utility.py
+
+def ensure_literal(*literals):
+    '''
+    Raises an Explanation if the literal values (strings, ints, floats) are not
+    in the source code.
+    
+    Args:
+        *literals (int, float or str): Any literal value.
+    Returns: False if the literals were all in the code, otherwise
+             returns the first missing literal value.
+    '''
+def prevent_literal(*literals):
+    '''
+    Raises an Explanation if the literal values (strings, ints, floats) are
+    in the source code.
+    
+    Args:
+        *literals (int, float or str): Any literal value.
+    Returns: False if the literals were not in the code, otherwise
+             returns the first present literal value.
+    '''
+    
+def ensure_operation(op_name, root=None):
+    '''
+    Gently rebukes if the given operator is not found in the source code.
+    
+    Args:
+        op_name (str): The name of the operator, as it is written in Python
+                       (e.g., "==" and not "Eq"). Works for BoolOps, BinOps,
+                       UnaryOps, and Compares.
+    Returns: False if the operator was not in the code, otherwise returns the
+             first AST node apperance of the operator.
+    '''
+def prevent_operation(op_name, root=None):
+    '''
+    Gently rebukes if the given operator is found in the source code.
+    
+    Args:
+        op_name (str): The name of the operator, as it is written in Python
+                       (e.g., "==" and not "Eq"). Works for BoolOps, BinOps,
+                       UnaryOps, and Compares.
+    Returns: False if the operator was not in the code, otherwise returns the
+             first AST node apperance of the operator.
+    '''
 
 def function_is_called(name):
     '''

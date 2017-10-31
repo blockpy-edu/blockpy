@@ -198,6 +198,7 @@ BlockPyFeedback.prototype.internalError = function(original, name, message) {
     this.main.model.status.error("internal");
     this.main.components.printer.print("Internal error! Please show this to an instructor!");
     this.main.components.server.logEvent('feedback', "Internal Error", name+"\n|\n"+original+"\n|\n"+message);
+    console.error(original);
 }
 
 /**
@@ -351,7 +352,11 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     // Error in Instructor Feedback code
     if (!report['instructor'].success) {
         var error = report['instructor'].error;
-        if (error.traceback[0].filename == "__main__.py") {
+        if (!error.traceback) {
+            this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+            console.error(error);
+            return 'instructor';
+        } else if (error.traceback[0].filename == "__main__.py") {
             this.printError(report['instructor'].error);
             return 'student';
         } else {
@@ -474,4 +479,8 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     }
     return false;
+}
+
+if (typeof exports !== 'undefined') {
+    exports.BlockPyFeedback = BlockPyFeedback;
 }
