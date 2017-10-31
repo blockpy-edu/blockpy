@@ -70,7 +70,7 @@ def wrong_append_list_initiatization():
                 else:#or if its not even a list
                     init_fail = True
             if init_fail and append_var.id != "___":
-                explain("The list property <code>{0!s}</code> is not initialized correctly. The list you append to should be initialized to an empty list.<br><br><i>(app_list_init)<i></br>".format(append_var.id))
+                explain("The list property <code>{0!s}</code> is either not initialized correctly or mistaken for another property. The list you append to should be initialized to an empty list.<br><br><i>(app_list_init)<i></br>".format(append_var.id))
                 return
 def append_list_wrong_slot():
     ast = parse_program()
