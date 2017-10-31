@@ -2,6 +2,7 @@ Thumbs.db
 ignore/
 kennel_dist/
 blockly_backup/
+data_analysis/
 closure-compiler/
 research/
 test_corgis/

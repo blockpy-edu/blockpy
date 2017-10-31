@@ -57,6 +57,31 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Num", "optional": true}
         ]
     },
+    "map": {
+        "type": "Function",
+        "returns": {"type": "List"},
+        "parameters": [
+            {"type": "Function"},
+            {"type": "Sequence"}
+        ]
+    },
+    "filter": {
+        "type": "Function",
+        "returns": {"type": "List"},
+        "parameters": [
+            {"type": "Function"},
+            {"type": "Sequence"}
+        ]
+    },
+    "sorted": {
+        "type": "Function",
+        "returns": {"type": "List"},
+        "parameters": [
+            {"type": "Sequence"},
+            {"type": "Function", "optional": true},
+            {"type": "Function", "optional": true}
+        ]
+    },
     "xrange": {
         "type": "Function",
         "returns": {"type": "List", "subtype": {"type": "Num"}},

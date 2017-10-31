@@ -11,7 +11,8 @@ trace.removeAll = x => x;
 mockFeedback = {
     'isFeedbackVisible': x => true,
     'clear': x => x,
-    'presentFeedback': x => blockpy.BlockPyFeedback.prototype.presentFeedback.bind(mockFeedback)(x),
+    //'presentFeedback': x => blockpy.BlockPyFeedback.prototype.presentFeedback.bind(mockFeedback)(x),
+    'presentFeedback': x => console.log(Sk.executionReports.instructor.complaint),
     'presentAnalyzerFeedback': x => blockpy.BlockPyFeedback.prototype.presentAnalyzerFeedback.bind(mockFeedback)(x),
     'instructorFeedback': (name, message, line) => console.log(name, message, line),
 }
@@ -47,7 +48,7 @@ main = {
         },
         'programs': {
             '__main__': v => 'a = "Words"\nprint(a)',
-            'give_feedback': v => 'from instructor import *\ngently("You have failed.")',
+            'give_feedback': v => 'from instructor import *\ngently("You have failed.")\ngently("Not bad!")',
         },
         'settings': {
             'disable_timeout': x => false,
@@ -57,5 +58,11 @@ main = {
 };
 main.components.feedback.main = main;
 engine = new blockpy.BlockPyEngine(main);
+
+const loadJsonFile = require('load-json-file');
+ 
+loadJsonFile('data_analysis/f17_ct_posts.json').then(json => {
+    console.log(json);
+    //=> {foo: true} 
+});
 result = engine.on_run();
-main.components.feedback

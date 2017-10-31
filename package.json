@@ -1,5 +1,6 @@
 {
-    "dependencies" : {
-        "jsdom": "latest"
+    "dependencies": {
+        "jsdom": "latest",
+        "load-json-file": "^3.0.0"
     }
 }
