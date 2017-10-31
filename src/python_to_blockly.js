@@ -1196,7 +1196,8 @@ PythonToBlocks.KNOWN_MODULES = {
         "hist": ["*plot_hist", {"type": "variable", "mode": "value", "name": "values"}],
         "scatter": ["*plot_scatter", {"type": "variable", "mode": "value", "name": "x_values"},
                                       {"type": "variable", "mode": "value", "name": "y_values"}],
-        "show": ["*plot_show"]
+        "show": ["*plot_show"],
+        "legend": ["*plot_legend"]
     }
 };
 PythonToBlocks.prototype.KNOWN_FUNCTIONS = ["append", "strip", "rstrip", "lstrip"];

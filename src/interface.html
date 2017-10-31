@@ -23,6 +23,18 @@
                   data-bind='text: assignment.name'></span>
             <div class='blockpy-presentation' data-bind="html: assignment.introduction">
             </div>
+            <br>
+            <div data-bind="visible: assignment.files().length">
+                Files Available:<ul data-bind="foreach: assignment.files">
+                    <li>
+                        <button data-bind="click: $parent.viewFile"
+                                class='btn btn-default btn-xs'>
+                           <code data-bind='text: $data'></code>
+                           <span class='glyphicon glyphicon-new-window'></span>
+                        </button>
+                   </li>
+               </ul>
+            </div>
         </div>
         <div class='blockpy-content-topright col-md-3 col-sm-3'>
             <span class='text-muted' data-bind="visible: status.dataset_loading().length">Loading Dataset!</span>
@@ -54,6 +66,12 @@
                 <!--Disable Semantic Errors: <input type='checkbox' data-bind="checked: settings.disable_semantic_errors"><br>-->
                 
                 <!--Disable Typed Blocks: <input type='checkbox' data-bind="checked: settings.disable_variable_types"><br>-->
+                <div class='pull-right'>
+                <label>AID:</label> <span data-bind="text: assignment.assignment_id"></span>
+                <label>GID:</label> <span data-bind="text: assignment.group_id"></span>
+                <label>SID:</label> <span data-bind="text: assignment.student_id"></span>
+                <label>CID:</label> <span data-bind="text: assignment.course_id"></span>
+                </div>
                 
                 <label class='pull-right'>
                 Disable Timeout: <input type='checkbox' data-bind="checked: settings.disable_timeout"><br>
@@ -68,6 +86,8 @@
                 Auto-save:
                 <input type='checkbox' data-bind="checked:settings.auto_upload"><br>
                 </label>
+                
+                <br>
             </div>
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
@@ -308,18 +328,24 @@
                             <br>
                         
                             <!-- Filesystem -->
-                            <label class='blockpy-presentation-importable-check'>
+                            <label class='blockpy-presentation-filesystem-controls'>
                             Filesystem:
                             </label>
-                            <label class="btn btn-sm btn-default btn-file">
+                            <!--<label class="btn btn-sm btn-default btn-file">
                                 Upload <input class="blockpy-presentation-upload" type="file" style="display: none;">
-                            </label>
-                            <ul>
-                            <!--
+                            </label>-->
+                            <button type='button' class='btn btn-default'
+                                    data-bind="click: addFile">
+                                <span class='glyphicon glyphicon-file'></span> Add
+                            </button>
+                            <ul data-bind="foreach: assignment.files">
                                 <li>
-                                    <a href="#" target="_blank">file.json<span class='glyphicon glyphicon-new-window'></span></a>
-                                    <button class='btn btn-sm btn-danger'><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                                </li>-->
+                                    <a href="#" target="_blank" 
+                                       data-bind="click: $parent.viewFile, text: $data"><span class='glyphicon glyphicon-new-window'></span></a>
+                                    <button class='btn btn-sm btn-danger'
+                                            data-bind="click: $parent.removeFile">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                                </li>
                             </ul>
                             
                             <label>Available Modules</lable>

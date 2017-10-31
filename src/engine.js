@@ -17,6 +17,8 @@ function BlockPyEngine(main) {
     // Keeps track of the tracing while the program is executing
     this.executionBuffer = {};
     this.abstractInterpreter = new AbstractInterpreter();
+    
+    this.openedFiles = {};
 }
 
 BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
@@ -39,15 +41,18 @@ BlockPyEngine.prototype.configureSkulpt = function() {
         // Function to handle loading in new files
         read: this.readFile.bind(this)
     });
-    // Create an input box
-    Sk.inputfunTakesPrompt = true;
-    Sk.inputfun = this.inputFunction.bind(this);
     // Allow file access
     Sk.openFilenamePrefix = "sk-filename-";
+    Sk.inBrowser = this.openFile.bind(this);
+    // Proxy requests
+    var engine = this;
+    Sk.requestsGet = function(filename) { return engine.openURL(filename, 'url')};
     // Access point for instructor data
     Sk.executionReports = this.main.model.execution.reports;
     Sk.feedbackSuppressions = this.main.model.execution.suppressions;
     Sk.analyzeParse = this.analyzeParse.bind(this);
+    // Allow input box
+    Sk.inputfunTakesPrompt = true;
 }
 
 /**
@@ -55,7 +60,11 @@ BlockPyEngine.prototype.configureSkulpt = function() {
  */
 BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
-    Sk.execLimit = this.main.model.settings.disable_timeout() ? null : 10000;
+    var settings = this.main.model.settings;
+    Sk.execLimitFunction = function() { 
+        return settings.disable_timeout() ? null : 10000; 
+    };
+    Sk.execLimit = Sk.execLimitFunction();
     // Identify the location to put new charts
     Sk.console = this.main.components.printer.getConfiguration();
     // Stepper! Executed after every statement.
@@ -66,8 +75,10 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
         delete Sk.builtinFiles['files']['src/lib/'+module_name];
     }
     // Unmute everything
-    Sk.skip_drawing = false;
+    Sk.console.skipDrawing = false;
     this.main.model.settings.mute_printer(false);
+    // Create an input box
+    Sk.inputfun = this.inputFunction.bind(this);
 }
 BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
@@ -80,8 +91,11 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
         Sk.builtinFiles['files']['src/lib/'+module_name] = $INSTRUCTOR_MODULES_EXTENDED[module_name];
     }
     // Mute everything
-    Sk.skip_drawing = true;
+    Sk.console.skipDrawing = true;
     this.main.model.settings.mute_printer(true);
+    // Disable input box
+    Sk.queuedInput = [];
+    Sk.inputfun = this.inputMockFunction.bind(this);
 }
 
 /**
@@ -128,6 +142,66 @@ BlockPyEngine.prototype.inputFunction = function(promptMessage) {
         return submittedPromise;
     } else {
         return "";
+    }
+}
+
+BlockPyEngine.prototype.inputMockFunction = function(promptMessage) {
+    if (Sk.queuedInput.length) {
+        var next = Sk.queuedInput.pop();
+        return next;
+    } else {
+        return "";
+    }
+}
+
+/**
+ * @param {skulpt Str} name - The filename as a Skulpt string.
+ */
+BlockPyEngine.prototype.openFile = function(name) {
+    var filename = Sk.openFilenamePrefix || "";
+    filename += name;
+    elem = document.getElementById(filename);
+    if (elem == null) {
+        if (name in this.openedFiles) {
+            return this.openedFiles[name];
+        } else {
+            throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name + "'");
+        }
+    } else {
+        if (elem.nodeName.toLowerCase() == "textarea") {
+            return elem.value;
+        } else {
+            return elem.textContent;
+        }
+    }
+}
+
+
+BlockPyEngine.prototype.openURL = function(url, type) {
+    var server = this.main.components.server;
+    var openedFiles = this.openedFiles;
+    return new Promise( function(resolve, reject) {
+        if (url in openedFiles) {
+            resolve(openedFiles[url]);
+        } else {
+            server.loadFile(url, type, function(contents) {
+                openedFiles[url] = contents;
+                resolve(contents);
+            }, function(message) {
+                reject(new Sk.builtin.IOError("Cannot access url: "+url+" because "+message));
+            })
+        }
+    });
+}
+
+BlockPyEngine.prototype.loadAllFiles = function() {
+    var names = this.main.model.assignment.files();
+    var feedback = this.main.components.feedback;
+    for (var i = 0; i < names.length; ++i) {
+        this.openURL(names[i], 'file')
+            .then(function() {}, function(e) {
+                feedback.internalError(e, "FileLoadError", "The file failed to load on the server.")
+            });
     }
 }
 
@@ -410,10 +484,13 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     instructorCode = (
         'from instructor import *\n'+
         'def run_student():\n'+
+        '    limit_execution_time()\n'+
         '    try:\n'+
         indent(indent(studentCode))+'\n'+
         '    except Exception as error:\n'+
+        '        unlimit_execution_time()\n'+
         '        return error\n'+
+        '    unlimit_execution_time()\n'+
         '    return None\n'+
         instructorCode
     );
@@ -588,3 +665,7 @@ BlockPyEngine.prototype.executionEnd_ = function() {
         this.onExecutionEnd();
     }
 };
+
+if (typeof exports !== 'undefined') {
+    exports.BlockPyEngine = BlockPyEngine
+}

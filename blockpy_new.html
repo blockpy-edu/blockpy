@@ -68,6 +68,7 @@
     <script type="text/javascript" src="src/blockly_blocks/tuple.js"></script>
     <script type="text/javascript" src="src/blockly_blocks/turtles.js"></script>
     <script type="text/javascript" src="src/blockly_blocks/text.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/plots.js"></script>
     <script type="text/javascript" src="src/dialog.js"></script>
     <script type="text/javascript" src="src/storage.js"></script>
     <script type="text/javascript" src="src/printer.js"></script>
@@ -105,7 +106,7 @@
             'attachmentPoint': document.getElementById('blockpy-div'),
             'instructor': !getQueryParams()["instructor"] || getQueryParams()["instructor"]=="true",
             'developer': true,
-            'editor': 'Split',
+            'editor': getQueryParams()["mode"] || 'Split',
             'urls': {
                 'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
                 //'walk_old_code': 'http://localhost:8000/walk_code/',
@@ -118,7 +119,7 @@
         blockpy.setAssignment(
             // settings
             {
-                'editor': 'Split',
+                'editor': getQueryParams()["mode"] || 'Split',
                 'read_only': getQueryParams()["upload"]=="true",
                 'disable_semantic_errors': false,
             },
@@ -130,13 +131,18 @@
                 //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
                 //'give_feedback': 'set_success()',
-                'give_feedback': 'ast = parse_program()\nassignments = ast.find_all("Assign")\nfor assignment in assignments:\n    if assignment.targets.id == "parking_allowed":\n        log(assignment.targets.data_type)',
+                //'give_feedback': "from instructor_utility import *\nensure_operation('in')",
+                //'give_feedback': 'reset_output()\nqueue_input("Test")\nrun_student()\nlog(get_output())',
+                //'give_feedback': "from instructor_files import *\nfiles_not_handled_correctly('example.txt')",
+                //'give_feedback': "from instructor_imports import *\nensure_imports('math', 'random')",
+                'give_feedback': "from instructor_plotting import * \nprevent_incorrect_plt() \nensure_correct_plot('plot') \nensure_show() \ncheck_for_plot('line', [[1,2,3],[4,5,6]])",
+                //'give_feedback': 'ast = parse_program()\nassignments = ast.find_all("Assign")\nfor assignment in assignments:\n    if assignment.targets.id == "parking_allowed":\n        log(assignment.targets.data_type)',
                 'on_change': '',
                 //'on_change': 'gently("Test")',
                 'parsons': false,
                 'starting_code': '',
                 'importable': true,
-                'initial_view': 'Split',
+                'initial_view': getQueryParams()["mode"] || 'Split',
                 'upload': getQueryParams()["upload"]=="true",
                 'modules': {
                     'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples'],
@@ -150,7 +156,13 @@
                 //'__main__': 'a = 0\nprint(a)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
                 //'__main__': 'round(float("9.5", ___))',
-                '__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'
+                '__main__': getQueryParams()["code"] || "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3],[4, 5, 6])\nplt.show()",
+                //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
+                //'__main__': "print(open('example.txt').read())"
+                //'__main__': "import math\nmath\nfrom random import choice\nchoice"
+                //'__main__': "from random import randint\nprint(5+randint(1,10))"
+                //'__main__': 'print(input("Prompt:"))',
+                //'__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'
                 //'__main__': 'print("Banana"[:int(len("Banana")/2)])',
                 //'__main__': 'def curve_grade(old):\n    return (old ** .5) * 10\n\nprint(90, "becomes", curve_grade(90))\nprint(50, "becomes", curve_grade(50))\nprint(20, "becomes", curve_grade(20))'
                 //'__main__': 'print(1 != 2 and 2 != 1)'

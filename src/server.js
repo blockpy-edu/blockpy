@@ -34,6 +34,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.files.subscribe(function(e) { server.saveAssignment(); });
     //model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
     model.execution.show_trace.subscribe(function(newValue) { server.logEvent('trace', newValue); });
     model.execution.trace_step.subscribe(function(newValue) { server.logEvent('trace_step', newValue); });
@@ -114,7 +115,7 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
                this.defaultResponse.bind(this))
          .fail(this.defaultFailure.bind(this));
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Log Event)");
     }
 }
 
@@ -127,7 +128,9 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
         data['status'] = success;
         this.main.components.editor.getPngFromBlocks(function(pngData, img) {
             data['image'] = pngData;
-            img.remove();
+            if (img.remove) {
+                img.remove();
+            }
             server.setStatus('Saving');
             // Trigger request
             $.post(model.constants.urls.save_success, data, 
@@ -152,7 +155,7 @@ BlockPyServer.prototype.markSuccess = function(success, callback) {
              .fail(server.defaultFailure.bind(server));
         });
     } else {
-        server.setStatus('Offline', "Server is not connected!");
+        server.setStatus('Offline', "Server is not connected! (Mark Success)");
     }
 };
 
@@ -169,6 +172,7 @@ BlockPyServer.prototype.saveAssignment = function() {
         data['disable_timeout'] = model.assignment.disable_timeout();
         data['name'] = model.assignment.name();
         data['modules'] = model.assignment.modules().join(','); // TODO: hackish, broken if ',' is in name
+        data['files'] = model.assignment.files().join(','); // TODO: hackish, broken if ',' is in name
         
         var server = this;
         this.setStatus('Saving');
@@ -180,7 +184,7 @@ BlockPyServer.prototype.saveAssignment = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Save Assignment)");
     }
 }
 
@@ -206,7 +210,7 @@ BlockPyServer.prototype.saveCode = function() {
              .fail(server.defaultFailure.bind(server));
         }, this.TIMER_DELAY);
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Save Code)");
     }
 }
 
@@ -229,7 +233,7 @@ BlockPyServer.prototype.getHistory = function(callback) {
                })
          .fail(server.defaultFailure.bind(server));
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Get History)");
         callback([]);
     }
 }
@@ -279,7 +283,7 @@ BlockPyServer.prototype.walkOldCode = function() {
             );
             //server.defaultFailure.bind(server));
         } else {
-            this.setStatus('Offline', "Server is not connected!");
+            this.setStatus('Offline', "Server is not connected! (Walk Old Code)");
         }
     }
 }
@@ -321,6 +325,40 @@ BlockPyServer.prototype.loadAssignment = function(assignment_id) {
             server.defaultFailure()
          });
     } else {
-        this.setStatus('Offline', "Server is not connected!");
+        this.setStatus('Offline', "Server is not connected! (Load Assignment)");
+    }
+}
+
+/**
+ * This function can be used to load files and web resources.
+ */
+BlockPyServer.prototype.loadFile = function(filename, type, callback, errorCallback) {
+    var model = this.main.model;
+    var server = this;
+    if (model.server_is_connected('load_file')) {
+        var data = this.createServerData();
+        data['filename'] = filename;
+        data['type'] = type;
+        this.setStatus('Loading');
+        $.post(model.constants.urls.load_file, data, 
+                function(response) {
+                    if (response.success) {
+                        callback(response.data);
+                        server.setStatus('Loaded');
+                        server.hideOverlay();
+                    } else {
+                        errorCallback(response.message);
+                        server.setStatus('Failure', response.message);
+                        server.hideOverlay();
+                    }
+               })
+         .fail(function(e, textStatus, errorThrown) {
+            errorCallback("Server failure! Report to instructor");
+            console.error(errorThrown);
+            server.defaultFailure()
+         });
+    } else {
+        errorCallback("No file server available.");
+        this.setStatus('Offline', "Server is not connected! (Load File)");
     }
 }

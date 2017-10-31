@@ -48,6 +48,23 @@ BlockPyPrinter.prototype.getConfiguration = function() {
 }
 
 /**
+ * Update and return a static disabled configuration of the printer. This 
+ * printer will be unable to do most tasks.
+ *
+ * @returns {Object} Returns an object with information about the printer.
+ */
+BlockPyPrinter.getDisabledConfiguration = function() {
+    var printerSettings = {}
+    printerSettings['printHtml']= function(html, value) { console.log(html, value);};
+    printerSettings['width']= 500;
+    printerSettings['pngMode']= false;
+    printerSettings['skipDrawing']= true;
+    printerSettings['height']= 500;
+    printerSettings['container']= null;
+    return printerSettings;
+}
+
+/**
  * Updates each printed element in the printer and makes it hidden
  * or visible, depending on what step we're on.
  *
@@ -155,4 +172,8 @@ BlockPyPrinter.prototype.printInput = function(promptMessage) {
         }
     }
     return {'promise': false}
+}
+
+if (typeof exports !== 'undefined') {
+    exports.BlockPyPrinter = BlockPyPrinter;
 }
