@@ -268,7 +268,7 @@ BlockPyEngine.prototype.lastStep = function() {
 /**
  * Activated whenever the Run button is clicked
  */
-BlockPyEngine.prototype.on_run = function() {
+BlockPyEngine.prototype.on_run = function(afterwards) {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
     var engine = this;
@@ -290,6 +290,9 @@ BlockPyEngine.prototype.on_run = function() {
                 engine.main.components.server.markSuccess(0.0, model.settings.completedCallback);
             }
             model.execution.status("complete");
+            if (afterwards !== undefined) {
+                afterwards(result);
+            }
         });
     });
     this.main.components.server.logEvent('engine', 'on_run')
@@ -514,6 +517,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
             if (error.tp$name === 'GracefulExit') {
                 report['instructor']['success'] = true;
             } else {
+                console.log(error.args.v);
                 console.log(error);
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
@@ -667,5 +671,7 @@ BlockPyEngine.prototype.executionEnd_ = function() {
 };
 
 if (typeof exports !== 'undefined') {
-    exports.BlockPyEngine = BlockPyEngine
+    exports.BlockPyEngine = BlockPyEngine;
+    exports.AbstractInterpreter = AbstractInterpreter;
+    exports.NodeVisitor = NodeVisitor;
 }
