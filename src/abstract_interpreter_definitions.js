@@ -26,6 +26,20 @@ AbstractInterpreter.prototype.BUILTINS = {
             {"type": "Num", "optional": true}
         ]
     },
+    "max": {
+        "type": "Function",
+        "returns": {"type": "Num"},
+        "parameters": [
+            {"type": "Sequence"},
+        ]
+    },
+    "min": {
+        "type": "Function",
+        "returns": {"type": "Num"},
+        "parameters": [
+            {"type": "Sequence"},
+        ]
+    },
     "open": {
         "type": "Function",
         "returns": {"type": "File"},

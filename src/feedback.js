@@ -440,6 +440,10 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     if (suppress === true) {
         // Suppress all types of analyzer errors
         return false;
+    } else if (!suppress['Return outside function'] && report['Return outside function'].length >= 1) {
+        var first = report['Return outside function'][0];
+        this.semanticError("Return outside function", "You attempted to return outside of a function on line "+first.position.line+". But you can only return from within a function.", first.position.line)
+        return true;
     } else if (!suppress['Unconnected blocks'] && report["Unconnected blocks"].length >= 1) {
         var variable = report['Unconnected blocks'][0];
         this.semanticError("Unconnected blocks", "It looks like you have unconnected blocks on line "+variable.position.line+". Before you run your program, you must make sure that all of your blocks are connected and that there are no unfilled holes.", variable.position.line)

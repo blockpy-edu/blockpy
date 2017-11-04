@@ -1,6 +1,7 @@
 {
     "dependencies": {
         "jsdom": "latest",
-        "load-json-file": "^3.0.0"
+        "load-json-file": "^3.0.0",
+        "progress": "^2.0.0"
     }
 }

@@ -94,6 +94,7 @@ AbstractInterpreter.prototype.newReport = function(parentFrame) {
             "Iteration variable is iteration list": [],
             "Unknown functions": [],
             "Incompatible types": [],
+            "Return outside function": [],
             'Read out of scope': []
         }
 }
@@ -224,6 +225,7 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 for (var i = 0, len = nodes.length; i < len; i += 1) {
                     var node = nodes[i];
+                    console.log(firstScope, node.scope, name);
                     if (firstScope === undefined) {
                         firstScope = node.scope;
                     } else if (!isInScope(firstScope, node.scope)) {
@@ -648,6 +650,9 @@ AbstractInterpreter.prototype.visit_FunctionDef = function(node) {
     this.currentScope = oldScope;
 }
 AbstractInterpreter.prototype.visit_Return = function(node) {
+    if (this.currentScope === null) {
+        this.report['Return outside function'].push({"position": this.getLocation(node)})
+    }
     this.setReturnVariable(this.currentScope, 
                            node.value ? this.typecheck(node.value) : {"type": "None"}, 
                            this.getLocation(node));

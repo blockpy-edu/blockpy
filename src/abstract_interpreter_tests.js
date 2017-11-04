@@ -135,6 +135,10 @@
         
         // List comprehensions
         ['a = [5 for x in range(100)]\nfor i in a:\n    5+i', ['Non-list iterations', 'Incompatible types'], []],
+        
+        // Return outside function
+        ['def x():\n    return 5\nx()', ['Return outside function'], []],
+        ['def x():\n    pass\nreturn 5\nx()', [], ['Return outside function']],
     ];
     
     var errors = 0;
