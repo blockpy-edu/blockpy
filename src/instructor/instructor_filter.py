@@ -18,9 +18,8 @@ def missing_if_in_for():
     for loop in loops:
         iter_prop = loop.target
         ifs = loop.find_all("If")
-        for if_block in ifs:
-            if if_block.has(iter_prop):
-                return False
+        if len(ifs) > 0:
+        	return False
     explain("The arrangement of decision and iteration is not correct for the filter pattern.<br><br><i>(missing_if_in_for)<i></br>")
     return True
 '''

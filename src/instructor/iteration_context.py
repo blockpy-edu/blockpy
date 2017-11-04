@@ -1027,11 +1027,11 @@ def plot_group_error():
     elif len(output[0]) != 1:
         explain("You should only be plotting one thing!<br><br><i>(one_plot)<i></br>")
         return True
-def all_labels_present():
+def all_labels_present():#TODO: make sure it's before the show, maybe check for default values
     x_labels = len(find_function_calls("xlabel"))
     y_labels = len(find_function_calls("ylabel"))
     titles = len(find_function_calls("title"))
     if x_labels < 1 or y_labels < 1 or titles < 1:
-        explain("Make sure you supply labels to all your axes and provide a title")
+        explain("Make sure you supply labels to all your axes and provide a title<br><br><i>(labels_present)<i></br>")
         return False
     return True
