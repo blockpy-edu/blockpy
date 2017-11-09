@@ -225,7 +225,6 @@ AbstractInterpreter.prototype.postProcess = function() {
                 }
                 for (var i = 0, len = nodes.length; i < len; i += 1) {
                     var node = nodes[i];
-                    console.log(firstScope, node.scope, name);
                     if (firstScope === undefined) {
                         firstScope = node.scope;
                     } else if (!isInScope(firstScope, node.scope)) {
