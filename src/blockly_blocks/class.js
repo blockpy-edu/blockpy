@@ -44,8 +44,8 @@ Blockly.Blocks['attribute_access'] = {
 };
 
 Blockly.Python['attribute_access'] = function(block) {
-  var value_module = Blockly.Python.valueToCode(block, 'MODULE', Blockly.Python.ORDER_ATOMIC);
-  var value_name = Blockly.Python.valueToCode(block, 'NAME', Blockly.Python.ORDER_ATOMIC);
+  var value_module = Blockly.Python.valueToCode(block, 'MODULE', Blockly.Python.ORDER_MEMBER);
+  var value_name = Blockly.Python.valueToCode(block, 'NAME', Blockly.Python.ORDER_MEMBER);
   // TODO: Assemble JavaScript into code variable.
   var code = value_module+'.'+value_name;
   // TODO: Change ORDER_NONE to the correct strength.
