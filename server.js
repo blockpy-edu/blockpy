@@ -93,10 +93,12 @@ datasets.forEach(slug => {
     require('./data_analysis/corgis/'+slug+'_dataset.js')
 });
 
+console.log(AbstractInterpreter.MODULES)
+
 // Actual work
 final_result = []
 loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions => {
-    loadJsonFile('data_analysis/f17_ct_posts.json').then(data => {
+    loadJsonFile('data_analysis/f17_ct_posts_short.json').then(data => {
         subs = data.submissions;
         var next = function(subi, stui) {
             processSub(subs[subi][stui], function() {
@@ -108,7 +110,7 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 if (subi < subs.length) {
                     next(subi, stui);
                 } else {
-                    fs.writeFile('./data_analysis/f17_ct_processed.json', 
+                    fs.writeFile('./data_analysis/f17_ct_processed_new.json', 
                                  JSON.stringify(final_result), 
                                  {'spaces':2}, 
                                  function (err) {
