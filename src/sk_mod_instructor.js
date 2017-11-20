@@ -46,6 +46,24 @@ var $sk_mod_instructor = function(name) {
         throw new Sk.builtin.GracefulExit();
     });
     /**
+     * Mark problem as partially completed
+     */
+    mod.give_partial = new Sk.builtin.func(function(value, message) {
+        Sk.builtin.pyCheckArgs("give_partial", arguments, 1, 2);
+        Sk.builtin.pyCheckType("value", "float", Sk.builtin.checkFloat(value));
+        value = Sk.ffi.remapToJs(value);
+        if (message != undefined) {
+            Sk.builtin.pyCheckType("message", "string", Sk.builtin.checkString(message));
+            message = Sk.ffi.remapToJs(message);
+        } else {
+            message = '';
+        }
+        if (!Sk.executionReports.instructor.partials){
+            Sk.executionReports.instructor.partials = [];
+        }
+        Sk.executionReports.instructor.partials.push({'value': value, 'message': message});
+    });
+    /**
      * Let user know about an issue
      */
     mod.explain = new Sk.builtin.func(function(message, priority, line) {
