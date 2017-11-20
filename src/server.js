@@ -119,13 +119,14 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
     }
 }
 
-BlockPyServer.prototype.markSuccess = function(success, callback) {
+BlockPyServer.prototype.markSuccess = function(success, callback, hide_correctness) {
     var model = this.main.model;
     var server = this;
     if (model.server_is_connected('save_success')) {
         var data = this.createServerData();
         data['code'] = model.programs.__main__;
         data['status'] = success;
+        data['hide_correctness'] = hide_correctness;
         this.main.components.editor.getPngFromBlocks(function(pngData, img) {
             data['image'] = pngData;
             if (img.remove) {
