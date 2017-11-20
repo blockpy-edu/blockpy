@@ -287,7 +287,13 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
             if (result == 'success' || result == 'no errors') {
                 engine.main.components.server.markSuccess(1.0, model.settings.completedCallback);
             } else {
-                engine.main.components.server.markSuccess(0.0, model.settings.completedCallback);
+                var success_level = 0;
+                var partials = Sk.executionReports.instructor.partials;
+                for (var i = 0, len = partials.length; i < len; i = i+1) {
+                    success_level = success_level + partials[i].value;
+                }
+                success_level = Math.max(0.0, Math.min(1.0, success_level));
+                engine.main.components.server.markSuccess(success_level, model.settings.completedCallback);
             }
             model.execution.status("complete");
             if (afterwards !== undefined) {
