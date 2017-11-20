@@ -373,13 +373,14 @@ BlockPyFeedback.prototype.presentFeedback = function() {
         //this.compliment(report['instructor'].compliments);
         console.log(report['instructor'].compliments);
     }
-    if (complaint && complaint.length) {
+    if (suppress['instructor'] !== true && complaint && complaint.length) {
         complaint.sort(BlockPyFeedback.sortPriorities);
         this.instructorFeedback(complaint[0].name, complaint[0].message, complaint[0].line);
         return 'instructor';
     }
     // Analyzer
-    if (suppress['analyzer'] !== true) {//if a subtype is specified, or no suppression requested, present feedback
+    if (!report['instructor'].hide_correctness &&
+        suppress['analyzer'] !== true) {//if a subtype is specified, or no suppression requested, present feedback
         if (!report['analyzer'].success) {
             this.internalError(report['analyzer'].error, "Analyzer Error", "Error in analyzer. Please show the above message to an instructor!");
             return 'analyzer';
@@ -396,15 +397,20 @@ BlockPyFeedback.prototype.presentFeedback = function() {
             return 'student';
         }
     }
+    // No instructor feedback if hiding correctness
+    if (report['instructor'].hide_correctness == true) {
+        this.noErrors()
+        return 'no errors';
+    }
     // Gentle instructor feedback
-    if (gentleComplaints.length) {
+    if (suppress['instructor'] !== true && gentleComplaints.length) {
         this.instructorFeedback(gentleComplaints[0].name, 
                                 gentleComplaints[0].message, 
                                 gentleComplaints[0].line);
         return 'instructor';
     }
     //instructor completion flag
-    if (report['instructor'].complete) {
+    if (suppress['instructor'] !== true && report['instructor'].complete) {
         this.complete();
         return 'success';
     }

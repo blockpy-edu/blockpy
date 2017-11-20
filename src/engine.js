@@ -284,16 +284,19 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 engine.main.components.toolbar.notifyFeedbackUpdate();
             }
             var result = feedback.presentFeedback();
-            if (result == 'success' || result == 'no errors') {
-                engine.main.components.server.markSuccess(1.0, model.settings.completedCallback);
-            } else {
-                var success_level = 0;
-                var partials = Sk.executionReports.instructor.partials;
+            var hide_correctness = !!Sk.executionReports.instructor.hide_correctness;
+            var success_level = 0;
+            var partials = Sk.executionReports.instructor.partials;
+            if (partials) {
                 for (var i = 0, len = partials.length; i < len; i = i+1) {
                     success_level = success_level + partials[i].value;
                 }
-                success_level = Math.max(0.0, Math.min(1.0, success_level));
-                engine.main.components.server.markSuccess(success_level, model.settings.completedCallback);
+            }
+            success_level = Math.max(0.0, Math.min(1.0, success_level));
+            if (result == 'success') {
+                engine.main.components.server.markSuccess(1.0, model.settings.completedCallback, hide_correctness);
+            } else {
+                engine.main.components.server.markSuccess(success_level, model.settings.completedCallback, hide_correctness);
             }
             model.execution.status("complete");
             if (afterwards !== undefined) {
@@ -350,6 +353,7 @@ BlockPyEngine.prototype.resetReports = function() {
     suppress['parser'] = false;
     suppress['analyzer'] = false;
     suppress['student'] = false;
+    suppress['instructor'] = false;
     suppress['no errors'] = false;
 }
 

@@ -63,6 +63,11 @@ var $sk_mod_instructor = function(name) {
         }
         Sk.executionReports.instructor.partials.push({'value': value, 'message': message});
     });
+    
+    mod.hide_correctness = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("hide_correctness", arguments, 0, 0);
+        Sk.executionReports.instructor.hide_correctness = true;
+    });
     /**
      * Let user know about an issue
      */
