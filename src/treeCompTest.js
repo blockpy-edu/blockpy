@@ -11,6 +11,7 @@ print(_accu_)
 function parseCode(studentCode){
 	var stdAST;
 	try{
+		Sk.python3 = true;
 	    var studentParse = Sk.parse(filename,studentCode);
 	    stdAST = Sk.astFromParse(studentParse.cst, filename, studentParse.flags);
 	    stdAST = new EasyNode(stdAST, "none");
@@ -21,6 +22,7 @@ function parseCode(studentCode){
 }
 function testShallowMatch(){
 	console.log("TESTING VAR MATCH");
+	var failCount = 0;
 	//tests whether variables are stored correctly
 	var testTree = new StretchyTreeMatcher("_accu_ = 0");
 
@@ -39,10 +41,12 @@ function testShallowMatch(){
 	if(!(mapping.mappings.keys[0] == insNameNode.astNode)){
 		console.error("ins node match not correct in _var_ case");
 		debugPrint = true;
+		failCount++;
 	}
 	if(!(mapping.mappings.values[0] == stdNameNode.astNode)){
 		console.error("std node match not correct in _var_ case");
 		debugPrint = true;
+		failCount++;
 	}
 	if(debugPrint){
 		console.log(testTree);
@@ -69,10 +73,12 @@ function testShallowMatch(){
 	debugPrint = false;
 	if(!(mapping.symbolTable.keys[0] == "__exp__")){
 		debugPrint = true;
+		failCount++;
 		console.error("symbol match not found");
 	}
 	if(!(mapping.symbolTable.values[0] == stdForLoop.astNode)){
 		debugPrint = true;
+		failCount++;
 		console.error("did not match to correct ast node");
 	}
 	if(debugPrint){
@@ -101,6 +107,7 @@ function testShallowMatch(){
 			mapping.mappings.values[0] != stdForLoop.astNode)){
 		console.error("wild card match didn't match");
 		debugPrint = true;
+		failCount++;
 	}
 	if(debugPrint){
 		console.log(testTree);
@@ -125,34 +132,42 @@ function testShallowMatch(){
 		if(mapping.mappings.keys[0] != insNumNode.astNode){
 			console.error("ins node not matched correctly");
 			debugPrint = true;
+			failCount++;
 		}
 		if(mapping.mappings.values[0] != stdNumNode.astNode){
 			console.error("student node not matched correctly");
 			debugPrint = true;
+			failCount++;
 		}
 	}else{
 		console.error("Match not found");
 		debugPrint = true;
+		failCount++;
 	}
 	if(debugPrint){
 		console.log(testTree);
 		console.log(stdNumNode);
 		console.log(mapping);
 	}
+	return failCount;
 }
 
 function testGenericMatch(){
 	console.log("TESTING SAME ORDER");
+	var failCount = 0;
 	var stdCode = "_sum = 0\nlist = [1,2,3,4]\nfor item in list:\n    _sum = _sum + item\nprint(_sum)";
 	var insCode = "_accu_ = 0\n_iList_ = __listInit__\nfor _item_ in _iList_:\n    _accu_ = _accu_ + _item_\nprint(_accu_)";
+	//var stdCode = "_sum = 12 + 13";
+	//var insCode = "_accu_ = 12 + 11";
 	var insTree = new StretchyTreeMatcher(insCode);
 	var insAST = insTree.rootNode;
 	var stdAST = parseCode(stdCode);
 
 	var mappings = insTree.findMatches(stdAST.astNode);
-	var debugPrint = true;
-	if(mappings.mappings.size() != 17 && mappings.mappings.size() != 19){
+	var debugPrint = false;
+	if(mappings.mappings.size() != 19){
 		debugPrint = true;
+		failCount++;
 		console.error("incorrect number of mappings found");
 	}
 	if(mappings.symbolTable.size() != 3 ||
@@ -160,6 +175,7 @@ function testGenericMatch(){
 		mappings.symbolTable.values[1].length != 2 ||
 		mappings.symbolTable.values[2].length != 2){
 		debugPrint = true;
+		failCount++;
 		console.error("inconsistent symbol matching");
 	}
 	if(debugPrint){
@@ -167,10 +183,12 @@ function testGenericMatch(){
 		console.log(insAST.astNode);
 		console.log(stdAST.astNode);
 	}
+	return failCount;
 }
 
 function testManyToOne(){
 	console.log("TESTING MANY TO ONE");
+	var failCount = 0;
 	var stdCode = "_sum = 0\nlist = [1,2,3,4]\nfor item in list:\n    _sum = _sum + item\nprint(_sum)";
 	var insCode = "_accu_ = 0\n_iList_ = __listInit__\nfor _item_ in _iList_:\n    _accu_ = _accu2_ + _item_\nprint(_accu_)";
 	var insTree = new StretchyTreeMatcher(insCode);
@@ -179,17 +197,37 @@ function testManyToOne(){
 
 
 	var mappings = insTree.findMatches(stdAST.astNode);
-
-	if(mappings.conflictKeys.length != 0){
-		console.error("Conflicting keys when there shouldn't be");
+	var debugPrint = false;
+	if(mappings){
+		if(mappings.conflictKeys.length != 0){
+			console.error("Conflicting keys when there shouldn't be");
+			debugPrint = true;
+			failCount++;
+		}
+		if(mappings.symbolTable.size() != 4 ||
+			mappings.symbolTable.values[0].length != 3 ||
+			mappings.symbolTable.values[1].length != 2 ||
+			mappings.symbolTable.values[2].length != 2 ||
+			mappings.symbolTable.values[3].length != 1){
+			debugPrint = true;
+			failCount++;
+			console.error("inconsistent symbol matching");
+		}
+	}else{
+		debugPrint = true;
+		console.log("no mapping found");
+	}
+	if(debugPrint){
 		console.log(insAST.astNode);
 		console.log(stdAST.astNode);
 		console.log(mappings);
 	}
+	return failCount;
 }
 
 function testCommutativity(){
 	console.log("TESTING COMMUTATIVITY ADDITION");
+	var failCount = 0;
 	var stdCode = "_sum = 0\nlist = [1,2,3,4]\nfor item in list:\n    _sum = item + _sum\nprint(_sum)";
 	var insCode = "_accu_ = 0\n_iList_ = __listInit__\nfor _item_ in _iList_:\n    _accu_ = _accu_ + _item_\nprint(_accu_)";
 	var insTree = new StretchyTreeMatcher(insCode);
@@ -200,6 +238,7 @@ function testCommutativity(){
 	var debugPrint = false;
 	if(mappings.conflictKeys.length != 0){
 		debugPrint = true;
+		failCount++;
 		console.error("Conflicting keys in ADDITION when there shouldn't be");
 	}
 	if(debugPrint){
@@ -210,12 +249,15 @@ function testCommutativity(){
 	debugPrint = false;
 }
 
+function testOneToMany(){
+	console.error("Need to assert when there are conflicting errors");
+}
 function runTreeCompTestSuite(){
 	testShallowMatch();
 	testGenericMatch();
 	testManyToOne();
-	testCommutativity();
-	
+	//testCommutativity();
+	testOneToMany();
 }
 
 runTreeCompTestSuite();
