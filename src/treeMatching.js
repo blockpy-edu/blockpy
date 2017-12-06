@@ -95,6 +95,7 @@ ASTMap.prototype.addVarToSymbolTable = function(insNode, stdNode){
 		newList = [value];
 	}
 	this.symbolTable.set(key, newList);
+	return this.conflictKeys.length;
 }
 ASTMap.prototype.addExpToSymbolTable = function(insNode, stdNode){
 	var key = Sk.ffi.remapToJs(insNode.astNode.id);
@@ -104,6 +105,27 @@ ASTMap.prototype.addExpToSymbolTable = function(insNode, stdNode){
 ASTMap.prototype.addNodePairing = function(insNode, stdNode){
 	this.mappings.set(insNode.astNode, stdNode.astNode);
 }
+ASTMap.prototype.hasConflicts = function(){
+	return this.conflictKeys.length > 0;
+}
+/**
+	Returns a newly merged map consisting of this and other
+	without modifying this.
+	@param {ASTMap} other - the other ASTMap to be merged with
+	@return this modified by adding the contents of other
+**/
+ASTMap.prototype.newMergedMap = function(other){
+	var newMap = new ASTMap();
+	newMap.mergeMapWith(this);
+	newMap.mergeMapWith(other);
+	return newMap;
+}
+/**
+	Returns a newly merged map consisting of this and other
+	by modifying this
+	@param {ASTMap} other - the other ASTMap to be merged with
+	@return this modified by adding the contents of other
+**/
 ASTMap.prototype.mergeMapWith = function(other){
 	//TODO: check if other is also an ASTMap.
 	//merge all mappings
@@ -205,6 +227,62 @@ StretchyTreeMatcher.prototype.anyNodeMatch = function(insNode, stdNode){
 	@return a mapping of nodes and a symbol table mapping insNode to stdNode
 **/
 StretchyTreeMatcher.prototype.deep_findMatch = function(insNode, stdNode){
+	var method_name = "deep_findMatch_" + insNode.astNode._astname;
+	if(method_name in this){
+		return this[method_name](insNode, stdNode);
+	}else{
+		return this.deep_findMatch_generic(insNode, stdNode);
+	}
+}
+StretchyTreeMatcher.prototype.deep_findMatch_BinOp = function(insNode, stdNode){
+	var op = insNode.astNode.op;
+	op = op.toString();
+	op = op.substring(("function").length + 1, op.length - 4);
+	var isGeneric = !(op === "Mult" || op === "Add");
+	if(isGeneric){
+		return this.deep_findMatch_generic(insNode, stdNode);
+	}else{
+		return this.deep_findMatch_BinFlex(insNode, stdNode);
+	}
+}
+/**
+TODO: possibly make this more generic for a multiflex?
+**/
+StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode){
+	//return this.deep_findMatch_generic(insNode, stdNode);//TODO: delete this line
+	var baseMappings = this.shallowMatch(insNode, stdNode);
+	if (baseMappings){
+		//only two children because it's a binop
+		var insLeft = insNode.children[0];//insChild
+		var insRight = insNode.children[1];//insChild
+		var stdLeft = stdNode.children[0];//stdChild
+		var stdRight = stdNode.children[1];//stdChild
+		//case 1: insLeft->stdLeft and insRight->stdRight
+		var mapLeft = this.deep_findMatch(insLeft, stdLeft);
+		var mapRight = this.deep_findMatch(insRight, stdRight);
+		var mergedMaps = null;
+		if(mapLeft && mapRight){
+			mergedMaps = baseMappings.newMergedMap(mapLeft);
+			mergedMaps.mergeMapWith(mapRight);
+		}
+		if(mergedMaps && !mergedMaps.hasConflicts()){
+			return mergedMaps;
+		}
+		//case 2: insLeft->stdRight and insRight->stdLeft
+		mapLeft = this.deep_findMatch(insLeft, stdRight);
+		mapRight = this.deep_findMatch(insRight, stdLeft);
+		if(mapLeft && mapRight){
+			mergedMaps = baseMappings.newMergedMap(mapLeft);
+			mergedMaps.mergeMapWith(mapRight);
+		}
+		if(mergedMaps && !mergedMaps.hasConflicts()){
+			return mergedMaps;
+		}
+		return false;
+	}
+	return false;
+}
+StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode){
 	var baseMappings = this.shallowMatch(insNode, stdNode);
 	if (baseMappings){
 		//base case this runs 0 times because no children
@@ -218,8 +296,11 @@ StretchyTreeMatcher.prototype.deep_findMatch = function(insNode, stdNode){
 				var stdChild = stdNode.children[j];
 				var newMapping = this.deep_findMatch(insChild, stdChild);
 				if (newMapping){
-					baseMappings.mergeMapWith(newMapping);
-					matches = true;
+					var mergedMaps = baseMappings.newMergedMap(newMapping);
+					matches = !mergedMaps.hasConflicts();
+					if(matches){
+						baseMappings = mergedMaps;
+					}
 				}
 			}
 			if (!matches){
