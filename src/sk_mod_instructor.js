@@ -263,28 +263,9 @@ var $sk_mod_instructor = function(name) {
             }
         }
         visitor.visit(ast);
+        console.log(flatTree);
     }
-    /**
-     * This function checks if the given object is one of the Sk.builtin objects
-     * TODO: make this so we don't have to explicitly put out every option
-     *          one possible thing we could do is get a string version of the 
-     *          of the constructor and look for the substring "return new Sk.builtin"
-     *          But I don't know how reliable that is.  Rather, it's kind of hackish.
-     * @param {object} obj - the object to be examined
-     * @return {boolean} true if the object is one of the Sk.builtin types
-    **/
-    function isSkBuiltin(obj){
-        return (obj instanceof Sk.builtin.dict) ||
-            (obj instanceof Sk.builtin.list) ||
-            (obj instanceof Sk.builtin.tuple) ||
-            (obj instanceof Sk.builtin.bool) ||
-            (obj instanceof Sk.builtin.int_) ||
-            (obj instanceof Sk.builtin.float_) ||
-            (obj instanceof Sk.builtin.str) ||
-            (obj instanceof Sk.builtin.lng);
-        //var cons_str = obj.constructor + "";
-        //return cons_str.indexOf("return new Sk.builtin") !== -1;
-    }
+
     /**
      * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
      * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
@@ -720,7 +701,7 @@ var $sk_mod_instructor = function(name) {
                     for(var i = 0; i < field.length; i++){
                         var subfield = field[i];
                         //if AST node, use callism and push new object
-                        if(subfield instanceof Object && "_astname" in subfield){//an AST node)
+                        if(isAstNode(subfield)){//an AST node)
                             var childId = flatTree.indexOf(subfield);//get the relevant node
                             fieldArray.push(Sk.misceval.callsimOrSuspend(mod.AstNode, childId));
                         }else{//else smart remap
@@ -733,7 +714,7 @@ var $sk_mod_instructor = function(name) {
                     return new Sk.builtin.list(fieldArray);
                 } else if (isSkBuiltin(field)){//probably already a python object
                     return field;
-                } else if (field instanceof Object && "_astname" in field){//an AST node
+                } else if (isAstNode(field)){//an AST node
                     var childId = flatTree.indexOf(field);//get the relevant node
                     return Sk.misceval.callsimOrSuspend(mod.AstNode, childId);
                 } else {
