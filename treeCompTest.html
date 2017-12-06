@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>BlockPy Replay</title>
+    <title>Tree Comp Test</title>
     
     <link rel="stylesheet" href="libs/bootstrap.min.css">
     <link rel="stylesheet" href="libs/codemirror/codemirror.css">
@@ -85,7 +85,7 @@
     <script type="text/javascript" src="src/sk_mod_instructor.js"></script>
     <script type="text/javascript" src="src/engine.js"></script>
     <script type="text/javascript" src="src/main.js"></script>
-    
+    <script type="text/javascript" src="src/treeCompTest.js"></script>
     <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
@@ -102,7 +102,7 @@
             'developer': true,
             'editor': 'Text',
             'urls': {
-                'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
+                //'import_datasets': 'https://think.cs.vt.edu/blockpy/load_corgis/',
                 //'walk_old_code': 'http://localhost:8000/walk_code/',
                 //'log_event': 'http://localhost:8000/save_events/'
                 /*'save_code': 'http://localhost:8000/save_code/',
@@ -133,7 +133,7 @@
             },
             // programs
             {
-                '__main__': 'import matplotlib.pyplot as plt\nquakes = [1,2,3,4]\nquakes_in_miles = []\nfor quake in quakes:\n    quakes_in_miles.append(quake * 0.62)\nplt.hist(quakes_in_miles)\nplt.xlabel("Depth in Miles")\nplt.ylabel("Number of Earthquakes")\nplt.title("Distribution of Depth in Miles of Earthquakes")\nplt.show()\n'
+                '__main__': ''
             }
         )
         
@@ -214,6 +214,10 @@
 
         $('#backward-button').click(function() {
             backEvent();
+        });
+
+        $('#test-button').click(function() {
+            runTreeCompTestSuite();
         });
         
         function handleCodeEvents(record){
@@ -368,6 +372,7 @@
     <button type='button' class='btn btn-submit' id='pause-button'>Pause</button>
     <button type='button' class='btn btn-submit' id='backward-button'>Backward</button>
     <button type='button' class='btn btn-submit' id='forward-button'>Forward</button>
+    <button type='button' class='btn btn-submit' id='test-button'>Test</button>
     KeyNavigation: <input type="checkbox" id="myCheck" checked="check">
     <input type="range" id="speed-slider" value="50" min="1" max="100">
     <p id="sliderValue" value="50"></p>

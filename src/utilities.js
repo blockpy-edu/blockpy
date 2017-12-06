@@ -142,3 +142,30 @@ function moveElements(source, target, moveCheck) {
         }
     } 
 }
+
+/**
+ * This function checks if the given object is one of the Sk.builtin objects
+ * TODO: make this so we don't have to explicitly put out every option
+ *          one possible thing we could do is get a string version of the 
+ *          of the constructor and look for the substring "return new Sk.builtin"
+ *          But I don't know how reliable that is.  Rather, it's kind of hackish.
+ *          Should tehoretically belong in Sk.ffi
+ * @param {object} obj - the object to be examined
+ * @return {boolean} true if the object is one of the Sk.builtin types
+**/
+function isSkBuiltin(obj){
+    return (obj instanceof Sk.builtin.dict) ||
+        (obj instanceof Sk.builtin.list) ||
+        (obj instanceof Sk.builtin.tuple) ||
+        (obj instanceof Sk.builtin.bool) ||
+        (obj instanceof Sk.builtin.int_) ||
+        (obj instanceof Sk.builtin.float_) ||
+        (obj instanceof Sk.builtin.str) ||
+        (obj instanceof Sk.builtin.lng);
+    //var cons_str = obj.constructor + "";
+    //return cons_str.indexOf("return new Sk.builtin") !== -1;
+}
+
+function isAstNode(obj){
+    return obj instanceof Object && "_astname" in obj;
+}
