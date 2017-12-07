@@ -245,40 +245,44 @@ StretchyTreeMatcher.prototype.deep_findMatch_BinOp = function(insNode, stdNode){
 		return this.deep_findMatch_BinFlex(insNode, stdNode);
 	}
 }
-/**
-TODO: possibly make this more generic for a multiflex?
-**/
 StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode){
+	//TODO: implement this properly
 	//return this.deep_findMatch_generic(insNode, stdNode);//TODO: delete this line
 	var baseMappings = this.shallowMatch(insNode, stdNode);
-	if (baseMappings){
-		//only two children because it's a binop
-		var insLeft = insNode.children[0];//insChild
-		var insRight = insNode.children[1];//insChild
-		var stdLeft = stdNode.children[0];//stdChild
-		var stdRight = stdNode.children[1];//stdChild
+	if(baseMappings){
+		var insLeft = insNode.children[0];
+		var insRight = insNode.children[1];
+		var stdLeft = stdNode.children[0];
+		var stdRight = stdNode.children[1];
+		var newMappings = [];
 		//case 1: insLeft->stdLeft and insRight->stdRight
-		var mapLeft = this.deep_findMatch(insLeft, stdLeft);
-		var mapRight = this.deep_findMatch(insRight, stdRight);
-		var mergedMaps = null;
-		if(mapLeft && mapRight){
-			mergedMaps = baseMappings.newMergedMap(mapLeft);
-			mergedMaps.mergeMapWith(mapRight);
-		}
-		if(mergedMaps && !mergedMaps.hasConflicts()){
-			return mergedMaps;
+		var caseLeft = this.deep_findMatch(insLeft, stdLeft);
+		var caseRight = this.deep_findMatch(insRight, stdRight);
+		if(caseLeft && caseRight){
+			for(var i = 0; i < caseLeft.length; i += 1){
+				var newMap = baseMappings[0].newMergedMap(caseLeft[i]);
+				for(var j = 0; j < caseRight.length; j += 1){
+					var both = newMap.newMergedMap(caseRight[j]);
+					newMappings.push(both);
+				}
+			}
 		}
 		//case 2: insLeft->stdRight and insRight->stdLeft
-		mapLeft = this.deep_findMatch(insLeft, stdRight);
-		mapRight = this.deep_findMatch(insRight, stdLeft);
-		if(mapLeft && mapRight){
-			mergedMaps = baseMappings.newMergedMap(mapLeft);
-			mergedMaps.mergeMapWith(mapRight);
+		caseLeft = this.deep_findMatch(insLeft, stdRight);
+		caseRight = this.deep_findMatch(insRight, stdLeft);
+		if(caseLeft && caseRight){
+			for(var i = 0; i < caseLeft.length; i += 1){
+				var newMap = baseMappings[0].newMergedMap(caseLeft[i]);
+				for(var j = 0; j < caseRight.length; j += 1){
+					var both = newMap.newMergedMap(caseRight[j]);
+					newMappings.push(both);
+				}
+			}
 		}
-		if(mergedMaps && !mergedMaps.hasConflicts()){
-			return mergedMaps;
+		if(newMappings.length == 0){
+			return false;
 		}
-		return false;
+		return newMappings;
 	}
 	return false;
 }
@@ -287,29 +291,73 @@ StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode
 	if (baseMappings){
 		//base case this runs 0 times because no children
 		//find each child of insNode that matches IN ORDER
-		var j = 0;
+		var runningMaps = baseMappings;
+		var baseSibs = [-1];
+		var runningSibs = [-1];
+		var youngestSib = 0;
+		//for each child
 		for(var i = 0; i < insNode.children.length; i += 1){
+			//make a new set of maps
+			runningMaps = [];
+			runningSibs = [];
 			var insChild = insNode.children[i];
-			matches = false
-			//@TODO: make this multimatch (get rid of !matches)
-			for(;j < stdNode.children.length && !matches; j += 1){
+			//accumulate all potential matches for current child
+			for(var j = youngestSib; j < stdNode.children.length; j += 1){
 				var stdChild = stdNode.children[j];
 				var newMapping = this.deep_findMatch(insChild, stdChild);
 				if (newMapping){
-					var mergedMaps = baseMappings.newMergedMap(newMapping);
-					matches = !mergedMaps.hasConflicts();
-					if(matches){
-						baseMappings = mergedMaps;
-					}
+					runningMaps.push(newMapping);
+					runningSibs.push(j);
 				}
 			}
-			if (!matches){
+			var mapUpdate = this.mapMerge(baseMappings, baseSibs, runningMaps, runningSibs);
+			if (mapUpdate == null){
 				return false;
 			}
+			baseMappings = mapUpdate.newMaps;
+			baseSibs = mapUpdate.newSibs;
+			youngestSib = mapUpdate.youngestSib;
 		}
 		return baseMappings;
 	}
 	return false;
+}
+StretchyTreeMatcher.prototype.mapMerge = function(baseMaps, baseSibs, runMaps, runSibs){
+	//no matching nodes were found
+	if(runMaps.length == 0){
+		return null;
+	}
+	var newMaps = [];
+	var newSibs = [];
+	var youngestSib = 0;
+	for(var i = 0; i < runMaps.length; i += 1){
+		var sib = runSibs[i];
+		var runMap = runMaps[i];
+		for(var k = 0; k < runMap.length; k++){
+			runMapSub = runMap[k];
+			for(var j = 0; j < baseMaps.length; j += 1){
+				if(sib > baseSibs[j]){
+					var baseMap = baseMaps[j];
+					var newMap = baseMap.newMergedMap(runMapSub);
+					if(!newMap.hasConflicts()){
+						newMaps.push(newMap);
+						newSibs.push(sib);
+						if(sib < youngestSib){
+							youngestSib = sib;
+						}
+					}
+				}
+			}
+		}
+	}
+	var mapUpdate = null;
+	if(newMaps.length != 0){
+		mapUpdate = new Object();
+		mapUpdate.newMaps = newMaps;
+		mapUpdate.newSibs = newSibs;
+		mapUpdate.youngestSib = youngestSib;
+	}
+	return mapUpdate;
 }
 /**
 	Flexibly matches a module node to a module or a body
@@ -319,7 +367,7 @@ StretchyTreeMatcher.prototype.shallowMatch_Module = function(insNode, stdNode){
 	if(stdNode.astNode._astname == "Module" || stdNode.field == "body"){
 		var mapping = new ASTMap();
 		mapping.addNodePairing(insNode, stdNode);
-		return mapping;
+		return [mapping];
 	}
 	return false;
 }
@@ -351,7 +399,7 @@ StretchyTreeMatcher.prototype.shallowMatch_Name = function(insNode, stdNode){
 	}
 	if(matched){
 		mapping.addNodePairing(insNode, stdNode);
-		return mapping;
+		return [mapping];
 	}//else
 	return this.shallowMatch_generic(insNode, stdNode);
 }
@@ -361,7 +409,8 @@ StretchyTreeMatcher.prototype.shallowMatch_Name = function(insNode, stdNode){
 **/
 StretchyTreeMatcher.prototype.shallowMatch_pass = function(insNode, stdNode){
 	var mapping = new ASTMap();
-	return mapping.addNodePairing(insNode, stdNode);
+	mapping.addNodePairing(insNode, stdNode)
+	return [mapping];
 }
 /**
 	Checks that all non astNode attributes are equal between insNode and stdNode
@@ -400,11 +449,13 @@ StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode){
 			}
 		}
 	}
+	var mapping = false;
 	if(isMatch){
-		isMatch = new ASTMap();//return MAPPING
-		isMatch.addNodePairing(insNode, stdNode);
+		mapping = new ASTMap();//return MAPPING
+		mapping.addNodePairing(insNode, stdNode);
+		mapping = [mapping];
 	}
-	return isMatch;
+	return mapping;
 }
 
 //filter function for various types of nodes
