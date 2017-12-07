@@ -416,7 +416,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     if (!suppress['no errors']) {
         this.noErrors()
-        return 'no errors';
+        return report['instructor'].complete ? 'success' : 'no errors';
     }
     return 'completed';
 }

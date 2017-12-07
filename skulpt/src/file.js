@@ -69,6 +69,10 @@ Sk.builtin.file.prototype["__exit__"] = new Sk.builtin.func(function __exit__(se
 
 Sk.builtin.file.prototype.tp$iter = function () {
     var allLines = this.lineList;
+    
+    if (self.closed) {
+        throw new Sk.builtin.ValueError("I/O operation on closed file");
+    }
 
     var ret =
     {
@@ -170,7 +174,7 @@ Sk.builtin.file.prototype["readline"] = new Sk.builtin.func(function readline(se
 
 Sk.builtin.file.prototype["readlines"] = new Sk.builtin.func(function readlines(self, sizehint) {
     if (self.fileno === 0) {
-        return new Sk.builtin.NotImplementedError("readlines ins't implemented because the web doesn't support Ctrl+D");
+        return new Sk.builtin.NotImplementedError("readlines isn't implemented because the web doesn't support Ctrl+D");
     }
 
     var i;
