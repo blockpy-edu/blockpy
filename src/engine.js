@@ -499,13 +499,13 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     instructorCode = (
         'from instructor import *\n'+
         'def run_student():\n'+
-        '    limit_execution_time()\n'+
+        //'    limit_execution_time()\n'+
         '    try:\n'+
         indent(indent(studentCode))+'\n'+
         '    except Exception as error:\n'+
-        '        unlimit_execution_time()\n'+
+        //'        unlimit_execution_time()\n'+
         '        return error\n'+
-        '    unlimit_execution_time()\n'+
+        //'    unlimit_execution_time()\n'+
         '    return None\n'+
         instructorCode
     );
