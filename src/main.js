@@ -483,6 +483,10 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     if (assignment.disable_algorithm_errors) {
         this.model.assignment['disable_algorithm_errors'](assignment.disable_algorithm_errors);
     }
+    if (settings.disable_timeout || assignment.disable_timeout) {
+        this.model.assignment['disable_timeout'](settings.disable_timeout || 
+                                                 assignment.disable_timeout);
+    }
     // Programs
     if (programs.__main__ !== undefined) {
         this.model.programs['__main__'](programs.__main__);
