@@ -57,6 +57,7 @@ CT_Map.prototype.size = function(){
 function ASTMap(){
 	this.mappings = new CT_Map();
 	this.symbolTable = new CT_Map();
+	this.expTable = new CT_Map();
 	this.conflictKeys = [];
 }
 
@@ -99,7 +100,7 @@ ASTMap.prototype.addVarToSymbolTable = function(insNode, stdNode){
 }
 ASTMap.prototype.addExpToSymbolTable = function(insNode, stdNode){
 	var key = Sk.ffi.remapToJs(insNode.astNode.id);
-	this.symbolTable.set(key, stdNode.astNode);
+	this.expTable.set(key, stdNode.astNode);
 }
 
 ASTMap.prototype.addNodePairing = function(insNode, stdNode){
@@ -132,6 +133,11 @@ ASTMap.prototype.mergeMapWith = function(other){
 	var otherMap = other.mappings;
 	for(var i = 0; i < otherMap.keys.length; i += 1){
 		this.mappings.set(otherMap.keys[i], otherMap.values[i]);
+	}
+	//merge all expressions
+	var otherExp = other.expTable;
+	for(var i = 0; i < otherExp.keys.length; i += 1){
+		this.expTable.set(otherExp.keys[i], otherExp.values[i]);
 	}
 	//merge all symbols
 	var otherSym = other.symbolTable;
@@ -179,7 +185,11 @@ function StretchyTreeMatcher(code){
 	}else{
 		astNode = code;
 	}
-	this.rootNode = new EasyNode(astNode, "none");
+	if(astNode == null){
+		this.rootNode = null;
+	}else{
+		this.rootNode = new EasyNode(astNode, "none");
+	}
 }
 
 
@@ -316,7 +326,7 @@ StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode
 			}
 			baseMappings = mapUpdate.newMaps;
 			baseSibs = mapUpdate.newSibs;
-			youngestSib = mapUpdate.youngestSib;
+			youngestSib = mapUpdate.youngestSib + 1;
 		}
 		return baseMappings;
 	}
@@ -329,24 +339,22 @@ StretchyTreeMatcher.prototype.mapMerge = function(baseMaps, baseSibs, runMaps, r
 	}
 	var newMaps = [];
 	var newSibs = [];
-	var youngestSib = 0;
-	for(var i = 0; i < runMaps.length; i += 1){
-		var sib = runSibs[i];
-		var runMap = runMaps[i];
-		for(var k = 0; k < runMap.length; k++){
-			runMapSub = runMap[k];
-			for(var j = 0; j < baseMaps.length; j += 1){
-				if(sib > baseSibs[j]){
-					var baseMap = baseMaps[j];
+	var youngestSib = runSibs[0];
+	for(var i = 0; i < baseMaps.length; i += 1){
+		var baseMap = baseMaps[i];
+		var baseSib = baseSibs[i];
+		for(var j = 0; j < runMaps.length; j += 1){
+			var runMap = runMaps[j];
+			var runSib = runSibs[j];
+			if(runSib > baseSib){
+				for(var k = 0; k < runMap.length; k += 1){
+					var runMapSub = runMap[k];
 					var newMap = baseMap.newMergedMap(runMapSub);
 					if(!newMap.hasConflicts()){
 						newMaps.push(newMap);
-						newSibs.push(sib);
-						if(sib < youngestSib){
-							youngestSib = sib;
-						}
+						newSibs.push(runSib);
 					}
-				}
+				}	
 			}
 		}
 	}
@@ -417,8 +425,8 @@ StretchyTreeMatcher.prototype.shallowMatch_pass = function(insNode, stdNode){
 	@return a mappin gof insNode to stdNode, or false, if the attributes aren't equal
 **/
 StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode){
-	ins = insNode.astNode;
-	std = stdNode.astNode;
+	var ins = insNode.astNode;
+	var std = stdNode.astNode;
 	var insFieldList = iter_fields(ins);
 	var stdFieldList = iter_fields(std);
 	var isMatch = insFieldList.length === stdFieldList.length && ins._astname === std._astname;
@@ -437,7 +445,7 @@ StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode){
 		if(!(Array === stdValue.constructor)){
 			stdValue = [stdValue];
 		}
-		isMatch = insValue.length === stdValue.length;
+		//isMatch = insValue.length === stdValue.length;//for stretchy matching this isn't true
 		//Reference ast_node_visitor.js for the original behavior and keep note of it for the purposes of handling the children noting the special case when the nodes of the array are actually parameters of the node (e.g. a load function) instead of a child node
 		for (var j = 0; j < insValue.length && isMatch; j += 1) {
 			var insSubvalue = insValue[j];
