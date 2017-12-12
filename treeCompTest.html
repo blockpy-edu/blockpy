@@ -219,7 +219,29 @@
         $('#test-button').click(function() {
             runTreeCompTestSuite();
         });
-        
+        $('#parse-button').click(function() {
+            var code = $('#replay-data').val().split(/\n#==========\n/);
+            var stdCode = null;
+            var insCode = null;
+            var insTree = null;
+            var insAST = null;
+            var stdAST = null;
+            var mappings = null;
+            try{
+                stdCode = code[0];
+                insCode = code[1];
+                insTree = new StretchyTreeMatcher(insCode);
+                insAST = insTree.rootNode;
+                stdAST = parseCode(stdCode);
+                mappings = null;
+                mappings = insTree.findMatches(stdAST.astNode);
+            }catch(exception){
+                console.error("parse failed");
+            }
+            console.log(insAST);
+            console.log(stdAST);
+            console.log(mappings);            
+        });
         function handleCodeEvents(record){
             switch (record.action.toLowerCase()) {
                 case "set":
@@ -367,15 +389,16 @@
 <body>
 <div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
     <!-- Replay stuff -->
-    <textarea class="form-control" rows="3" id='replay-data'></textarea>
+    <textarea class="form-control" rows="10" id='replay-data'></textarea>
     <button type='button' class='btn btn-submit' id='replay-button'>Replay</button>
     <button type='button' class='btn btn-submit' id='pause-button'>Pause</button>
     <button type='button' class='btn btn-submit' id='backward-button'>Backward</button>
     <button type='button' class='btn btn-submit' id='forward-button'>Forward</button>
-    <button type='button' class='btn btn-submit' id='test-button'>Test</button>
     KeyNavigation: <input type="checkbox" id="myCheck" checked="check">
     <input type="range" id="speed-slider" value="50" min="1" max="100">
     <p id="sliderValue" value="50"></p>
+    <button type='button' class='btn btn-submit' id='test-button'>Test</button>
+    <button type='button' class='btn btn-submit' id='parse-button'>Parse</button>
     <div id="blockpy-div" style='height:100%'></div>
 </div>
 

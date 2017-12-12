@@ -169,3 +169,60 @@ function isSkBuiltin(obj){
 function isAstNode(obj){
     return obj instanceof Object && "_astname" in obj;
 }
+
+/**
+ * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
+ * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
+ * cases where the types in obj are a mix of python SIMPLE objects and SIMPLE normal javascript objects
+ * @param {object} obj - the object to be converted
+ * @return {Sk.builtin.???} - returns the corresponding python object, dropping all functions and things it can't convert
+**/
+function mixedRemapToPy(obj){
+    var k;
+    var kvs;
+    var i;
+    var arr;
+    //@TODO: should theoretically check if the object is a pyhon dict or array with js objects
+    if (isSkBuiltin(obj)){
+        //object is already python ready
+        return obj;
+    } else if (Object.prototype.toString.call(obj) === "[object Array]") {
+        //object is actually a javascript array
+        arr = [];
+        for (i = 0; i < obj.length; ++i) {
+            //for each object, convert it to a python object if it isn't one already
+            var subval = obj[i];
+            if(!isSkBuiltin(subval)){
+                arr.push(mixedRemapToPy(subval));
+            }else{
+                arr.push(subval)
+            }
+        }
+        return new Sk.builtin.list(arr);
+    } else if (obj === null) {//null object
+        return Sk.builtin.none.none$;
+    } else if (typeof obj === "object") {
+        if(!isSkBuiltin(obj)){
+            //assuming it's a standard dictionary
+            kvs = [];//Sk.builtin.dict uses an array of key-value,key-value...
+            for (k in obj) {
+                //convert the key if it needs to be converted
+                kvs.push(mixedRemapToPy(k));
+                //covert corresponding value if it needs to be converted
+                kvs.push(mixedRemapToPy(obj[k]));
+            }
+            //create the new dictionary
+            return new Sk.builtin.dict(kvs);
+        }else{
+            return obj;
+        }
+    } else if (typeof obj === "string") {
+        return new Sk.builtin.str(obj);
+    } else if (typeof obj === "number") {
+        return Sk.builtin.assk$(obj);
+    } else if (typeof obj === "boolean") {
+        return new Sk.builtin.bool(obj);
+    } else if(typeof obj === "function") {
+        return new Sk.builtin.str(obj.name);
+    }
+}
