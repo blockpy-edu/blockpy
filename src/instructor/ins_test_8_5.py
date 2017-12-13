@@ -92,12 +92,13 @@ def m_wrong_modifying_list_8_5():
         explain("Don't modify the list<br><br><i>(mod_list_8.5)<i></br>")
 #this has some issues in that it can be tricked if we don't do multiple matches
 def m_missing_zero_initialization():
-    match = find_match("for ___ in ___:\n    ___ = _sum_ + ___")
-    if match:
-        _sum_ = match.get_std_name("_sum_")
-        if def_use_error(_sum_):
-            explain("The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(_sum_.id))
-            return True
+    matches = find_matches("for ___ in ___:\n    ___ = _sum_ + ___")
+    if matches:
+        for match in matches
+            _sum_ = match.get_std_name("_sum_")
+            if def_use_error(_sum_):
+                explain("The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(_sum_.id))
+                return True
     return False
 def m_wrong_duplicate_var_in_add():
     match = find_match("for ___ in ___:\n    _sum_ + _sum_")
