@@ -340,8 +340,8 @@ function testMultiMatch(){
 	}
 	return [failCount, successCount];
 }
-function testVarConflicts(){
-	console.log("TESTING REPEAT VARIABLE");
+function testPass(){
+	console.log("TESTING PASS MATCH");
 	var failCount = 0;
 	var successCount = 0;
 	var debugPrint = false;
@@ -351,7 +351,6 @@ function testVarConflicts(){
 	var insAST = insTree.rootNode;
 	var stdAST = parseCode(stdCode);
 	var mappings = insTree.findMatches(stdAST.astNode);
-	debugPrint = true;
 	if(!mappings){
 		console.error("mapping should have been found");
 		failCount++;
@@ -379,7 +378,7 @@ function runTreeCompTestSuiteHelper(){
 	tabulateResults(currentCounts, testCommutativity());
 	tabulateResults(currentCounts, testOneToMany());
 	tabulateResults(currentCounts, testMultiMatch());
-	tabulateResults(currentCounts, testVarConflicts());
+	tabulateResults(currentCounts, testPass());
 	return currentCounts;
 }
 

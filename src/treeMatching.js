@@ -421,6 +421,15 @@ StretchyTreeMatcher.prototype.shallowMatch_Pass = function(insNode, stdNode){
 	return [mapping];
 }
 /**
+	An Expression node should match to anything
+	@return a mappping of insNode to stdNode
+**/
+StretchyTreeMatcher.prototype.shallowMatch_Expr = function(insNode, stdNode){
+	var mapping = new ASTMap();
+	mapping.addNodePairing(insNode, stdNode)
+	return [mapping];
+}
+/**
 	Checks that all non astNode attributes are equal between insNode and stdNode
 	@return a mappin gof insNode to stdNode, or false, if the attributes aren't equal
 **/

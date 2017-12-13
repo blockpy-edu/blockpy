@@ -263,66 +263,16 @@ var $sk_mod_instructor = function(name) {
             }
         }
         visitor.visit(ast);
-        console.log(flatTree);
+        //console.log(flatTree);
     }
 
-    /**
-     * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
-     * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
-     * cases where the types in obj ore a mix of python SIMPLE objects and SIMPLE normal javascript objects
-     * @param {object} obj - the object to be converted
-     * @return {Sk.builtin.???} - returns the corresponding python object, dropping all functions and things it can't convert
-    **/
-    function mixedRemapToPy(obj){
-        var k;
-        var kvs;
-        var i;
-        var arr;
-        //@TODO: should theoretically check if the object is a pyhon dict or array with js objects
-        if (isSkBuiltin(obj)){
-            //object is already python ready
-            return obj;
-        } else if (Object.prototype.toString.call(obj) === "[object Array]") {
-            //object is actually a javascript array
-            arr = [];
-            for (i = 0; i < obj.length; ++i) {
-                //for each object, convert it to a python object if it isn't one already
-                var subval = obj[i];
-                if(!isSkBuiltin(subval)){
-                    arr.push(mixedRemapToPy(subval));
-                }else{
-                    arr.push(subval)
-                }
-            }
-            return new Sk.builtin.list(arr);
-        } else if (obj === null) {//null object
-            return Sk.builtin.none.none$;
-        } else if (typeof obj === "object") {
-            if(!isSkBuiltin(obj)){
-                //assuming it's a standard dictionary
-                kvs = [];//Sk.builtin.dict uses an array of key-value,key-value...
-                for (k in obj) {
-                    //convert the key if it needs to be converted
-                    kvs.push(mixedRemapToPy(k));
-                    //covert corresponding value if it needs to be converted
-                    kvs.push(mixedRemapToPy(obj[k]));
-                }
-                //create the new dictionary
-                return new Sk.builtin.dict(kvs);
-            }else{
-                return obj;
-            }
-        } else if (typeof obj === "string") {
-            return new Sk.builtin.str(obj);
-        } else if (typeof obj === "number") {
-            return Sk.builtin.assk$(obj);
-        } else if (typeof obj === "boolean") {
-            return new Sk.builtin.bool(obj);
-        } else if(typeof obj === "function") {
-            return new Sk.builtin.str(obj.name);
+    function parseProgram(){
+        if (Sk.executionReports['verifier'].success) {
+            generateFlatTree(Sk.executionReports['verifier'].code);
+        } else {
+            return null;
         }
     }
-    
     /**
      * This function coverts the output in the student report to a python 
      * list and returns it.
@@ -365,12 +315,11 @@ var $sk_mod_instructor = function(name) {
      * This function is called by instructors to construct the python version of the AST
     **/
     mod.parse_program = new Sk.builtin.func(function() {
-        if (Sk.executionReports['verifier'].success) {
-            generateFlatTree(Sk.executionReports['verifier'].code);
-            //console.log(flatTree);
-            return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
-        } else {
+        var result = parseProgram();
+        if(result == null){
             return Sk.builtin.none.none$;
+        }else{
+            return Sk.misceval.callsimOrSuspend(mod.AstNode, 0);
         }
     });
     
@@ -403,7 +352,10 @@ var $sk_mod_instructor = function(name) {
 
     mod.def_use_error = new Sk.builtin.func(function(py_node) {
        var id = py_node.id;
+       //console.log(id);
        var node = flatTree[id];
+       //"Undefined variables": []
+       //"Possibly undefined variables": []
        if((node instanceof Object) && ("_astname" in node) && node._astname == "Name"){
             var undefVars = Sk.executionReports['analyzer'].issues["Undefined variables"];
             var hasError = false;
@@ -524,6 +476,97 @@ var $sk_mod_instructor = function(name) {
         }
         return transOp;
     }
+
+    function findMatches(insCode){
+        if(flatTree.length == 0)
+            parseProgram();
+        var insMatcher = new StretchyTreeMatcher(insCode);
+        if(insMatcher.rootNode == null){
+            console.error("instructor code didn't parse");
+            return null;
+        }
+        var stdAST = flatTree[0];
+        var matches = insMatcher.findMatches(stdAST);
+        if(!matches){
+            //console.log("match not found");
+            return null;
+        }
+        //console.log("match found");
+        //console.log(matches);
+        return matches;
+    }
+
+    mod.find_match = new Sk.builtin.func(function(insCode) {
+        Sk.builtin.pyCheckType("insCode", "string", Sk.builtin.checkString(insCode));
+        insCode = Sk.ffi.remapToJs(insCode);
+        var matches = findMatches(insCode);
+        if(matches)
+            return Sk.misceval.callsimOrSuspend(mod.ASTMAp, matches[0]);
+        else
+            return Sk.ffi.remapToPy(null);
+    });
+    
+    mod.find_matches = new Sk.builtin.func(function(insCode) {
+        Sk.builtin.pyCheckType("insCode", "string", Sk.builtin.checkString(insCode));
+        insCode = Sk.ffi.remapToJs(insCode);
+        var matches = findMatches(insCode);
+        if(matches){
+            var converts = [];
+            for(var i = 0; i < matches.length; i += 1){
+                converts.push(Sk.misceval.callsimOrSuspend(mod.ASTMAp, matches[i]));
+            }
+            //console.log(converts);
+            return new Sk.builtin.list(converts);
+        }
+        else
+            return Sk.ffi.remapToJs(null);
+    });
+
+    /**
+      * This type of object should ONLY be generated in javascript!
+    **/
+    mod.ASTMAp = Sk.misceval.buildClass(mod, function($gbl, $loc) {
+        $loc.__init__ = new Sk.builtin.func(function(self, jsASTMap) {
+            //the map
+            self.astMap = jsASTMap;
+            //console.log(self.astMap);
+        });
+        $loc.get_std_name = new Sk.builtin.func(function(self, id) {
+            var insKey = Sk.ffi.remapToJs(id);
+            //not a key
+            if(typeof insKey != "string"){
+                return Sk.ffi.remapToPy(null);
+            }
+            var value = self.astMap.symbolTable.get(insKey);
+            //symbol doesn't exist
+            if(value == null){//actually probably undefined
+                return Sk.ffi.remapToPy(null);
+            }else{
+                //console.log(value[0].node);
+                //console.log(flatTree.indexOf(value[0].node));
+                return Sk.misceval.callsimOrSuspend(mod.AstNode, flatTree.indexOf(value[0].node));
+            }
+        });
+        $loc.get_std_exp = new Sk.builtin.func(function(self, id) {
+            var insKey = Sk.ffi.remapToJs(id);
+            //not a key
+            if(typeof insKey != "string"){
+                return Sk.ffi.remapToPy(null);
+            }
+            var value = self.astMap.expTable.get(insKey);
+            //symbol doesn't exist
+            if(value == null){//actually probably undefined
+                return Sk.ffi.remapToPy(null);
+            }else{
+                //console.log(value);
+                //console.log(flatTree.indexOf(value));
+                return Sk.misceval.callsimOrSuspend(mod.AstNode, flatTree.indexOf(value));
+            }
+        });
+        //$loc.__getattr__ = new Sk.builtin.func(function(self, key) {
+        //    key = Sk.ffi.remapToJs(key);
+        //});
+    });
 
     /**
      * Python representation of the AST nodes w/o recreating the entire thing. This class assumes that parse_program
