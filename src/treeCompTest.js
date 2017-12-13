@@ -340,7 +340,31 @@ function testMultiMatch(){
 	}
 	return [failCount, successCount];
 }
-
+function testVarConflicts(){
+	console.log("TESTING REPEAT VARIABLE");
+	var failCount = 0;
+	var successCount = 0;
+	var debugPrint = false;
+	var stdCode = 'import matplotlib.pyplot as plt\nquakes = [1,2,3,4]\nquakes_in_miles = []\nfor quakes in quakes:\n    quakes_in_miles.append(quake * 0.62)\nplt.hist(quakes_in_miles)\nplt.xlabel("Depth in Miles")\nplt.ylabel("Number of Earthquakes")\nplt.title("Distribution of Depth in Miles of Earthquakes")\nplt.show()';
+	var insCode = "for _item_ in _item_:\n    pass";
+	var insTree = new StretchyTreeMatcher(insCode);
+	var insAST = insTree.rootNode;
+	var stdAST = parseCode(stdCode);
+	var mappings = insTree.findMatches(stdAST.astNode);
+	debugPrint = true;
+	if(!mappings){
+		console.error("mapping should have been found");
+		failCount++;
+		debugPrint = true;
+	}else
+		successCount++;
+	if(debugPrint){
+		console.log(insAST);
+		console.log(stdAST);
+		console.log(mappings);
+	}
+	return [failCount, successCount];
+}
 function tabulateResults(currentCounts, result){
 	currentCounts[0] += result[0];
 	currentCounts[1] += result[1];
@@ -355,6 +379,7 @@ function runTreeCompTestSuiteHelper(){
 	tabulateResults(currentCounts, testCommutativity());
 	tabulateResults(currentCounts, testOneToMany());
 	tabulateResults(currentCounts, testMultiMatch());
+	tabulateResults(currentCounts, testVarConflicts());
 	return currentCounts;
 }
 
