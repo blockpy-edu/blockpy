@@ -35,7 +35,7 @@ var $INSTRUCTOR_MODULES_EXTENDED = {};
     for instructor_file_name in os.listdir(INSTRUCTOR_ROOT):
         with open(INSTRUCTOR_ROOT+instructor_file_name, 'r') as input:
             contents = input.read()
-            contents = contents.replace('"', '\\"').replace('\n', '\\n')
+            contents = contents.replace('\\','\\\\').replace('"', '\\"').replace('\n', '\\n')
             output.write('$INSTRUCTOR_MODULES_EXTENDED["{module}"] = "{code}"\n'.format(
                 module = instructor_file_name,
                 code = contents
