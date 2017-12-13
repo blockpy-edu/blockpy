@@ -415,7 +415,7 @@ StretchyTreeMatcher.prototype.shallowMatch_Name = function(insNode, stdNode){
 	An empty loop body should match to anything
 	@return a mappping of insNode to stdNode
 **/
-StretchyTreeMatcher.prototype.shallowMatch_pass = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.shallowMatch_Pass = function(insNode, stdNode){
 	var mapping = new ASTMap();
 	mapping.addNodePairing(insNode, stdNode)
 	return [mapping];
