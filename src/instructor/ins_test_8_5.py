@@ -94,7 +94,7 @@ def m_wrong_modifying_list_8_5():
 def m_missing_zero_initialization():
     matches = find_matches("for ___ in ___:\n    ___ = _sum_ + ___")
     if matches:
-        for match in matches
+        for match in matches:
             _sum_ = match.get_std_name("_sum_")
             if def_use_error(_sum_):
                 explain("The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(_sum_.id))
