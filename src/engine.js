@@ -684,4 +684,8 @@ if (typeof exports !== 'undefined') {
     exports.BlockPyEngine = BlockPyEngine;
     exports.AbstractInterpreter = AbstractInterpreter;
     exports.NodeVisitor = NodeVisitor;
+    exports.StretchyTreeMatcher = StretchyTreeMatcher;
+    exports.isSkBuiltin = isSkBuiltin;
+    exports.isAstNode = isAstNode;
+    exports.mixedRemapToPy = mixedRemapToPy;
 }

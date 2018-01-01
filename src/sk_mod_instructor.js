@@ -269,6 +269,7 @@ var $sk_mod_instructor = function(name) {
     function parseProgram(){
         if (Sk.executionReports['verifier'].success) {
             generateFlatTree(Sk.executionReports['verifier'].code);
+            return true;
         } else {
             return null;
         }
@@ -519,7 +520,7 @@ var $sk_mod_instructor = function(name) {
             return new Sk.builtin.list(converts);
         }
         else
-            return Sk.ffi.remapToJs(null);
+            return Sk.ffi.remapToPy(null);
     });
 
     /**
