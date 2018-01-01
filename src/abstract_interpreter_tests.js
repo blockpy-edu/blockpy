@@ -11,9 +11,6 @@
     }
 
     var filename = '__main__.py';
-
-    //var python_source = 'sum([1,2])/len([4,5,])\ntotal=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
-    var python_source = 'if 5:\n    a = 0\n    b = 0\n    c = 0\nelif "yes":\n    a = 3\n    b = 3\nelse:\n    a = 5\n    if True:\n        b = 7\n    else:\n        b = 3\nprint(a)\nprint(b)';
     
     var unit_tests = [
         // Source Code, Shouldn't catch this, Should catch this
@@ -142,7 +139,7 @@
     ];
     
     var errors = 0;
-    var analyzer = new AbstractInterpreter();
+    var analyzer = new Tifa();
     for (var i = 0, len = unit_tests.length; i < len; i = i+1) {
         var source = unit_tests[i][0],
             nones = unit_tests[i][1],
