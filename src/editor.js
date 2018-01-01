@@ -848,7 +848,7 @@ BlockPyEditor.prototype.setLevel = function() {
  * individual blocks.
  */
 BlockPyEditor.CATEGORY_MAP = {
-    'Properties': '<category name="Properties" custom="VARIABLE" colour="240">'+
+    'Variables': '<category name="Variables" custom="VARIABLE" colour="240">'+
                   '</category>',
     'Decisions': '<category name="Decisions" colour="330">'+
                     '<block type="controls_if_better"></block>'+

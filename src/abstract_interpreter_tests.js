@@ -29,6 +29,7 @@
         ['print(___)', [], ['Unconnected blocks']],
         // Incompatible types
         ['a = 5 + "ERROR"', [], ['Incompatible types']],
+        ['a = "ERROR" * 5', ['Incompatible types'], []],
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
@@ -140,25 +141,25 @@
     
     var errors = 0;
     var analyzer = new Tifa();
-    for (var i = 0, len = unit_tests.length; i < len; i = i+1) {
+    for (var i = len = unit_tests.length-1; i >= 0; i = i-1) {
         var source = unit_tests[i][0],
             nones = unit_tests[i][1],
             somes = unit_tests[i][2];
         analyzer.processCode(source);
         //console.log(source);
-        if (analyzer.report.error !== false) {
-            console.error("AI Tests: Error message in "+nones[j], "\n"+source, "\n"+analyzer.report.error);
+        if (!analyzer.report.success) {
+            console.error("AI Tests: Error message in "+nones[j], "\n"+source, "\n", analyzer.report.error);
             errors += 1;
             continue;
         }
         for (var j = 0, len2 = nones.length; j < len2; j=j+1) {
-            if (analyzer.report[nones[j]].length > 0) {
+            if (analyzer.report.issues[nones[j]].length > 0) {
                 console.error("AI Tests: Incorrectly detected "+nones[j], "\n"+source);
                 errors += 1;
             }
         }
         for (var k = 0, len2 = somes.length; k < len2; k=k+1) {
-            if (analyzer.report[somes[k]].length == 0) {
+            if (analyzer.report.issues[somes[k]].length == 0) {
                 console.error("AI Tests: Failed to detect "+somes[k], "\n"+source);
                 errors += 1;
             }
