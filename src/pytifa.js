@@ -91,6 +91,7 @@ Tifa.prototype.processAst = function(ast) {
     
     // Traverse every node
     this.visit(ast);
+    this.report.variables = this.nameMap;
     
     // Check afterwards
     this.finishScope();
@@ -232,7 +233,7 @@ Tifa.prototype.visit_Assign = function(node) {
             that.storeVariable(target.id.v, type, position);
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
-                var elt = targets.elts[i];
+                var elt = target.elts[i];
                 var eltType = Tifa.indexSequenceType(type, i);
                 that.walkTargets(elt, eltType, position);
             }
@@ -240,25 +241,162 @@ Tifa.prototype.visit_Assign = function(node) {
     });
 }
 
+Tifa.prototype.visit_Call = function(node) {
+    // Handle func part (Name or Attribute)
+    this.visit(node.func)
+    // Handle args
+    for (var i = 0, len = node.args.length; i < len; i++) {
+        var arg = node.args[i];
+        this.visit(arg);
+    }
+    // Handle keywords
+    // Handle starargs
+    // Handle kwargs
+    if (node.func._astname === 'Name') {
+        var functionName = node.func.id.v;
+        var state = this.findVariableUpScopes(functionName);
+        console.log("Found", state);
+        if (state != null && state.definition) {
+            state.definition(node.args);
+        }
+    }
+}
+
+Tifa.prototype.visit_If = function(node) {
+    // Visit the conditional
+    this.visit(node.test);
+    
+    // Visit the bodies
+    var thisPathId = this.PathId;
+    this.PathId += 1;
+    var ifPathId = this.PathId;
+    this.pathNames.push(ifPathId+'i');
+    this.pathChain.unshift(ifPathId);
+    this.nameMap[ifPathId] = {};
+    for (var i = 0, len = node.body.length; i < len; i++) {
+        this.visit(node.body[i]);
+    }
+    this.pathNames.pop()
+    this.pathChain.shift();
+    
+    this.PathId += 1;
+    var elsePathId = this.PathId;
+    this.pathNames.push(elsePathId+'e');
+    this.pathChain.unshift(elsePathId);
+    this.nameMap[elsePathId] = {};
+    for (var i = 0, len = node.orelse.length; i < len; i++) {
+        this.visit(node.orelse[i]);
+    }
+    this.pathNames.pop()
+    this.pathChain.shift();
+    
+    // Combine two paths into one
+    for (var ifName in this.nameMap[ifPathId]) {
+        if (ifName in this.nameMap[elsePathId]) {
+            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName],
+                                              this.nameMap[elsePathId][ifName],
+                                              Tifa.locate(node))
+        } else {
+            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], null, Tifa.locate(node))
+        }
+        this.nameMap[thisPathId][ifName] = combined;
+    }
+    for (var elseName in this.nameMap[elsePathId]) {
+        if (!(ifName in this.nameMap[elsePathId])) {
+            var combined = Tifa.combineStates(this.nameMap[elsePathId][elseName], 
+                                              null,
+                                              Tifa.locate(node))
+            this.nameMap[thisPathId][elseName] = combined;
+        }
+    }
+}
+
+Tifa.prototype.visit_While = function(node) {
+    this.visit_If(node);
+    // This probably doesn't work for orelse bodies, but who actually uses those.
+}
+
 Tifa.prototype.visit_For = function(node) {
     // Handle the iteration list
     var iter = node.iter;
+    var iterType = this.typecheck(iter);
     var iterationListName = null;
-    if (iter._astname === "Name" && iter.ctx.prototype._astname === "Load") {
+    if (Tifa.isTypeEmptyList(iterType)) {
+        this.reportIssue("Empty iterations", {"position": Tifa.locate(node)});
+    }
+    if (!(Tifa.isTypeSequence(iterType))) {
+        this.reportIssue("Non-list iterations", {"position": Tifa.locate(node)});
+    }
+    if (iter._astname === "Name") {
         iterationListName = iter.id.v;
-        if (Tifa.isTypeEmptyList(iterationListName)) {
-            this.reportIssue("Empty iterations", 
-                             {"name": iterationListName, "position": Tifa.locate(node)});
-        }
-        if (!(this.isTypeSequence(iterationListName))) {
-            this.reportIssue("Non-list iterations", 
-                             {"name": iterationListName, "position": Tifa.locate(node)});
+        if (iterationListName == "___") {
+            this.reportIssue("Unconnected blocks", {"position": Tifa.locate(node)})
         }
         this.iterateVariable(iterationListName, Tifa.locate(node));
-    } else if (iter._astname === "List" && iter.elts.length === 0) {
-        this.report["Empty iterations"].push({"name": "[]", "position": this.getLocation(node)});
     } else {
         this.visit(iter);
+    }
+    var iterSubtype = null;
+    if (iterType !== null) {
+        iterSubtype = Tifa.indexSequenceType(iterType, 0);
+    }
+    
+    // Handle the iteration variable
+    var iterationVariable = null;
+    var position = Tifa.locate(node);
+    var that = this;
+    var walkTarget = function (target, type) {
+        if (target._astname === 'Name') {
+            if (iterationVariable == null) {
+                iterationVariable = target.id.v;
+            }
+            that.storeIterVariable(target.id.v, type, position);
+        } else if (target._astname == 'Tuple' || target._astname == 'List') {
+            for (var i = 0, len = target.elts.length; i < len; i++) {
+                var elt = target.elts[i];
+                var eltType = Tifa.indexSequenceType(type, i);
+                walkTarget(elt, eltType, position);
+            }
+        }
+    }(node.target, iterType);
+    
+    if (iterationVariable && iterationListName && iterationListName == iterationVariable) {
+        this.reportIssue("Iteration variable is iteration list", 
+                         {"name": iterationVariable, "position": Tifa.locate(node)});
+    }
+
+    // Handle the bodies
+    for (var i = 0, len = node.body.length; i < len; i++) {
+        this.visit(node.body[i]);
+    }
+    for (var i = 0, len = node.orelse.length; i < len; i++) {
+        this.visit(node.orelse[i]);
+    }
+}
+
+Tifa.prototype.visit_FunctionDef = function(node) {
+    // Name
+    var functionName = node.name.v;
+    var position = Tifa.locate(node);
+    var state = this.storeVariable(functionName, {"type": "Function"}, position);
+    var that = this;
+    state.definition = function(parameters) {
+        // Manage scope
+        that.ScopeId += 1;
+        that.scopeChain.unshift(that.ScopeId);
+        // Process arguments
+        var args = node.args.args;
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            var name = Sk.ffi.remapToJs(arg.id);
+            that.storeVariable(name, parameters[i], position)
+        }
+        for (var i = 0, len = node.body.length; i < len; i++) {
+            that.visit(node.body[i]);
+        }
+        // Return scope
+        that.finishScope();
+        that.scopeChain.shift();
     }
 }
 
@@ -293,17 +431,36 @@ Tifa.prototype.findVariable = function(fullName) {
     return state;
 }
 
+/**
+ *
+ * @returns State
+ */
+Tifa.prototype.findVariableUpScopes = function(name) {
+    for (var i = 0, len = this.pathChain.length; i < len; i++) {
+        var pathId = this.pathChain[i];
+        var path = this.nameMap[pathId];
+        for (var j = 0, len = this.scopeChain.length; j < len; j++) {
+            var fullName = this.scopeChain.slice(j).join("/") + "/" + name;
+            if (fullName in path) {
+                return path[fullName];
+            }
+        }
+    }
+    return null;
+}
+
 Tifa.prototype.storeVariable = function(name, type, position) {
-    var fullName = this.ScopeId + "/" + name;
+    var fullName = this.scopeChain.join("/") + "/" + name;
+    var currentPath = this.pathChain[0];
     var state = this.findVariable(fullName);
     if (state === null) {
         // Create a new instance of the variable on the current path
         state = {'name': name, 'trace': [], 'type': type,
                  'read': 'no', 'set': 'yes', 'over': 'no'};
-        this.nameMap[this.PathId][fullName] = state;
+        this.nameMap[currentPath][fullName] = state;
     } else {
         // Type change?
-        if (Tifa.areTypesEqual(type, state.type)) {
+        if (!Tifa.areTypesEqual(type, state.type)) {
             this.reportIssue("Type changes", 
                              {'name': name, 'position':position,
                               'old': state.type, 'new': type})
@@ -316,17 +473,26 @@ Tifa.prototype.storeVariable = function(name, type, position) {
             state.set = 'yes';
             state.read = 'no';
         }
+        this.nameMap[currentPath][fullName] = state;
     }
+    return state;
+}
+
+Tifa.prototype.storeIterVariable = function(name, type, position) {
+    var state = this.storeVariable(name, type, position);
+    state.read = 'yes';
+    return state;
 }
 
 Tifa.prototype.loadVariable = function(name, position) {
-    var fullName = this.ScopeId + "/" + name;
+    var fullName = this.scopeChain.join("/") + "/" + name;
+    var currentPath = this.pathChain[0];
     var state = this.findVariable(fullName);
     if (state === null) {
         // Create a new instance of the variable on the current path
         state = {'name': name, 'trace': [], 'type': '*Unknown',
                  'read': 'yes', 'set': 'no', 'over': 'no'};
-        this.nameMap[this.PathId][fullName] = state;
+        this.nameMap[currentPath][fullName] = state;
         this.reportIssue("Undefined variables", 
                          {'name': name, 'position':position})
     } else {
@@ -339,7 +505,12 @@ Tifa.prototype.loadVariable = function(name, position) {
                              {'name': name, 'position':position})
         }
         state.read = 'yes';
+        this.nameMap[currentPath][fullName] = state;
     }
+}
+
+Tifa.prototype.iterateVariable = function(name, position) {
+    return this.loadVariable(name, position);
 }
 
 Tifa.prototype.finishScope = function() {
@@ -380,12 +551,21 @@ Tifa.prototype.typecheck_Str = function(node) {
 }
 Tifa.prototype.typecheck_Name = function(node) {
     var name = node.id.v;
-    var path = this.nameMap[this.PathId];
-    var fullName = (this.ScopeId ? this.ScopeId + "/" : "") + name;
+    var currentPath = this.pathChain[0];
+    var path = this.nameMap[currentPath];
+    var fullName = this.scopeChain.join("/") + "/" + name;
     if (fullName in path) {
-        return path[fullName];
+        return path[fullName].type;
     } else {
         return {'name': '*Unknown'}
+    }
+}
+Tifa.prototype.typecheck_List = function(node) {
+    if (node.elts.length == 0) {
+        return {"name": "List", "empty": true};
+    } else {
+        return {"name": "List", "empty": false, 
+                "subtype": this.typecheck(node.elts[0])};
     }
 }
 
@@ -438,4 +618,32 @@ Tifa.sameScope = function(fullName, scopeChain) {
         }
     }
     return true;
+}
+
+Tifa.combineStates = function(left, right, position) {
+    var state = {'name': left.name, 'trace': left.trace, 'type': left.type,
+                 'read': left.read, 'set': left.set, 'over': left.over};
+    if (right == null) {
+        state.read = left.read == 'no' ? 'no' : 'maybe';
+        state.set = left.set == 'no' ? 'no' : 'maybe';
+        state.over = left.over == 'no' ? 'no' : 'maybe';
+    } else {
+        if (!Tifa.areTypesEqual(left.type, right.type)) {
+            this.reportIssue("Type changes", 
+                             {'name': left.name, 'position':position,
+                             'old': left.type, 'new': right.type})
+        }
+        state.read = Tifa.matchRSO(left.read, right.read);
+        state.set = Tifa.matchRSO(left.set, right.set);
+        state.over = Tifa.matchRSO(left.over, right.over);
+    }
+    return state;
+}
+
+Tifa.matchRSO = function(left, right) {
+    if (left == right) {
+        return left;
+    } else {
+        return "maybe";
+    }
 }
