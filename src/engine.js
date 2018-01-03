@@ -507,6 +507,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         instructorCode
     );
+    console.log(lineOffset, instructorCode.split(NEW_LINE_REGEX).length, instructorCode);
     lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
     var engine = this;
     report['instructor'] = {
