@@ -20,30 +20,14 @@
         ['a = 0\na = 5', [], ['Overwritten variables']],
         ['a = 0\nb = 5', ['Overwritten variables'], ['Unread variables']],
         ['a = [1]\nprint(a)\na = [1]\nprint(a)', [], []],
-        // Iterating over the result of a builtin
-        ['x = range(100)\nprint(x)', ['Non-list iterations'], []],
-        ['x = range(100)\nfor y in x:\n    print(y)', ['Non-list iterations'], []],
-        ['x = range(100)\nfor y in x:\n    pass\nfor z in y:\n    print(z)', [], ['Non-list iterations']],
         // Unconnected blocks
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
-        // Incompatible types
-        ['a = 5 + "ERROR"', [], ['Incompatible types']],
-        ['a = "ERROR" * 5', ['Incompatible types'], []],
+        
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
         ['a = 0\na+= 1\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to empty list
-        ['a = []\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to non-empty list
-        ['a = [1]\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to undefined
-        ['a.append(1)\nprint(a)', ['Unread variables'], ['Undefined variables']],
-        // Append to unread
-        ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
-        // Append to number
-        ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
         // Iterate through non-existing list
         ['for x in y:\n\tpass', ['Unread variables'], ['Undefined variables']],
         // Iterate through list
@@ -56,10 +40,6 @@
         ['y = 5\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Non-list iterations']],
         // Iterate over iteration variable
         ['y = [1,2,3]\nfor y in y:\n\tpass', [], ['Iteration variable is iteration list']],
-        // Created a new list but didn't read it
-        ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
-        // Created a new list but didn't initialize it
-        ['old = [1,2,3]\nfor x in old:\n\tnew.append(x)\nprint(new)', [], ['Undefined variables']],
         // Type change
         ['a = 0\nprint(a)\na="T"\nprint(a)', [], ['Type changes']],
         // Defined in IF root branch but not the other
@@ -95,6 +75,15 @@
         // Overwritten in all branch
         ['a = 0\nif True:\n\tprint(a)\n\tif False:\n\t\ta = 0\n\telse:\n\t\ta = 2\nelse:\n\ta = 1', ['Overwritten variables'], []],
         
+        // Iterating over the result of a builtin
+        ['x = range(100)\nprint(x)', ['Non-list iterations'], []],
+        ['x = range(100)\nfor y in x:\n    print(y)', ['Non-list iterations'], []],
+        ['x = range(100)\nfor y in x:\n    pass\nfor z in y:\n    print(z)', [], ['Non-list iterations']],
+        
+        // Incompatible types
+        ['a = 5 + "ERROR"', [], ['Incompatible types']],
+        ['a = "ERROR" * 5', ['Incompatible types'], []],
+        
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
         ['def int_func(x):\n\treturn 5\nint_func(10)', [], []],
@@ -106,6 +95,22 @@
         // Out of scope
         ['def x(parameter):\n    return parameter\nparameter\nx(0)', [], ['Read out of scope']],
         ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
+        
+        // Append to empty list
+        ['a = []\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to non-empty list
+        ['a = [1]\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to undefined
+        ['a.append(1)\nprint(a)', ['Unread variables'], ['Undefined variables']],
+        // Append to unread
+        ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
+        // Append to number
+        ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
+        
+        // Created a new list but didn't read it
+        ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
+        // Created a new list but didn't initialize it
+        ['old = [1,2,3]\nfor x in old:\n\tnew.append(x)\nprint(new)', [], ['Undefined variables']],
         
         // Built-ins
         ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']],
@@ -142,6 +147,7 @@
     var errors = 0;
     var analyzer = new Tifa();
     for (var i = len = unit_tests.length-1; i >= 0; i = i-1) {
+        console.log("TEST", i)
         var source = unit_tests[i][0],
             nones = unit_tests[i][1],
             somes = unit_tests[i][2];

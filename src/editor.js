@@ -862,14 +862,14 @@ BlockPyEditor.CATEGORY_MAP = {
     'Iteration': '<category name="Iteration" colour="300">'+
                     '<block type="controls_forEach"></block>'+
                 '</category>',
-    'Functions': '<category name="Functions" custom="PROCEDURE" colour="210">'+
-                '</category>',
-    'Classes': '<category name="Classes" colour="210">'+
+    /*'Functions': '<category name="Functions" custom="PROCEDURE" colour="210">'+
+                '</category>',*/
+    /*'Classes': '<category name="Classes" colour="210">'+
                     '<block type="class_creation"></block>'+
                     '<block type="class_creation">'+
                         '<mutation value="k"></mutation>'+
                     '</block>'+
-                '</category>',
+                '</category>',*/
     'Calculation': '<category name="Calculation" colour="270">'+
                     //'<block type="raw_table"></block>'+
                     '<block type="math_arithmetic"></block>'+
