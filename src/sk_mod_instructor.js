@@ -298,10 +298,14 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
-    mod.queue_input = new Sk.builtin.func(function(input) {
-        Sk.builtin.pyCheckArgs("queue_input", arguments, 1, 1);
-        Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
-        Sk.queuedInput.push(Sk.ffi.remapToJs(input));
+    mod.queue_input = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("queue_input", arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
+        for (var i = args.length-1; i > 0; i--) {
+            var input = args[i];
+            Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
+            Sk.queuedInput.push(Sk.ffi.remapToJs(input));
+        }
     });
     
     /**
@@ -337,11 +341,13 @@ var $sk_mod_instructor = function(name) {
         backupTime = Sk.execLimit;
         if (Sk.execLimitFunction) {
             Sk.execLimit = Sk.execLimitFunction();
+            Sk.execStart = Date.now()
         }
     });
     mod.unlimit_execution_time = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("unlimit_execution_time", arguments, 0, 0);
         Sk.execLimit = backupTime;
+        Sk.execStart = Date.now()
     });
     
     /**

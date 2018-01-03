@@ -11,7 +11,8 @@
  *  * No introspection or reflective characteristics
  *  * No dunder methods
  *  * No closures (maybe?)
- *  * No global variables
+ *  * You cannot write a variable out of scope
+ *  * You cannot read a mutable variable out of scope
  *  * No multiple inheritance
  *
  * Additionally, it reads the following as issues:
@@ -123,6 +124,7 @@ Tifa.prototype.initializeReport = function() {
             "Incompatible types": [], // 
             "Return outside function": [], // 
             "Read out of scope": [], // 
+            "Write out of scope": [], // Attempted to modify a variable in a higher scope
             "Aliased built-in": [], // 
             "Method not in Type": [] // A method was used that didn't exist for that type
         }
@@ -209,9 +211,14 @@ Important concepts:
 Tifa.prototype.visit = function(node) {
     this.astNames.push(node._astname);
     this.AstId += 1;
-    NodeVisitor.prototype.visit.call(this, node);
+    var result = NodeVisitor.prototype.visit.call(this, node);
     this.AstId -= 1;
     this.astNames.pop();
+    if (result === undefined) {
+        return Tifa._UNKNOWN_TYPE();
+    } else {
+        return result;
+    }
 }
 
 Tifa.prototype.walkTargets = function(targets, type, walker) {
@@ -241,6 +248,11 @@ Tifa.prototype.visit_Assign = function(node) {
     });
 }
 
+Tifa.prototype.visit_BinOp = function(node) {
+    this.generic_visit(node);
+    this.typecheck_BinOp(node);
+}
+
 Tifa.prototype.visit_Call = function(node) {
     // Handle func part (Name or Attribute)
     this.visit(node.func)
@@ -252,13 +264,9 @@ Tifa.prototype.visit_Call = function(node) {
     // Handle keywords
     // Handle starargs
     // Handle kwargs
-    if (node.func._astname === 'Name') {
-        var functionName = node.func.id.v;
-        var state = this.findVariableUpScopes(functionName);
-        console.log("Found", state);
-        if (state != null && state.definition) {
-            state.definition(node.args);
-        }
+    var functionType = this.typecheck(node.func);
+    if (functionType.name == 'Function') {
+        functionType.definition(functionType, node.args);
     }
 }
 
@@ -345,7 +353,7 @@ Tifa.prototype.visit_For = function(node) {
     var iterationVariable = null;
     var position = Tifa.locate(node);
     var that = this;
-    var walkTarget = function (target, type) {
+    (function walkTarget(target, type) {
         if (target._astname === 'Name') {
             if (iterationVariable == null) {
                 iterationVariable = target.id.v;
@@ -358,7 +366,7 @@ Tifa.prototype.visit_For = function(node) {
                 walkTarget(elt, eltType, position);
             }
         }
-    }(node.target, iterType);
+    })(node.target, iterType);
     
     if (iterationVariable && iterationListName && iterationListName == iterationVariable) {
         this.reportIssue("Iteration variable is iteration list", 
@@ -389,7 +397,8 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         for (var i = 0; i < args.length; i++) {
             var arg = args[i];
             var name = Sk.ffi.remapToJs(arg.id);
-            that.storeVariable(name, parameters[i], position)
+            var parameter = Tifa.copyType(parameters[i]);
+            that.storeVariable(name, parameter, position)
         }
         for (var i = 0, len = node.body.length; i < len; i++) {
             that.visit(node.body[i]);
@@ -410,55 +419,40 @@ Tifa.prototype.visit_Name = function(node) {
     }
 }
 
-/**
- *
- * @returns State
- */
-Tifa.prototype.findVariable = function(fullName) {
-    var state = null;
-    // Find the variable if it already exists
-    for (var i = 0, len = this.pathChain.length; i < len; i++) {
-        var pathId = this.pathChain[i];
-        var path = this.nameMap[pathId];
-        if (fullName in path) {
-            state = path[fullName];
-            state.trace.push({
-                'type': state.type,
-                'set': state.set, 'read': state.read, 'over': state.over
-            })
-        }
-    }
-    return state;
-}
 
-/**
- *
- * @returns State
- */
-Tifa.prototype.findVariableUpScopes = function(name) {
-    for (var i = 0, len = this.pathChain.length; i < len; i++) {
-        var pathId = this.pathChain[i];
-        var path = this.nameMap[pathId];
-        for (var j = 0, len = this.scopeChain.length; j < len; j++) {
+Tifa.prototype.findVariablesScope = function (name) {
+    for (var j = 0, len = this.scopeChain.length; j < len; j++) {
+        for (var i = 0, len = this.pathChain.length; i < len; i++) {
+            var pathId = this.pathChain[i];
+            var path = this.nameMap[pathId];
             var fullName = this.scopeChain.slice(j).join("/") + "/" + name;
             if (fullName in path) {
-                return path[fullName];
+                if (j == 0) {
+                    return {'exists': true, 'inScope': true, 'state': path[fullName]};
+                } else {
+                    return {'exists': true, 'inScope': false, 'state': path[fullName]};
+                }
             }
         }
     }
-    return null;
+    return {'exists': false};
 }
 
 Tifa.prototype.storeVariable = function(name, type, position) {
     var fullName = this.scopeChain.join("/") + "/" + name;
     var currentPath = this.pathChain[0];
-    var state = this.findVariable(fullName);
-    if (state === null) {
+    var variable = this.findVariablesScope(name);
+    if (!variable.exists) {
         // Create a new instance of the variable on the current path
         state = {'name': name, 'trace': [], 'type': type,
                  'read': 'no', 'set': 'yes', 'over': 'no'};
         this.nameMap[currentPath][fullName] = state;
     } else {
+        Tifa.traceState(variable.state, "store");
+        if (!variable.inScope) {
+            this.reportIssue("Write out of scope", 
+                             {'name': name, 'position':position})
+        }
         // Type change?
         if (!Tifa.areTypesEqual(type, state.type)) {
             this.reportIssue("Type changes", 
@@ -487,8 +481,8 @@ Tifa.prototype.storeIterVariable = function(name, type, position) {
 Tifa.prototype.loadVariable = function(name, position) {
     var fullName = this.scopeChain.join("/") + "/" + name;
     var currentPath = this.pathChain[0];
-    var state = this.findVariable(fullName);
-    if (state === null) {
+    var variable = this.findVariablesScope(name);
+    if (!variable.exists) {
         // Create a new instance of the variable on the current path
         state = {'name': name, 'trace': [], 'type': '*Unknown',
                  'read': 'yes', 'set': 'no', 'over': 'no'};
@@ -496,16 +490,17 @@ Tifa.prototype.loadVariable = function(name, position) {
         this.reportIssue("Undefined variables", 
                          {'name': name, 'position':position})
     } else {
-        if (state.set == 'no') {
+        Tifa.traceState(variable.state, "load");
+        if (variable.state.set == 'no') {
             this.reportIssue("Undefined variables", 
                              {'name': name, 'position':position})
         }
-        if (state.set == 'maybe') {
+        if (variable.state.set == 'maybe') {
             this.reportIssue("Possibly undefined variables", 
                              {'name': name, 'position':position})
         }
-        state.read = 'yes';
-        this.nameMap[currentPath][fullName] = state;
+        variable.state.read = 'yes';
+        this.nameMap[currentPath][fullName] = variable.state;
     }
 }
 
@@ -551,13 +546,19 @@ Tifa.prototype.typecheck_Str = function(node) {
 }
 Tifa.prototype.typecheck_Name = function(node) {
     var name = node.id.v;
-    var currentPath = this.pathChain[0];
-    var path = this.nameMap[currentPath];
-    var fullName = this.scopeChain.join("/") + "/" + name;
-    if (fullName in path) {
-        return path[fullName].type;
+    var variable = this.findVariablesScope(name);
+    if (variable.exists) {
+        return variable.state.type;
     } else {
-        return {'name': '*Unknown'}
+        return Tifa._UNKNOWN_TYPE();
+    }
+}
+Tifa.prototype.typecheck_Call = function(node) {
+    var functionType = this.typecheck(node.func);
+    if (functionType.name == 'Function') {
+        return functionType.definition(functionType, node.args);
+    } else {
+        return Tifa._UNKNOWN_TYPE();
     }
 }
 Tifa.prototype.typecheck_List = function(node) {
@@ -567,6 +568,52 @@ Tifa.prototype.typecheck_List = function(node) {
         return {"name": "List", "empty": false, 
                 "subtype": this.typecheck(node.elts[0])};
     }
+}
+Tifa._NUM_TYPE = function() { return {'name': 'Num'} };
+Tifa._STR_TYPE = function() { return {'name': 'Str'} };
+Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
+Tifa._LIST_TYPE = function() { return {'name': 'List', "empty": false} };
+Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple'} };
+Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
+Tifa.VALID_BINOP_TYPES = {
+    'Add': {'Num': {'Num': Tifa._NUM_TYPE()}, 
+            'String' :{'String': Tifa._STR_TYPE()}, 
+            'List': {'List': Tifa._LIST_TYPE()},
+            'Tuple': {'Tuple': Tifa._TUPLE_TYPE()}},
+    'Sub': {'Num': {'Num': Tifa._NUM_TYPE()}, 
+            'Set': {'Set': Tifa._SET_TYPE()}},
+    'Div': {'Num': {'Num': Tifa._NUM_TYPE()}},
+    'Mult': {'Num': {'Num': Tifa._NUM_TYPE(), 
+                     'Str': Tifa._STR_TYPE(), 
+                     'List': Tifa._LIST_TYPE(), 
+                     'Tuple': Tifa._TUPLE_TYPE()},
+             'Str': {'Num': Tifa._STR_TYPE()},
+             'List': {'Num': Tifa._LIST_TYPE()},
+             'Tuple': {'Num': Tifa._TUPLE_TYPE()}},
+    'Pow': {'Num': {'Num': Tifa._NUM_TYPE()}},
+    // Should we allow old-fashioned string interpolation?
+    // Currently, I vote no because it makes the code harder and is bad form.
+    'Mod': {'Num': {'Num': Tifa._NUM_TYPE()}},
+}
+
+Tifa.prototype.typecheck_BinOp = function(node) {
+    var left = this.typecheck(node.left);
+    var right = this.typecheck(node.right);
+    var opLookup = Tifa.VALID_BINOP_TYPES[node.op.name];
+    if (opLookup) {
+        opLookup = opLookup[left.name];
+        if (opLookup) {
+            opLookup = opLookup[right.name];
+            if (opLookup) {
+                return opLookup;
+            }
+        }
+    }
+    this.reportIssue("Incompatible types", 
+                     {"left": left, "right": right, 
+                      "operation": node.op.name, 
+                      "position": Tifa.locate(node)});
+    return Tifa._UNKNOWN_TYPE;
 }
 
 Tifa.locate = function(node) {
@@ -645,5 +692,26 @@ Tifa.matchRSO = function(left, right) {
         return left;
     } else {
         return "maybe";
+    }
+}
+
+Tifa.traceState = function(state, method) {
+    state.trace.push({
+        'type': state.type, 'method': method,
+        'set': state.set, 'read': state.read, 'over': state.over
+    })
+}
+
+/**
+ * Correctly clones a type, returning mutable types unchanged.
+ */
+Tifa.copyType = function(type) {
+    switch (type.name) {
+        // Immutable types:
+        case "Str": return Tifa._STR_TYPE();
+        case "Num": return Tifa._NUM_TYPE();
+        case "Tuple": return Tifa._TUPLE_TYPE();
+        // Mutable types:
+        default: return type;
     }
 }

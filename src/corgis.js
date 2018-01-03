@@ -108,7 +108,7 @@ BlockPyCorgis.prototype.openDialog = function(name) {
             var datasets = data.blockpy.datasets;
             var start = $("<p>Documentation is available at url</p>");
             var body = $('<table></table>', {'class': 'table-bordered table-condensed table-striped'});
-            Object.keys(datasets).map(function(name) {
+            Object.keys(datasets).sort().map(function(name) {
                 var title_name = name;
                 name = name.replace(/\s/g, '_').toLowerCase();
                 var btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');

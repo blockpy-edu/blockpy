@@ -14,6 +14,7 @@
     
     var unit_tests = [
         // Source Code, Shouldn't catch this, Should catch this
+        ['print(True)', ['Undefined variables'], []],
         ['a = 0', [], ['Unread variables']],
         ['print(a)', [], ['Undefined variables']],
         ['a = 0\nprint(a)', ['Undefined variables'], []],
