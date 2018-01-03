@@ -121,6 +121,7 @@ Tifa.prototype.initializeReport = function() {
             "Type changes": [], // 
             "Iteration variable is iteration list": [], // 
             "Unknown functions": [], // 
+            "Not a function": [], // Attempt to call non-function as function
             "Incompatible types": [], // 
             "Return outside function": [], // 
             "Read out of scope": [], // 
@@ -184,7 +185,6 @@ Important concepts:
         type: Type
         set, read, overwrite: str {yes, no, maybe}
         trace: list of TraceNode
-        definition?: JS function object
     TraceNode:
         type: Type
         set, read, overwrite: str {yes, no, maybe}
@@ -196,7 +196,7 @@ Important concepts:
         keys?: Type
         values?: Type
         subtypes?: list of Type
-        
+        definition?: JS function object
     Report:
         success: bool
         issues: Issue => list of IssueData
@@ -221,53 +221,67 @@ Tifa.prototype.visit = function(node) {
     }
 }
 
-Tifa.prototype.walkTargets = function(targets, type, walker) {
-    for (var i = 0, len = targets.length; i < len; i++) {
-        walker(targets[i], type);
-    }
-}
-
 Tifa.prototype.visit_Assign = function(node) {
     // Handle value
-    this.visit(node.value);
-    var valueType = this.typecheck(node.value);
+    var valueType = this.visit(node.value);
     // Handle targets
     this.visitList(node.targets);
     var position = Tifa.locate(node);
     var that = this;
-    this.walkTargets(node.targets, valueType, function (target, type) {
+    this.walkTargets(node.targets, valueType, (function action(target, type) {
         if (target._astname === 'Name') {
             that.storeVariable(target.id.v, type, position);
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
                 var elt = target.elts[i];
                 var eltType = Tifa.indexSequenceType(type, i);
-                that.walkTargets(elt, eltType, position);
+                action(elt, eltType);
             }
         }
-    });
+    }));
+    
 }
 
 Tifa.prototype.visit_BinOp = function(node) {
-    this.generic_visit(node);
-    this.typecheck_BinOp(node);
+    // Handle left and right
+    var left = this.visit(node.left);
+    var right = this.visit(node.right);
+    
+    // Handle operation
+    var opLookup = Tifa.VALID_BINOP_TYPES[node.op.name];
+    if (opLookup) {
+        opLookup = opLookup[left.name];
+        if (opLookup) {
+            opLookup = opLookup[right.name];
+            if (opLookup) {
+                return opLookup(left, right);
+            }
+        }
+    }
+    this.reportIssue("Incompatible types", 
+                     {"left": left, "right": right, 
+                      "operation": node.op.name, 
+                      "position": Tifa.locate(node)});
+    return Tifa._UNKNOWN_TYPE;
 }
 
 Tifa.prototype.visit_Call = function(node) {
     // Handle func part (Name or Attribute)
-    this.visit(node.func)
+    var functionType = this.visit(node.func);
     // Handle args
+    var arguments = [];
     for (var i = 0, len = node.args.length; i < len; i++) {
-        var arg = node.args[i];
-        this.visit(arg);
+        var arg = this.visit(node.args[i]);
+        arguments.push(arg);
     }
     // Handle keywords
     // Handle starargs
     // Handle kwargs
-    var functionType = this.typecheck(node.func);
     if (functionType.name == 'Function') {
-        functionType.definition(functionType, node.args);
+        return functionType.definition(functionType, arguments);
     }
+    this.reportIssue("Not a function", {"position": Tifa.locate(node)});
+    return Tifa._UNKNOWN_TYPE;
 }
 
 Tifa.prototype.visit_If = function(node) {
@@ -326,23 +340,25 @@ Tifa.prototype.visit_While = function(node) {
 
 Tifa.prototype.visit_For = function(node) {
     // Handle the iteration list
+    var position = Tifa.locate(node);
     var iter = node.iter;
-    var iterType = this.typecheck(iter);
-    var iterationListName = null;
+    var iterType;
+    var iterListName = null;
+    if (iter._astname === "Name") {
+        iterListName = iter.id.v;
+        if (iterListName == "___") {
+            this.reportIssue("Unconnected blocks", {"position": position})
+        }
+        var state = this.iterateVariable(iterListName, Tifa.locate(node));
+        iterType = state.type;
+    } else {
+        iterType = this.visit(iter);
+    }
     if (Tifa.isTypeEmptyList(iterType)) {
-        this.reportIssue("Empty iterations", {"position": Tifa.locate(node)});
+        this.reportIssue("Empty iterations", {"position": position});
     }
     if (!(Tifa.isTypeSequence(iterType))) {
-        this.reportIssue("Non-list iterations", {"position": Tifa.locate(node)});
-    }
-    if (iter._astname === "Name") {
-        iterationListName = iter.id.v;
-        if (iterationListName == "___") {
-            this.reportIssue("Unconnected blocks", {"position": Tifa.locate(node)})
-        }
-        this.iterateVariable(iterationListName, Tifa.locate(node));
-    } else {
-        this.visit(iter);
+        this.reportIssue("Non-list iterations", {"position": position});
     }
     var iterSubtype = null;
     if (iterType !== null) {
@@ -350,13 +366,12 @@ Tifa.prototype.visit_For = function(node) {
     }
     
     // Handle the iteration variable
-    var iterationVariable = null;
-    var position = Tifa.locate(node);
+    var iterVariableName = null;
     var that = this;
     (function walkTarget(target, type) {
         if (target._astname === 'Name') {
-            if (iterationVariable == null) {
-                iterationVariable = target.id.v;
+            if (iterVariableName == null) {
+                iterVariableName = target.id.v;
             }
             that.storeIterVariable(target.id.v, type, position);
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
@@ -368,9 +383,9 @@ Tifa.prototype.visit_For = function(node) {
         }
     })(node.target, iterType);
     
-    if (iterationVariable && iterationListName && iterationListName == iterationVariable) {
+    if (iterVariableName && iterListName && iterListName == iterVariableName) {
         this.reportIssue("Iteration variable is iteration list", 
-                         {"name": iterationVariable, "position": Tifa.locate(node)});
+                         {"name": iterVariableName, "position": position});
     }
 
     // Handle the bodies
@@ -388,7 +403,7 @@ Tifa.prototype.visit_FunctionDef = function(node) {
     var position = Tifa.locate(node);
     var state = this.storeVariable(functionName, {"type": "Function"}, position);
     var that = this;
-    state.definition = function(parameters) {
+    state.type.definition = function(parameters) {
         // Manage scope
         that.ScopeId += 1;
         that.scopeChain.unshift(that.ScopeId);
@@ -407,16 +422,69 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         that.finishScope();
         that.scopeChain.shift();
     }
+    return state.type;
 }
 
 Tifa.prototype.visit_Name = function(node) {
-    var v = node.id.v;
-    if (v == "___") {
+    var name = node.id.v;
+    if (name == "___") {
         this.reportIssue("Unconnected blocks", {"position": Tifa.locate(node)})
     }
     if (node.ctx.prototype._astname === "Load") {
-        this.loadVariable(v, Tifa.locate(node));
+        if (name == "True" || name == "False") {
+            return Tifa._BOOL_TYPE();
+        } else if (name == "None") {
+            return Tifa._NONE_TYPE();
+        } else {
+            var state = this.loadVariable(name, Tifa.locate(node));
+            return state.type;
+        }
+    } else {
+        var variable = this.findVariablesScope(name);
+        if (variable.exists) {
+            return variable.state.type;
+        } else {
+            return Tifa._UNKNOWN_TYPE();
+        }
     }
+}
+
+
+Tifa.prototype.visit_Num = function(node) {
+    return Tifa._NUM_TYPE();
+}
+Tifa.prototype.visit_Bool = function(node) {
+    return Tifa._BOOL_TYPE();
+}
+Tifa.prototype.visit_Str = function(node) {
+    return Tifa._STR_TYPE();
+}
+Tifa.prototype.visit_List = function(node) {
+    var type = Tifa._LIST_TYPE();
+    if (node.elts.length == 0) {
+        type.empty = true;
+    } else {
+        type.empty = false;
+        // TODO: confirm homogenous subtype
+        for (var i = 0, len = node.elts.length; i < len; i++) {
+            type.subtype = this.visit(node.elts[i]);
+        }
+    }
+    return type;
+}
+Tifa.prototype.visit_Tuple = function(node) {
+    var type = Tifa._TUPLE_TYPE();
+    if (node.elts.length == 0) {
+        type.empty = true;
+    } else {
+        type.empty = false;
+        type.subtypes = [];
+        // TODO: confirm homogenous subtype
+        for (var i = 0, len = node.elts.length; i < len; i++) {
+            type.subtypes.push(this.visit(node.elts[i]));
+        }
+    }
+    return type;
 }
 
 
@@ -489,6 +557,7 @@ Tifa.prototype.loadVariable = function(name, position) {
         this.nameMap[currentPath][fullName] = state;
         this.reportIssue("Undefined variables", 
                          {'name': name, 'position':position})
+        return state;
     } else {
         Tifa.traceState(variable.state, "load");
         if (variable.state.set == 'no') {
@@ -501,6 +570,7 @@ Tifa.prototype.loadVariable = function(name, position) {
         }
         variable.state.read = 'yes';
         this.nameMap[currentPath][fullName] = variable.state;
+        return variable.state;
     }
 }
 
@@ -526,94 +596,39 @@ Tifa.prototype.finishScope = function() {
     }
 }
 
-Tifa.prototype.typecheck = function(node) {
-    /** Visit a node. **/
-    var method_name = 'typecheck_' + node._astname;
-    if (method_name in this) {
-        return this[method_name](node);
-    } else {
-        return {"name": "*Unknown"}
+Tifa.prototype.walkTargets = function(targets, type, walker) {
+    for (var i = 0, len = targets.length; i < len; i++) {
+        walker(targets[i], type);
     }
 }
-Tifa.prototype.typecheck_Num = function(node) {
-    return {'name': 'Num'}
-}
-Tifa.prototype.typecheck_Bool = function(node) {
-    return {'name': 'Bool'}
-}
-Tifa.prototype.typecheck_Str = function(node) {
-    return {'name': 'Str'}
-}
-Tifa.prototype.typecheck_Name = function(node) {
-    var name = node.id.v;
-    var variable = this.findVariablesScope(name);
-    if (variable.exists) {
-        return variable.state.type;
-    } else {
-        return Tifa._UNKNOWN_TYPE();
-    }
-}
-Tifa.prototype.typecheck_Call = function(node) {
-    var functionType = this.typecheck(node.func);
-    if (functionType.name == 'Function') {
-        return functionType.definition(functionType, node.args);
-    } else {
-        return Tifa._UNKNOWN_TYPE();
-    }
-}
-Tifa.prototype.typecheck_List = function(node) {
-    if (node.elts.length == 0) {
-        return {"name": "List", "empty": true};
-    } else {
-        return {"name": "List", "empty": false, 
-                "subtype": this.typecheck(node.elts[0])};
-    }
-}
+
+Tifa._BOOL_TYPE = function() { return {'name': 'Bool'} };
 Tifa._NUM_TYPE = function() { return {'name': 'Num'} };
 Tifa._STR_TYPE = function() { return {'name': 'Str'} };
 Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
 Tifa._LIST_TYPE = function() { return {'name': 'List', "empty": false} };
 Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple'} };
+Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
 Tifa.VALID_BINOP_TYPES = {
-    'Add': {'Num': {'Num': Tifa._NUM_TYPE()}, 
-            'String' :{'String': Tifa._STR_TYPE()}, 
-            'List': {'List': Tifa._LIST_TYPE()},
-            'Tuple': {'Tuple': Tifa._TUPLE_TYPE()}},
-    'Sub': {'Num': {'Num': Tifa._NUM_TYPE()}, 
-            'Set': {'Set': Tifa._SET_TYPE()}},
-    'Div': {'Num': {'Num': Tifa._NUM_TYPE()}},
-    'Mult': {'Num': {'Num': Tifa._NUM_TYPE(), 
-                     'Str': Tifa._STR_TYPE(), 
-                     'List': Tifa._LIST_TYPE(), 
-                     'Tuple': Tifa._TUPLE_TYPE()},
-             'Str': {'Num': Tifa._STR_TYPE()},
-             'List': {'Num': Tifa._LIST_TYPE()},
-             'Tuple': {'Num': Tifa._TUPLE_TYPE()}},
-    'Pow': {'Num': {'Num': Tifa._NUM_TYPE()}},
+    'Add': {'Num': {'Num': Tifa._NUM_TYPE}, 
+            'String' :{'String': Tifa._STR_TYPE}, 
+            'List': {'List': Tifa.mergeTypes},
+            'Tuple': {'Tuple': Tifa.mergeTypes}},
+    'Sub': {'Num': {'Num': Tifa._NUM_TYPE}, 
+            'Set': {'Set': Tifa.mergeTypes}},
+    'Div': {'Num': {'Num': Tifa._NUM_TYPE}},
+    'Mult': {'Num': {'Num': Tifa._NUM_TYPE, 
+                     'Str': Tifa._STR_TYPE, 
+                     'List': (l, r) => r, 
+                     'Tuple': (l, r) => r},
+             'Str': {'Num': Tifa._STR_TYPE},
+             'List': {'Num': (l, r) => l},
+             'Tuple': {'Num': (l, r) => l}},
+    'Pow': {'Num': {'Num': Tifa._NUM_TYPE}},
     // Should we allow old-fashioned string interpolation?
     // Currently, I vote no because it makes the code harder and is bad form.
-    'Mod': {'Num': {'Num': Tifa._NUM_TYPE()}},
-}
-
-Tifa.prototype.typecheck_BinOp = function(node) {
-    var left = this.typecheck(node.left);
-    var right = this.typecheck(node.right);
-    var opLookup = Tifa.VALID_BINOP_TYPES[node.op.name];
-    if (opLookup) {
-        opLookup = opLookup[left.name];
-        if (opLookup) {
-            opLookup = opLookup[right.name];
-            if (opLookup) {
-                return opLookup;
-            }
-        }
-    }
-    this.reportIssue("Incompatible types", 
-                     {"left": left, "right": right, 
-                      "operation": node.op.name, 
-                      "position": Tifa.locate(node)});
-    return Tifa._UNKNOWN_TYPE;
+    'Mod': {'Num': {'Num': Tifa._NUM_TYPE}},
 }
 
 Tifa.locate = function(node) {
@@ -713,5 +728,14 @@ Tifa.copyType = function(type) {
         case "Tuple": return Tifa._TUPLE_TYPE();
         // Mutable types:
         default: return type;
+    }
+}
+
+Tifa.mergeTypes = function(left, right) {
+    // TODO: Check that lists/sets have the same subtypes
+    switch (left.name) {
+        case "List": return (left.empty ? right.subtype : left.subtype);
+        case "Set": return (left.empty ? right.subtype : left.subtype);
+        case "Tuple": return left.subtypes.concat(right.subtypes);
     }
 }
