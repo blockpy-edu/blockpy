@@ -103,8 +103,8 @@ console.log(AbstractInterpreter.MODULES)
 // Actual work
 final_result = []
 loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions => {
-    loadJsonFile('data_analysis/f17_ct_8-5_run_submission.json').then(data => {
-        subs = data.submissions;
+    loadJsonFile('data_analysis/f17_ct_8-5_change_steps.json').then(data => {
+        subs = data.steps;
         var next = function(subi, stui) {
             processSub(subs[subi][stui], function() {
                 stui += 1;
@@ -115,7 +115,7 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 if (subi < subs.length) {
                     next(subi, stui);
                 } else {
-                    fs.writeFile('./data_analysis/f17_ct_processed_new_8-5.json', 
+                    fs.writeFile('./data_analysis/f17_ct_stepped_new_8-5.json', 
                                  JSON.stringify(final_result), 
                                  {'spaces':2}, 
                                  function (err) {

@@ -161,13 +161,13 @@
         }
         for (var j = 0, len2 = nones.length; j < len2; j=j+1) {
             if (analyzer.report.issues[nones[j]].length > 0) {
-                console.error("AI Tests: Incorrectly detected "+nones[j], "\n"+source);
+                console.error("AI Tests: Incorrectly detected "+nones[j], "\n"+source, "\n", analyzer.report);
                 errors += 1;
             }
         }
         for (var k = 0, len2 = somes.length; k < len2; k=k+1) {
             if (analyzer.report.issues[somes[k]].length == 0) {
-                console.error("AI Tests: Failed to detect "+somes[k], "\n"+source);
+                console.error("AI Tests: Failed to detect "+somes[k], "\n"+source, "\n", analyzer.report);
                 errors += 1;
             }
         }
