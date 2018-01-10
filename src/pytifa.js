@@ -381,7 +381,7 @@ Tifa.prototype.visit_For = function(node) {
                 walkTarget(elt, eltType, position);
             }
         }
-    })(node.target, iterType);
+    })(node.target, iterSubtype);
     
     if (iterVariableName && iterListName && iterListName == iterVariableName) {
         this.reportIssue("Iteration variable is iteration list", 
@@ -425,6 +425,16 @@ Tifa.prototype.visit_FunctionDef = function(node) {
     return state.type;
 }
 
+Tifa.prototype.visit_Attribute = function(node) {
+    // Handle value
+    var valueType = this.visit(node.value);
+    // Handle attr
+    var attrType = Tifa.loadBuiltinAttr(valueType, node.attr);
+    // Handle ctx
+    //TODO: Handling contexts
+    return attrType;
+}
+
 Tifa.prototype.visit_Name = function(node) {
     var name = node.id.v;
     if (name == "___") {
@@ -436,8 +446,14 @@ Tifa.prototype.visit_Name = function(node) {
         } else if (name == "None") {
             return Tifa._NONE_TYPE();
         } else {
-            var state = this.loadVariable(name, Tifa.locate(node));
-            return state.type;
+            var variable = this.findVariablesScope(name);
+            var builtin = Tifa.loadBuiltin(name);
+            if (!variable.exists && builtin) {
+                return builtin;
+            } else {
+                var state = this.loadVariable(name, Tifa.locate(node));
+                return state.type;
+            }
         }
     } else {
         var variable = this.findVariablesScope(name);
@@ -512,32 +528,32 @@ Tifa.prototype.storeVariable = function(name, type, position) {
     var variable = this.findVariablesScope(name);
     if (!variable.exists) {
         // Create a new instance of the variable on the current path
-        state = {'name': name, 'trace': [], 'type': type,
-                 'read': 'no', 'set': 'yes', 'over': 'no'};
-        this.nameMap[currentPath][fullName] = state;
+        newState = {'name': name, 'trace': [], 'type': type,
+                    'read': 'no', 'set': 'yes', 'over': 'no'};
+        this.nameMap[currentPath][fullName] = newState;
     } else {
-        Tifa.traceState(variable.state, "store");
+        newState = Tifa.traceState(variable.state, "store");
         if (!variable.inScope) {
             this.reportIssue("Write out of scope", 
                              {'name': name, 'position':position})
         }
         // Type change?
-        if (!Tifa.areTypesEqual(type, state.type)) {
+        if (!Tifa.areTypesEqual(type, variable.state.type)) {
             this.reportIssue("Type changes", 
                              {'name': name, 'position':position,
                               'old': state.type, 'new': type})
         }
-        state.type = type;
+        newState.type = type;
         // Overwritten?
-        if (state.set == 'yes' && state.read == 'no') {
-            state.over = 'yes';
+        if (variable.state.set == 'yes' && variable.state.read == 'no') {
+            newState.over = 'yes';
         } else {
-            state.set = 'yes';
-            state.read = 'no';
+            newState.set = 'yes';
+            newState.read = 'no';
         }
-        this.nameMap[currentPath][fullName] = state;
+        this.nameMap[currentPath][fullName] = newState;
     }
-    return state;
+    return newState;
 }
 
 Tifa.prototype.storeIterVariable = function(name, type, position) {
@@ -559,7 +575,7 @@ Tifa.prototype.loadVariable = function(name, position) {
                          {'name': name, 'position':position})
         return state;
     } else {
-        Tifa.traceState(variable.state, "load");
+        var newState = Tifa.traceState(variable.state, "load");
         if (variable.state.set == 'no') {
             this.reportIssue("Undefined variables", 
                              {'name': name, 'position':position})
@@ -568,9 +584,9 @@ Tifa.prototype.loadVariable = function(name, position) {
             this.reportIssue("Possibly undefined variables", 
                              {'name': name, 'position':position})
         }
-        variable.state.read = 'yes';
-        this.nameMap[currentPath][fullName] = variable.state;
-        return variable.state;
+        newState.read = 'yes';
+        this.nameMap[currentPath][fullName] = newState;
+        return newState;
     }
 }
 
@@ -580,7 +596,6 @@ Tifa.prototype.iterateVariable = function(name, position) {
 
 Tifa.prototype.finishScope = function() {
     var pathId = this.pathChain[0];
-    //console.log("Finishing Scope", this.scopeChain, "on path", pathId, "; variables:", this.nameMap);
     for (var name in this.nameMap[pathId]) {
         if (Tifa.sameScope(name, this.scopeChain)) {
             var state = this.nameMap[pathId][name];
@@ -641,7 +656,11 @@ Tifa.indexSequenceType= function(type, i) {
     } else if (type.name == "List") {
         return type.subtype;
     } else if (type.name == "Str") {
-        return {"name": 'Str'}
+        return Tifa._STR_TYPE();
+    } else if (type.name == "File") {
+        return Tifa._STR_TYPE();
+    } else {
+        return Tifa._UNKNOWN_TYPE();
     }
 }
 
@@ -711,10 +730,12 @@ Tifa.matchRSO = function(left, right) {
 }
 
 Tifa.traceState = function(state, method) {
-    state.trace.push({
-        'type': state.type, 'method': method,
+    var newState = {
+        'type': state.type, 'method': method, 'trace': state.trace.slice(0),
         'set': state.set, 'read': state.read, 'over': state.over
-    })
+    };
+    newState.trace.push(state);
+    return newState;
 }
 
 /**
@@ -737,5 +758,40 @@ Tifa.mergeTypes = function(left, right) {
         case "List": return (left.empty ? right.subtype : left.subtype);
         case "Set": return (left.empty ? right.subtype : left.subtype);
         case "Tuple": return left.subtypes.concat(right.subtypes);
+    }
+}
+
+Tifa.loadBuiltin = function(name) {
+    switch (name) {
+        case "range": return { "name": "Function",
+            "definition": function (type, args) {
+                return {"name": "List", "empty": false, "subtype": Tifa._NUM_TYPE()};
+            }
+        };
+        case "set": return { "name": "Function",
+            "definition": function (type, args) {
+                return Tifa._SET_TYPE();
+            }
+        };
+        case "print": return { "name": "Function",
+            "definition": function (type, args) {
+                return Tifa._NONE_TYPE();
+            }
+        };
+    }
+}
+
+Tifa.loadBuiltinAttr = function(type, attr) {
+    switch (type.name) {
+        case "List":
+            switch (attr) {
+                case "append": return { "name": "Function",
+                    "mutates": true,
+                    "definition": function (type, args) {
+                        type.empty = false;
+                        type.subtype = args[0];
+                    }
+                };
+            };
     }
 }

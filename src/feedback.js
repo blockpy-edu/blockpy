@@ -456,31 +456,31 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress['Iteration variable is iteration list'] && report['Iteration variable is iteration list'].length >= 1) {
         var variable = report['Iteration variable is iteration list'][0];
-        this.semanticError("Iteration Problem", "The property <code>"+variable.name+"</code> was iterated on line "+variable.position.line+", but you used the same variable as the iteration variable. You should choose a different variable name for the iteration variable. Usually, the iteration variable is the singular form of the iteration list (e.g., <code>for dog in dogs:</code>).", variable.position.line)
+        this.semanticError("Iteration Problem", "The variable <code>"+variable.name+"</code> was iterated on line "+variable.position.line+", but you used the same variable as the iteration variable. You should choose a different variable name for the iteration variable. Usually, the iteration variable is the singular form of the iteration list (e.g., <code>for dog in dogs:</code>).", variable.position.line)
         return true;
     } else if (!suppress["Undefined variables"] && report["Undefined variables"].length >= 1) {
         var variable = report["Undefined variables"][0];
-        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a property until it has been given a value.", variable.position.line)
+        this.semanticError("Initialization Problem", "The variable <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was not given a value on a previous line. You cannot use a variable until it has been given a value.", variable.position.line)
         return true;
     } else if (!suppress["Possibly undefined variables"] && report["Possibly undefined variables"].length >= 1) {
         var variable = report["Possibly undefined variables"][0];
-        this.semanticError("Initialization Problem", "The property <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a property until it has been given a value. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        this.semanticError("Initialization Problem", "The variable <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a variable until it has been given a value. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
         return true;
     } else if (!suppress["Unread variables"] && report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        this.semanticError("Unused Property", "The property <code>"+variable.name+"</code> was given a value, but was never used after that.", null)
+        this.semanticError("Unused Variable", "The variable <code>"+variable.name+"</code> was given a value, but was never used after that.", null)
         return true;
     } else if (!suppress["Overwritten variables"] && report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
-        this.semanticError("Overwritten Property", "The property <code>"+variable.name+"</code> was given a value, but <code>"+variable.name+"</code> was changed on line "+variable.position.line+" before it was used. One of the times that you gave <code>"+variable.name+"</code> a value was incorrect.", variable.position.line)
+        this.semanticError("Overwritten Variable", "The variable <code>"+variable.name+"</code> was given a value, but <code>"+variable.name+"</code> was changed on line "+variable.position.line+" before it was used. One of the times that you gave <code>"+variable.name+"</code> a value was incorrect.", variable.position.line)
         return true;
     } else if (!suppress["Empty iterations"] && report["Empty iterations"].length >= 1) {
         var variable = report["Empty iterations"][0];
-        this.semanticError("Iterating over empty list", "The property <code>"+variable.name+"</code> was set as an empty list, and then you attempted to use it in an iteration on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+        this.semanticError("Iterating over empty list", "The variable <code>"+variable.name+"</code> was set as an empty list, and then you attempted to use it in an iteration on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
         return true;
     } else if (!suppress["Non-list iterations"] && report["Non-list iterations"].length >= 1) {
         var variable = report["Non-list iterations"][0];
-        this.semanticError("Iterating over non-list", "The property <code>"+variable.name+"</code> is not a list, but you used it in the iteration on line "+variable.position.line+". You should only iterate over lists.", variable.position.line)
+        this.semanticError("Iterating over non-list", "The variable <code>"+variable.name+"</code> is not a list, but you used it in the iteration on line "+variable.position.line+". You should only iterate over lists.", variable.position.line)
         return true;
     } else if (!suppress["Incompatible types"] && report["Incompatible types"].length >= 1) {
         var variable = report["Incompatible types"][0];

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Blockpy/Kennel/Silicon</title>
+    
+    <link rel="stylesheet" href="libs/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/codemirror/codemirror.css">
+    <link rel="stylesheet" href="libs/font-awesome.min.css">
+    <link rel="stylesheet" href="libs/summernote/summernote.css">
+    <link rel="stylesheet" href="libs/multi-select.css">
+    <link rel="stylesheet" href="src/blockpy.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
+    
+    <!-- JQuery, D3, Math.js, Bootstrap -->
+    <script type="text/javascript" src="libs/jquery.js"></script>
+    <script type="text/javascript" src="libs/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="libs/jquery.multi-select.js"></script>
+    <script type="text/javascript" src="libs/d3.min.js"></script>
+    <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap-wysiwyg.js"></script>
+    <script type="text/javascript" src="libs/mindmup-editabletable.js"></script>
+    <script type="text/javascript" src="libs/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="libs/codemirror/python.js"></script>
+    <script type="text/javascript" src="libs/codemirror/htmlmixed.js"></script>
+    <script type="text/javascript" src="libs/codemirror/xml.js"></script>
+    <script type="text/javascript" src="libs/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="libs/stringify.js"></script>
+    
+    <!-- Summernote, a rich text editor -->
+    <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-hint.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
+        
+    <!-- Skulpt -->
+    <script type="text/javascript" src="skulpt/dist/skulpt.min.js"></script>
+    <script type="text/javascript" src="skulpt/dist/skulpt-stdlib.js"></script>
+    
+    <!-- Source Code -->
+    <script type="text/javascript" src="src/utilities.js"></script>
+    <script type="text/javascript" src="src/python_errors.js"></script>
+    <script type="text/javascript" src="src/ast_node_visitor.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter.js"></script>
+    <script type="text/javascript" src="src/pytifa.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_definitions.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>
+    <script type="text/javascript" src="src/dialog.js"></script>
+    <script type="text/javascript" src="src/storage.js"></script>
+    <script type="text/javascript" src="src/printer.js"></script>
+    <script type="text/javascript" src="src/server.js"></script>
+    <script type="text/javascript" src="src/corgis.js"></script>
+    <script type="text/javascript" src="src/feedback.js"></script>
+    <script type="text/javascript" src="src/sk_mod_instructor_extended.js"></script>
+    <script type="text/javascript" src="src/sk_mod_instructor.js"></script>
+    <script type="text/javascript" src="src/engine.js"></script>
+    
+    <!-- CORGIS -->
+    <!--<script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_dataset.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_skulpt.js"></script>-->
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
+    
+    <style>
+
+    </style>
+    
+    <script>
+    $(document).ready(function() {
+        var trace = function() {
+            
+        };
+        trace.removeAll = x => x;
+        mockFeedback = {
+            'isFeedbackVisible': x => true,
+            'clear': x => x,
+            //'presentFeedback': x => blockpy.BlockPyFeedback.prototype.presentFeedback.bind(mockFeedback)(x),
+            'presentFeedback': x => x, //console.log(Sk.executionReports.instructor.complaint),
+            'presentAnalyzerFeedback': x => BlockPyFeedback.prototype.presentAnalyzerFeedback.bind(mockFeedback)(x),
+            'instructorFeedback': (name, message, line) => name, //console.log(name, message, line),
+        }
+        main = {
+            'components': {
+                'printer': {
+                    'print': e => this.printed.push(e.slice(0, -1)), //console.log("PRINTED", e),
+                    'printHtml': e => this.printed.push(e),
+                    'resetPrinter': e => this.printed = [], //console.log("PRINTER RESET"),
+                    'getConfiguration': BlockPyPrinter.getDisabledConfiguration,
+                },
+                'editor': {
+                    'triggerOnChange': 0
+                },
+                'server': {
+                    'logEvent': x => x,
+                    'markSuccess': x => x,
+                },
+                'feedback': mockFeedback,
+                'toolbar': {
+                    
+                }
+            },
+            'model': {
+                'execution': {
+                    'reports': {},
+                    'suppressions': {},
+                    'status': v => this['status'] = v,
+                    'trace': trace,
+                    'step': x => x,
+                    'last_step': x => x,
+                    'line_number': x => x,
+                    'show_trace': x => x,
+                    'output': v => this.printed
+                },
+                'programs': {
+                    '__main__': v => 'a = "Words"\nprint(a)',
+                    'give_feedback': v => 'from instructor import *\ngently("You have failed.")\ngently("Not bad!")',
+                },
+                'settings': {
+                    'disable_timeout': x => false,
+                    'mute_printer': x => this['mute_printer'] = x,
+                }
+            }
+        };
+        main.components.feedback.main = main;
+        engine = new BlockPyEngine(main);
+        Sk.afterSingleExecution = engine.step.bind(engine);
+            
+        
+        function inIframe () {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+        if (inIframe()) {
+            $("#blockpy-container").width("100%");
+        }
+    });
+    </script>
+  
+</head>
+<body>
+<div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
+    <div id="blockpy-div" style='height:100%'></div>
+</div>
+<div id="blockpy-div2" style='height:100%'></div>
+<script>
+
+function getQueryParams(){
+    try{
+        url = window.location.href;
+        query_str = url.substr(url.indexOf('?')+1, url.length-1);
+        r_params = query_str.split('&');
+        params = {}
+        for( i in r_params){
+            param = r_params[i].split('=');
+            params[ param[0] ] = param[1];
+        }
+        return params;
+    }
+    catch(e){
+       return {};
+    }
+}
+</script>
+
+  
+<!-- Google Analytics -->
+<script>
+switch(window.location.protocol) {
+case 'file:':
+    break;
+default:
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-38802329-2', 'auto');
+    ga('send', 'pageview');
+    }
+</script>
+
+</body>
+</html>
