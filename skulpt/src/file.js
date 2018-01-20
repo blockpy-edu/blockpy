@@ -208,6 +208,7 @@ Sk.builtin.file.prototype["write"] = new Sk.builtin.func(function write(self, st
     } else {
         goog.asserts.fail();
     }
+    return Sk.builtin.none.none$;
     /*if (mode === "w" || mode === "wb" || mode === "a" || mode === "ab") {
     } else {
         goog.asserts.fail();

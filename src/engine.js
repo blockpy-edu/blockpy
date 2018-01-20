@@ -503,7 +503,6 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    except Exception as error:\n'+
         '        unlimit_execution_time()\n'+
         '        return error\n'+
-        '    log("XX"+str(error))\n'+
         '    unlimit_execution_time()\n'+
         '    return None\n'+
         instructorCode
