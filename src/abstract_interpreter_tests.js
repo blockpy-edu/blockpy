@@ -25,6 +25,9 @@
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
         
+        // Double call
+        ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],
+        
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
@@ -148,6 +151,8 @@
         // Return outside function
         ['def x():\n    return 5\nx()', ['Return outside function'], []],
         ['def x():\n    pass\nreturn 5\nx()', [], ['Return outside function']],
+        
+        
     ];
     
     var errors = 0;

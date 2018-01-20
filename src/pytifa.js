@@ -915,7 +915,7 @@ Tifa.isTypeSequence = function(type) {
 
 Tifa.sameScope = function(fullName, scopeChain) {
     var nameScopes = fullName.split("/").slice(0, -1);
-    var checkingScopes = scopeChain.reverse();
+    var checkingScopes = scopeChain.slice().reverse();
     if (nameScopes.length != checkingScopes.length) {
         return false;
     }
