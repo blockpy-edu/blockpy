@@ -18,6 +18,17 @@ def no_nested_function_definitions():
             gently("You have defined a function inside of another block. For instance, you may have placed it inside another function definition, or inside of a loop. Do not nest your function definition!")
             return False
     return True
+    
+def function_prints():
+    ast = parse_program()
+    defs = ast.find_all('FunctionDef')
+    for a_def in defs:
+        all_calls = a_def.find_all('Call')
+        for a_call in all_calls:
+            if a_call.func.ast_name == 'Name':
+                if a_call.func.id == 'print':
+                    return True
+    return False
 
 def find_function_calls(name):
     ast = parse_program()
