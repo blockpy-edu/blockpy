@@ -285,7 +285,9 @@ BlockPyFeedback.prototype.printError = function(error) {
         console.error(error.stack);
     }
     this.main.model.status.error("runtime");
-    this.main.components.editor.highlightError(error.traceback[0].lineno-1);
+    if (error.traceback && error.traceback.length) {
+        this.main.components.editor.highlightError(error.traceback[0].lineno-1);
+    }
     this.main.components.server.logEvent('feedback', "Runtime", original);
 }
 
@@ -434,10 +436,21 @@ BlockPyFeedback.prototype.convertSkulptSyntax = function(skulptError) {
 BlockPyFeedback.prototype.OPERATION_DESCRIPTION = {
     "Pow": "an exponent",
     "Add": "an addition",
-    "Mul": "a multiplication",
+    "Mult": "a multiplication",
     "Sub": "a subtraction",
     "Div": "a division",
     "Mod": "a modulo"
+};
+BlockPyFeedback.prototype.TYPE_DESCRIPTION = {
+    "Num": "a number",
+    "Str": "a string",
+    "Tuple": "a tuple",
+    "List": "a list",
+    "Bool": "a boolean",
+    "File": "a file",
+    "None": "a None",
+    "Set": "a set",
+    "Function": "a function"
 };
 
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
@@ -446,9 +459,21 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     if (suppress === true) {
         // Suppress all types of analyzer errors
         return false;
+    } else if (!suppress["Action after return"] && report["Action after return"].length >= 1) {
+        var variable = report["Action after return"][0];
+        this.semanticError("Action after return", "You performed an action after already returning from a function, on line "+variable.position.line+". You can only return on a path once.", variable.position.line)
+        return true;
     } else if (!suppress['Return outside function'] && report['Return outside function'].length >= 1) {
         var first = report['Return outside function'][0];
         this.semanticError("Return outside function", "You attempted to return outside of a function on line "+first.position.line+". But you can only return from within a function.", first.position.line)
+        return true;
+    } else if (!suppress['Write out of scope'] && report['Write out of scope'].length >= 1) {
+        var first = report['Write out of scope'][0];
+        this.semanticError("Write out of scope", "You attempted to write a variable from a higher scope (outside the function) on line "+first.position.line+". You should only use variables inside the function they were declared in.", first.position.line)
+        return true;
+    } else if (!suppress['Read out of scope'] && report['Read out of scope'].length >= 1) {
+        var first = report['Read out of scope'][0];
+        this.semanticError("Read out of scope", "You attempted to read a variable from a higher scope (outside the function) on line "+first.position.line+". You should only use variables inside the function they were declared in.", first.position.line)
         return true;
     } else if (!suppress['Unconnected blocks'] && report["Unconnected blocks"].length >= 1) {
         var variable = report['Unconnected blocks'][0];
@@ -468,7 +493,12 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress["Unread variables"] && report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
-        this.semanticError("Unused Variable", "The variable <code>"+variable.name+"</code> was given a value, but was never used after that.", null)
+        var kindName = 'variable', kindBody = 'value';
+        if (variable.type && variable.type.name == 'Function') {
+            kindName = 'function';
+            kindBody = 'definition';
+        }
+        this.semanticError("Unused Variable", "The "+kindName+" <code>"+variable.name+"</code> was given a "+kindBody+", but was never used after that.", null)
         return true;
     } else if (!suppress["Overwritten variables"] && report["Overwritten variables"].length >= 1) {
         var variable = report["Overwritten variables"][0];
@@ -476,16 +506,22 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress["Empty iterations"] && report["Empty iterations"].length >= 1) {
         var variable = report["Empty iterations"][0];
-        this.semanticError("Iterating over empty list", "The variable <code>"+variable.name+"</code> was set as an empty list, and then you attempted to use it in an iteration on "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
-        return true;
+        if (variable.name) {
+            this.semanticError("Iterating over empty list", "The variable <code>"+variable.name+"</code> was set as an empty list, and then you attempted to use it in an iteration on line "+variable.position.line+". You should only iterate over non-empty lists.", variable.position.line)
+            return true;
+        }
     } else if (!suppress["Non-list iterations"] && report["Non-list iterations"].length >= 1) {
         var variable = report["Non-list iterations"][0];
-        this.semanticError("Iterating over non-list", "The variable <code>"+variable.name+"</code> is not a list, but you used it in the iteration on line "+variable.position.line+". You should only iterate over lists.", variable.position.line)
-        return true;
+        if (variable.name) {
+            this.semanticError("Iterating over non-list", "The variable <code>"+variable.name+"</code> is not a list, but you used it in the iteration on line "+variable.position.line+". You should only iterate over sequences like lists.", variable.position.line)
+            return true;
+        }
     } else if (!suppress["Incompatible types"] && report["Incompatible types"].length >= 1) {
         var variable = report["Incompatible types"][0];
-        op = this.OPERATION_DESCRIPTION[variable.operation];
-        this.semanticError("Incompatible types", "You used "+op+" operation with a "+variable.left.type+" and a "+variable.right.type+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
+        var op = this.OPERATION_DESCRIPTION[variable.operation];
+        var left = this.TYPE_DESCRIPTION[variable.left.name];
+        var right = this.TYPE_DESCRIPTION[variable.right.name];
+        this.semanticError("Incompatible types", "You used "+op+" operation with a "+left+" and a "+right+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
         return true;
     }
     return false;

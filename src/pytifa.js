@@ -97,6 +97,15 @@ Tifa.prototype.processAst = function(ast) {
     // Check afterwards
     this.finishScope();
     
+    this.report.topLevelVariables = {};
+    var mainPathVars = this.nameMap[this.pathChain[0]]
+    for (var fullName in mainPathVars) {
+        var splitName = fullName.split("/");
+        if (splitName.length == 2 && splitName[0] == this.scopeChain[0]) {
+            this.report.topLevelVariables[splitName[1]] = mainPathVars[fullName];
+        }
+    }
+    
     return this.report;
 }
 
@@ -122,6 +131,7 @@ Tifa.prototype.initializeReport = function() {
             "Iteration variable is iteration list": [], // 
             "Unknown functions": [], // 
             "Not a function": [], // Attempt to call non-function as function
+            "Action after return": [],
             "Incompatible types": [], // 
             "Return outside function": [], // 
             "Read out of scope": [], // 
@@ -209,6 +219,16 @@ Important concepts:
 */
 
 Tifa.prototype.visit = function(node) {
+    // Actions after return?
+    if (this.scopeChain.length > 1) {
+        var returnState = this.findVariablesScope("*return");
+        if (returnState.exists && returnState.inScope) {
+            if (returnState.state.set == "yes") {
+                this.reportIssue("Action after return", {"position": Tifa.locate(node)});
+            }
+        }
+    }
+    // No? All good.
     this.astNames.push(node._astname);
     this.AstId += 1;
     var result = NodeVisitor.prototype.visit.call(this, node);
@@ -266,8 +286,10 @@ Tifa.prototype.visit_BinOp = function(node) {
 }
 
 Tifa.prototype.visit_Call = function(node) {
+    var position = Tifa.locate(node);
     // Handle func part (Name or Attribute)
     var functionType = this.visit(node.func);
+    var calleeName = this.identifyCaller(node);
     // Handle args
     var arguments = [];
     for (var i = 0, len = node.args.length; i < len; i++) {
@@ -278,9 +300,10 @@ Tifa.prototype.visit_Call = function(node) {
     // Handle starargs
     // Handle kwargs
     if (functionType.name == 'Function') {
-        return functionType.definition(functionType, arguments);
+        var result = functionType.definition(this, functionType, calleeName, arguments, position);
+        return result;
     }
-    this.reportIssue("Not a function", {"position": Tifa.locate(node)});
+    this.reportIssue("Not a function", {"position": position});
     return Tifa._UNKNOWN_TYPE;
 }
 
@@ -334,8 +357,116 @@ Tifa.prototype.visit_If = function(node) {
 }
 
 Tifa.prototype.visit_While = function(node) {
-    this.visit_If(node);
-    // This probably doesn't work for orelse bodies, but who actually uses those.
+    // Visit the conditional
+    this.visit(node.test);
+    
+    // Visit the bodies
+    var thisPathId = this.PathId;
+    this.PathId += 1;
+    var ifPathId = this.PathId;
+    this.pathNames.push(ifPathId+'i');
+    this.pathChain.unshift(ifPathId);
+    this.nameMap[ifPathId] = {};
+    this.pathNames.pop()
+    this.pathChain.shift();
+    
+    this.PathId += 1;
+    var elsePathId = this.PathId;
+    this.pathNames.push(elsePathId+'e');
+    this.pathChain.unshift(elsePathId);
+    this.nameMap[elsePathId] = {};
+    for (var i = 0, len = node.orelse.length; i < len; i++) {
+        this.visit(node.orelse[i]);
+    }
+    this.visit(node.test);
+    this.pathNames.pop()
+    this.pathChain.shift();
+    
+    // Combine two paths into one
+    for (var ifName in this.nameMap[ifPathId]) {
+        if (ifName in this.nameMap[elsePathId]) {
+            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName],
+                                              this.nameMap[elsePathId][ifName],
+                                              Tifa.locate(node))
+        } else {
+            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], null, Tifa.locate(node))
+        }
+        this.nameMap[thisPathId][ifName] = combined;
+    }
+    for (var elseName in this.nameMap[elsePathId]) {
+        if (!(ifName in this.nameMap[elsePathId])) {
+            var combined = Tifa.combineStates(this.nameMap[elsePathId][elseName], 
+                                              null,
+                                              Tifa.locate(node))
+            this.nameMap[thisPathId][elseName] = combined;
+        }
+    }
+}
+
+Tifa.prototype.visit_ListComp = function(node) {
+    // TODO: Handle comprehension scope
+    var generators = node.generators;
+    for (var i = 0, len = generators.length; i < len; i++) {
+        this.visit(generators[i]);
+    }
+    var elt = node.elt;
+    return Tifa._LIST_OF_TYPE(this.visit(elt));
+}
+
+Tifa.prototype.visit_comprehension = function(node) {
+    // Handle the iteration list
+    var position = Tifa.locate(node);
+    var iter = node.iter;
+    var iterType;
+    var iterListName = null;
+    if (iter._astname === "Name") {
+        iterListName = iter.id.v;
+        if (iterListName == "___") {
+            this.reportIssue("Unconnected blocks", {"position": position})
+        }
+        var state = this.iterateVariable(iterListName, Tifa.locate(node));
+        iterType = state.type;
+    } else {
+        iterType = this.visit(iter);
+    }
+    if (Tifa.isTypeEmptyList(iterType)) {
+        this.reportIssue("Empty iterations", {"position": position, "name": iterListName});
+    }
+    if (!(Tifa.isTypeSequence(iterType))) {
+        this.reportIssue("Non-list iterations", {"position": position, "name": iterListName});
+    }
+    var iterSubtype = null;
+    if (iterType !== null) {
+        iterSubtype = Tifa.indexSequenceType(iterType, 0);
+    }
+    
+    // Handle the iteration variable
+    var iterVariableName = null;
+    var that = this;
+    (function walkTarget(target, type) {
+        if (target._astname === 'Name') {
+            if (iterVariableName == null) {
+                iterVariableName = target.id.v;
+            }
+            that.storeIterVariable(target.id.v, type, position);
+        } else if (target._astname == 'Tuple' || target._astname == 'List') {
+            for (var i = 0, len = target.elts.length; i < len; i++) {
+                var elt = target.elts[i];
+                var eltType = Tifa.indexSequenceType(type, i);
+                walkTarget(elt, eltType, position);
+            }
+        }
+    })(node.target, iterSubtype);
+    
+    if (iterVariableName && iterListName && iterListName == iterVariableName) {
+        this.reportIssue("Iteration variable is iteration list", 
+                         {"name": iterVariableName, "position": position});
+    }
+
+    // Handle the bodies
+    for (var i = 0, len = node.ifs.length; i < len; i++) {
+        this.visit(node.ifs[i]);
+    }
 }
 
 Tifa.prototype.visit_For = function(node) {
@@ -355,10 +486,10 @@ Tifa.prototype.visit_For = function(node) {
         iterType = this.visit(iter);
     }
     if (Tifa.isTypeEmptyList(iterType)) {
-        this.reportIssue("Empty iterations", {"position": position});
+        this.reportIssue("Empty iterations", {"position": position, "name": iterListName});
     }
     if (!(Tifa.isTypeSequence(iterType))) {
-        this.reportIssue("Non-list iterations", {"position": position});
+        this.reportIssue("Non-list iterations", {"position": position, "name": iterListName});
     }
     var iterSubtype = null;
     if (iterType !== null) {
@@ -401,35 +532,51 @@ Tifa.prototype.visit_FunctionDef = function(node) {
     // Name
     var functionName = node.name.v;
     var position = Tifa.locate(node);
-    var state = this.storeVariable(functionName, {"type": "Function"}, position);
-    var that = this;
-    state.type.definition = function(parameters) {
+    var state = this.storeVariable(functionName, {"name": "Function"}, position);
+    state.type.definition = function(analyzer, callType, callName, parameters, callPosition) {
         // Manage scope
-        that.ScopeId += 1;
-        that.scopeChain.unshift(that.ScopeId);
+        analyzer.ScopeId += 1;
+        analyzer.scopeChain.unshift(analyzer.ScopeId);
         // Process arguments
         var args = node.args.args;
         for (var i = 0; i < args.length; i++) {
             var arg = args[i];
             var name = Sk.ffi.remapToJs(arg.id);
             var parameter = Tifa.copyType(parameters[i]);
-            that.storeVariable(name, parameter, position)
+            analyzer.storeVariable(name, parameter, position)
         }
         for (var i = 0, len = node.body.length; i < len; i++) {
-            that.visit(node.body[i]);
+            analyzer.visit(node.body[i]);
+        }
+        var returnState = analyzer.findVariablesScope("*return");
+        var returnValue = Tifa._NONE_TYPE();
+        if (returnState.exists && returnState.inScope) {
+            analyzer.loadVariable("*return", callPosition);
         }
         // Return scope
-        that.finishScope();
-        that.scopeChain.shift();
+        analyzer.finishScope();
+        analyzer.scopeChain.shift();
+        return returnValue;
+        
     }
     return state.type;
+}
+
+Tifa.prototype.visit_Return = function(node) {
+    if (this.scopeChain.length == 1) {
+        this.reportIssue("Return outside function", {"position": Tifa.locate(node)});
+    }
+    var valueType = this.visit(node.value);
+    var position = Tifa.locate(node);
+    this.returnVariable(valueType, position)
 }
 
 Tifa.prototype.visit_Attribute = function(node) {
     // Handle value
     var valueType = this.visit(node.value);
     // Handle attr
-    var attrType = Tifa.loadBuiltinAttr(valueType, node.attr);
+    var position = Tifa.locate(node);
+    var attrType = this.loadBuiltinAttr(valueType, node.value, node.attr.v, position);
     // Handle ctx
     //TODO: Handling contexts
     return attrType;
@@ -488,6 +635,21 @@ Tifa.prototype.visit_List = function(node) {
     }
     return type;
 }
+Tifa.prototype.visit_Dict = function(node) {
+    var type = Tifa._DICT_TYPE();
+    type.keys = Tifa._UNKNOWN_TYPE();
+    type.values = Tifa._UNKNOWN_TYPE();
+    if (node.keys.length == 0) {
+        type.empty = true;
+    } else {
+        type.empty = false;
+        for (var i = 0, len = node.keys.length; i < len; i++) {
+            type.keys = this.visit(node.keys[i]);
+            type.values = this.visit(node.values[i]);
+        }
+    }
+    return type;
+}
 Tifa.prototype.visit_Tuple = function(node) {
     var type = Tifa._TUPLE_TYPE();
     if (node.elts.length == 0) {
@@ -503,6 +665,53 @@ Tifa.prototype.visit_Tuple = function(node) {
     return type;
 }
 
+Tifa.prototype.visit_With = function(node) {
+    var typeValue = this.visit(node.context_expr),
+        position = Tifa.locate(node),
+        that = this;
+    this.visitList(node.optional_vars);
+    (function walkTarget(target, type) {
+        if (target._astname === 'Name') {
+            that.storeVariable(target.id.v, type, position);
+        } else if (target._astname == 'Tuple' || target._astname == 'List') {
+            for (var i = 0, len = target.elts.length; i < len; i++) {
+                var elt = target.elts[i];
+                var eltType = Tifa.indexSequenceType(type, i);
+                walkTarget(elt, eltType, position);
+            }
+        }
+    })(node.optional_vars, typeValue);
+    // Handle the bodies
+    for (var i = 0, len = node.body.length; i < len; i++) {
+        this.visit(node.body[i]);
+    }
+}
+
+Tifa.prototype.identifyCaller = function (node) {
+    switch (node._astname) {
+        case "Name":
+            return node.id.v;
+        case "Call":
+            return this.identifyCaller(node.func);
+        case "Attribute": case "Subscript":
+            return this.identifyCaller(node.value);
+        default:
+            return null;
+    }
+}
+
+Tifa.prototype.findVariableOutOfScope = function (name) {
+    for (var pathId in this.nameMap) {
+        var path = this.nameMap[pathId];
+        for (var fullName in path) {
+            var unscopedName = /[^/]*$/.exec(fullName)[0];
+            if (unscopedName == name) {
+                return {'exists': true, 'inScope': false, 'state': path[fullName]};
+            }
+        }
+    }
+    return {'exists': false, 'inScope': false, 'state': path[fullName]}
+}
 
 Tifa.prototype.findVariablesScope = function (name) {
     for (var j = 0, len = this.scopeChain.length; j < len; j++) {
@@ -562,17 +771,31 @@ Tifa.prototype.storeIterVariable = function(name, type, position) {
     return state;
 }
 
+Tifa.prototype.appendVariable = function(name, type, position) {
+    var state = this.storeVariable(name, type, position);
+    return state;
+}
+
+Tifa.prototype.returnVariable = function(type, position) {
+    return this.storeVariable("*return", type, position);
+}
+
 Tifa.prototype.loadVariable = function(name, position) {
     var fullName = this.scopeChain.join("/") + "/" + name;
     var currentPath = this.pathChain[0];
     var variable = this.findVariablesScope(name);
     if (!variable.exists) {
         // Create a new instance of the variable on the current path
+        if (this.findVariableOutOfScope(name).exists) {
+            this.reportIssue("Read out of scope", 
+                             {'name': name, 'position':position})
+        } else {
+            this.reportIssue("Undefined variables", 
+                             {'name': name, 'position':position})
+        }
         state = {'name': name, 'trace': [], 'type': '*Unknown',
                  'read': 'yes', 'set': 'no', 'over': 'no'};
         this.nameMap[currentPath][fullName] = state;
-        this.reportIssue("Undefined variables", 
-                         {'name': name, 'position':position})
         return state;
     } else {
         var newState = Tifa.traceState(variable.state, "load");
@@ -605,7 +828,7 @@ Tifa.prototype.finishScope = function() {
             }
             if (state.read == 'no') {
                 this.reportIssue('Unread variables', 
-                                 {'name': state.name})
+                                 {'name': state.name, 'type': state.type})
             }
         }
     }
@@ -620,14 +843,17 @@ Tifa.prototype.walkTargets = function(targets, type, walker) {
 Tifa._BOOL_TYPE = function() { return {'name': 'Bool'} };
 Tifa._NUM_TYPE = function() { return {'name': 'Num'} };
 Tifa._STR_TYPE = function() { return {'name': 'Str'} };
+Tifa._FILE_TYPE = function() { return {'name': 'File'} };
 Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
 Tifa._LIST_TYPE = function() { return {'name': 'List', "empty": false} };
+Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false} };
+Tifa._LIST_OF_TYPE = function(subtype) { return {'name': 'List', "empty": false, "subtype": subtype} };
 Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple'} };
 Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
 Tifa.VALID_BINOP_TYPES = {
     'Add': {'Num': {'Num': Tifa._NUM_TYPE}, 
-            'String' :{'String': Tifa._STR_TYPE}, 
+            'Str' :{'Str': Tifa._STR_TYPE}, 
             'List': {'List': Tifa.mergeTypes},
             'Tuple': {'Tuple': Tifa.mergeTypes}},
     'Sub': {'Num': {'Num': Tifa._NUM_TYPE}, 
@@ -732,7 +958,8 @@ Tifa.matchRSO = function(left, right) {
 Tifa.traceState = function(state, method) {
     var newState = {
         'type': state.type, 'method': method, 'trace': state.trace.slice(0),
-        'set': state.set, 'read': state.read, 'over': state.over
+        'set': state.set, 'read': state.read, 'over': state.over,
+        'name': state.name
     };
     newState.trace.push(state);
     return newState;
@@ -761,37 +988,53 @@ Tifa.mergeTypes = function(left, right) {
     }
 }
 
+Tifa.simpleFunctionDefinition = function(returnType) {
+    return { "name": "Function",
+             "definition": function (analyzer, type, name, args, position) {
+                return returnType;
+              }
+    };
+}
 Tifa.loadBuiltin = function(name) {
     switch (name) {
-        case "range": return { "name": "Function",
-            "definition": function (type, args) {
-                return {"name": "List", "empty": false, "subtype": Tifa._NUM_TYPE()};
-            }
-        };
-        case "set": return { "name": "Function",
-            "definition": function (type, args) {
-                return Tifa._SET_TYPE();
-            }
-        };
-        case "print": return { "name": "Function",
-            "definition": function (type, args) {
-                return Tifa._NONE_TYPE();
-            }
-        };
+        case "range": return Tifa.simpleFunctionDefinition({"name": "List", "empty": false, "subtype": Tifa._NUM_TYPE()});
+        case "set": return Tifa.simpleFunctionDefinition(Tifa._SET_TYPE());
+        case "print": return Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE());
+        case "input": return Tifa.simpleFunctionDefinition(Tifa._STR_TYPE());
+        case "open": return Tifa.simpleFunctionDefinition(Tifa._FILE_TYPE());
     }
 }
 
-Tifa.loadBuiltinAttr = function(type, attr) {
+Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
     switch (type.name) {
         case "List":
             switch (attr) {
                 case "append": return { "name": "Function",
-                    "mutates": true,
-                    "definition": function (type, args) {
+                    "definition": function (analyzer, functionType, callee, args, position) {
                         type.empty = false;
                         type.subtype = args[0];
+                        if (callee) {
+                            analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(type.subtype), position);
+                        }
                     }
                 };
             };
+        case "Dict":
+            switch (attr) {
+                case "items": return { "name": "Function",
+                    "definition": function (analyzer, functionType, callee, args, position) {
+                        return Tifa._LIST_OF_TYPE({
+                            'name': 'Tuple', 'subtypes': [type.keys, type.values], 'empty': false
+                        });
+                    }
+                };
+            };
+    }
+    // Catch mistakes
+    if (attr == "append") {
+        this.reportIssue('Append to non-list', 
+                         {'name': this.identifyCaller(func), 
+                          'position': position,
+                          'type': type})
     }
 }

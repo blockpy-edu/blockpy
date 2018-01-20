@@ -160,7 +160,7 @@ var $sk_mod_instructor = function(name) {
     mod.log_variables = create_logger('analyzer', 'variables');
     mod.log_behavior = create_logger('analyzer', 'behavior');
     mod.log_issues = create_logger('analyzer', 'issues');
-    mod.log_trace = create_logger('analyzer', 'student');
+    mod.log_trace = create_logger('student', 'trace');
 
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
@@ -335,13 +335,13 @@ var $sk_mod_instructor = function(name) {
                 Sk.executionReports['student'].error.tp$name == 'TimeLimitError';
     });
     
-    var backupTime = null;
+    var backupTime = undefined;
     mod.limit_execution_time = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("limit_execution_time", arguments, 0, 0);
         backupTime = Sk.execLimit;
         if (Sk.execLimitFunction) {
             Sk.execLimit = Sk.execLimitFunction();
-            Sk.execStart = Date.now()
+            Sk.execStart = Date.now();
         }
     });
     mod.unlimit_execution_time = new Sk.builtin.func(function() {
@@ -391,7 +391,7 @@ var $sk_mod_instructor = function(name) {
             if (typesList[name] === undefined) {
                 return Sk.ffi.remapToPy(null);
             } else {
-                return Sk.ffi.remapToPy(typesList[name]["type"]);
+                return Sk.ffi.remapToPy(typesList[name]["type"]["name"]);
             }
         }else{
             return Sk.ffi.remapToPy(null);

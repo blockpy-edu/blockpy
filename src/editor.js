@@ -472,7 +472,10 @@ BlockPyEditor.prototype.showConversionError = function() {
 }
 
 BlockPyEditor.prototype.setBlocks = function(python_code) {
-    if (!this.main.model.areBlocksUpdating()) {
+    if (!(!this.main.model.assignment.upload() &&
+        (this.main.model.settings.filename() == "__main__" ||
+         this.main.model.settings.filename() == "starting_code"))) {
+        console.log("NO")
         return false;
     }
     var xml_code = "";
@@ -823,7 +826,9 @@ BlockPyEditor.prototype.getHighlightMap = function() {
  *
  * @param {String} name - The name of the file being edited (e.g, "__main__", "starting_code")
  */
+/*
 BlockPyEditor.prototype.changeProgram = function(name) {
+    console.log("TEST")
     this.silentChange_ = true;
     if (name == 'give_feedback') {
         this.setMode('Text');
@@ -831,7 +836,7 @@ BlockPyEditor.prototype.changeProgram = function(name) {
     this.model.settings.filename = name;
     this.editor.setPython(this.model.programs[name]);
     this.toolbar.elements.programs.find("[data-name="+name+"]").click();
-}
+}*/
 
 /**
  * Eventually will be used to update "levels" of sophistication of the code interface.
