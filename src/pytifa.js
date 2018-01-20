@@ -551,7 +551,7 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         var returnState = analyzer.findVariablesScope("*return");
         var returnValue = Tifa._NONE_TYPE();
         if (returnState.exists && returnState.inScope) {
-            analyzer.loadVariable("*return", callPosition);
+            returnValue = analyzer.loadVariable("*return", callPosition).type;
         }
         // Return scope
         analyzer.finishScope();
