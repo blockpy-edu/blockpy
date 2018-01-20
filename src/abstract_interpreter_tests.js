@@ -33,6 +33,9 @@
         // List indexing and slicing
         ['([0][0] + [1,2,3][:][2])', ['Incompatible types'], []],
         
+        // Returned string
+        ['def pluralize(a_word):\n    return a_word+"s"\nnoun = pluralize("Dog")\nprint(noun + " can pet other " + noun)', ['Incompatible types'], []],
+        
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
