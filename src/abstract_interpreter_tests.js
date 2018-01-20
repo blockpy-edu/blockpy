@@ -88,13 +88,18 @@
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
         ['def int_func(x):\n\treturn 5\nint_func(10)', [], []],
+        // Return value
+        ['def x():\n    return 4\nx()', ['Unread variables'], []],
+        // Actions after returning
+        ['def x():\n    return 5\n    return 4\nx()', [], ['Action after return']],
+        ['def x():\n  if True:\n    return 4\n  else:\n    return 3\n  a = 0\n  print(a)\nx()', [], ['Action after return']],
         // Function with subtypes
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first([1]))', ['Incompatible types'], []],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(["1"]))', [], ['Incompatible types']],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(1))', [], ['Incompatible types']],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first("1"))', [], ['Incompatible types']],
         // Out of scope
-        ['def x(parameter):\n    return parameter\nparameter\nx(0)', [], ['Read out of scope']],
+        ['def x(parameter):\n    return parameter\nx(0)\nparameter', [], ['Read out of scope']],
         ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
         
         // Append to empty list
