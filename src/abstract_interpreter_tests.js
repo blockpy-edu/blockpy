@@ -28,6 +28,11 @@
         // Double call
         ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],
         
+        // String indexing and slicing
+        ['("a"[0] + ""[:])[:][0]', ['Incompatible types'], []],
+        // List indexing and slicing
+        ['([0][0] + [1,2,3][:][2])', ['Incompatible types'], []],
+        
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read

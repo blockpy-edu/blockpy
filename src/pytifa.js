@@ -582,6 +582,16 @@ Tifa.prototype.visit_Attribute = function(node) {
     return attrType;
 }
 
+Tifa.prototype.visit_Subscript = function(node) {
+    // Handle value
+    var valueType = this.visit(node.value);
+    // Handle slice
+    switch (node.slice._astname) {
+        case "Index": return Tifa.indexSequenceType(valueType, 0);
+        case "Slice": return valueType;
+    }
+}
+
 Tifa.prototype.visit_Name = function(node) {
     var name = node.id.v;
     if (name == "___") {
