@@ -37,7 +37,8 @@ def unit_test(name, *tests):
                     out = out[0]
                 message = "Your <code>{}</code> function did not produce the correct output for the values {}.<br>Expected: <code>{}</code><br>Actual: <code>{}</code>{}"
                 test_out = the_function(*inp)
-                message = message.format(name, ', '.join(["<code>{}</code>".format(repr(i)) for i in inp]), repr(out), repr(test_out), tip)
+                inputs = ', '.join(["<code>{}</code>".format(repr(i)) for i in inp])
+                message = message.format(name, inputs, repr(out), repr(test_out), tip)
                 if (isinstance(out, float) and 
                     isinstance(test_out, (float, int)) and
                     abs(out-test_out) < DELTA):
