@@ -13,6 +13,13 @@
     var filename = '__main__.py';
     
     var unit_tests = [
+        /*// Write aliased variables
+        // Actually this isn't an issue
+        ['def x(y):\n    y = y+1\ny=0\nx(y)', ['Write out of scope'], []],*/
+        
+        // Calling functions from within functions
+        ['def z():\n     return b\ndef y():\n    b = 0\n    z()\n    return b\ndef x():\n    y()\nx()',
+            ['Unread variables'], ['Read out of scope']],
         // Source Code, Shouldn't catch this, Should catch this
         ['print(True)', ['Undefined variables'], []],
         ['a = 0', [], ['Unread variables']],
@@ -27,6 +34,9 @@
         
         // Double call
         ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],
+        
+        // Chained functions
+        ['def x():\n    return 0\ndef y():\n    x()\ny()', ['Read out of scope', 'Undefined variables'], []],
         
         // String indexing and slicing
         ['("a"[0] + ""[:])[:][0]', ['Incompatible types'], []],

@@ -533,9 +533,12 @@ Tifa.prototype.visit_FunctionDef = function(node) {
     var functionName = node.name.v;
     var position = Tifa.locate(node);
     var state = this.storeVariable(functionName, {"name": "Function"}, position);
+    var definitionsScope = this.scopeChain.slice(0);
     state.type.definition = function(analyzer, callType, callName, parameters, callPosition) {
         // Manage scope
         analyzer.ScopeId += 1;
+        var oldScope = analyzer.scopeChain.slice(0);
+        analyzer.scopeChain = definitionsScope.slice(0);
         analyzer.scopeChain.unshift(analyzer.ScopeId);
         // Process arguments
         var args = node.args.args;
@@ -556,6 +559,7 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         // Return scope
         analyzer.finishScope();
         analyzer.scopeChain.shift();
+        analyzer.scopeChain = oldScope;
         return returnValue;
         
     }
@@ -716,7 +720,7 @@ Tifa.prototype.findVariableOutOfScope = function (name) {
         for (var fullName in path) {
             var unscopedName = /[^/]*$/.exec(fullName)[0];
             if (unscopedName == name) {
-                return {'exists': true, 'inScope': false, 'state': path[fullName]};
+                return {'exists': true, 'inScope': false, 'scopedName': unscopedName, 'state': path[fullName]};
             }
         }
     }
@@ -724,16 +728,16 @@ Tifa.prototype.findVariableOutOfScope = function (name) {
 }
 
 Tifa.prototype.findVariablesScope = function (name) {
-    for (var j = 0, len = this.scopeChain.length; j < len; j++) {
-        for (var i = 0, len = this.pathChain.length; i < len; i++) {
+    for (var j = 0, slen = this.scopeChain.length; j < slen; j++) {
+        for (var i = 0, plen = this.pathChain.length; i < plen; i++) {
             var pathId = this.pathChain[i];
             var path = this.nameMap[pathId];
             var fullName = this.scopeChain.slice(j).join("/") + "/" + name;
             if (fullName in path) {
                 if (j == 0) {
-                    return {'exists': true, 'inScope': true, 'state': path[fullName]};
+                    return {'exists': true, 'inScope': true, 'scopedName': fullName, 'state': path[fullName]};
                 } else {
-                    return {'exists': true, 'inScope': false, 'state': path[fullName]};
+                    return {'exists': true, 'inScope': false, 'scopedName': fullName, 'state': path[fullName]};
                 }
             }
         }
@@ -794,9 +798,10 @@ Tifa.prototype.loadVariable = function(name, position) {
     var fullName = this.scopeChain.join("/") + "/" + name;
     var currentPath = this.pathChain[0];
     var variable = this.findVariablesScope(name);
+    var outOfScopeVar = this.findVariableOutOfScope(name);
     if (!variable.exists) {
         // Create a new instance of the variable on the current path
-        if (this.findVariableOutOfScope(name).exists) {
+        if (outOfScopeVar.exists) {
             this.reportIssue("Read out of scope", 
                              {'name': name, 'position':position})
         } else {
@@ -818,7 +823,11 @@ Tifa.prototype.loadVariable = function(name, position) {
                              {'name': name, 'position':position})
         }
         newState.read = 'yes';
-        this.nameMap[currentPath][fullName] = newState;
+        if (!variable.inScope && variable.state.type && variable.state.type.name == 'Function') {
+            this.nameMap[currentPath][variable.scopedName] = newState;
+        } else {
+            this.nameMap[currentPath][fullName] = newState;
+        }
         return newState;
     }
 }
@@ -967,7 +976,7 @@ Tifa.matchRSO = function(left, right) {
 
 Tifa.traceState = function(state, method) {
     var newState = {
-        'type': state.type, 'method': method, 'trace': state.trace.slice(0),
+        'type': state.type, 'method': method, 'trace': [],//state.trace.slice(0),
         'set': state.set, 'read': state.read, 'over': state.over,
         'name': state.name
     };
