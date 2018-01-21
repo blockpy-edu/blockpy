@@ -132,10 +132,10 @@
                 //'give_feedback': 'from instructor_functions import *\nsuppress("analyzer", "Incompatible types")\nmatch_signature("curve_grade", 1, "old")\nunit_test("curve_grade", (64, True), (0, 0), (100, 100))',
                 //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
-                //'give_feedback': 'set_success()',
+                'give_feedback': 'set_success()',
                 //'give_feedback': 'from instructor_utility import *\nfrom instructor_printing import *\n\nsuppress("analyzer")\nsuppress("instructor")\nhide_correctness()\n\nast = parse_program()\n\nall_checked = True\nanswers = [("1*2*3", "6"), ("3*4","12"), ("0","0"), ("5*-5", "-25")]\nfor an_input, result in answers:\n    reset_output()\n    queue_input(an_input)\n    run_student()\n    if not get_output():\n        all_checked = False\n    elif result not in get_output():\n        if str(float(result)) in get_output():\n            give_partial(.1/len(answers), "Checking Float "+an_input)\n        all_checked = False\n    else:\n        give_partial(.2/len(answers), "Checking "+an_input)',
                 //'give_feedback': "from instructor_utility import *\nensure_operation('in')",
-                'give_feedback': 'for x in range(2):\n    reset_output()\n    queue_input("Test", "")\n    e = run_student()\n    if e:\n        gently(str(e))\n    log(get_output())\nif not e:\n    set_success()',
+                //'give_feedback': 'for x in range(2):\n    reset_output()\n    queue_input("Test", "")\n    e = run_student()\n    if e:\n        gently(str(e))\n    log(get_output())\nif not e:\n    set_success()',
                 //'give_feedback': "from instructor_files import *\nfiles_not_handled_correctly('example.txt')",
                 //'give_feedback': "from instructor_imports import *\nensure_imports('math', 'random')",
                 //'give_feedback': "from instructor_plotting import * \nprevent_incorrect_plt() \nensure_correct_plot('plot') \nensure_show() \ncheck_for_plot('line', [[1,2,3],[4,5,6]])",
@@ -156,12 +156,12 @@
             {
                 //'__main__': 'ss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
                 //'__main__': 'print("Hello world"[1:5])',
-                //'__main__': 'a = 0\nprint(a)',
+                '__main__': 'a = 0\nprint(a)',
                 //'__main__': 'num = input("")\nnum_list = [int(n) for n in num.split("*")]\nfor n in num_list:\n    n*n\n    return 4\nprint(n)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
                 //'__main__': 'round(float("9.5", ___))',
                 //'__main__': getQueryParams()["code"] || "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3],[4, 5, 6])\nplt.show()",
-                '__main__': 'i=0\nwhile i!="0":\n    i=input("")\n    print(i)',
+                //'__main__': 'i=0\nwhile i!="0":\n    i=input("")\n    print(i)',
                 //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
                 //'__main__': "print(open('example.txt').read())"
                 //'__main__': "import math\nmath\nfrom random import choice\nchoice"
