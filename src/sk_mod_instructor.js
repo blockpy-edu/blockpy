@@ -299,9 +299,9 @@ var $sk_mod_instructor = function(name) {
     });
     
     mod.queue_input = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("queue_input", arguments, 1);
-        var args = Array.prototype.slice.call(arguments, 1);
-        for (var i = args.length-1; i > 0; i--) {
+        Sk.builtin.pyCheckArgs("queue_input", arguments, 1, Infinity);
+        var args = arguments;
+        for (var i = args.length-1; i >= 0; i--) {
             var input = args[i];
             Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
             Sk.queuedInput.push(Sk.ffi.remapToJs(input));

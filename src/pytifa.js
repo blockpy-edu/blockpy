@@ -137,7 +137,9 @@ Tifa.prototype.initializeReport = function() {
             "Read out of scope": [], // 
             "Write out of scope": [], // Attempted to modify a variable in a higher scope
             "Aliased built-in": [], // 
-            "Method not in Type": [] // A method was used that didn't exist for that type
+            "Method not in Type": [], // A method was used that didn't exist for that type
+            "Submodule not found": [],
+            "Module not found": []
         }
     }
     return this.report;
@@ -260,6 +262,38 @@ Tifa.prototype.visit_Assign = function(node) {
         }
     }));
     
+}
+
+Tifa.prototype.visit_Import = function(node) {
+    // Handle names
+    var position = Tifa.locate(node);
+    for (var i = 0, len = node.names.length; i < len; i++) {
+        var module = node.names[i];
+        var asname = module.asname === null ? module.name : module.asname;
+        var moduleType = this.loadModule(module.name.v, position);
+        this.storeVariable(asname.v, moduleType, position);
+    }
+}
+
+Tifa.prototype.visit_ImportFrom = function(node) {
+    // Handle names
+    var position = Tifa.locate(node);
+    for (var i = 0, len = node.names.length; i < len; i++) {
+        if (node.module === null) {
+            var alias = node.names[i];
+            var asname = alias.asname === null ? alias.name : alias.asname;
+            var moduleType = this.loadModule(alias.name.v, position);
+            var nameType = this.loadBuiltinAttr(moduleType, null, alias.name.v, position);
+            this.storeVariable(asname.v, nameType, position);
+        } else {
+            var moduleName = node.module.v;
+            var alias = node.names[i];
+            var asname = alias.asname === null ? alias.name : alias.asname;
+            var moduleType = this.loadModule(moduleName, position);
+            var nameType = this.loadBuiltinAttr(moduleType, null, alias.name.v, position);
+            this.storeVariable(asname.v, nameType, position);
+        }
+    }
 }
 
 Tifa.prototype.visit_BinOp = function(node) {
@@ -823,7 +857,7 @@ Tifa.prototype.loadVariable = function(name, position) {
                              {'name': name, 'position':position})
         }
         newState.read = 'yes';
-        if (!variable.inScope && variable.state.type && variable.state.type.name == 'Function') {
+        if (!variable.inScope) {
             this.nameMap[currentPath][variable.scopedName] = newState;
         } else {
             this.nameMap[currentPath][fullName] = newState;
@@ -861,6 +895,7 @@ Tifa.prototype.walkTargets = function(targets, type, walker) {
 
 Tifa._BOOL_TYPE = function() { return {'name': 'Bool'} };
 Tifa._NUM_TYPE = function() { return {'name': 'Num'} };
+Tifa._MODULE_TYPE = function() { return {'name': 'Module', 'submodules': []} };
 Tifa._STR_TYPE = function() { return {'name': 'Str'} };
 Tifa._FILE_TYPE = function() { return {'name': 'File'} };
 Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
@@ -1018,9 +1053,77 @@ Tifa.loadBuiltin = function(name) {
     switch (name) {
         case "range": return Tifa.simpleFunctionDefinition({"name": "List", "empty": false, "subtype": Tifa._NUM_TYPE()});
         case "set": return Tifa.simpleFunctionDefinition(Tifa._SET_TYPE());
+        case "int": return Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE());
+        case "str": return Tifa.simpleFunctionDefinition(Tifa._STR_TYPE());
+        case "list": return Tifa.simpleFunctionDefinition(Tifa._LIST_TYPE());
+        case "float": return Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE());
         case "print": return Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE());
         case "input": return Tifa.simpleFunctionDefinition(Tifa._STR_TYPE());
         case "open": return Tifa.simpleFunctionDefinition(Tifa._FILE_TYPE());
+    }
+}
+
+Tifa.MODULES = {
+    'matplotlib': {
+        'name': 'Module',
+        'submodules': {
+            'pyplot': {
+                'name': 'Module',
+                'fields': {
+                    'plot': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'hist': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'scatter': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'show': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'xlabel': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'ylabel': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'title': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                }
+            }
+        }
+    },
+    'pprint': {
+        'name': "Module",
+        'fields': {
+            'pprint': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE())
+        }
+    },
+    'random': {
+        'name': "Module",
+        'fields': {
+            'randint': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE())
+        }
+    },
+    'math': {
+        'name': "Module",
+        'fields': {
+            'sin': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'cos': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'tan': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'log': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'log2': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'log10': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+        }
+    }
+}
+
+Tifa.prototype.loadModule = function(chain, position) {
+    var moduleNames = chain.split('.');
+    if (moduleNames[0] in Tifa.MODULES) {
+        var baseModule = Tifa.MODULES[moduleNames[0]];
+        for (var i=1, len=moduleNames.length; i<len; i++) {
+            if (baseModule.name == "Module" && 
+                moduleNames[i] in baseModule.submodules) {
+                baseModule = baseModule.submodules[moduleNames[i]];
+            } else {
+                this.reportIssue("Submodule not found",
+                                 {"name": chain, "position": position})
+            }
+        }
+        return baseModule;
+    } else {
+        this.reportIssue("Module not found",
+                         {"name": chain, "position": position});
+        return Tifa._MODULE_TYPE();
     }
 }
 
@@ -1048,6 +1151,12 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                     }
                 };
             };
+        case "Module":
+            if (attr in type.fields) {
+                return type.fields[attr];
+            } else {
+                return Tifa._UNKNOWN_TYPE();
+            }
     }
     // Catch mistakes
     if (attr == "append") {
