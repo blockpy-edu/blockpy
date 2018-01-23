@@ -475,7 +475,6 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
     if (!(!this.main.model.assignment.upload() &&
         (this.main.model.settings.filename() == "__main__" ||
          this.main.model.settings.filename() == "starting_code"))) {
-        console.log("NO")
         return false;
     }
     var xml_code = "";

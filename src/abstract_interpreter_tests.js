@@ -13,9 +13,13 @@
     var filename = '__main__.py';
     
     var unit_tests = [
+        // Importing
+        ['import matplotlib.pyplot as plt\nplt.hist([1,2,3])\nplt.show()', ['Undefined variables'], []],
+        ['from random import randint\na=randint(1,2)\n1+a', ['Undefined variables', 'Incompatible types'], []],
         /*// Write aliased variables
         // Actually this isn't an issue
         ['def x(y):\n    y = y+1\ny=0\nx(y)', ['Write out of scope'], []],*/
+        ["x = ''\ndef y():\n    return x\ny()", ['Unread variables'], []],
         
         // Calling functions from within functions
         ['def z():\n     return b\ndef y():\n    b = 0\n    z()\n    return b\ndef x():\n    y()\nx()',
