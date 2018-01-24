@@ -214,7 +214,7 @@ StretchyTreeMatcher.prototype.findMatches = function(other){
 StretchyTreeMatcher.prototype.anyNodeMatch = function(insNode, stdNode){
 	//@TODO: create a more public function that converts insNode and stdNode into EasyNodes
 	//matching: an object representing the mapping and the symbol table
-	var matching = this.deep_findMatch(insNode, stdNode);
+	var matching = this.deep_findMatch(insNode, stdNode, true);
 	//if a direct matching is found
 	if(matching){
 		return matching;//return it
@@ -236,29 +236,27 @@ StretchyTreeMatcher.prototype.anyNodeMatch = function(insNode, stdNode){
 	Finds whether insNode and matches stdNode and whether insNode's children flexibly match stdNode's children in order
 	@return a mapping of nodes and a symbol table mapping insNode to stdNode
 **/
-StretchyTreeMatcher.prototype.deep_findMatch = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.deep_findMatch = function(insNode, stdNode, checkMeta){
 	var method_name = "deep_findMatch_" + insNode.astNode._astname;
 	if(method_name in this){
-		return this[method_name](insNode, stdNode);
+		return this[method_name](insNode, stdNode, checkMeta);
 	}else{
-		return this.deep_findMatch_generic(insNode, stdNode);
+		return this.deep_findMatch_generic(insNode, stdNode, checkMeta);
 	}
 }
-StretchyTreeMatcher.prototype.deep_findMatch_BinOp = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.deep_findMatch_BinOp = function(insNode, stdNode, checkMeta){
 	var op = insNode.astNode.op;
 	op = op.toString();
 	op = op.substring(("function").length + 1, op.length - 4);
 	var isGeneric = !(op === "Mult" || op === "Add");
 	if(isGeneric){
-		return this.deep_findMatch_generic(insNode, stdNode);
+		return this.deep_findMatch_generic(insNode, stdNode, checkMeta);
 	}else{
-		return this.deep_findMatch_BinFlex(insNode, stdNode);
+		return this.deep_findMatch_BinFlex(insNode, stdNode, checkMeta);
 	}
 }
-StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode){
-	//TODO: implement this properly
-	//return this.deep_findMatch_generic(insNode, stdNode);//TODO: delete this line
-	var baseMappings = this.shallowMatch(insNode, stdNode);
+StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode, checkMeta){
+	var baseMappings = this.shallowMatch(insNode, stdNode, checkMeta);
 	if(baseMappings){
 		var insLeft = insNode.children[0];
 		var insRight = insNode.children[1];
@@ -266,8 +264,8 @@ StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode
 		var stdRight = stdNode.children[1];
 		var newMappings = [];
 		//case 1: insLeft->stdLeft and insRight->stdRight
-		var caseLeft = this.deep_findMatch(insLeft, stdLeft);
-		var caseRight = this.deep_findMatch(insRight, stdRight);
+		var caseLeft = this.deep_findMatch(insLeft, stdLeft, false);
+		var caseRight = this.deep_findMatch(insRight, stdRight, false);
 		if(caseLeft && caseRight){
 			for(var i = 0; i < caseLeft.length; i += 1){
 				var newMap = baseMappings[0].newMergedMap(caseLeft[i]);
@@ -278,8 +276,8 @@ StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode
 			}
 		}
 		//case 2: insLeft->stdRight and insRight->stdLeft
-		caseLeft = this.deep_findMatch(insLeft, stdRight);
-		caseRight = this.deep_findMatch(insRight, stdLeft);
+		caseLeft = this.deep_findMatch(insLeft, stdRight, false);
+		caseRight = this.deep_findMatch(insRight, stdLeft, false);
 		if(caseLeft && caseRight){
 			for(var i = 0; i < caseLeft.length; i += 1){
 				var newMap = baseMappings[0].newMergedMap(caseLeft[i]);
@@ -296,8 +294,8 @@ StretchyTreeMatcher.prototype.deep_findMatch_BinFlex = function(insNode, stdNode
 	}
 	return false;
 }
-StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode){
-	var baseMappings = this.shallowMatch(insNode, stdNode);
+StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode, checkMeta){
+	var baseMappings = this.shallowMatch(insNode, stdNode, checkMeta);
 	if (baseMappings){
 		//base case this runs 0 times because no children
 		//find each child of insNode that matches IN ORDER
@@ -314,7 +312,7 @@ StretchyTreeMatcher.prototype.deep_findMatch_generic = function(insNode, stdNode
 			//accumulate all potential matches for current child
 			for(var j = youngestSib; j < stdNode.children.length; j += 1){
 				var stdChild = stdNode.children[j];
-				var newMapping = this.deep_findMatch(insChild, stdChild);
+				var newMapping = this.deep_findMatch(insChild, stdChild, true);
 				if (newMapping){
 					runningMaps.push(newMapping);
 					runningSibs.push(j);
@@ -371,7 +369,7 @@ StretchyTreeMatcher.prototype.mapMerge = function(baseMaps, baseSibs, runMaps, r
 	Flexibly matches a module node to a module or a body
 	@return a mapping of insNode to stdNode, or false if doesn't match
 **/
-StretchyTreeMatcher.prototype.shallowMatch_Module = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.shallowMatch_Module = function(insNode, stdNode, checkMeta){
 	if(stdNode.astNode._astname == "Module" || stdNode.field == "body"){
 		var mapping = new ASTMap();
 		mapping.addNodePairing(insNode, stdNode);
@@ -387,29 +385,30 @@ StretchyTreeMatcher.prototype.shallowMatch_Module = function(insNode, stdNode){
 		case 4: matches only if the exact names are the same (falls through to shallowMatch_generic)
 	@return a mapping of insNode to stdNode and possibly a symbolTable, or false if it doesn't match
 **/
-StretchyTreeMatcher.prototype.shallowMatch_Name = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.shallowMatch_Name = function(insNode, stdNode, checkMeta){
 	var id = Sk.ffi.remapToJs(insNode.astNode.id);
 	var varMatch = /^_[^_].*_$/;//regex
 	var expMatch = /^__.*__$/;//regex
 	var wildCard =/^___$/;//regex
 	var mapping = new ASTMap();
 	var matched = false;
-	if(varMatch.test(id)){//variable
+	var metaMatched = (checkMeta && insNode.field === stdNode.field) || !checkMeta;
+	if(varMatch.test(id) && metaMatched){//variable
 		if(stdNode.astNode._astname == "Name"){
 			var result = mapping.addVarToSymbolTable(insNode, stdNode);
 			matched = true;
 		}//could else return false, but shallowMatch_generic should do this as well
-	}else if(expMatch.test(id)){//expression
+	}else if(expMatch.test(id) && metaMatched){//expression
 		mapping.addExpToSymbolTable(insNode, stdNode);
 		matched = true;
-	}else if(wildCard.test(id)){//don't care
+	}else if(wildCard.test(id) && metaMatched){//don't care
 		matched = true;
 	}
 	if(matched){
 		mapping.addNodePairing(insNode, stdNode);
 		return [mapping];
 	}//else
-	return this.shallowMatch_generic(insNode, stdNode);
+	return this.shallowMatch_generic(insNode, stdNode, checkMeta);
 }
 /**
 	An empty loop body should match to anything
@@ -433,12 +432,13 @@ StretchyTreeMatcher.prototype.shallowMatch_Expr = function(insNode, stdNode){
 	Checks that all non astNode attributes are equal between insNode and stdNode
 	@return a mappin gof insNode to stdNode, or false, if the attributes aren't equal
 **/
-StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode, checkMeta){
 	var ins = insNode.astNode;
 	var std = stdNode.astNode;
 	var insFieldList = iter_fields(ins);
 	var stdFieldList = iter_fields(std);
-	var isMatch = insFieldList.length === stdFieldList.length && ins._astname === std._astname;
+	var metaMatched = (checkMeta && insNode.field === stdNode.field) || !checkMeta;
+	var isMatch = insFieldList.length === stdFieldList.length && ins._astname === std._astname && metaMatched;
 	for (var i = 0; i < insFieldList.length && isMatch; i += 1){
 		var insField = insFieldList[i][0];
 		var insValue = insFieldList[i][1];
@@ -476,10 +476,10 @@ StretchyTreeMatcher.prototype.shallowMatch_generic = function(insNode, stdNode){
 }
 
 //filter function for various types of nodes
-StretchyTreeMatcher.prototype.shallowMatch = function(insNode, stdNode){
+StretchyTreeMatcher.prototype.shallowMatch = function(insNode, stdNode, checkMeta){
 	var method_name = 'shallowMatch_' + insNode.astNode._astname;
 	if (method_name in this){
-		return this[method_name](insNode, stdNode);
+		return this[method_name](insNode, stdNode, checkMeta);
 	}//else
-	return this.shallowMatch_generic(insNode, stdNode);
+	return this.shallowMatch_generic(insNode, stdNode, checkMeta);
 }
