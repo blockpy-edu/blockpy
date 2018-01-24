@@ -21,7 +21,7 @@ function BlockPyToolbar(main, tag) {
 }
 
 BlockPyToolbar.prototype.notifyFeedbackUpdate = function() {
-    this.tag.find(".blockpy-toolbar-feedback").show().fadeOut(5000);
+    this.tag.find(".blockpy-toolbar-feedback").show().fadeOut(7000);
 }
 
 /**
