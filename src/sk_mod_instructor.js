@@ -519,7 +519,7 @@ var $sk_mod_instructor = function(name) {
             return new Sk.builtin.list(converts);
         }
         else
-            return Sk.ffi.remapToJs(null);
+            return Sk.ffi.remapToPy(null);
     });
 
     /**
