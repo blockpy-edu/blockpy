@@ -11,41 +11,49 @@
     }
 
     var filename = '__main__.py';
-
-    //var python_source = 'sum([1,2])/len([4,5,])\ntotal=0\ntotal=total+1\nimport weather\nimport matplotlib.pyplot as plt\ncelsius_temperatures = []\nexisting=weather.get_forecasts("Miami, FL")\nfor t in existing:\n    celsius = (t - 32) / 2\n    celsius_temperatures.append(celsius)\nplt.plot(celsius_temperatures)\nplt.title("Temperatures in Miami")\nplt.show()';
-    var python_source = 'if 5:\n    a = 0\n    b = 0\n    c = 0\nelif "yes":\n    a = 3\n    b = 3\nelse:\n    a = 5\n    if True:\n        b = 7\n    else:\n        b = 3\nprint(a)\nprint(b)';
     
     var unit_tests = [
+        // Importing
+        ['import matplotlib.pyplot as plt\nplt.hist([1,2,3])\nplt.show()', ['Undefined variables'], []],
+        ['from random import randint\na=randint(1,2)\n1+a', ['Undefined variables', 'Incompatible types'], []],
+        /*// Write aliased variables
+        // Actually this isn't an issue
+        ['def x(y):\n    y = y+1\ny=0\nx(y)', ['Write out of scope'], []],*/
+        ["x = ''\ndef y():\n    return x\ny()", ['Unread variables'], []],
+        
+        // Calling functions from within functions
+        ['def z():\n     return b\ndef y():\n    b = 0\n    z()\n    return b\ndef x():\n    y()\nx()',
+            ['Unread variables'], ['Read out of scope']],
         // Source Code, Shouldn't catch this, Should catch this
+        ['print(True)', ['Undefined variables'], []],
         ['a = 0', [], ['Unread variables']],
         ['print(a)', [], ['Undefined variables']],
         ['a = 0\nprint(a)', ['Undefined variables'], []],
         ['a = 0\na = 5', [], ['Overwritten variables']],
         ['a = 0\nb = 5', ['Overwritten variables'], ['Unread variables']],
         ['a = [1]\nprint(a)\na = [1]\nprint(a)', [], []],
-        // Iterating over the result of a builtin
-        ['x = range(100)\nprint(x)', ['Non-list iterations'], []],
-        ['x = range(100)\nfor y in x:\n    print(y)', ['Non-list iterations'], []],
-        ['x = range(100)\nfor y in x:\n    pass\nfor z in y:\n    print(z)', [], ['Non-list iterations']],
         // Unconnected blocks
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
-        // Incompatible types
-        ['a = 5 + "ERROR"', [], ['Incompatible types']],
+        
+        // Double call
+        ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],
+        
+        // Chained functions
+        ['def x():\n    return 0\ndef y():\n    x()\ny()', ['Read out of scope', 'Undefined variables'], []],
+        
+        // String indexing and slicing
+        ['("a"[0] + ""[:])[:][0]', ['Incompatible types'], []],
+        // List indexing and slicing
+        ['([0][0] + [1,2,3][:][2])', ['Incompatible types'], []],
+        
+        // Returned string
+        ['def pluralize(a_word):\n    return a_word+"s"\nnoun = pluralize("Dog")\nprint(noun + " can pet other " + noun)', ['Incompatible types'], []],
+        
         // Update without read
         ['a = 0\na+= 1\n', ['Undefined variables'], ['Unread variables']],
         // Update and read
         ['a = 0\na+= 1\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to empty list
-        ['a = []\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to non-empty list
-        ['a = [1]\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
-        // Append to undefined
-        ['a.append(1)\nprint(a)', ['Unread variables'], ['Undefined variables']],
-        // Append to unread
-        ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
-        // Append to number
-        ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
         // Iterate through non-existing list
         ['for x in y:\n\tpass', ['Unread variables'], ['Undefined variables']],
         // Iterate through list
@@ -58,10 +66,6 @@
         ['y = 5\nfor x in y:\n\tpass', ['Unread variables', 'Undefined variables'], ['Non-list iterations']],
         // Iterate over iteration variable
         ['y = [1,2,3]\nfor y in y:\n\tpass', [], ['Iteration variable is iteration list']],
-        // Created a new list but didn't read it
-        ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
-        // Created a new list but didn't initialize it
-        ['old = [1,2,3]\nfor x in old:\n\tnew.append(x)\nprint(new)', [], ['Undefined variables']],
         // Type change
         ['a = 0\nprint(a)\na="T"\nprint(a)', [], ['Type changes']],
         // Defined in IF root branch but not the other
@@ -97,17 +101,47 @@
         // Overwritten in all branch
         ['a = 0\nif True:\n\tprint(a)\n\tif False:\n\t\ta = 0\n\telse:\n\t\ta = 2\nelse:\n\ta = 1', ['Overwritten variables'], []],
         
+        // Iterating over the result of a builtin
+        ['x = range(100)\nprint(x)', ['Non-list iterations'], []],
+        ['x = range(100)\nfor y in x:\n    print(y)', ['Non-list iterations'], []],
+        ['x = range(100)\nfor y in x:\n    pass\nfor z in y:\n    print(z)', [], ['Non-list iterations']],
+        
+        // Incompatible types
+        ['a = 5 + "ERROR"', [], ['Incompatible types']],
+        ['a = "ERROR" * 5', ['Incompatible types'], []],
+        
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
         ['def int_func(x):\n\treturn 5\nint_func(10)', [], []],
+        // Return value
+        ['def x():\n    return 4\nx()', ['Unread variables'], []],
+        // Actions after returning
+        ['def x():\n    return 5\n    return 4\nx()', [], ['Action after return']],
+        ['def x():\n  if True:\n    return 4\n  else:\n    return 3\n  a = 0\n  print(a)\nx()', [], ['Action after return']],
         // Function with subtypes
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first([1]))', ['Incompatible types'], []],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(["1"]))', [], ['Incompatible types']],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first(1))', [], ['Incompatible types']],
         ['def add_first(a_list):\n    for element in a_list:\n        return element + 5\nprint(add_first("1"))', [], ['Incompatible types']],
         // Out of scope
-        ['def x(parameter):\n    return parameter\nparameter\nx(0)', [], ['Read out of scope']],
+        ['def x(parameter):\n    return parameter\nx(0)\nparameter', [], ['Read out of scope']],
         ['def x(parameter):\n    return parameter\nx(0)', ['Read out of scope'], []],
+        
+        // Append to empty list
+        ['a = []\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to non-empty list
+        ['a = [1]\na.append(1)\nprint(a)', ['Undefined variables', 'Unread variables'], []],
+        // Append to undefined
+        ['a.append(1)\nprint(a)', ['Unread variables'], ['Undefined variables']],
+        // Append to unread
+        ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
+        // Append to number
+        ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
+        
+        // Created a new list but didn't read it
+        ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
+        // Created a new list but didn't initialize it
+        ['old = [1,2,3]\nfor x in old:\n\tnew.append(x)\nprint(new)', [], ['Undefined variables']],
         
         // Built-ins
         ['a = float(5)\nb = "test"\nprint(a+b)', [], ['Incompatible types']],
@@ -139,30 +173,33 @@
         // Return outside function
         ['def x():\n    return 5\nx()', ['Return outside function'], []],
         ['def x():\n    pass\nreturn 5\nx()', [], ['Return outside function']],
+        
+        
     ];
     
     var errors = 0;
-    var analyzer = new AbstractInterpreter();
-    for (var i = 0, len = unit_tests.length; i < len; i = i+1) {
+    var analyzer = new Tifa();
+    for (var i = len = unit_tests.length-1; i >= 0; i = i-1) {
+        console.log("TEST", i)
         var source = unit_tests[i][0],
             nones = unit_tests[i][1],
             somes = unit_tests[i][2];
         analyzer.processCode(source);
         //console.log(source);
-        if (analyzer.report.error !== false) {
-            console.error("AI Tests: Error message in "+nones[j], "\n"+source, "\n"+analyzer.report.error);
+        if (!analyzer.report.success) {
+            console.error("AI Tests: Error message in "+nones[j], "\n"+source, "\n", analyzer.report.error);
             errors += 1;
             continue;
         }
         for (var j = 0, len2 = nones.length; j < len2; j=j+1) {
-            if (analyzer.report[nones[j]].length > 0) {
-                console.error("AI Tests: Incorrectly detected "+nones[j], "\n"+source);
+            if (analyzer.report.issues[nones[j]].length > 0) {
+                console.error("AI Tests: Incorrectly detected "+nones[j], "\n"+source, "\n", analyzer.report);
                 errors += 1;
             }
         }
         for (var k = 0, len2 = somes.length; k < len2; k=k+1) {
-            if (analyzer.report[somes[k]].length == 0) {
-                console.error("AI Tests: Failed to detect "+somes[k], "\n"+source);
+            if (analyzer.report.issues[somes[k]].length == 0) {
+                console.error("AI Tests: Failed to detect "+somes[k], "\n"+source, "\n", analyzer.report);
                 errors += 1;
             }
         }

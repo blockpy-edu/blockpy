@@ -23,7 +23,7 @@ function BlockPy(settings, assignment, programs) {
  *
  * @type Array.<String>
  */
-BlockPy.DEFAULT_MODULES = ['Properties', 'Decisions', 
+BlockPy.DEFAULT_MODULES = ['Variables', 'Decisions', 
                            'Iteration',
                            'Calculation', 'Output', 
                            'Values', 

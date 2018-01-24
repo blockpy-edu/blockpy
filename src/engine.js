@@ -16,7 +16,7 @@ function BlockPyEngine(main) {
     
     // Keeps track of the tracing while the program is executing
     this.executionBuffer = {};
-    this.abstractInterpreter = new AbstractInterpreter();
+    this.abstractInterpreter = new Tifa();
     
     this.openedFiles = {};
 }
@@ -62,7 +62,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
     var settings = this.main.model.settings;
     Sk.execLimitFunction = function() { 
-        return settings.disable_timeout() ? null : 10000; 
+        return settings.disable_timeout() ? Infinity : 10000; 
     };
     Sk.execLimit = Sk.execLimitFunction();
     // Identify the location to put new charts
@@ -429,9 +429,9 @@ BlockPyEngine.prototype.analyzeParse = function() {
     }
     report['analyzer'] = {
         'success': true,
-        'variables': this.abstractInterpreter.variableTypes,
-        'behavior': this.abstractInterpreter.variablesNonBuiltin,
-        'issues': this.abstractInterpreter.report
+        'variables': this.abstractInterpreter.report.topLevelVariables,
+        'behavior': this.abstractInterpreter.report.variables,
+        'issues': this.abstractInterpreter.report.issues
     }
     return true;
 }
@@ -682,6 +682,10 @@ BlockPyEngine.prototype.executionEnd_ = function() {
 
 if (typeof exports !== 'undefined') {
     exports.BlockPyEngine = BlockPyEngine;
-    exports.AbstractInterpreter = AbstractInterpreter;
+    exports.AbstractInterpreter = Tifa;
     exports.NodeVisitor = NodeVisitor;
+    exports.StretchyTreeMatcher = StretchyTreeMatcher;
+    exports.isSkBuiltin = isSkBuiltin;
+    exports.isAstNode = isAstNode;
+    exports.mixedRemapToPy = mixedRemapToPy;
 }

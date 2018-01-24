@@ -80,6 +80,11 @@ function readModuleFile(path, callback) {
     }
 }
 
+StretchyTreeMatcher = blockpy.StretchyTreeMatcher;
+isSkBuiltin = blockpy.isSkBuiltin;
+mixedRemapToPy = blockpy.mixedRemapToPy;
+isAstNode = blockpy.isAstNode;
+
 // Hardcoded datasets
 _IMPORTED_DATASETS = {};
 AbstractInterpreter = blockpy.AbstractInterpreter;
@@ -98,8 +103,8 @@ console.log(AbstractInterpreter.MODULES)
 // Actual work
 final_result = []
 loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions => {
-    loadJsonFile('data_analysis/f17_ct_posts_short.json').then(data => {
-        subs = data.submissions;
+    loadJsonFile('data_analysis/f17_ct_8-5_change_steps.json').then(data => {
+        subs = data.steps;
         var next = function(subi, stui) {
             processSub(subs[subi][stui], function() {
                 stui += 1;
@@ -110,11 +115,13 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 if (subi < subs.length) {
                     next(subi, stui);
                 } else {
-                    fs.writeFile('./data_analysis/f17_ct_processed_new.json', 
+                    fs.writeFile('./data_analysis/f17_ct_stepped_new_8-5.json', 
                                  JSON.stringify(final_result), 
                                  {'spaces':2}, 
                                  function (err) {
-                         console.error(err);
+                         if (err) {
+                            console.error("ERROR", err);
+                         }
                     });
                 }
             });
@@ -128,7 +135,7 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 console.log(sub.user, sub.assignment);
                 var ms = Sk.executionReports.instructor.complaint ?
                          Sk.executionReports.instructor.complaint.map(x => x.message.match(/.*\((.*)\).*/).pop()) : [];
-                //console.log(ms);
+                console.log(ms);
                 final_result.push({
                     'aid': sub.aid,
                     'assignment': sub.assignment,
