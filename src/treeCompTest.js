@@ -77,18 +77,24 @@ function testShallowMatch(){
 
 	mapping = testTree.shallowMatch(insNameNode, stdForLoop)[0];
 	debugPrint = false;
-	if(!(mapping.expTable.keys[0] == "__exp__")){
-		debugPrint = true;
-		failCount++;
-		console.error("symbol match not found");
-	}else
-		successCount++;
-	if(!(mapping.expTable.values[0] == stdForLoop.astNode)){
-		debugPrint = true;
-		failCount++;
-		console.error("did not match to correct ast node");
-	}else
-		successCount++;
+	if(mapping){
+		if(!(mapping.expTable.keys[0] == "__exp__")){
+			debugPrint = true;
+			failCount++;
+			console.error("symbol match not found");
+		}else
+			successCount++;
+		if(!(mapping.expTable.values[0] == stdForLoop.astNode)){
+			debugPrint = true;
+			failCount++;
+			console.error("did not match to correct ast node");
+		}else
+			successCount++;
+		}else{
+			debugPrint = true;
+			console.error("no mapping found");
+			failCount++;
+		}
 	if(debugPrint){
 		console.log(testTree);
 		console.log(insNameNode);
@@ -258,12 +264,18 @@ function testCommutativity(){
 
 	var mappings = insTree.findMatches(stdAST.astNode)[0];
 	var debugPrint = false;
-	if(mappings.conflictKeys.length != 0){
+	if(mappings){
+		if(mappings.conflictKeys.length != 0){
+			debugPrint = true;
+			failCount++;
+			console.error("Conflicting keys in ADDITION when there shouldn't be");
+		}else
+			successCount++;
+	}else{
 		debugPrint = true;
 		failCount++;
-		console.error("Conflicting keys in ADDITION when there shouldn't be");
-	}else
-		successCount++;
+		console.error("No mapping found when mapping should have been found");
+	}
 	if(debugPrint){
 		console.log(insAST.astNode);
 		console.log(stdAST.astNode);
@@ -364,6 +376,41 @@ function testPass(){
 	}
 	return [failCount, successCount];
 }
+function testMetaStretch(){
+	console.log("TESTING META STRETCH");
+	var failCount = 0;
+	var successCount = 0;
+	var debugPrint = false;
+	var stdCode = 'steps_hiked_list = [1,2,3,4]\n' +
+					'total = 0\n' +
+					'for steps_hiked in steps_hiked_list:\n' +
+					'    total = steps_hiked + total\n    steps = steps + 1';
+	var insCode = "for ___ in ___:\n" +
+					"    ___ = _sum_ + ___";
+	var insTree = new StretchyTreeMatcher(insCode);
+	var insAST = insTree.rootNode;
+	var stdAST = parseCode(stdCode);
+	var mappings = insTree.findMatches(stdAST.astNode);
+	if(!mappings){
+		console.error("mapping should have been found");
+		failCount++;
+		debugPrint = true;
+	}else{
+		if (mappings.length != 3){
+			console.log("Should find exactly 3 matches, instead found " + mappings.length)
+			failCount++;
+			debugPrint = true;
+		}else
+			successCount++;
+	}
+	if(debugPrint){
+		console.log(insAST);
+		console.log(stdAST);
+		console.log(mappings);
+	}
+	return [failCount, successCount];
+}
+
 function tabulateResults(currentCounts, result){
 	currentCounts[0] += result[0];
 	currentCounts[1] += result[1];
@@ -379,6 +426,7 @@ function runTreeCompTestSuiteHelper(){
 	tabulateResults(currentCounts, testOneToMany());
 	tabulateResults(currentCounts, testMultiMatch());
 	tabulateResults(currentCounts, testPass());
+	tabulateResults(currentCounts, testMetaStretch());
 	return currentCounts;
 }
 

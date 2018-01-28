@@ -143,15 +143,15 @@ def m_missing_no_print():
         return True
     return False
 def m_iteration_group():
-    m_list_initialization_misplaced()
-    m_wrong_target_is_list()
-    m_wrong_list_repeated_in_for()#should be moved before target_is_list
-    m_missing_iterator_initialization()
-    m_list_not_initialized_on_run()
-    m_wrong_iterator_not_list()
-    m_missing_target_slot_empty()
-    m_missing_for_slot_empty()
-    m_wrong_target_reassigned()
+    m_list_initialization_misplaced()#list_init_misplaced
+    m_wrong_target_is_list()#target_is_list
+    m_wrong_list_repeated_in_for()#list_repeat#should be moved before target_is_list
+    m_missing_iterator_initialization()#no_iter_init,no_iter_init-blank
+    m_list_not_initialized_on_run()#no_list_init
+    m_wrong_iterator_not_list()#iter_not_list
+    m_missing_target_slot_empty()#target_empty
+    m_missing_for_slot_empty()#for_incomplete
+    m_wrong_target_reassigned()#target_reassign
 def m_iteration_group_on_change():
     m_wrong_target_is_list()
     m_wrong_list_repeated_in_for()
