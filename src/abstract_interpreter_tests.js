@@ -109,6 +109,14 @@
         // Incompatible types
         ['a = 5 + "ERROR"', [], ['Incompatible types']],
         ['a = "ERROR" * 5', ['Incompatible types'], []],
+        ['-(5)+0', ['Incompatible types'], []],
+        ['a=0\na+=5\na', ['Incompatible types', 'Unread variables', 'Undefined variables', 'Overwritten variables'], []],
+        ['a=""\na+=5\na', ['Unread variables', 'Undefined variables', 'Overwritten variables'], ['Incompatible types']],
+        ['a+=5\na', ['Unread variables', 'Overwritten variables'], ['Undefined variables']],
+        ['a=0\na+=5', ['Undefined variables', 'Overwritten variables'], ['Unread variables']],
+        
+        // Lambda
+        ['a = lambda: 0\nb=a()\nb+5', ['Incompatible types'], []],
         
         // Handle function definitions
         ['def named(x):\n\tprint(x)\n', ['Undefined variables'], ['Unread variables']],
