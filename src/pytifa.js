@@ -250,6 +250,7 @@ Tifa.prototype.visit_Assign = function(node) {
     this.visitList(node.targets);
     var position = Tifa.locate(node);
     var that = this;
+    // TODO: Properly handle assignments with subscripts
     this.walkTargets(node.targets, valueType, (function action(target, type) {
         if (target._astname === 'Name') {
             that.storeVariable(target.id.v, type, position);
@@ -1094,7 +1095,7 @@ Tifa._MODULE_TYPE = function() { return {'name': 'Module', 'submodules': []} };
 Tifa._STR_TYPE = function() { return {'name': 'Str'} };
 Tifa._FILE_TYPE = function() { return {'name': 'File'} };
 Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
-Tifa._LIST_TYPE = function() { return {'name': 'List', "empty": false} };
+Tifa._LIST_TYPE = function(isEmpty) { return {'name': 'List', "empty": !!isEmpty} };
 Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false} };
 Tifa._GENERATOR_OF_TYPE = function(subtype) { return {'name': 'Generator', "empty": false, "subtype": subtype} };
 Tifa._LIST_OF_TYPE = function(subtype) { return {'name': 'List', "empty": false, "subtype": subtype} };
@@ -1160,6 +1161,8 @@ Tifa.indexSequenceType= function(type, i) {
         return Tifa._STR_TYPE();
     } else if (type.name == "File") {
         return Tifa._STR_TYPE();
+    } else if (type.name == "Dict") {
+        return Tifa.keys;
     } else {
         return Tifa._UNKNOWN_TYPE();
     }
@@ -1185,7 +1188,7 @@ Tifa.isTypeEmptyList = function(type) {
     return (type.name === "List" && type.empty);
 }
 Tifa.isTypeSequence = function(type) {
-    return arrayContains(type.name, ["List", "Set", "Tuple", "Str", "File"]);
+    return arrayContains(type.name, ["List", "Set", "Tuple", "Str", "File", "Dict"]);
 }
 
 Tifa.sameScope = function(fullName, scopeChain) {
@@ -1263,24 +1266,109 @@ Tifa.mergeTypes = function(left, right) {
     }
 }
 
-Tifa.simpleFunctionDefinition = function(returnType) {
+Tifa.defineSupplier = function(returnType) {
     return { "name": "Function",
              "definition": function (analyzer, type, name, args, position) {
                 return returnType;
               }
     };
 }
+Tifa.defineIdentity = function(returnType) {
+    return { "name": "Function",
+             "definition": function (analyzer, type, name, args, position) {
+                 if (args.length) {
+                    return args[0];
+                 }
+                 return Tifa._UNKNOWN_TYPE();
+              }
+    };
+}
+Tifa.defineFunction = function(definition) {
+    return { "name": "Function", "definition": definition};
+}
+
 Tifa.loadBuiltin = function(name) {
     switch (name) {
-        case "range": return Tifa.simpleFunctionDefinition({"name": "List", "empty": false, "subtype": Tifa._NUM_TYPE()});
-        case "set": return Tifa.simpleFunctionDefinition(Tifa._SET_TYPE());
-        case "int": return Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE());
-        case "str": return Tifa.simpleFunctionDefinition(Tifa._STR_TYPE());
-        case "list": return Tifa.simpleFunctionDefinition(Tifa._LIST_TYPE());
-        case "float": return Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE());
-        case "print": return Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE());
-        case "input": return Tifa.simpleFunctionDefinition(Tifa._STR_TYPE());
-        case "open": return Tifa.simpleFunctionDefinition(Tifa._FILE_TYPE());
+        // Void functions
+        case "print": return Tifa.defineSupplier(Tifa._NONE_TYPE());
+        // Math functions
+        case "int": case "abs": case "float": case "len":
+        case "ord": case "pow": case "round": case "sum":
+            return Tifa.defineSupplier(Tifa._NUM_TYPE());
+        // Boolean functions
+        case "bool": case "all": case "any": case "isinstance":
+            return Tifa.defineSupplier(Tifa._BOOL_TYPE());
+        // String functions
+        case "input": case "str": case "chr": case "repr":
+            return Tifa.defineSupplier(Tifa._STR_TYPE());
+        // File functions
+        case "open": 
+            return Tifa.defineSupplier(Tifa._FILE_TYPE());
+        // List functions
+        case "map": return Tifa.defineSupplier(Tifa._LIST_TYPE());
+        case "list":
+            return Tifa.defineFunction(
+                function (analyzer, functionType, callee, args, position) {
+                    var returnType = Tifa._LIST_TYPE();
+                    if (args.length) {
+                        returnType.subtype = Tifa.indexSequenceType(args[0], 0);
+                        // TODO: Should inherit the emptiness too
+                        returnType.empty = true;
+                    } else {
+                        returnType.empty = true;
+                    }
+                    return returnType;
+                }
+            );
+        // Set functions
+        case "set": 
+            return Tifa.defineFunction(
+                function (analyzer, functionType, callee, args, position) {
+                    var returnType = Tifa._SET_TYPE();
+                    if (args.length) {
+                        returnType.subtype = Tifa.indexSequenceType(args[0], 0);
+                        // TODO: Should inherit the emptiness too
+                        returnType.empty = true;
+                    } else {
+                        returnType.empty = true;
+                    }
+                    return returnType;
+                }
+            );
+        // Dict functions
+        case "dict": 
+            return Tifa.defineSupplier(Tifa._DICT_TYPE());
+        // Pass through
+        case "sorted": case "reversed": case "filter":
+            return Tifa.defineIdentity();
+        // Special functions
+        case "range": return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._NUM_TYPE()));
+        case "dir": return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
+        case "max": case "min":
+            return Tifa.defineFunction(
+                function (analyzer, functionType, callee, args, position) {
+                    if (args.length) {
+                        return Tifa.indexSequenceType(args[0], 0);
+                    }
+                    return Tifa._UNKNOWN_TYPE();
+                }
+            );
+        case "zip":
+            return Tifa.defineFunction(
+                function (analyzer, functionType, callee, args, position) {
+                    if (args.length) {
+                        var tupledTypes = Tifa._TUPLE_TYPE();
+                        tupledTypes.subtypes = [];
+                        for (var i=0, len=args.length; i<len; i+=1) {
+                            tupledTypes.subtypes[i] = Tifa.indexSequenceType(args[i],0);
+                        }
+                        return Tifa._LIST_OF_TYPE(tupledTypes);
+                    } else {
+                        var emptyList = Tifa._LIST_TYPE(true);
+                        return emptyList;
+                    }
+                }
+            );
     }
 }
 
@@ -1291,13 +1379,13 @@ Tifa.MODULES = {
             'pyplot': {
                 'name': 'Module',
                 'fields': {
-                    'plot': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'hist': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'scatter': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'show': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'xlabel': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'ylabel': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
-                    'title': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE()),
+                    'plot': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'hist': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'scatter': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'show': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'xlabel': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'ylabel': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+                    'title': Tifa.defineSupplier(Tifa._NONE_TYPE()),
                 }
             }
         }
@@ -1305,24 +1393,78 @@ Tifa.MODULES = {
     'pprint': {
         'name': "Module",
         'fields': {
-            'pprint': Tifa.simpleFunctionDefinition(Tifa._NONE_TYPE())
+            'pprint': Tifa.defineSupplier(Tifa._NONE_TYPE())
         }
     },
     'random': {
         'name': "Module",
         'fields': {
-            'randint': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE())
+            'randint': Tifa.defineSupplier(Tifa._NUM_TYPE())
+        }
+    },
+    'turtle': {
+        'name': "Module",
+        'fields': {
+            'forward': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+            'backward': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+            'color': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+            'right': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+            'left': Tifa.defineSupplier(Tifa._NONE_TYPE()),
         }
     },
     'math': {
         'name': "Module",
         'fields': {
-            'sin': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
-            'cos': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
-            'tan': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
-            'log': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
-            'log2': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
-            'log10': Tifa.simpleFunctionDefinition(Tifa._NUM_TYPE()),
+            'ceil': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'copysign': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'fabs': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'factorial': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'floor': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'fmod': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'frexp': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'fsum': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'gcd': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'isclose': Tifa.defineSupplier(Tifa._BOOL_TYPE()),
+            'isfinite': Tifa.defineSupplier(Tifa._BOOL_TYPE()),
+            'isinf': Tifa.defineSupplier(Tifa._BOOL_TYPE()),
+            'isnan': Tifa.defineSupplier(Tifa._BOOL_TYPE()),
+            'ldexp': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'modf': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'trunc': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'exp': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'expm1': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'log': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'log1p': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'log2': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'log10': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'pow': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'sqrt': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'acos': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'sin': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'cos': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'tan': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'asin': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'acos': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'atan': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'atan2': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'hypot': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'degrees': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'radians': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'sinh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'cosh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'tanh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'asinh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'acosh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'atanh': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'erf': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'erfc': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'gamma': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'lgamma': Tifa.defineSupplier(Tifa._NUM_TYPE()),
+            'pi': Tifa._NUM_TYPE(),
+            'e': Tifa._NUM_TYPE(),
+            'tau': Tifa._NUM_TYPE(),
+            'inf': Tifa._NUM_TYPE(),
+            'nan': Tifa._NUM_TYPE(),
         }
     }
 }
@@ -1350,33 +1492,64 @@ Tifa.prototype.loadModule = function(chain, position) {
 
 Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
     switch (type.name) {
+        case "File":
+            switch (attr) {
+                case "close": return Tifa.defineFunction(
+                    function (analyzer, functionType, callee, args, position) {}
+                );
+                case "read": return Tifa.defineSupplier(Tifa._STR_TYPE());
+                case "readlines": return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
+            }
         case "List":
             switch (attr) {
-                case "append": return { "name": "Function",
-                    "definition": function (analyzer, functionType, callee, args, position) {
+                case "append": return Tifa.defineFunction(
+                    function (analyzer, functionType, callee, args, position) {
                         type.empty = false;
                         type.subtype = args[0];
                         if (callee) {
                             analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(type.subtype), position);
                         }
                     }
-                };
+                );
             };
         case "Dict":
             switch (attr) {
-                case "items": return { "name": "Function",
-                    "definition": function (analyzer, functionType, callee, args, position) {
+                case "items": return Tifa.defineFunction(
+                    function (analyzer, functionType, callee, args, position) {
                         return Tifa._LIST_OF_TYPE({
                             'name': 'Tuple', 'subtypes': [type.keys, type.values], 'empty': false
                         });
                     }
-                };
+                );
             };
         case "Module":
             if (attr in type.fields) {
                 return type.fields[attr];
             } else {
                 return Tifa._UNKNOWN_TYPE();
+            }
+        case "Str":
+            switch (attr) {
+                // Strings
+                case "capitalize": case "center": case "expandtabs":
+                case "join": case "ljust": case "lower": 
+                case "lstrip": case "replace": case "rjust":
+                case "rstrip": case "strip": case "swapcase":
+                case "title": case "translate": case "upper":
+                case "zfill":
+                    return Tifa.defineSupplier(Tifa._STR_TYPE());
+                // Numbers
+                case "count": case "find": case "index":
+                case "rfind": case "rindex":
+                    return Tifa.defineSupplier(Tifa._NUM_TYPE());
+                //Booleans
+                case "endswith": case "isalnum": case "isalpha":
+                case "isdigit": case "islower": case "isspace":
+                case "istitle": case "isupper": case "startswith":
+                    return Tifa.defineSupplier(Tifa._BOOL_TYPE());
+                // Lists
+                case "rsplit": case "split": case "splitlines":
+                    return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
             }
     }
     // Catch mistakes
@@ -1386,4 +1559,5 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                           'position': position,
                           'type': type})
     }
+    return Tifa._NONE_TYPE();
 }

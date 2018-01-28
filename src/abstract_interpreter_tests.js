@@ -182,7 +182,8 @@
         ['def x():\n    return 5\nx()', ['Return outside function'], []],
         ['def x():\n    pass\nreturn 5\nx()', [], ['Return outside function']],
         
-        
+        // Classes
+        ['class A:\n    y = 0\n    def __init__(self, x):\n        self.x = 0\n        self.test()\n    def test(self):\n        self.x = 5\nA()', [], []],
     ];
     
     var errors = 0;
