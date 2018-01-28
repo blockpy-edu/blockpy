@@ -261,7 +261,38 @@ Tifa.prototype.visit_Assign = function(node) {
             }
         }
     }));
+}
+
+Tifa.prototype.visit_AugAssign = function(node) {
+    // Handle value
+    var right = this.visit(node.value);
+    // Handle target
+    var left = this.visit(node.target);
+    var name = this.identifyCaller(node.target);
+    // Handle op
+    var position = Tifa.locate(node);
     
+    // Handle operation
+    this.loadVariable(name, position);
+    var opLookup = Tifa.VALID_BINOP_TYPES[node.op.name];
+    if (left.name == "Unknown" || right.name == "Unknown") {
+        return Tifa._UNKNOWN_TYPE();
+    } else if (opLookup) {
+        opLookup = opLookup[left.name];
+        if (opLookup) {
+            opLookup = opLookup[right.name];
+            if (opLookup) {
+                var resultType = opLookup(left, right);
+                this.storeVariable(name, resultType, position);
+                return resultType;
+            }
+        }
+    }
+    this.reportIssue("Incompatible types", 
+                     {"left": left, "right": right, 
+                      "operation": node.op.name, 
+                      "position": position});
+    return Tifa._UNKNOWN_TYPE();
 }
 
 Tifa.prototype.visit_Import = function(node) {
@@ -303,7 +334,9 @@ Tifa.prototype.visit_BinOp = function(node) {
     
     // Handle operation
     var opLookup = Tifa.VALID_BINOP_TYPES[node.op.name];
-    if (opLookup) {
+    if (left.name == "Unknown" || right.name == "Unknown") {
+        return Tifa._UNKNOWN_TYPE();
+    } else if (opLookup) {
         opLookup = opLookup[left.name];
         if (opLookup) {
             opLookup = opLookup[right.name];
@@ -316,7 +349,81 @@ Tifa.prototype.visit_BinOp = function(node) {
                      {"left": left, "right": right, 
                       "operation": node.op.name, 
                       "position": Tifa.locate(node)});
-    return Tifa._UNKNOWN_TYPE;
+    return Tifa._UNKNOWN_TYPE();
+}
+
+Tifa.prototype.visit_UnaryOp = function(node) {
+    // Handle operand
+    var operand = this.visit(node.operand);
+    
+    if (node.op.name == "Not") {
+        return Tifa._BOOL_TYPE();
+    } else if (operand.name == "Unknown") {
+        return Tifa._UNKNOWN_TYPE();
+    } else {
+        var opLookup = Tifa.VALID_UNARYOP_TYPES[node.op.name];
+        if (opLookup) {
+            opLookup = opLookup[operand.name];
+            if (opLookup) {
+                return opLookup(operand);
+            }
+        }
+    }
+    return Tifa._UNKNOWN_TYPE();
+}
+
+Tifa.prototype.visit_BoolOp = function(node) {
+    // Handle left and right
+    var values = [];
+    for (var i=0, len=node.values.length; i < len; i+= 1) {
+        values[i] = this.visit(node.values[i]);
+    }
+    
+    // TODO: Truthiness is not supported! Probably need a Union type
+    
+    // Handle operation
+    return Tifa._BOOL_TYPE();
+}
+
+Tifa.prototype.visit_Compare = function(node) {
+    // Handle left and right
+    var left = this.visit(node.left);
+    var comparators = [];
+    for (var i=0, len=node.comparators.length; i < len; i+= 1) {
+        comparators[i] = this.visit(node.comparators[i]);
+    }
+    
+    // Handle ops
+    for (var i=0, len=comparators.length; i < len; i+= 1) {
+        var op = node.ops[i];
+        var right = node.op[i];
+        switch (op.name) {
+            case "Eq": case "NotEq": case "Is": case "IsNot":
+                break;
+            case "Lt": case "LtE": case "GtE": case "Gt": 
+                if (left.name != right.name ||
+                    (left.name != "Num" && left.name != "Bool" &&
+                     left.name != "Str" && left.name != "List" &&
+                     left.name != "Set" && left.name != "Tuple" )) {
+                    this.reportIssue("Incompatible types", 
+                                     {"left": left, "right": right, 
+                                      "operation": node.op.name, 
+                                      "position": Tifa.locate(node)});
+                }
+                break;
+            case "In": case "NotIn":
+                if (right.name != "Str" && right.name != "List" &&
+                    right.name != "Set" && right.name != "Tuple" &&
+                    right.name != "Dict") {
+                    this.reportIssue("Incompatible types", 
+                                     {"left": left, "right": right, 
+                                      "operation": node.op.name, 
+                                      "position": Tifa.locate(node)});
+                }
+                break;
+        } 
+    }
+    return Tifa._BOOL_TYPE();
 }
 
 Tifa.prototype.visit_Call = function(node) {
@@ -338,7 +445,25 @@ Tifa.prototype.visit_Call = function(node) {
         return result;
     }
     this.reportIssue("Not a function", {"position": position});
-    return Tifa._UNKNOWN_TYPE;
+    return Tifa._UNKNOWN_TYPE();
+}
+
+Tifa.prototype.IfExp = function(node) {
+    // Visit the conditional
+    this.visit(node.test);
+    
+    // Visit the body
+    var body = this.visit(node.body);
+    
+    // Visit the orelse
+    var orelse = this.visit(node.orelse);
+
+    if (body.name != orelse.name) {
+        // TODO: Union type?
+        return Tifa._UNKNOWN_TYPE();
+    } else {
+        return body;
+    }
 }
 
 Tifa.prototype.visit_If = function(node) {
@@ -445,6 +570,37 @@ Tifa.prototype.visit_ListComp = function(node) {
     }
     var elt = node.elt;
     return Tifa._LIST_OF_TYPE(this.visit(elt));
+}
+
+Tifa.prototype.visit_SetComp = function(node) {
+    // TODO: Handle comprehension scope
+    var generators = node.generators;
+    for (var i = 0, len = generators.length; i < len; i++) {
+        this.visit(generators[i]);
+    }
+    var elt = node.elt;
+    return Tifa._SET_OF_TYPE(this.visit(elt));
+}
+
+Tifa.prototype.visit_SetComp = function(node) {
+    // TODO: Handle comprehension scope
+    var generators = node.generators;
+    for (var i = 0, len = generators.length; i < len; i++) {
+        this.visit(generators[i]);
+    }
+    var key = node.key;
+    var value = node.value;
+    return Tifa._DICT_OF_TYPE(this.visit(key), this.visit(value));
+}
+
+Tifa.prototype.visit_GeneratorExp = function(node) {
+    // TODO: Handle comprehension scope
+    var generators = node.generators;
+    for (var i = 0, len = generators.length; i < len; i++) {
+        this.visit(generators[i]);
+    }
+    var elt = node.elt;
+    return Tifa._GENERATOR_OF_TYPE(this.visit(elt));
 }
 
 Tifa.prototype.visit_comprehension = function(node) {
@@ -598,6 +754,36 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         
     }
     return state.type;
+}
+
+Tifa.prototype.visit_Lambda = function(node) {
+    // Name
+    var position = Tifa.locate(node);
+    var definitionsScope = this.scopeChain.slice(0);
+    var functionType = { "name": "Function"};
+    functionType.definition = function(analyzer, callType, callName, parameters, callPosition) {
+        // Manage scope
+        analyzer.ScopeId += 1;
+        var oldScope = analyzer.scopeChain.slice(0);
+        analyzer.scopeChain = definitionsScope.slice(0);
+        analyzer.scopeChain.unshift(analyzer.ScopeId);
+        // Process arguments
+        var args = node.args.args;
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            var name = Sk.ffi.remapToJs(arg.id);
+            var parameter = Tifa.copyType(parameters[i]);
+            analyzer.storeVariable(name, parameter, position)
+        }
+        var returnValue = analyzer.visit(node.body);
+        // Return scope
+        analyzer.finishScope();
+        analyzer.scopeChain.shift();
+        analyzer.scopeChain = oldScope;
+        return returnValue;
+        
+    }
+    return functionType;
 }
 
 Tifa.prototype.visit_Return = function(node) {
@@ -798,7 +984,7 @@ Tifa.prototype.storeVariable = function(name, type, position) {
         if (!Tifa.areTypesEqual(type, variable.state.type)) {
             this.reportIssue("Type changes", 
                              {'name': name, 'position':position,
-                              'old': state.type, 'new': type})
+                              'old': variable.state.type, 'new': type})
         }
         newState.type = type;
         // Overwritten?
@@ -901,7 +1087,11 @@ Tifa._FILE_TYPE = function() { return {'name': 'File'} };
 Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
 Tifa._LIST_TYPE = function() { return {'name': 'List', "empty": false} };
 Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false} };
+Tifa._GENERATOR_OF_TYPE = function(subtype) { return {'name': 'Generator', "empty": false, "subtype": subtype} };
 Tifa._LIST_OF_TYPE = function(subtype) { return {'name': 'List', "empty": false, "subtype": subtype} };
+Tifa._SET_OF_TYPE = function(subtype) { return {'name': 'Set', "empty": false, "subtype": subtype} };
+Tifa._DICT_OF_TYPE = function(keytype, valuetype) { 
+    return {'name': 'Set', "empty": false, "keys": keytype, "values": valuetype} };
 Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple'} };
 Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
@@ -913,6 +1103,7 @@ Tifa.VALID_BINOP_TYPES = {
     'Sub': {'Num': {'Num': Tifa._NUM_TYPE}, 
             'Set': {'Set': Tifa.mergeTypes}},
     'Div': {'Num': {'Num': Tifa._NUM_TYPE}},
+    'FloorDiv': {'Num': {'Num': Tifa._NUM_TYPE}},
     'Mult': {'Num': {'Num': Tifa._NUM_TYPE, 
                      'Str': Tifa._STR_TYPE, 
                      'List': (l, r) => r, 
@@ -924,6 +1115,25 @@ Tifa.VALID_BINOP_TYPES = {
     // Should we allow old-fashioned string interpolation?
     // Currently, I vote no because it makes the code harder and is bad form.
     'Mod': {'Num': {'Num': Tifa._NUM_TYPE}},
+    'LShift': {'Num': {'Num': Tifa._NUM_TYPE}},
+    'RShift': {'Num': {'Num': Tifa._NUM_TYPE}},
+    'BitOr': {'Num': {'Num': Tifa._NUM_TYPE}, 
+              'Bool': {'Num': Tifa._NUM_TYPE,
+                       'Bool': Tifa._BOOL_TYPE}, 
+              'Set': {'Set': Tifa.mergeTypes}},
+    'BitXor': {'Num': {'Num': Tifa._NUM_TYPE}, 
+              'Bool': {'Num': Tifa._NUM_TYPE,
+                       'Bool': Tifa._BOOL_TYPE}, 
+              'Set': {'Set': Tifa.mergeTypes}},
+    'BitAnd': {'Num': {'Num': Tifa._NUM_TYPE}, 
+              'Bool': {'Num': Tifa._NUM_TYPE,
+                       'Bool': Tifa._BOOL_TYPE}, 
+              'Set': {'Set': Tifa.mergeTypes}},
+}
+Tifa.VALID_UNARYOP_TYPES = {
+    'UAdd': {'Num': Tifa._NUM_TYPE},
+    'USub': {'Num': Tifa._NUM_TYPE},
+    'Invert': {'Num': Tifa._NUM_TYPE}
 }
 
 Tifa.locate = function(node) {
@@ -934,6 +1144,8 @@ Tifa.indexSequenceType= function(type, i) {
     if (type.name == "Tuple") {
         return type.subtypes[i];
     } else if (type.name == "List") {
+        return type.subtype;
+    } else if (type.name == "Generator") {
         return type.subtype;
     } else if (type.name == "Str") {
         return Tifa._STR_TYPE();

@@ -48,7 +48,7 @@ def plot_show_missing():
 Name: histogram_argument_not_list
 Pattern:
    plt.hist(<argument>)
-Where type(<argument>) is not “list”
+Where type(<argument>) is not "list"
 
 Feedback: Making a histogram requires a list; <argument> is not a list.
 
