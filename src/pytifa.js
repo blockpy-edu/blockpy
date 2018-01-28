@@ -718,6 +718,15 @@ Tifa.prototype.visit_For = function(node) {
     }
 }
 
+Tifa.prototype.visit_ClassDef = function(node) {
+    var className = node.name.v;
+    var position = Tifa.locate(node);
+    this.storeVariable(className, {"type": "Class"}, position)
+    // TODO: Define a new scope definition that executes the body
+    // TODO: find __init__, execute that
+    this.generic_visit(node);
+}
+
 Tifa.prototype.visit_FunctionDef = function(node) {
     // Name
     var functionName = node.name.v;
