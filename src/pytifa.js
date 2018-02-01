@@ -397,7 +397,7 @@ Tifa.prototype.visit_Compare = function(node) {
     // Handle ops
     for (var i=0, len=comparators.length; i < len; i+= 1) {
         var op = node.ops[i];
-        var right = node.op[i];
+        var right = comparators[i];
         switch (op.name) {
             case "Eq": case "NotEq": case "Is": case "IsNot":
                 break;
@@ -1038,7 +1038,7 @@ Tifa.prototype.loadVariable = function(name, position) {
             this.reportIssue("Undefined variables", 
                              {'name': name, 'position':position})
         }
-        state = {'name': name, 'trace': [], 'type': '*Unknown',
+        state = {'name': name, 'trace': [], 'type': Tifa._UNKNOWN_TYPE(),
                  'read': 'yes', 'set': 'no', 'over': 'no'};
         this.nameMap[currentPath][fullName] = state;
         return state;
@@ -1500,6 +1500,7 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                 case "read": return Tifa.defineSupplier(Tifa._STR_TYPE());
                 case "readlines": return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
             }
+            break;
         case "List":
             switch (attr) {
                 case "append": return Tifa.defineFunction(
@@ -1512,6 +1513,7 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                     }
                 );
             };
+            break;
         case "Dict":
             switch (attr) {
                 case "items": return Tifa.defineFunction(
@@ -1522,12 +1524,14 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                     }
                 );
             };
+            break;
         case "Module":
             if (attr in type.fields) {
                 return type.fields[attr];
             } else {
                 return Tifa._UNKNOWN_TYPE();
             }
+            break;
         case "Str":
             switch (attr) {
                 // Strings
@@ -1551,6 +1555,7 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                 case "rsplit": case "split": case "splitlines":
                     return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
             }
+            break;
     }
     // Catch mistakes
     if (attr == "append") {
