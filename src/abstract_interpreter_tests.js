@@ -36,6 +36,9 @@
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
         
+        ['print("dog" in input("test"))', [], []],
+        ["[].replace(',','')", [], []],
+        
         // Double call
         ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],
         
