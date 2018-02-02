@@ -408,7 +408,7 @@ Tifa.prototype.visit_Compare = function(node) {
                      left.name != "Set" && left.name != "Tuple" )) {
                     this.reportIssue("Incompatible types", 
                                      {"left": left, "right": right, 
-                                      "operation": node.op.name, 
+                                      "operation": op.name, 
                                       "position": Tifa.locate(node)});
                 }
                 break;
@@ -418,7 +418,7 @@ Tifa.prototype.visit_Compare = function(node) {
                     right.name != "Dict") {
                     this.reportIssue("Incompatible types", 
                                      {"left": left, "right": right, 
-                                      "operation": node.op.name, 
+                                      "operation": op.name, 
                                       "position": Tifa.locate(node)});
                 }
                 break;
@@ -502,14 +502,16 @@ Tifa.prototype.visit_If = function(node) {
                                               this.nameMap[elsePathId][ifName],
                                               Tifa.locate(node))
         } else {
-            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], null, Tifa.locate(node))
+            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], 
+                                              this.nameMap[thisPathId][ifName], 
+                                              Tifa.locate(node))
         }
         this.nameMap[thisPathId][ifName] = combined;
     }
     for (var elseName in this.nameMap[elsePathId]) {
         if (!(ifName in this.nameMap[elsePathId])) {
             var combined = Tifa.combineStates(this.nameMap[elsePathId][elseName], 
-                                              null,
+                                              this.nameMap[thisPathId][elseName],
                                               Tifa.locate(node))
             this.nameMap[thisPathId][elseName] = combined;
         }
@@ -1526,8 +1528,12 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
             };
             break;
         case "Module":
-            if (attr in type.fields) {
-                return type.fields[attr];
+            if ("fields" in type) {
+                if (attr in type.fields) {
+                    return type.fields[attr];
+                } else {
+                    return Tifa._UNKNOWN_TYPE();
+                }
             } else {
                 return Tifa._UNKNOWN_TYPE();
             }
