@@ -5,7 +5,7 @@ def m_wrong_target_is_list():
     if match:
         _item_ = match.get_std_name("_item_")
         if _item_.data_type == "List":
-            explain('The property <code>{0!s}</code> is a list and should not be placed in the iteration property slot of the "for" block<br><br><i>(target_is_list)<i></br>.'.format(_item_.id))
+            explain('The variable <code>{0!s}</code> is a list and should not be placed in the iteration variable slot of the "for" block<br><br><i>(target_is_list)<i></br>.'.format(_item_.id))
             return True
     return False
 #this conflics with list_in_wrong_slot_in_for
@@ -14,7 +14,7 @@ def m_wrong_list_repeated_in_for():
     if match:
         _item_ = match.get_std_name("_item_")
         if _item_.data_type == "List":
-            explain('The <code>{0!s}</code> property can only appear once in the "for" block <br><br><i>(list_repeat)<i></br>'.format(_item_.id))
+            explain('The <code>{0!s}</code> variable can only appear once in the "for" block <br><br><i>(list_repeat)<i></br>'.format(_item_.id))
             return True
     return False
 #this isn't consistent with the pattern you wrote
@@ -27,7 +27,7 @@ def m_missing_iterator_initialization():
                 explain("The slot to hold a list in the iteration is empty.<br><br><i>(no_iter_init-blank)<i></br>")
                 return True
             else:
-                explain("The property <code>{0!s}</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>".format(_list_.id))
+                explain("The variable <code>{0!s}</code> is in the list slot of the iteration but is not a list.<br><br><i>(no_iter_init)<i></br>".format(_list_.id))
             return True
     return False
 #TODO: We need to cover the different cases for these
@@ -36,7 +36,7 @@ def m_wrong_iterator_not_list():
     if match:
         _item_ = match.get_std_name("_item_")
         if _item_.data_type != "List":
-            explain("The property <code>{0!s}</code> has been set to something that is not a list but is placed in the iteration block that must be a list.<br><br><i>(iter_not_list)<i></br>".format(_item_.id))
+            explain("The variable <code>{0!s}</code> has been set to something that is not a list but is placed in the iteration block that must be a list.<br><br><i>(iter_not_list)<i></br>".format(_item_.id))
             return True
     return False
 def m_missing_target_slot_empty():
@@ -76,7 +76,7 @@ def m_wrong_target_reassigned():
     match = find_match("for _item_ in ___:\n   _item_ = ___")
     if match:
         _item_ = match.get_std_name("_item_")
-        explain("The property <code>{0!s}</code> has been reassigned. The iteration property shouldn't be reassigned<br><br><i>(target_reassign)<i></br>".format(_item_.id))
+        explain("The variable <code>{0!s}</code> has been reassigned. The iteration variable shouldn't be reassigned<br><br><i>(target_reassign)<i></br>".format(_item_.id))
         return True
     return False
 def m_hard_code_8_5():#TODO: This one's weird
@@ -97,7 +97,7 @@ def m_missing_zero_initialization():
         for match in matches:
             _sum_ = match.get_std_name("_sum_")
             if def_use_error(_sum_):
-                explain("The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(_sum_.id))
+                explain("The addition on the first iteration step is not correct because either the variable <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>".format(_sum_.id))
                 return True
     return False
 def m_wrong_duplicate_var_in_add():
