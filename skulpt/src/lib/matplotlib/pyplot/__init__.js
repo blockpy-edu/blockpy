@@ -167,6 +167,11 @@ var $builtinmodule = function(name) {
     mod.plot = new Sk.builtin.func(plot_f);
 
     var show_f = function() {
+        /*if (Sk.console.skipDrawing) {
+            Sk.console.printHtml([0], plots);
+            return;
+        }*/
+        
         if (!chart) {
             createChart('line');
         }

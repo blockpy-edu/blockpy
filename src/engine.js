@@ -75,7 +75,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
         delete Sk.builtinFiles['files']['src/lib/'+module_name];
     }
     // Unmute everything
-    Sk.console.skipDrawing = false;
+    Sk.console.skipDrawing = !!settings.preventD3;
     this.main.model.settings.mute_printer(false);
     // Create an input box
     Sk.inputfun = this.inputFunction.bind(this);

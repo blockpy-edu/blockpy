@@ -4,6 +4,7 @@ Blockly.WorkspaceSvg = new function() {};
 Blockly.WorkspaceSvg.prototype = {};
 skulpt = require('./skulpt/dist/skulpt.min.js')
 skulpt_libs = require('./skulpt/dist/skulpt-stdlib.js')
+d3 = require('d3-3');
 blockpy = require('./dist/blockpy_node.js')
 var trace = function() {
     
@@ -17,13 +18,23 @@ mockFeedback = {
     'presentAnalyzerFeedback': x => blockpy.BlockPyFeedback.prototype.presentAnalyzerFeedback.bind(mockFeedback)(x),
     'instructorFeedback': (name, message, line) => name, //console.log(name, message, line),
 }
+var printHtml = ((e,v) => this.printed.push(v));
 main = {
     'components': {
         'printer': {
             'print': e => this.printed.push(e.slice(0, -1)), //console.log("PRINTED", e),
-            'printHtml': e => this.printed.push(e),
+            'printHtml': printHtml,
             'resetPrinter': e => this.printed = [], //console.log("PRINTER RESET"),
-            'getConfiguration': blockpy.BlockPyPrinter.getDisabledConfiguration,
+            'getConfiguration': function() {
+                    var printerSettings = {}
+                    printerSettings['printHtml']= printHtml;
+                    printerSettings['width']= 500;
+                    printerSettings['pngMode']= false;
+                    printerSettings['skipDrawing']= true;
+                    printerSettings['height']= 500;
+                    printerSettings['container']= null;
+                    return printerSettings;
+                }
         },
         'editor': {
             'triggerOnChange': 0
@@ -56,6 +67,7 @@ main = {
         'settings': {
             'disable_timeout': x => false,
             'mute_printer': x => this['mute_printer'] = x,
+            'preventD3': false,
         }
     }
 };
@@ -97,14 +109,17 @@ datasets.forEach(slug => {
     require('./data_analysis/corgis/'+slug+'_abstract.js')
     require('./data_analysis/corgis/'+slug+'_dataset.js')
 });
-
 console.log(AbstractInterpreter.MODULES)
 
 // Actual work
 final_result = []
 loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions => {
-    loadJsonFile('data_analysis/f17_ct_8-5_change_steps.json').then(data => {
-        subs = data.steps;
+    // f17_ct_8-5_change_steps
+    // s17_post_run_submissions
+    // quick_test.json
+    // ct_f17_post_run_submissions.json
+    loadJsonFile('data_analysis/s17_post_run_submissions.json').then(data => {
+        subs = data.submissions;
         var next = function(subi, stui) {
             processSub(subs[subi][stui], function() {
                 stui += 1;
@@ -115,7 +130,9 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 if (subi < subs.length) {
                     next(subi, stui);
                 } else {
-                    fs.writeFile('./data_analysis/f17_ct_stepped_new_8-5.json', 
+                    //f17_ct_stepped_new_8-5
+                    //f17_post_checked
+                    fs.writeFile('./data_analysis/s17_post_checked.json', 
                                  JSON.stringify(final_result), 
                                  {'spaces':2}, 
                                  function (err) {
@@ -129,13 +146,7 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
         function processSub(sub, callback) {
             var instructor_code = assignment_solutions[""+sub.aid];
             var student_code = sub.code;
-            main.model.programs.__main__ = v => student_code;
-            main.model.programs.give_feedback = v => instructor_code;
-            result = engine.on_run(v => {
-                console.log(sub.user, sub.assignment);
-                var ms = Sk.executionReports.instructor.complaint ?
-                         Sk.executionReports.instructor.complaint.map(x => x.message.match(/.*\((.*)\).*/).pop()) : [];
-                console.log(ms);
+            if (student_code == "") {
                 final_result.push({
                     'aid': sub.aid,
                     'assignment': sub.assignment,
@@ -143,11 +154,33 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                     'uid': sub.uid,
                     'timestamp': sub.timestamp,
                     'code': sub.code,
-                    'messages': ms,
-                    'complete': !!(Sk.executionReports.instructor.complete)
+                    'messages': ['nocode'],
+                    'complete': false
                 })
                 callback();
-            });
+            } else {
+                main.model.programs.__main__ = v => student_code;
+                main.model.programs.give_feedback = v => instructor_code;
+                Sk.console= {skipDrawing: false};
+                result = engine.on_run(v => {
+                    var ms = Sk.executionReports.instructor.complaint ?
+                             Sk.executionReports.instructor.complaint.map(x => x.message.match(/.*\((.*)\).*/).pop()) 
+                             : [];
+                    console.log(sub.user, sub.assignment, ms.length);
+                    //console.log(Sk.executionReports['student']);
+                    final_result.push({
+                        'aid': sub.aid,
+                        'assignment': sub.assignment,
+                        'user': sub.user,
+                        'uid': sub.uid,
+                        'timestamp': sub.timestamp,
+                        'code': sub.code,
+                        'messages': ms,
+                        'complete': !!(Sk.executionReports.instructor.complete)
+                    })
+                    callback();
+                });
+            }
         }
         next(0, 0);
     });
