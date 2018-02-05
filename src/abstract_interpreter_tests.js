@@ -22,6 +22,7 @@
         ['x = []\nx.append(x)\nx', [], []],
         ['def x(y):\n    y\nx()', [], []],
         ['def x():\n    return\nx()', [], []],
+        ['def y():\n    x()\ndef x():\n    y()\nx()', [], []],
         // Overwritten in one branches
         ['a = 0\nif True:\n\ta = 1\na', ['Possibly undefined variables'], []],
         ["t = 0\nfor x in []:\n    if x:\n        t = t + 1\nprint(t)", ['Possibly undefined variables'], []],

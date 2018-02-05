@@ -86,6 +86,7 @@ Tifa.prototype.processAst = function(ast) {
     this.pathChain = [this.PathId];
     this.nameMap = {};
     this.nameMap[this.PathId] = {};
+    this.definitionChain = [];
     
     // Initialize a new, empty report
     this.initializeReport();
@@ -132,6 +133,8 @@ Tifa.prototype.initializeReport = function() {
             "Iteration variable is iteration list": [], // 
             "Unknown functions": [], // 
             "Not a function": [], // Attempt to call non-function as function
+            "Recursive Call": [],
+            "Incorrect Arity": [],
             "Action after return": [],
             "Incompatible types": [], // 
             "Return outside function": [], // 
@@ -443,10 +446,17 @@ Tifa.prototype.visit_Call = function(node) {
     // Handle starargs
     // Handle kwargs
     if (functionType.name == 'Function') {
-        var result = functionType.definition(this, functionType, calleeName, arguments, position);
-        return result;
+        if (-1 === this.definitionChain.indexOf(functionType.definition)) {
+            this.definitionChain.push(functionType.definition);
+            var result = functionType.definition(this, functionType, calleeName, arguments, position);
+            this.definitionChain.pop();
+            return result;
+        } else {
+            this.reportIssue("Recursive Call", {"position": position, "name": calleeName});
+        }
+    } else {
+        this.reportIssue("Not a function", {"position": position, "name": calleeName});
     }
-    this.reportIssue("Not a function", {"position": position});
     return Tifa._UNKNOWN_TYPE();
 }
 
@@ -763,7 +773,7 @@ Tifa.prototype.visit_FunctionDef = function(node) {
                 var parameter = Tifa.copyType(parameters[i]);
                 analyzer.storeVariable(name, parameter, position)
             } else {
-                //analyzer.reportIssue('Incorrect Arity') // TODO:
+                analyzer.reportIssue('Incorrect Arity', {"position": position})
                 analyzer.storeVariable(name, Tifa._UNKNOWN_TYPE(), position)
             }
         }
