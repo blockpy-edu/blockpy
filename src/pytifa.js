@@ -409,6 +409,7 @@ Tifa.prototype.visit_Compare = function(node) {
                 if (left.name != right.name ||
                     (left.name != "Num" && left.name != "Bool" &&
                      left.name != "Str" && left.name != "List" &&
+                     left.name != "Date" && left.name != "Time" &&
                      left.name != "Set" && left.name != "Tuple" )) {
                     this.reportIssue("Incompatible types", 
                                      {"left": left, "right": right, 
@@ -1468,6 +1469,15 @@ Tifa.MODULES = {
             'color': Tifa.defineSupplier(Tifa._NONE_TYPE()),
             'right': Tifa.defineSupplier(Tifa._NONE_TYPE()),
             'left': Tifa.defineSupplier(Tifa._NONE_TYPE()),
+        }
+    },
+    'parking': {
+        'name': "Module",
+        'fields': {
+            'Time': Tifa.defineSupplier({'name': 'Time'}),
+            'now': Tifa.defineSupplier({'name': 'Time'}),
+            'Date': Tifa.defineSupplier({'name': 'Date'}),
+            'today': Tifa.defineSupplier({'name': 'Date'}),
         }
     },
     'math': {
