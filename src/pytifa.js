@@ -759,8 +759,13 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         for (var i = 0; i < args.length; i++) {
             var arg = args[i];
             var name = Sk.ffi.remapToJs(arg.id);
-            var parameter = Tifa.copyType(parameters[i]);
-            analyzer.storeVariable(name, parameter, position)
+            if (parameters[i] !== undefined) {
+                var parameter = Tifa.copyType(parameters[i]);
+                analyzer.storeVariable(name, parameter, position)
+            } else {
+                //analyzer.reportIssue('Incorrect Arity') // TODO:
+                analyzer.storeVariable(name, Tifa._UNKNOWN_TYPE(), position)
+            }
         }
         for (var i = 0, len = node.body.length; i < len; i++) {
             analyzer.visit(node.body[i]);
@@ -813,9 +818,13 @@ Tifa.prototype.visit_Return = function(node) {
     if (this.scopeChain.length == 1) {
         this.reportIssue("Return outside function", {"position": Tifa.locate(node)});
     }
-    var valueType = this.visit(node.value);
     var position = Tifa.locate(node);
-    this.returnVariable(valueType, position)
+    if (node.value) {
+        var valueType = this.visit(node.value);
+        this.returnVariable(valueType, position)
+    } else {
+        this.returnVariable(Tifa._NONE_TYPE(), position)
+    }
 }
 
 Tifa.prototype.visit_Attribute = function(node) {
