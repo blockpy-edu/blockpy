@@ -24,6 +24,7 @@
         ['def x():\n    return\nx()', [], []],
         ['def y():\n    x()\ndef x():\n    y()\nx()', [], ['Recursive Call']],
         ['def x():\n    x()\nx()', [], ['Recursive Call']],
+        ['b= 0\nif True:\n    if True:\n        b=0\nb', ['Possibly undefined variables'], []],
         // Overwritten in one branches
         ['a = 0\nif True:\n\ta = 1\na', ['Possibly undefined variables'], []],
         ["t = 0\nfor x in []:\n    if x:\n        t = t + 1\nprint(t)", ['Possibly undefined variables'], []],
