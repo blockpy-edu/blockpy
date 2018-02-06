@@ -87,6 +87,7 @@ Tifa.prototype.processAst = function(ast) {
     this.nameMap = {};
     this.nameMap[this.PathId] = {};
     this.definitionChain = [];
+    this.pathParents = {};
     
     // Initialize a new, empty report
     this.initializeReport();
@@ -494,11 +495,14 @@ Tifa.prototype.visit_If = function(node) {
     
     // Visit the bodies
     var thisPathId = this.PathId;
+    //console.log("Enter", thisPathId);
     this.PathId += 1;
     var ifPathId = this.PathId;
+    //console.log("Left", ifPathId);
     this.pathNames.push(ifPathId+'i');
     this.pathChain.unshift(ifPathId);
     this.nameMap[ifPathId] = {};
+    this.pathParents[ifPathId] = thisPathId;
     for (var i = 0, len = node.body.length; i < len; i++) {
         this.visit(node.body[i]);
     }
@@ -507,9 +511,11 @@ Tifa.prototype.visit_If = function(node) {
     
     this.PathId += 1;
     var elsePathId = this.PathId;
+    //console.log("Right", elsePathId);
     this.pathNames.push(elsePathId+'e');
     this.pathChain.unshift(elsePathId);
     this.nameMap[elsePathId] = {};
+    this.pathParents[elsePathId] = thisPathId;
     for (var i = 0, len = node.orelse.length; i < len; i++) {
         this.visit(node.orelse[i]);
     }
@@ -518,9 +524,10 @@ Tifa.prototype.visit_If = function(node) {
     
     // Combine two paths into one
     for (var ifName in this.nameMap[ifPathId]) {
-        if (ifName in this.nameMap[elsePathId]) {
+        var ename = this.findPathParent(elsePathId, ifName);
+        if (ename) {
             var combined = this.combineStates(this.nameMap[ifPathId][ifName],
-                                              this.nameMap[elsePathId][ifName],
+                                              ename,
                                               position)
         } else {
             var combined = this.combineStates(this.nameMap[ifPathId][ifName], 
@@ -535,6 +542,19 @@ Tifa.prototype.visit_If = function(node) {
                                               this.nameMap[thisPathId][elseName],
                                               position)
             this.nameMap[thisPathId][elseName] = combined;
+        }
+    }
+}
+
+Tifa.prototype.findPathParent = function(pathId, name) {
+    if (this.nameMap[pathId][name] !== undefined) {
+        return this.nameMap[pathId][name];
+    } else {
+        var pathParent = this.pathParents[pathId];
+        if (pathParent === undefined) {
+            return undefined;
+        } else {
+            return this.findPathParent(pathParent, name);
         }
     }
 }
@@ -567,9 +587,10 @@ Tifa.prototype.visit_While = function(node) {
     
     // Combine two paths into one
     for (var ifName in this.nameMap[ifPathId]) {
-        if (ifName in this.nameMap[elsePathId]) {
+        var ename = this.findPathParent(elsePathId, ifName);
+        if (ename) {
             var combined = this.combineStates(this.nameMap[ifPathId][ifName],
-                                              this.nameMap[elsePathId][ifName],
+                                              ename,
                                               Tifa.locate(node))
         } else {
             var combined = this.combineStates(this.nameMap[ifPathId][ifName], 
@@ -1013,10 +1034,11 @@ Tifa.prototype.storeVariable = function(name, type, position) {
     if (!variable.exists) {
         // Create a new instance of the variable on the current path
         newState = {'name': name, 'trace': [], 'type': type,
+                    'method': 'store', 'position': position,
                     'read': 'no', 'set': 'yes', 'over': 'no'};
         this.nameMap[currentPath][fullName] = newState;
     } else {
-        newState = Tifa.traceState(variable.state, "store");
+        newState = Tifa.traceState(variable.state, "store", position);
         if (!variable.inScope) {
             this.reportIssue("Write out of scope", 
                              {'name': name, 'position':position})
@@ -1030,6 +1052,7 @@ Tifa.prototype.storeVariable = function(name, type, position) {
         newState.type = type;
         // Overwritten?
         if (variable.state.set == 'yes' && variable.state.read == 'no') {
+            newState.overPosition = position;
             newState.over = 'yes';
         } else {
             newState.set = 'yes';
@@ -1070,11 +1093,12 @@ Tifa.prototype.loadVariable = function(name, position) {
                              {'name': name, 'position':position})
         }
         state = {'name': name, 'trace': [], 'type': Tifa._UNKNOWN_TYPE(),
-                 'read': 'yes', 'set': 'no', 'over': 'no'};
+                 'read': 'yes', 'set': 'no', 'over': 'no',
+                 'method': 'load', 'position': position};
         this.nameMap[currentPath][fullName] = state;
         return state;
     } else {
-        var newState = Tifa.traceState(variable.state, "load");
+        var newState = Tifa.traceState(variable.state, "load", position);
         if (variable.state.set == 'no') {
             this.reportIssue("Undefined variables", 
                              {'name': name, 'position':position})
@@ -1103,8 +1127,9 @@ Tifa.prototype.finishScope = function() {
         if (Tifa.sameScope(name, this.scopeChain)) {
             var state = this.nameMap[pathId][name];
             if (state.over == 'yes') {
+                var position = state.overPosition;
                 this.reportIssue('Overwritten variables', 
-                                 {'name': state.name, 'position': 0}) // TODO position
+                                 {'name': state.name, 'position': position}) // TODO position
             }
             if (state.read == 'no') {
                 this.reportIssue('Unread variables', 
@@ -1265,8 +1290,11 @@ Tifa.sameScope = function(fullName, scopeChain) {
 }
 
 Tifa.prototype.combineStates = function(left, right, position) {
-    var state = {'name': left.name, 'trace': left.trace, 'type': left.type,
-                 'read': left.read, 'set': left.set, 'over': left.over};
+    var state = {'name': left.name, 'trace': [left], 'type': left.type,
+                 'read': left.read, 'set': left.set, 'over': left.over,
+                 'overPosition': left.overPosition,
+                 'position': position, 'method': 'branch'};
+    //console.log(left, right)
     if (right == null) {
         state.read = left.read == 'no' ? 'no' : 'maybe';
         state.set = left.set == 'no' ? 'no' : 'maybe';
@@ -1280,6 +1308,10 @@ Tifa.prototype.combineStates = function(left, right, position) {
         state.read = Tifa.matchRSO(left.read, right.read);
         state.set = Tifa.matchRSO(left.set, right.set);
         state.over = Tifa.matchRSO(left.over, right.over);
+        if (left.over == 'no') {
+            state.overPosition = right.overPosition;
+        }
+        state.trace.push(right);
     }
     return state;
 }
@@ -1292,13 +1324,13 @@ Tifa.matchRSO = function(left, right) {
     }
 }
 
-Tifa.traceState = function(state, method) {
+Tifa.traceState = function(state, method, position) {
     var newState = {
-        'type': state.type, 'method': method, 'trace': [],//state.trace.slice(0),
+        'type': state.type, 'method': method, 'trace': [state],//state.trace.slice(0),
         'set': state.set, 'read': state.read, 'over': state.over,
-        'name': state.name
+        'overPosition': state.overPosition,
+        'name': state.name, 'position': position
     };
-    newState.trace.push(state);
     return newState;
 }
 
@@ -1476,7 +1508,7 @@ Tifa.MODULES = {
         'fields': {
             'Time': Tifa.defineSupplier({'name': 'Time'}),
             'now': Tifa.defineSupplier({'name': 'Time'}),
-            'Date': Tifa.defineSupplier({'name': 'Date'}),
+            'Day': Tifa.defineSupplier({'name': 'Date'}),
             'today': Tifa.defineSupplier({'name': 'Date'}),
         }
     },
