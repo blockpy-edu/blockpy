@@ -22,7 +22,7 @@ def missing_list_initialization_8_2():
                 isMissing = False
                 break
     if isMissing:
-        explain('You must set the property <code>shopping_cart</code> to a list containing the prices of items in the shopping cart.<br><br><i>(missing_list_init_8.2)<i></br>')
+        explain('You must set the variable <code>shopping_cart</code> to a list containing the prices of items in the shopping cart.<br><br><i>(missing_list_init_8.2)<i></br>')
 def wrong_list_is_constant_8_2():
     ast = parse_program()
     assignments = ast.find_all('Assign')
@@ -85,7 +85,7 @@ def wrong_accumulator_initialization_placement_8_3():
         if loop.lineno > lineno:
             is_placed_wrong = False
     if is_placed_wrong:
-        explain('The property to hold the sum of the episode lengths (<code>sum_length</code>) must be initialized before the iteration which uses this property.<br><br><i>(accu_init_place_8.3)<i></br>')
+        explain('The variable to hold the sum of the episode lengths (<code>sum_length</code>) must be initialized before the iteration which uses this variable.<br><br><i>(accu_init_place_8.3)<i></br>')
     return is_placed_wrong 
 def wrong_iteration_body_8_3():
     ast = parse_program()
@@ -304,7 +304,7 @@ def missing_zero_initialization():
                     accu_init = True
                     break
     if accu_init == False and accumulator != None:
-        explain('The addition on the first iteration step is not correct because either the property <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>'.format(accumulator.id))
+        explain('The addition on the first iteration step is not correct because either the variable <code>{0!s}</code> has not been initialized to an appropriate initial value or it has not been placed in an appropriate location<br><br><i>(miss_zero_init)<i></br>'.format(accumulator.id))
         return False
     return True
 def wrong_printing_list():
@@ -479,7 +479,7 @@ def iterator_is_function():
     for loop in for_loops:
         list_prop = loop.iter
         if list_prop.ast_name == 'Call':
-            explain('You should make a property for the list instead of using a function call for the list<br><br><i>(iter_is_func)<i></br>')
+            explain('You should make a variable for the list instead of using a function call for the list<br><br><i>(iter_is_func)<i></br>')
 ###########################9.1 START############################
 def wrong_list_initialization_9_1():
     ast = parse_program()
@@ -507,7 +507,7 @@ def wrong_accumulator_initialization_9_1():
                 has_assignment = True
                 break
     if not has_assignment:
-        explain('The property to hold the total value of the rainfall amounts (<code>rainfall_sum</code>) is not initialized properly.<br><br><i>(accu_init_9.1)<i></br>')
+        explain('The variable to hold the total value of the rainfall amounts (<code>rainfall_sum</code>) is not initialized properly.<br><br><i>(accu_init_9.1)<i></br>')
     return not has_assignment
 def wrong_accumulation_9_1():
     ast = parse_program()
@@ -559,7 +559,7 @@ def wrong_accumulator_initialization_placement_9_1():
             init_after_loop = True
             break
     if list_init == None or not init_after_loop:
-        explain('The property for the sum of all the rainfall amounts (<code>rainfall_sum</code>) must be initialized before the iteration which uses this property.<br><br><i>(accu_init_place_9.1)<i></br>')
+        explain('The variable for the sum of all the rainfall amounts (<code>rainfall_sum</code>) must be initialized before the iteration which uses this variable.<br><br><i>(accu_init_place_9.1)<i></br>')
 def wrong_iteration_body_9_1():
     ast = parse_program()
     loops = ast.find_all('For')
@@ -623,7 +623,7 @@ def wrong_accumulator_initialization_9_2():
                 has_assignment = True
                 break
     if not has_assignment:
-        explain('The property to hold the total value of the rainfall amounts (<code>rainfall_count</code>) is not initialized properly.<br><br><i>(accu_init_9.2)<i></br>')
+        explain('The variable to hold the total value of the rainfall amounts (<code>rainfall_count</code>) is not initialized properly.<br><br><i>(accu_init_9.2)<i></br>')
     return not has_assignment
 def wrong_accumulation_9_2():
     ast = parse_program()
@@ -680,7 +680,7 @@ def wrong_accumulator_initialization_placement_9_2():
                 init_after_loop = True
                 break
     if list_init == None or not init_after_loop:
-        explain('The property for the count of the number of days having rain (<code>rainfall_count</code>) must be initialized before the iteration which uses this property.<br><br><i>(accu_init_place_9.2)<i></br>')
+        explain('The variable for the count of the number of days having rain (<code>rainfall_count</code>) must be initialized before the iteration which uses this variable.<br><br><i>(accu_init_place_9.2)<i></br>')
 def wrong_iteration_body_9_2():
     ast = parse_program()
     loops = ast.find_all('For')
