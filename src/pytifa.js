@@ -1154,7 +1154,7 @@ Tifa.cloneType = function (aType){
                                       Tifa.cloneType(aType.values));
         case "Tuple":
             var newTuple = Tifa._TUPLE_TYPE();
-            newTuple.subtypes = aType.subtypes.map(t => Tifa.cloneType(t));
+            newTuple.subtypes = aType.subtypes.map(function(t) { return Tifa.cloneType(t) });
             return newTuple;
         case "Module":
             var newModule = Tifa._MODULE_TYPE();
@@ -1200,11 +1200,11 @@ Tifa.VALID_BINOP_TYPES = {
     'FloorDiv': {'Num': {'Num': Tifa._NUM_TYPE}},
     'Mult': {'Num': {'Num': Tifa._NUM_TYPE, 
                      'Str': Tifa._STR_TYPE, 
-                     'List': (l, r) => r, 
-                     'Tuple': (l, r) => r},
+                     'List': function(l, r) { return r }, 
+                     'Tuple': function(l, r) { return r }},
              'Str': {'Num': Tifa._STR_TYPE},
-             'List': {'Num': (l, r) => l},
-             'Tuple': {'Num': (l, r) => l}},
+             'List': {'Num': function(l, r) { return l}},
+             'Tuple': {'Num': function(l, r) { return l}}},
     'Pow': {'Num': {'Num': Tifa._NUM_TYPE}},
     // Should we allow old-fashioned string interpolation?
     // Currently, I vote no because it makes the code harder and is bad form.
