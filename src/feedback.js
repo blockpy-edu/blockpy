@@ -471,10 +471,6 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         var first = report['Write out of scope'][0];
         this.semanticError("Write out of scope", "You attempted to write a variable from a higher scope (outside the function) on line "+first.position.line+". You should only use variables inside the function they were declared in.", first.position.line)
         return true;*/
-    } else if (!suppress['Read out of scope'] && report['Read out of scope'].length >= 1) {
-        var first = report['Read out of scope'][0];
-        this.semanticError("Read out of scope", "You attempted to read a variable from a different scope on line "+first.position.line+". You should only use variables inside the function they were declared in.", first.position.line)
-        return true;
     } else if (!suppress['Unconnected blocks'] && report["Unconnected blocks"].length >= 1) {
         var variable = report['Unconnected blocks'][0];
         this.semanticError("Unconnected blocks", "It looks like you have unconnected blocks on line "+variable.position.line+". Before you run your program, you must make sure that all of your blocks are connected and that there are no unfilled holes.", variable.position.line)
@@ -522,6 +518,10 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         var left = this.TYPE_DESCRIPTION[variable.left.name];
         var right = this.TYPE_DESCRIPTION[variable.right.name];
         this.semanticError("Incompatible types", "You used "+op+" operation with a "+left+" and a "+right+" on line "+variable.position.line+". But you can't do that with that operator. Make sure both sides of the operator are the right type.", variable.position.line)
+        return true;
+    } else if (!suppress['Read out of scope'] && report['Read out of scope'].length >= 1) {
+        var first = report['Read out of scope'][0];
+        this.semanticError("Read out of scope", "You attempted to read a variable from a different scope on line "+first.position.line+". You should only use variables inside the function they were declared in.", first.position.line)
         return true;
     }
     return false;
