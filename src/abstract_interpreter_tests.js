@@ -182,6 +182,10 @@
         
         // Dictionaries
         ['a = {}\na[1] = 0', [], []],
+        ['a = {"x": 5, "y": "T"}\na["x"]+5', ['Incompatible types'], []],
+        ["x=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\ny=x[0]\nz=y['a']+0", ['Incompatible types'], []],
+        ["x=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\nnot x[1]['b']", ['Incompatible types'], []],
+        ["ls=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\nfor x in ls:\n    x['a']+0", ['Incompatible types'], []],
         
         // While
         ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',

@@ -207,13 +207,28 @@ Important concepts:
         set, read, overwrite: str {yes, no, maybe}
     Type:
         ast: str {Unknown, Num, Str, List, Tuple, Set, Dict, Bool, None}
-        empty?: boolean
-        literals?: boolean
-        subtype?: Type
-        keys?: Type
-        values?: Type
-        subtypes?: list of Type
-        definition?: JS function object
+        
+        List:
+            empty?: boolean
+            subtype?: Type
+        Tuple:
+            empty?: boolean
+            subtypes?: list of Type
+        Dict:
+            empty?: boolean
+            
+            or
+            
+            literals?: list of Literal
+            values?: list of Type
+            
+            or
+            
+            keys?: Type
+            values?: Type
+        Function:
+            definition?: JS function object
+    Literal: Hashable value
     Report:
         success: bool
         issues: Issue => list of IssueData
@@ -265,6 +280,8 @@ Tifa.prototype.visit_Assign = function(node) {
                 var eltType = Tifa.indexSequenceType(type, i);
                 action(elt, eltType);
             }
+        } else if (target._astname == "Subscript") {
+            // TODO: Handle minor type changes (e.g., appending to an inner list)
         }
     }));
 }
@@ -629,7 +646,7 @@ Tifa.prototype.visit_SetComp = function(node) {
     return Tifa._SET_OF_TYPE(this.visit(elt));
 }
 
-Tifa.prototype.visit_SetComp = function(node) {
+Tifa.prototype.visit_DictComp = function(node) {
     // TODO: Handle comprehension scope
     var generators = node.generators;
     for (var i = 0, len = generators.length; i < len; i++) {
@@ -875,7 +892,7 @@ Tifa.prototype.visit_Subscript = function(node) {
     var valueType = this.visit(node.value);
     // Handle slice
     switch (node.slice._astname) {
-        case "Index": return Tifa.indexSequenceType(valueType, 0);
+        case "Index": return Tifa.indexSequenceType(valueType, Tifa.getLiteral(node.slice.value));
         case "Slice": return valueType;
     }
 }
@@ -933,15 +950,39 @@ Tifa.prototype.visit_List = function(node) {
     }
     return type;
 }
+/**
+ * Three types of dictionaries
+ *  - empty
+ *  - uniform type
+ *  - record
+ */
 Tifa.prototype.visit_Dict = function(node) {
     var type = Tifa._DICT_TYPE();
     if (node.keys.length == 0) {
         type.empty = true;
     } else {
         type.empty = false;
+        var keys = [];
+        var values = [];
+        var literals = [];
+        var allLiterals = true;
         for (var i = 0, len = node.keys.length; i < len; i++) {
-            type.keys = this.visit(node.keys[i]);
-            type.values = this.visit(node.values[i]);
+            var key = this.visit(node.keys[i]);
+            var value = this.visit(node.values[i]);
+            var literal = Tifa.getLiteral(node.keys[i]);
+            if (literal) {
+                literals.push(literal);
+                values.push(value);
+            } else {
+                allLiterals = false;
+            }
+        }
+        if (allLiterals) {
+            type.literals = literals;
+            type.values = values;
+        } else {
+            type.keys = key;
+            type.values = value;
         }
     }
     return type;
@@ -1150,8 +1191,19 @@ Tifa.cloneType = function (aType){
         case "List": case "Set": case "Generator":
             return Tifa._LIST_OF_TYPE(Tifa.cloneType(aType.subtype));
         case "Dict":
-            return Tifa._DICT_OF_TYPE(Tifa.cloneType(aType.keys),
+            if (aType.empty) {
+                return Tifa._DICT_TYPE();
+            } else if (aType.literals !== undefined) {
+                // TODO: Check if this copy needs to be deeper
+                var clones = [];
+                for (var i = 0, len = aType.values.length; i < len; i+= 1) {
+                    clones.push(Tifa.cloneType(aType.values[i]));
+                }
+                return Tifa._DICT_LITERAL_TYPE(aType.literals, clones);
+            } else {
+                return Tifa._DICT_OF_TYPE(Tifa.cloneType(aType.keys),
                                       Tifa.cloneType(aType.values));
+            }
         case "Tuple":
             var newTuple = Tifa._TUPLE_TYPE();
             newTuple.subtypes = aType.subtypes.map(function(t) { return Tifa.cloneType(t) });
@@ -1168,6 +1220,8 @@ Tifa.cloneType = function (aType){
         case "Bool": case "Num": case "Str": case "File":
         case "None": case "*Unknown":
             return {"name": aType.name};
+        default:
+            return Tifa._UNKNOWN_TYPE();
     }
 }
 
@@ -1183,8 +1237,10 @@ Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false, "keys": T
 Tifa._GENERATOR_OF_TYPE = function(subtype) { return {'name': 'Generator', "empty": false, "subtype": subtype} };
 Tifa._LIST_OF_TYPE = function(subtype) { return {'name': 'List', "empty": false, "subtype": subtype} };
 Tifa._SET_OF_TYPE = function(subtype) { return {'name': 'Set', "empty": false, "subtype": subtype} };
+Tifa._DICT_LITERAL_TYPE = function(literals, values) { 
+    return {'name': 'Dict', "empty": false, "literals": literals, "values": values}};
 Tifa._DICT_OF_TYPE = function(keytype, valuetype) { 
-    return {'name': 'Set', "empty": false, "keys": keytype, "values": valuetype} };
+    return {'name': 'Dict', "empty": false, "keys": keytype, "values": valuetype} };
 Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple', "subtypes": []} };
 Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
@@ -1235,6 +1291,12 @@ Tifa.locate = function(node) {
 }
 
 Tifa.indexSequenceType= function(type, i) {
+    // Determine if i is a literal
+    if (i === undefined) {
+        i = 0;
+    }
+    
+    // Handle type
     if (type.name == "Tuple") {
         return Tifa.cloneType(type.subtypes[i]);
     } else if (type.name == "List") {
@@ -1246,7 +1308,15 @@ Tifa.indexSequenceType= function(type, i) {
     } else if (type.name == "File") {
         return Tifa._STR_TYPE();
     } else if (type.name == "Dict") {
-        return Tifa.cloneType(type.keys);
+        if (type.literals !== undefined) {
+            for (var j = 0, len = type.literals.length; j < len; j+= 1) {
+                if (Tifa.areLiteralsEqual(type.literals[j], i)) {
+                    return Tifa.cloneType(type.values[j]);
+                }
+            }
+        } else {
+            return Tifa.cloneType(type.keys);
+        }
     } else {
         return Tifa._UNKNOWN_TYPE();
     }
@@ -1262,6 +1332,41 @@ Tifa.areTypesEqual = function(left, right) {
             return true;
         } else {
             return Tifa.areTypesEqual(left.subtype, right.subtype);
+        }
+    } else if (left.name === "Tuple" && right.name === "Tuple") {
+        if (left.empty || right.empty) {
+            return true;
+        } else if (left.subtypes.length != right.subtypes.length) {
+            return false;
+        } else {
+            for (var i = 0, len = left.subtypes.length; i < len; i++) {
+                if (!Tifa.areTypesEqual(left.subtypes[i], right.subtypes[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    } else if (left.name == "Dict" && right.name == "Dict") {
+        if (left.empty || right.empty) {
+            return true;
+        } else if (left.literals !== undefined && right.literals !== undefined) {
+            if (left.literals.length !== right.literals.length) {
+                return false;
+            } else {
+                for (var i = 0, len = left.literals.length; i < len; i++) {
+                    if (!Tifa.areLiteralsEqual(left.literals[i], right.literals[i])) {
+                        return false;
+                    }
+                    if (!Tifa.areTypesEqual(left.values[i], right.values[i])) {
+                        return false;
+                    }
+                }
+            }
+        } else if (left.literals !== undefined || right.literals !== undefined ) {
+            return false;
+        } else {
+            return (Tifa.areTypesEqual(left.keys, right.keys) &&
+                    Tifa.areTypesEqual(left.values, right.values));
         }
     } else {
         return left.name == right.name;
@@ -1354,6 +1459,53 @@ Tifa.mergeTypes = function(left, right) {
         case "List": return (left.empty ? right.subtype : Tifa.cloneType(left.subtype));
         case "Set": return (left.empty ? right.subtype : Tifa.cloneType(left.subtype));
         case "Tuple": return left.subtypes.concat(right.subtypes);
+    }
+}
+
+Tifa.getLiteral = function(node) {
+    switch (node._astname) {
+        case "Num": return {"type": "Num", "value": node.n.n};
+        case "Str": return {"type": "Str", "value": node.s.v};
+        case "Tuple": 
+            var values = [];
+            for (var i = 0, len = node.elts.length; i < len; i += 1) {
+                var subvalue = Tifa.getLiteral(node.elts[i]);
+                if (subvalue) {
+                    values.push(subvalue);
+                } else {
+                    return undefined;
+                }
+            }
+            return {"type": "Tuple", "value": values};
+        case "Name":
+            if (node.id == "None") {
+                return {"type": "None", "value": "None"};
+            } else if (node.id == "False") {
+                return {"type": "Bool", "value": "False"};
+            } else if (node.id == "True") {
+                return {"type": "Bool", "value": "True"};
+            }
+    }
+    return undefined;
+}
+
+Tifa.areLiteralsEqual = function(first, second) {
+    if (first === undefined || second === undefined) {
+        return false;
+    } else if (first.type != second.type) {
+        return false;
+    } else {
+        switch (first.type) {
+            case "Tuple": 
+                for (var i = 0, len = first.value.length; i < len; i += 1) {
+                    if (!Tifa.areLiteralsEqual(first.value[i], second.value[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            default:
+                return first.value == second.value;
+        }
     }
 }
 
@@ -1618,9 +1770,19 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
             switch (attr) {
                 case "items": return Tifa.defineFunction(
                     function (analyzer, functionType, callee, args, position) {
-                        return Tifa._LIST_OF_TYPE({
-                            'name': 'Tuple', 'subtypes': [type.keys, type.values], 'empty': false
-                        });
+                        if (type.literals === undefined) {
+                            return Tifa._LIST_OF_TYPE({
+                                'name': 'Tuple', 'subtypes': [type.keys, type.values], 'empty': false
+                            });
+                        } else {
+                            // TODO: typecheck a literal into a type
+                            return Tifa._LIST_OF_TYPE({
+                                'name': 'Tuple', 
+                                'subtypes': [{"name": type.literals[0].type}, 
+                                             type.values[0]], 
+                                'empty': false
+                            });
+                        }
                     }
                 );
             };
