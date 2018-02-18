@@ -485,7 +485,12 @@ BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
         return true;
     } else if (!suppress["Possibly undefined variables"] && report["Possibly undefined variables"].length >= 1) {
         var variable = report["Possibly undefined variables"][0];
-        this.semanticError("Initialization Problem", "The variable <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a variable until it has been given a value. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        var kindName = 'variable', kindBody = 'value';
+        if (variable.name == '*return') {
+            return false;
+        } else {
+            this.semanticError("Initialization Problem", "The variable <code>"+variable.name+"</code> was used on line "+variable.position.line+", but it was possibly not given a value on a previous line. You cannot use a variable until it has been given a value. Check to make sure that this variable was declared in all of the branches of your decision.", variable.position.line);
+        }
         return true;
     } else if (!suppress["Unread variables"] && report["Unread variables"].length >= 1) {
         var variable = report["Unread variables"][0];
