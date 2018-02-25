@@ -209,15 +209,29 @@
                     data-bind="visible: settings.instructor() || (!assignment.upload() && assignment.importable())">
                 <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
             </button>
-            <label class="btn btn-default btn-file">
-                <span class='glyphicon glyphicon-upload'></span> Upload
-                <input class="blockpy-toolbar-upload" type="file" style="display: none;">
-            </label>
+            
+            <div class="btn-group">
+                <label class="btn btn-default btn-file">
+                    <span class='glyphicon glyphicon-upload'></span> Upload
+                    <input class="blockpy-toolbar-upload" type="file" style="display: none;">
+                </label>
+                
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class='blockpy-toolbar-download'><span class='glyphicon glyphicon-download'></span> Download Python Code</a>
+                    </li>
+                </ul>
+            </div>
+            
             <button type='button' class='btn btn-default blockpy-toolbar-history'>
                 <span class='glyphicon glyphicon-hourglass'></span> History
             </button>
             <button type='button' class='btn btn-default blockpy-toolbar-instructor' data-bind="visible: settings.instructor">
-                <span class='glyphicon glyphicon-list-alt'></span> Assignment
+                <span class='glyphicon glyphicon-list-alt'></span> Settings
             </button>
             
             <b class='blockpy-toolbar-feedback text-muted pull-right' style='z-index:100; margin-top:10px; right:0px; position:absolute; display: none; color: red'>New feedback &uarr;</b>
