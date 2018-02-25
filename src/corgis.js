@@ -106,7 +106,8 @@ BlockPyCorgis.prototype.openDialog = function(name) {
         $.getJSON(root+'index.json', function(data) {
             // Make up the Body
             var datasets = data.blockpy.datasets;
-            var start = $("<p>Documentation is available at url</p>");
+            // TODO: Hardcoding a URL is bad.
+            var start = $("<p>Documentation is available at <a href='https://think.cs.vt.edu/corgis/blockpy/' target=_blank>url</a></p>");
             var body = $('<table></table>', {'class': 'table-bordered table-condensed table-striped'});
             Object.keys(datasets).sort().map(function(name) {
                 var title_name = name;
@@ -126,9 +127,10 @@ BlockPyCorgis.prototype.openDialog = function(name) {
                     .append($("<td class='col-md-2'></td>").append(btn))
                     .appendTo(body);
             });
+            body.appendTo(start)
             // Show the actual dialog
             var editor = corgis.main.components.editor;
-            corgis.main.components.dialog.show("Import Datasets", body, function() {
+            corgis.main.components.dialog.show("Import Datasets", start, function() {
                 if (editor.main.model.settings.editor() == "Blocks") {
                     editor.updateBlocksFromModel();
                 }

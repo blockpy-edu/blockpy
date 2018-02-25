@@ -100,6 +100,28 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         uploadButton.val("");
     });
     
+    var downloadButton = this.tag.find('.blockpy-toolbar-download');
+    downloadButton.click(function() {
+        var data = main.model.programs['__main__']();
+        var filename='blockpy_'+main.model.assignment.name();
+        // Make safe
+        filename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        // Make the data download as a file
+        var blob = new Blob([data], {type: 'text/plain'});
+        if(window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveBlob(blob, filename);
+        }
+        else{
+            var elem = window.document.createElement('a');
+            elem.href = window.URL.createObjectURL(blob);
+            elem.download = filename;        
+            document.body.appendChild(elem);
+            elem.click();        
+            document.body.removeChild(elem);
+        }
+        main.components.server.logEvent('editor', 'download')
+    });
+    
     this.tag.find('.blockpy-toolbar-filename-picker label').click(function() {
         main.model.settings.filename($(this).data('filename'))
     });
