@@ -1,5 +1,5 @@
 import ins_test_8_5 as stm85
-
+from instructor import*
 #for each problem
 def m_itergrp_2():
     stm85.m_list_initialization_misplaced()#list_init_misplaced
@@ -13,12 +13,14 @@ def m_itergrp_2():
 
 
 def missing_addition_slot_empty():
-    matches = find_matches("___ = _var1_ + _var2_")
+    matches = find_matches("___ = __exp1__ + __exp2__")
     if matches:
         for match in matches:
-            _var1_ = match.get_std_name("_var1_")
-            _var2_ = match.get_std_name("_var2_")
-            if _var1_.id == '___' or _var2_.id == '___':
+            __exp1__ = match.get_std_exp("__exp1__")
+            __exp2__ = match.get_std_exp("__exp2__")
+            cond1 = __exp1__.ast_name == "Name" and __exp1__.id == '___'
+            cond2 = __exp2__.ast_name == "Name" and __exp2__.id == '___'
+            if cond1 or cond2:
                 explain('You must fill in the empty slot in the addition.<br><br><i>(add_empty)<i></br>')
                 return True
     return False
@@ -29,7 +31,7 @@ def wrong_compare_list():
             _list_ = match.get_std_name("_list_")
             __exp__ = match.get_std_exp("__exp__")
             if __exp__.has(_list_):
-                explain('Each item in the list <code>{0!s}</code> must be compared one item at a time.<br><br><i>(comp_list)<i></br>'.format(_list_))
+                explain('Each item in the list <code>{0!s}</code> must be compared one item at a time.<br><br><i>(comp_list)<i></br>'.format(_list_.id))
                 return True
     return False
 def wrong_for_inside_if():#for the actual specification, we don't cover this syntax
@@ -47,6 +49,9 @@ def missing_if_in_for():#interesting case we don't cover exactly regarding synta
             if not (match and __exp__.has(_item_)):
                 explain("The arrangement of decision and iteration is not correct for the filter pattern.<br><br><i>(missing_if_in_for)<i></br>")
                 return True
+    else:
+    	explain("The arrangement of decision and iteration is not correct for the filter pattern.<br><br><i>(missing_if_in_for)<i></br>")
+    	return True
     return False
 def wrong_should_be_counting():
     match = find_match("for _item_ in ___:\n    ___ = ___ + _item_")
@@ -60,7 +65,7 @@ def missing_counting_list():
         explain('Count the total number of items in the list using iteration.<br><br><i>(miss_count_list)<i></br>')
         return True
     return False
-def missing_append_in_iteration():
+def missing_append_in_iteration():#TODO: implement matcher function that takes an AST node!
     match = find_match("for ___ in ___:\n    ___.append(___)")
     if not match:
         explain("You must construct a list by appending values one at a time to the list.<br><br><i>(app_in_iter)<i></br>")
@@ -80,7 +85,7 @@ def wrong_append_list_initiatization():
     if matches:
         for match in matches:
             _target_ = match.get_std_name("_target_")
-            found = find_match("{0!s} = []".format(_target_.id))
+            found = find_match("{0!s} = []".format(_target_.id))#This doesn't work because it uses the raw name, and doesn't save to the symbol table
             if found:
                 _target_2 = found.get_std_name("_target_")
             if (not found) or _target_2.lineno >= _target_.lineno:#in theory, should use first body of both instead of lineno
@@ -122,7 +127,7 @@ def histogram_argument_not_list():
     return False
 def histogram_wrong_list():
     matches = find_matches("for ___ in ___:\n    _target_.append(___)\nplt.hist(_list_)")
-    if match:
+    if matches:
         for match in matches:
             _target_ = match.get_std_name("_target_")
             _list_ = match.get_std_name("_list_")
