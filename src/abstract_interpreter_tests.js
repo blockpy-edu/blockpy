@@ -16,6 +16,13 @@
         // Importing
         ['import matplotlib.pyplot as plt\nplt.hist([1,2,3])\nplt.show()', ['Undefined variables'], []],
         ['from random import randint\na=randint(1,2)\n1+a', ['Undefined variables', 'Incompatible types'], []],
+        ["import state_demographics\n\n\nincome_list = state_demographics.get(\"Per Capita Income\",\"(None)\",'')\nfilter_income = []\nfor income in income_list:\n    if income > 28000:\n        income_list.append(filter_income)\nprint(filter_income)\n", [], []],
+        ["import state_demographics\n\n\nincome_list = state_demographics.get(\"Per Capita Income\",\"(None)\",'')\nnew_income_list = 0\nfor income in income_list:\n    if income > 28000:\n        new_income_list = new_income_list + 1\nprint(new_income_list)\n", [], []],
+        ['l = []\nfor x in l:\n    if x > 0:\n        x', [], []],
+        ['x = []\nx.append(x)\nx', [], []],
+        // Overwritten in one branches
+        ['a = 0\nif True:\n\ta = 1\na', ['Possibly undefined variables'], []],
+        ["t = 0\nfor x in []:\n    if x:\n        t = t + 1\nprint(t)", ['Possibly undefined variables'], []],
         /*// Write aliased variables
         // Actually this isn't an issue
         ['def x(y):\n    y = y+1\ny=0\nx(y)', ['Write out of scope'], []],*/
@@ -35,6 +42,9 @@
         // Unconnected blocks
         ['a = ___', [], ['Unconnected blocks']],
         ['print(___)', [], ['Unconnected blocks']],
+        
+        ['print("dog" in input("test"))', [], []],
+        ["[].replace(',','')", [], []],
         
         // Double call
         ['def x(a):\n    return a\nx(5)\nx(3)', ['Read out of scope'], []],

@@ -123,13 +123,16 @@ def m_missing_summing_list():
         return True
     return False
 def m_wrong_printing_list():
-    match = find_match("for ___ in ___:\n    print(__exp__)")
-    if match:
-        __exp__ = match.get_std_exp("__exp__")
-        if __exp__.ast_name == "Name" and __exp__.data_type != "Num":
-            explain("You should be printing a single value.<br><br><i>(list_print)<i></br>")
-            return True
-    return False
+    matches = find_matches("print(__exp__)")
+    if matches:
+        for match in matches:
+            __exp__ = match.get_std_exp("__exp__")
+            cond1 = __exp__.ast_name == "Name" and __exp__.data_type != "Num"
+            cond2 = __exp__.ast_name == 'List'
+            if cond1 or cond2:
+                explain("You should be printing a single value.<br><br><i>(list_print)<i></br>")
+                return False
+    return True
 def m_dup_var_8_5():
     match = find_match("_item_ + _item_")
     if match:

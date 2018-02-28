@@ -220,7 +220,7 @@ def test(debug_mode=False):
     ret3 = 0
     ret4 = 0
     if ret1 == 0:
-        print "Running jshint"
+        print("Running jshint")
         base_dirs = ["src", "debugger"]
         for base_dir in base_dirs:
             if sys.platform == "win32":
@@ -230,10 +230,10 @@ def test(debug_mode=False):
                 jshintcmd = "jshint " + base_dir + "/*.js"
                 jscscmd = "jscs " + base_dir + "/*.js --reporter=inline"
         ret2 = os.system(jshintcmd)
-        print "Running JSCS"
+        print("Running JSCS")
         ret3 = os.system(jscscmd)
         #ret3 = os.system(jscscmd)
-        print "Now running new unit tests"
+        print("Now running new unit tests")
         ret4 = rununits()
     return ret1 | ret2 | ret3 | ret4
 
@@ -249,27 +249,27 @@ def parse_time_args(argv):
     iter = 0
 
     if len(sys.argv) > 4:
-        print usageString
+        print(usageString)
         sys.exit(2)
 
     for arg in argv[2:]:
         if arg.isdigit():
             if iter:
-                print usageString
+                print(usageString)
                 sys.exit(2)
             else:
                 iter = int(arg)
                 if iter <= 0:
-                    print "Number of trials must be 1 or greater."
+                    print("Number of trials must be 1 or greater.")
                     sys.exit(2)
         elif ".py" in arg:
             if fn:
-                print usageString
+                print(usageString)
                 sys.exit(2)
             else:
                 fn = arg
         else:
-            print usageString
+            print(usageString)
             sys.exit(2)
 
     iter = iter if iter else 1
@@ -287,7 +287,7 @@ def time_suite(iter=1, fn=""):
     # Profile single file
     if fn:
         if not os.path.exists(fn):
-            print "%s doesn't exist" % fn
+            print("%s doesn't exist" % fn)
             raise SystemExit()
 
         modname = os.path.splitext(os.path.basename(fn))[0]
@@ -334,14 +334,14 @@ def time_suite(iter=1, fn=""):
 
     f.close()
 
-    print "Timing %s...\n" % fn
+    print("Timing %s...\n" % fn)
 
     times = []
 
     # Run profile
     for i in range(iter):
         if iter > 1:
-            print "Iteration %d of %d..." % (i + 1, iter)
+            print("Iteration %d of %d..." % (i + 1, iter))
         startTime = time.time()
         p = Popen("{0} {1} {2} support/tmp/run.js".format(jsprofengine,
                   ' '.join(getFileList(FILE_TYPE_TEST)),
@@ -351,7 +351,7 @@ def time_suite(iter=1, fn=""):
         outs, errs = p.communicate()
 
         if p.returncode != 0:
-            print "\n\nWARNING: Scripts returned with error code. Timing data may be inaccurate.\n\n"
+            print("\n\nWARNING: Scripts returned with error code. Timing data may be inaccurate.\n\n")
 
         endTime = time.time()
         times.append(endTime - startTime)
@@ -359,9 +359,9 @@ def time_suite(iter=1, fn=""):
     avg = sum(times) / len(times)
 
     if iter > 1:
-        print "\nAverage time over %s iterations: %s seconds" % (iter, avg)
+        print("\nAverage time over %s iterations: %s seconds" % (iter, avg))
     else:
-        print "%s seconds" % avg
+        print("%s seconds" % avg)
 
 def parse_profile_args(argv):
     usageString = """
@@ -376,19 +376,19 @@ def parse_profile_args(argv):
     numArgs = len(sys.argv)
 
     if len(sys.argv) > 4:
-        print usageString
+        print(usageString)
         sys.exit(2)
 
     for arg in argv[2:]:
         if ".py" in arg:
             if fn:
-                print usageString
+                print(usageString)
                 sys.exit(2)
             else:
                 fn = arg
         else:
             if out:
-                print usageString
+                print(usageString)
                 sys.exit(2)
             else:
                 out = arg
@@ -412,7 +412,7 @@ def profile(fn="", process=True, output=""):
     # Profile single file
     if fn:
         if not os.path.exists(fn):
-            print "%s doesn't exist" % fn
+            print("%s doesn't exist" % fn)
             raise SystemExit()
 
         modname = os.path.splitext(os.path.basename(fn))[0]
@@ -470,14 +470,14 @@ def profile(fn="", process=True, output=""):
     outs, errs = p.communicate()
 
     if p.returncode != 0:
-        print "\n\nWARNING: Scripts returned with error code. Timing data may be inaccurate.\n\n"
+        print("\n\nWARNING: Scripts returned with error code. Timing data may be inaccurate.\n\n")
 
     endTime = time.time()
 
     if errs:
-        print errs
+        print(errs)
 
-    print "\n\nRunning time: ", (endTime - startTime), " seconds\n\n"
+    print("\n\nRunning time: ", (endTime - startTime), " seconds\n\n")
 
     # Process and display results
     if process:
@@ -487,7 +487,7 @@ def profile(fn="", process=True, output=""):
         else:
             out_msg = ""
 
-        print "Processing profile using d8 processor%s..." % out_msg
+        print("Processing profile using d8 processor%s..." % out_msg)
         if sys.platform == "win32":
             os.system(".\\support\\d8\\tools\\windows-tick-processor.bat v8.log {0}".format(output))
         elif sys.platform == "darwin":
@@ -495,8 +495,8 @@ def profile(fn="", process=True, output=""):
         elif sys.platform == "linux2":
             os.system("./support/d8/tools/linux-tick-processor v8.log {0}".format(output))
         else:
-            print """d8 processor is unsupported on this platform.
-    Try using https://v8.googlecode.com/svn/branches/bleeding_edge/tools/profviz/profviz.html."""
+            print("""d8 processor is unsupported on this platform.
+    Try using https://v8.googlecode.com/svn/branches/bleeding_edge/tools/profviz/profviz.html.""")
 
 def debugbrowser():
     tmpl = """
@@ -545,7 +545,7 @@ def debugbrowser():
                 os.path.join('../..', f))
 
     with open("support/tmp/test.html", "w") as f:
-        print >>f, tmpl % '\n'.join(scripts)
+        print(tmpl % '\n'.join(scripts), file=f)
 
     if sys.platform == "win32":
         os.system("start support/tmp/test.html")
@@ -556,9 +556,9 @@ def debugbrowser():
 
 def buildVFS():
     """ build a silly virtual file system to support 'read'"""
-    print ". Slurping test data"
+    print(". Slurping test data")
     with open("support/tmp/vfs.js", "w") as out:
-        print >>out, "VFSData = {"
+        print("VFSData = {", file=out)
         all = []
         for root in (TEST_DIR, "src/builtin", "src/lib"):
             for dirpath, dirnames, filenames in os.walk(root):
@@ -570,9 +570,9 @@ def buildVFS():
                     data = open(f, "rb").read()
                     data = data.replace("\r\n", "\n")
                     all.append("'%s': '%s'" % (f.replace("\\", "/"), data.encode("hex")))
-        print >>out, ",\n".join(all)
-        print >>out, "};"
-        print >>out, """
+        print(",\n".join(all), file=out)
+        print("};", file=out)
+        print("""
 
 function readFromVFS(fn)
 {
@@ -586,7 +586,7 @@ function readFromVFS(fn)
     if (VFSData[fn] === undefined) throw "file not found: " + fn;
     return hexToStr(VFSData[fn]);
 }
-"""
+""", file=out)
 
 def buildBrowserTests():
     """combine all the tests data into something we can run from a browser
@@ -598,12 +598,12 @@ def buildBrowserTests():
     outfn = "doc/static/browser-test.js"
     out = open(outfn, "w")
 
-    print >>out, """
+    print("""
 window.addevent('onload', function(){
-"""
+""", file=out)
 
     # stub the d8 functions we use
-    print >>out, """
+    print("""
 function read(fn)
 {
     var hexToStr = function(str)
@@ -659,16 +659,16 @@ function quit(rc)
     });
     results.send(sendData);
 }
-""" % getTip()
+""" % getTip(), file=out)
 
     for f in ["{0}/browser-detect.js".format(TEST_DIR)] + getFileList(FILE_TYPE_TEST) + TestFiles:
-        print >>out, open(f).read()
+        print(open(f).read(), file=out)
 
-    print >>out, """
+    print("""
 });
-"""
+""", file=out)
     out.close()
-    print ". Built %s" % outfn
+    print(". Built %s" % outfn)
 
 def getInternalCodeAsJson():		
     ret = {}		
@@ -690,7 +690,7 @@ def getBuiltinsAsJson(options):
                 ext = os.path.splitext(f)[1]
                 if ext == ".py" or ext == ".js":
                     if options.verbose:
-                        print "reading", f
+                        print("reading", f)
                     f = f.replace("\\", "/")
                     ret['files'][f] = open(f).read()
     return "Sk.builtinFiles=" + json.dumps(ret)
@@ -702,21 +702,21 @@ def dist(options):
     """
     if GIT_MODULE_AVAILABLE:
         if not isClean():
-            print "WARNING: working directory not clean (according to 'git status')"
+            print("WARNING: working directory not clean (according to 'git status')")
         else:
-            print "Working directory is clean (according to 'git status')"
+            print("Working directory is clean (according to 'git status')")
     else:
         '''
         # We don't really use GitPython
-        print "+----------------------------------------------------------------------------+"
-        print "GitPython is not installed for Python 2.6"
-        print "The 'dist' command will not work without it.  Get it using pip or easy_install"
-        print "or see:  http://packages.python.org/GitPython/0.3.1/intro.html#getting-started"
-        print "+----------------------------------------------------------------------------+"
+        print("+----------------------------------------------------------------------------+")
+        print("GitPython is not installed for Python 2.6")
+        print("The 'dist' command will not work without it.  Get it using pip or easy_install")
+        print("or see:  http://packages.python.org/GitPython/0.3.1/intro.html#getting-started")
+        print("+----------------------------------------------------------------------------+")
         '''
 
     if options.verbose:
-        print ". Removing distribution directory, '{0}/'.".format(DIST_DIR)
+        print(". Removing distribution directory, '{0}/'.".format(DIST_DIR))
 
     shutil.rmtree(DIST_DIR, ignore_errors=True)
     if not os.path.exists(DIST_DIR): os.mkdir(DIST_DIR)
@@ -731,18 +731,18 @@ def dist(options):
 
     # Run tests on uncompressed.
     if options.verbose:
-        print ". Running tests on uncompressed..."
+        print(". Running tests on uncompressed...")
 
     ret = 0 #test()
     if ret != 0:
-        print "Tests failed on uncompressed version."
+        print("Tests failed on uncompressed version.")
         #sys.exit(1);
 
     # compress
     uncompfiles = ' '.join(['--js ' + x for x in getFileList(FILE_TYPE_DIST, include_ext_libs=False)])
 
     if options.verbose:
-        print ". Compressing..."
+        print(". Compressing...")
 
     ret = os.system("java -jar support/closure-compiler/compiler.jar --define goog.DEBUG=false --output_wrapper \"(function(){%%output%%}());\" --compilation_level SIMPLE_OPTIMIZATIONS --jscomp_error accessControls --jscomp_error checkRegExp --jscomp_error checkTypes --jscomp_error checkVars --jscomp_error deprecated --jscomp_off fileoverviewTags --jscomp_error invalidCasts --jscomp_error missingProperties --jscomp_error nonStandardJsDocs --jscomp_error strictModuleDepCheck --jscomp_error undefinedVars --jscomp_error unknownDefines --jscomp_error visibility %s --externs support/es6-promise-polyfill/externs.js --js_output_file tmp.js" % (uncompfiles))
     # to disable asserts
@@ -754,14 +754,14 @@ def dist(options):
     # --jscomp_error accessControls --jscomp_error checkRegExp --jscomp_error checkTypes --jscomp_error checkVars --jscomp_error deprecated --jscomp_error fileoverviewTags --jscomp_error invalidCasts --jscomp_error missingProperties --jscomp_error nonStandardJsDocs --jscomp_error strictModuleDepCheck --jscomp_error undefinedVars --jscomp_error unknownDefines --jscomp_error visibility
     #
     if ret != 0:
-        print "closure-compiler failed."
+        print("closure-compiler failed.")
         sys.exit(1)
 
     # Copy the debugger file to the output dir
 
 
     if options.verbose:
-        print ". Bundling external libraries..."
+        print(". Bundling external libraries...")
 
     bundle = ""
     for fn in ExtLibs + ["tmp.js"]:
@@ -771,20 +771,20 @@ def dist(options):
     with open(compfn, "w") as f:
         f.write(bundle)
 
-    print ". Wrote bundled file"
+    print(". Wrote bundled file")
 
 
     # Run tests on compressed.
     if options.verbose:
-        print ". Running tests on compressed..."
+        print(". Running tests on compressed...")
     buildNamedTestsFile()
     ret = 0 #os.system("{0} {1} {2}".format(jsengine, compfn, ' '.join(TestFiles)))
     if ret != 0:
-        print "Tests failed on compressed version."
+        print("Tests failed on compressed version.")
         sys.exit(1)
     ret = 0 #rununits(opt=True)
     if ret != 0:
-        print "Tests failed on compressed unit tests"
+        print("Tests failed on compressed unit tests")
         sys.exit(1)
 
     #doc()
@@ -793,7 +793,7 @@ def dist(options):
         shutil.copy(compfn, os.path.join(DIST_DIR, "tmp.js"))
         shutil.copy("debugger/debugger.js", DIST_DIR)
     except Exception as e:
-        print "Couldn't copy debugger to output folder: %s" % e.message
+        print("Couldn't copy debugger to output folder: %s" % e.message)
         sys.exit(1)
 
     path_list = os.environ.get('PATH','').split(':')
@@ -806,7 +806,7 @@ def dist(options):
     if has_gzip:
         ret = os.system("gzip -9 {0}/tmp.js".format(DIST_DIR))
         if ret != 0:
-            print "Couldn't gzip to get final size."
+            print("Couldn't gzip to get final size.")
             has_gzip = False
             os.unlink("{0}/tmp.js".format(DIST_DIR))
 
@@ -814,12 +814,12 @@ def dist(options):
         os.unlink("{0}/tmp.js.gz".format(DIST_DIR))
     else:
         os.unlink("{0}/tmp.js".format(DIST_DIR))
-        print "No gzip executable, can't get final size"
+        print("No gzip executable, can't get final size")
 
     with open(builtinfn, "w") as f:
         f.write(getBuiltinsAsJson(options))
         if options.verbose:
-            print ". Wrote {0}".format(builtinfn)
+            print(". Wrote {0}".format(builtinfn))
 
     # Update documentation folder copies of the distribution.
     try:
@@ -827,28 +827,28 @@ def dist(options):
         shutil.copy(builtinfn, os.path.join("doc", "static", OUTFILE_LIB))
         shutil.copy(debuggerfn, os.path.join("doc", "static", "debugger", OUTFILE_DEBUGGER))
     except:
-        print "Couldn't copy to docs dir."
+        print("Couldn't copy to docs dir.")
         sys.exit(1)
     if options.verbose:
-        print ". Updated doc dir"
+        print(". Updated doc dir")
 
     # All good!
     if options.verbose:
-        print ". Wrote {0}.".format(compfn)
+        print(". Wrote {0}.".format(compfn))
         if has_gzip:
-            print ". gzip of compressed: %d bytes" % size
+            print(". gzip of compressed: %d bytes" % size)
 
 
 def make_skulpt_js(options,dest):
     if options.verbose:
-        print ". Writing combined version..."
+        print(". Writing combined version...")
     combined = ''
     linemap = open(os.path.join(dest, OUTFILE_MAP), "w")
     curline = 1
     for file in getFileList(FILE_TYPE_DIST):
         curfiledata = open(file).read()
         combined += curfiledata
-        print >> linemap, "%d:%s" % (curline, file)
+        print("%d:%s" % (curline, file), file=linemap)
         curline += len(curfiledata.split("\n")) - 1
     linemap.close()
     uncompfn = os.path.join(dest, OUTFILE_REG)
@@ -928,15 +928,15 @@ def regenruntests(togen="{0}/run/*.py".format(TEST_DIR)):
             os.system("python %s %s.real" % (crlfprog, f))
 
 def doc():
-    print "Building Documentation in docs/ProgMan"
+    print("Building Documentation in docs/ProgMan")
     ret = os.system("jsdoc -c jsdoc.json HACKING.md")
     if ret != 0:
-        print "Build of docs failed.  Is jsdoc installed?"
+        print("Build of docs failed.  Is jsdoc installed?")
 
 
 def symtabdump(fn):
     if not os.path.exists(fn):
-        print "%s doesn't exist" % fn
+        print("%s doesn't exist" % fn)
         raise SystemExit()
     text = open(fn).read()
     mod = symtable.symtable(text, os.path.split(fn)[1], "exec")
@@ -994,7 +994,7 @@ def upload():
     """uploads doc to GAE (stub app for static hosting, mostly)"""
     ret = os.system("python2.6 ~/Desktop/3rdparty/google_appengine/appcfg.py update doc")
     if ret != 0:
-        print "Couldn't upload."
+        print("Couldn't upload.")
         raise SystemExit()
 
 def doctest():
@@ -1005,16 +1005,16 @@ def docbi(options,dest="doc/static"):
     with open(builtinfn, "w") as f:
         f.write(getBuiltinsAsJson(options))
         if options.verbose:
-            print ". Wrote {fileName}".format(fileName=builtinfn)
+            print(". Wrote {fileName}".format(fileName=builtinfn))
 
 def assess(student_code, instructor_code):
     student_code = student_code.replace("\\", "/")
     instructor_code = instructor_code.replace("\\", "/")
     if not os.path.exists(student_code):
-        print "%s doesn't exist" % student_code
+        print("%s doesn't exist" % student_code)
         raise SystemExit()
     if not os.path.exists(instructor_code):
-        print "%s doesn't exist" % instructor_code
+        print("%s doesn't exist" % instructor_code)
         raise SystemExit()
     if not os.path.exists("support/tmp"):
         os.mkdir("support/tmp")
@@ -1073,11 +1073,11 @@ Sk.misceval.asyncToPromise(function() {{
         out, err = p.communicate()
         print(out)
     except OSError as e:
-        print >>sys.stderr, "Execution failed:", e
+        print("Execution failed:", e, file=sys.stderr)
 
 def run(fn, shell="", opt=False, p3=True, debug_mode=False, dumpJS='true'):
     if not os.path.exists(fn):
-        print "%s doesn't exist" % fn
+        print("%s doesn't exist" % fn)
         raise SystemExit()
     if not os.path.exists("support/tmp"):
         os.mkdir("support/tmp")
@@ -1174,11 +1174,11 @@ Sk.misceval.asyncToPromise(function() {
 
         if p.returncode != 0:
             failTot += 1
-            print "{} exited with error code {}".format(fn,p.returncode)
+            print("{} exited with error code {}".format(fn,p.returncode))
 
-        print outs
+        print(outs)
         if errs:
-            print errs
+            print(errs)
         outlines = outs.split('\n')
         for ol in outlines:
             g = re.match(r'Ran.*passed:\s+(\d+)\s+failed:\s+(\d+)',ol)
@@ -1186,8 +1186,8 @@ Sk.misceval.asyncToPromise(function() {
                 passTot += int(g.group(1))
                 failTot += int(g.group(2))
 
-    print "Summary"
-    print "Passed: %5d Failed %5d" % (passTot, failTot)
+    print("Summary")
+    print("Passed: %5d Failed %5d" % (passTot, failTot))
 
     if failTot != 0:
         return -1
@@ -1209,13 +1209,13 @@ def nrt(newTest):
             editor = 'vim'
         os.system(editor + ' ' + fn)
         if os.path.exists(fn):
-            print "Generating tests for %s" % fn
+            print("Generating tests for %s" % fn)
             regensymtabtests(fn)
             regenasttests(fn)
             regenruntests(fn)
         else:
-            print "Test test_%s.py already exists." % newTest
-            print "run ./m regentests test_%s.py" % newTest
+            print("Test test_%s.py already exists." % newTest)
+            print("run ./m regentests test_%s.py" % newTest)
 
 def vmwareregr(names):
     """todo; not working yet.
@@ -1274,11 +1274,11 @@ def regengooglocs():
         for m in keys:
             if "demos." in m: continue
             if not m.startswith("goog."): continue
-            print >>glf, "goog.require('%s');" % m
+            print("goog.require('%s');" % m, file=glf)
 
-import SimpleHTTPServer
-import urlparse
-class HttpHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+import http.server
+from urllib.parse import urlparse
+class HttpHandler(http.server.SimpleHTTPRequestHandler):
     """allow grabbing any file for testing, and support /import
     which grabs all builtin and lib modules in a json request.
 
@@ -1302,7 +1302,7 @@ def host(PORT = 20710):
     """simple http host from root of dir for testing"""
     import SocketServer
     httpd = SocketServer.TCPServer(("", PORT), HttpHandler)
-    print "serving at port", PORT
+    print("serving at port", PORT)
     httpd.serve_forever()
 
 def usageString(program):
@@ -1388,7 +1388,7 @@ def main():
             togen = "{0}/run/".format(TEST_DIR) + sys.argv[2]
         else:
             togen = "{0}/run/*.py".format(TEST_DIR)
-        print "generating tests for ", togen
+        print("generating tests for ", togen)
         regensymtabtests(togen)
         regenasttests(togen)
         regenruntests(togen)
@@ -1425,12 +1425,12 @@ def main():
     elif cmd == "doc":
         doc()
     elif cmd == "nrt":
-        print "Warning: nrt is deprectated."
-        print "It is preferred that you enhance one of the unit tests in test/unit"
-        print "Or, create a new unit test file in test/unit using the template in test/unit_tmpl.py"
+        print("Warning: nrt is deprectated.")
+        print("It is preferred that you enhance one of the unit tests in test/unit")
+        print("Or, create a new unit test file in test/unit using the template in test/unit_tmpl.py")
         if len(sys.argv) < 3:
-            print "Need a name for the new test"
-            print usageString(os.path.basename(sys.argv[0]))
+            print("Need a name for the new test")
+            print(usageString(os.path.basename(sys.argv[0])))
             sys.exit(2)
         nrt(sys.argv[2])
     elif cmd == "browser":
@@ -1446,7 +1446,7 @@ def main():
             try:
                 host(int(sys.argv[2]))
             except ValueError:
-                print "Port must be an integer"
+                print("Port must be an integer")
                 sys.exit(2)
     elif cmd == "shell":
         shell(sys.argv[2]);
@@ -1457,7 +1457,7 @@ def main():
     elif cmd == "time":
         parse_time_args(sys.argv)
     else:
-        print usageString(os.path.basename(sys.argv[0]))
+        print(usageString(os.path.basename(sys.argv[0])))
         sys.exit(2)
 
 if __name__ == "__main__":

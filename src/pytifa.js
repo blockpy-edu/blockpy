@@ -117,6 +117,7 @@ Tifa.prototype.initializeReport = function() {
             "Parser Failure": [], // Complete failure to parse the code
             "Unconnected blocks": [], // Any names with ____
             "Empty Body": [], // Any use of pass on its own
+            "Malformed Conditional": [], // An if/else with empty else or if
             "Unnecessary Pass": [], // Any use of pass
             "Unread variables": [], // A variable was not read after it was defined
             "Undefined variables": [], // A variable was read before it was defined
@@ -397,7 +398,7 @@ Tifa.prototype.visit_Compare = function(node) {
     // Handle ops
     for (var i=0, len=comparators.length; i < len; i+= 1) {
         var op = node.ops[i];
-        var right = node.op[i];
+        var right = comparators[i];
         switch (op.name) {
             case "Eq": case "NotEq": case "Is": case "IsNot":
                 break;
@@ -408,7 +409,7 @@ Tifa.prototype.visit_Compare = function(node) {
                      left.name != "Set" && left.name != "Tuple" )) {
                     this.reportIssue("Incompatible types", 
                                      {"left": left, "right": right, 
-                                      "operation": node.op.name, 
+                                      "operation": op.name, 
                                       "position": Tifa.locate(node)});
                 }
                 break;
@@ -418,7 +419,7 @@ Tifa.prototype.visit_Compare = function(node) {
                     right.name != "Dict") {
                     this.reportIssue("Incompatible types", 
                                      {"left": left, "right": right, 
-                                      "operation": node.op.name, 
+                                      "operation": op.name, 
                                       "position": Tifa.locate(node)});
                 }
                 break;
@@ -468,8 +469,17 @@ Tifa.prototype.IfExp = function(node) {
 }
 
 Tifa.prototype.visit_If = function(node) {
+    var position = Tifa.locate(node);
+    
     // Visit the conditional
     this.visit(node.test);
+    
+    if (node.orelse.length == 1 && node.orelse[0]._astname == "Pass") {
+        this.reportIssue("Malformed Conditional", {"position": position});
+    } else if (node.body.length == 1 && node.orelse.length &&
+               node.body[0]._astname == "Pass") {
+        this.reportIssue("Malformed Conditional", {"position": position});
+    }
     
     // Visit the bodies
     var thisPathId = this.PathId;
@@ -498,19 +508,21 @@ Tifa.prototype.visit_If = function(node) {
     // Combine two paths into one
     for (var ifName in this.nameMap[ifPathId]) {
         if (ifName in this.nameMap[elsePathId]) {
-            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName],
+            var combined = this.combineStates(this.nameMap[ifPathId][ifName],
                                               this.nameMap[elsePathId][ifName],
-                                              Tifa.locate(node))
+                                              position)
         } else {
-            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], null, Tifa.locate(node))
+            var combined = this.combineStates(this.nameMap[ifPathId][ifName], 
+                                              this.nameMap[thisPathId][ifName], 
+                                              position)
         }
         this.nameMap[thisPathId][ifName] = combined;
     }
     for (var elseName in this.nameMap[elsePathId]) {
         if (!(ifName in this.nameMap[elsePathId])) {
-            var combined = Tifa.combineStates(this.nameMap[elsePathId][elseName], 
-                                              null,
-                                              Tifa.locate(node))
+            var combined = this.combineStates(this.nameMap[elsePathId][elseName], 
+                                              this.nameMap[thisPathId][elseName],
+                                              position)
             this.nameMap[thisPathId][elseName] = combined;
         }
     }
@@ -545,18 +557,20 @@ Tifa.prototype.visit_While = function(node) {
     // Combine two paths into one
     for (var ifName in this.nameMap[ifPathId]) {
         if (ifName in this.nameMap[elsePathId]) {
-            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName],
+            var combined = this.combineStates(this.nameMap[ifPathId][ifName],
                                               this.nameMap[elsePathId][ifName],
                                               Tifa.locate(node))
         } else {
-            var combined = Tifa.combineStates(this.nameMap[ifPathId][ifName], null, Tifa.locate(node))
+            var combined = this.combineStates(this.nameMap[ifPathId][ifName], 
+                                              this.nameMap[elsePathId][thisPathId], 
+                                              Tifa.locate(node))
         }
         this.nameMap[thisPathId][ifName] = combined;
     }
     for (var elseName in this.nameMap[elsePathId]) {
         if (!(ifName in this.nameMap[elsePathId])) {
-            var combined = Tifa.combineStates(this.nameMap[elsePathId][elseName], 
-                                              null,
+            var combined = this.combineStates(this.nameMap[elsePathId][elseName], 
+                                              this.nameMap[elsePathId][thisPathId],
                                               Tifa.locate(node))
             this.nameMap[thisPathId][elseName] = combined;
         }
@@ -761,7 +775,6 @@ Tifa.prototype.visit_FunctionDef = function(node) {
         analyzer.scopeChain.shift();
         analyzer.scopeChain = oldScope;
         return returnValue;
-        
     }
     return state.type;
 }
@@ -881,8 +894,6 @@ Tifa.prototype.visit_List = function(node) {
 }
 Tifa.prototype.visit_Dict = function(node) {
     var type = Tifa._DICT_TYPE();
-    type.keys = Tifa._UNKNOWN_TYPE();
-    type.values = Tifa._UNKNOWN_TYPE();
     if (node.keys.length == 0) {
         type.empty = true;
     } else {
@@ -1038,7 +1049,7 @@ Tifa.prototype.loadVariable = function(name, position) {
             this.reportIssue("Undefined variables", 
                              {'name': name, 'position':position})
         }
-        state = {'name': name, 'trace': [], 'type': '*Unknown',
+        state = {'name': name, 'trace': [], 'type': Tifa._UNKNOWN_TYPE(),
                  'read': 'yes', 'set': 'no', 'over': 'no'};
         this.nameMap[currentPath][fullName] = state;
         return state;
@@ -1089,22 +1100,50 @@ Tifa.prototype.walkTargets = function(targets, type, walker) {
     }
 }
 
+Tifa.cloneType = function (aType){
+    switch (aType.name) {
+        case "List": case "Set": case "Generator":
+            return Tifa._LIST_OF_TYPE(Tifa.cloneType(aType.subtype));
+        case "Dict":
+            return Tifa._DICT_OF_TYPE(Tifa.cloneType(aType.keys),
+                                      Tifa.cloneType(aType.values));
+        case "Tuple":
+            var newTuple = Tifa._TUPLE_TYPE();
+            newTuple.subtypes = aType.subtypes.map(t => Tifa.cloneType(t));
+            return newTuple;
+        case "Module":
+            var newModule = Tifa._MODULE_TYPE();
+            for (var name in aType.submodules) {
+                newModule.submodules[name] = Tifa.cloneType(aType.submodules[name]);
+            }
+            for (var name in aType.fields) {
+                newModule.fields[name] = Tifa.cloneType(aType.fields[name]);
+            }
+            return newModule;
+        case "Bool": case "Num": case "Str": case "File":
+        case "None": case "*Unknown":
+            return {"name": aType.name};
+    }
+}
+
+// Type Definitions
 Tifa._BOOL_TYPE = function() { return {'name': 'Bool'} };
 Tifa._NUM_TYPE = function() { return {'name': 'Num'} };
-Tifa._MODULE_TYPE = function() { return {'name': 'Module', 'submodules': []} };
+Tifa._MODULE_TYPE = function() { return {'name': 'Module', 'submodules': {}, 'fields': {} }};
 Tifa._STR_TYPE = function() { return {'name': 'Str'} };
 Tifa._FILE_TYPE = function() { return {'name': 'File'} };
-Tifa._SET_TYPE = function() { return {'name': 'Str', "empty": false} };
-Tifa._LIST_TYPE = function(isEmpty) { return {'name': 'List', "empty": !!isEmpty} };
-Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false} };
+Tifa._SET_TYPE = function() { return {'name': 'Str', "subtype": Tifa._UNKNOWN_TYPE(), "empty": false} };
+Tifa._LIST_TYPE = function(isEmpty) { return {'name': 'List', "subtype": Tifa._UNKNOWN_TYPE(), "empty": !!isEmpty} };
+Tifa._DICT_TYPE = function() { return {'name': 'Dict', "empty": false, "keys": Tifa._UNKNOWN_TYPE(), "values": Tifa._UNKNOWN_TYPE()} };
 Tifa._GENERATOR_OF_TYPE = function(subtype) { return {'name': 'Generator', "empty": false, "subtype": subtype} };
 Tifa._LIST_OF_TYPE = function(subtype) { return {'name': 'List', "empty": false, "subtype": subtype} };
 Tifa._SET_OF_TYPE = function(subtype) { return {'name': 'Set', "empty": false, "subtype": subtype} };
 Tifa._DICT_OF_TYPE = function(keytype, valuetype) { 
     return {'name': 'Set', "empty": false, "keys": keytype, "values": valuetype} };
-Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple'} };
+Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple', "subtypes": []} };
 Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
+
 Tifa.VALID_BINOP_TYPES = {
     'Add': {'Num': {'Num': Tifa._NUM_TYPE}, 
             'Str' :{'Str': Tifa._STR_TYPE}, 
@@ -1152,17 +1191,17 @@ Tifa.locate = function(node) {
 
 Tifa.indexSequenceType= function(type, i) {
     if (type.name == "Tuple") {
-        return type.subtypes[i];
+        return Tifa.cloneType(type.subtypes[i]);
     } else if (type.name == "List") {
-        return type.subtype;
+        return Tifa.cloneType(type.subtype);
     } else if (type.name == "Generator") {
-        return type.subtype;
+        return Tifa.cloneType(type.subtype);
     } else if (type.name == "Str") {
         return Tifa._STR_TYPE();
     } else if (type.name == "File") {
         return Tifa._STR_TYPE();
     } else if (type.name == "Dict") {
-        return Tifa.keys;
+        return Tifa.cloneType(type.keys);
     } else {
         return Tifa._UNKNOWN_TYPE();
     }
@@ -1205,7 +1244,7 @@ Tifa.sameScope = function(fullName, scopeChain) {
     return true;
 }
 
-Tifa.combineStates = function(left, right, position) {
+Tifa.prototype.combineStates = function(left, right, position) {
     var state = {'name': left.name, 'trace': left.trace, 'type': left.type,
                  'read': left.read, 'set': left.set, 'over': left.over};
     if (right == null) {
@@ -1260,8 +1299,8 @@ Tifa.copyType = function(type) {
 Tifa.mergeTypes = function(left, right) {
     // TODO: Check that lists/sets have the same subtypes
     switch (left.name) {
-        case "List": return (left.empty ? right.subtype : left.subtype);
-        case "Set": return (left.empty ? right.subtype : left.subtype);
+        case "List": return (left.empty ? right.subtype : Tifa.cloneType(left.subtype));
+        case "Set": return (left.empty ? right.subtype : Tifa.cloneType(left.subtype));
         case "Tuple": return left.subtypes.concat(right.subtypes);
     }
 }
@@ -1500,18 +1539,20 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                 case "read": return Tifa.defineSupplier(Tifa._STR_TYPE());
                 case "readlines": return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
             }
+            break;
         case "List":
             switch (attr) {
                 case "append": return Tifa.defineFunction(
                     function (analyzer, functionType, callee, args, position) {
+                        if (callee) {
+                            analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(Tifa.cloneType(type.subtype)), position);
+                        }
                         type.empty = false;
                         type.subtype = args[0];
-                        if (callee) {
-                            analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(type.subtype), position);
-                        }
                     }
                 );
             };
+            break;
         case "Dict":
             switch (attr) {
                 case "items": return Tifa.defineFunction(
@@ -1522,12 +1563,18 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                     }
                 );
             };
+            break;
         case "Module":
-            if (attr in type.fields) {
-                return type.fields[attr];
+            if ("fields" in type) {
+                if (attr in type.fields) {
+                    return type.fields[attr];
+                } else {
+                    return Tifa._UNKNOWN_TYPE();
+                }
             } else {
                 return Tifa._UNKNOWN_TYPE();
             }
+            break;
         case "Str":
             switch (attr) {
                 // Strings
@@ -1551,6 +1598,7 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
                 case "rsplit": case "split": case "splitlines":
                     return Tifa.defineSupplier(Tifa._LIST_OF_TYPE(Tifa._STR_TYPE()));
             }
+            break;
     }
     // Catch mistakes
     if (attr == "append") {
@@ -1561,3 +1609,4 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
     }
     return Tifa._NONE_TYPE();
 }
+
