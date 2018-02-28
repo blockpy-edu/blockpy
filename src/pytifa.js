@@ -1757,11 +1757,13 @@ Tifa.prototype.loadBuiltinAttr = function(type, func, attr, position) {
             switch (attr) {
                 case "append": return Tifa.defineFunction(
                     function (analyzer, functionType, callee, args, position) {
-                        if (callee) {
-                            analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(Tifa.cloneType(type.subtype)), position);
+                        if (args.length) {
+                            if (callee) {
+                                analyzer.appendVariable(callee, Tifa._LIST_OF_TYPE(Tifa.cloneType(args[0])), position);
+                            }
+                            type.empty = false;
+                            type.subtype = args[0];
                         }
-                        type.empty = false;
-                        type.subtype = args[0];
                     }
                 );
             };
