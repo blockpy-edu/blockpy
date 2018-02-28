@@ -900,6 +900,9 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="plot_xlabel"></block>'+
                     '<block type="plot_ylabel"></block>'+
                 '</category>',
+    'Input':   '<category name="Input" colour="165">'+
+                    '<block type="text_input"></block>'+
+                '</category>',
     'Turtles': '<category name="Turtles" colour="180">'+
                     '<block type="turtle_create"></block>'+
                     '<block type="turtle_forward"></block>'+
@@ -1016,7 +1019,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
         started_data = false;
     for (var i = 0, length = modules.length; i < length; i = i+1) {
         var module = modules[i];
-        if (!started_misc && ['Calculation', 'Output', 'Python'].indexOf(module) != -1) {
+        if (!started_misc && ['Calculation', 'Output', 'Input', 'Python'].indexOf(module) != -1) {
             started_misc = true;
             xml += BlockPyEditor.CATEGORY_MAP['Separator'];
         }

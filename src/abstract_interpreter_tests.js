@@ -13,6 +13,8 @@
     var filename = '__main__.py';
     
     var unit_tests = [
+        // Mutable Types
+        ['def t():\n    x = []\n    x.append(1)\n    return x\nfor x in t():\n    x + 1', ['Incompatible types'], []],
         // Importing
         ['import matplotlib.pyplot as plt\nplt.hist([1,2,3])\nplt.show()', ['Undefined variables'], []],
         ['from random import randint\na=randint(1,2)\n1+a', ['Undefined variables', 'Incompatible types'], []],
@@ -160,6 +162,9 @@
         ['a=[]\na.append(1)', ['Undefined variables'], ['Unread variables']],
         // Append to number
         ['a=1\na.append(1)\nprint(a)', [], ['Append to non-list']],
+        
+        // Append and index
+        ['x=[]\nx.append(1)\nx[0]+1', ['Incompatible types'], []],
         
         // Created a new list but didn't read it
         ['old = [1,2,3]\nnew=[]\nfor x in old:\n\tnew.append(x)', [], ['Unread variables']],
