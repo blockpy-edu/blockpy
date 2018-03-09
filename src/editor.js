@@ -884,6 +884,24 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="math_round"></block>'+
                     //'<block type="text_join"></block>'+
                 '</category>',
+    'Conversion': '<category name="Conversion" colour="275">'+
+                    '<block type="procedures_callreturn" inline="true">'+
+                        '<mutation name="int"><arg name="">'+
+                        '</arg></mutation>'+
+                    '</block>'+
+                    '<block type="procedures_callreturn" inline="true">'+
+                        '<mutation name="float"><arg name="">'+
+                        '</arg></mutation>'+
+                    '</block>'+
+                    '<block type="procedures_callreturn" inline="true">'+
+                        '<mutation name="str"><arg name="">'+
+                        '</arg></mutation>'+
+                    '</block>'+
+                    '<block type="procedures_callreturn" inline="true">'+
+                        '<mutation name="bool"><arg name="">'+
+                        '</arg></mutation>'+
+                    '</block>'+
+                '</category>',
     'Python':   '<category name="Python" colour="180">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
@@ -935,6 +953,14 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="lists_create_with"></block>'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
+                    '<block type="procedures_callreturn" inline="true">'+
+                        '<mutation name="range"><arg name="">'+
+                            '<block type="math_number"><field name="NUM">10</field></block>'+
+                        '</arg></mutation>'+
+                        '<value name="ARG0">'+
+                            '<block type="math_number"><field name="NUM">10</field></block>'+
+                        '</value>'+
+                    '</block>'+
                     /*'<block type="lists_length"></block>'+*/
                     /*'<block type="lists_index">'+
                         '<value name="ITEM">'+
@@ -1019,7 +1045,7 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
         started_data = false;
     for (var i = 0, length = modules.length; i < length; i = i+1) {
         var module = modules[i];
-        if (!started_misc && ['Calculation', 'Output', 'Input', 'Python'].indexOf(module) != -1) {
+        if (!started_misc && ['Calculation', 'Conversion', 'Output', 'Input', 'Python'].indexOf(module) != -1) {
             started_misc = true;
             xml += BlockPyEditor.CATEGORY_MAP['Separator'];
         }

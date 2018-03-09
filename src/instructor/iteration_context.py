@@ -974,8 +974,9 @@ def wrong_duplicate_var_in_add():
                 return True
     return False
 #########################PLOTTING###############################
-def plot_group_error():
-    output = get_output()
+def plot_group_error(output=None):
+    if output is None:
+        output = get_output()
     if len(output) > 1:
         explain('You should only be printing/plotting one thing!<br><br><i>(print_one)<i></br>')
         return True

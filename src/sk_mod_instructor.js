@@ -387,6 +387,9 @@ var $sk_mod_instructor = function(name) {
         if((node instanceof Object) && ("_astname" in node) && node._astname == "Name"){
             var analyzer = Sk.executionReports['analyzer'];
             var typesList = analyzer.variables;
+            if (typesList === undefined) {
+                return Sk.ffi.remapToPy(null);
+            }
             var name = Sk.ffi.remapToJs(node.id);
             if (typesList[name] === undefined) {
                 return Sk.ffi.remapToPy(null);
@@ -668,6 +671,9 @@ var $sk_mod_instructor = function(name) {
             visitor.visit_Num = function(node){
                 otherExpr += Sk.ffi.remapToJs(node.n) + " ";
             }
+            visitor.visit_Str = function(node){
+                fastFail = true;
+            }
             visitor.visit_Compare = function(node){
                 //left op comp op comp
                 otherExpr += "(";
@@ -691,6 +697,9 @@ var $sk_mod_instructor = function(name) {
                 return Sk.ffi.remapToPy(null);
             }
             var otherCons = otherExpr.match(consRegex);
+            if (otherCons === null) {
+                return Sk.ffi.remapToPy(null);
+            }
             for(var i = 0; i < otherCons.length; i += 1){
                 var cons = otherCons[i] * 1;
                 expConsArray.push(cons);

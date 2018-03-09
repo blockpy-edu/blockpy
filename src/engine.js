@@ -62,7 +62,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
     var settings = this.main.model.settings;
     Sk.execLimitFunction = function() { 
-        return settings.disable_timeout() ? Infinity : 10000; 
+        return settings.disable_timeout() ? Infinity : 3000; 
     };
     Sk.execLimit = Sk.execLimitFunction();
     // Identify the location to put new charts
@@ -546,18 +546,20 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
  * @param {Object} variables - a mapping of variable names to their Skupt value.
  */
 BlockPyEngine.prototype.parseGlobals = function(variables) {
-    var result = Array();
-    var modules = Array();
-    for (var property in variables) {
-        var value = variables[property];
-        if (property !== "__name__" && property !== "__doc__") {
-            property = property.replace('_$rw$', '')
-                               .replace('_$rn$', '');
-            var parsed = this.parseValue(property, value);
-            if (parsed !== null) {
-                result.push(parsed);
-            } else if (value.constructor == Sk.builtin.module) {
-                modules.push(value.$d.__name__.v);
+    var result = [];
+    var modules = [];
+    if (!this.main.model.settings.trace_off()) {
+        for (var property in variables) {
+            var value = variables[property];
+            if (property !== "__name__" && property !== "__doc__") {
+                property = property.replace('_$rw$', '')
+                                   .replace('_$rn$', '');
+                var parsed = this.parseValue(property, value);
+                if (parsed !== null) {
+                    result.push(parsed);
+                } else if (value.constructor == Sk.builtin.module) {
+                    modules.push(value.$d.__name__.v);
+                }
             }
         }
     }

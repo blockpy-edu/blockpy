@@ -68,6 +68,7 @@ main = {
             'disable_timeout': x => false,
             'mute_printer': x => this['mute_printer'] = x,
             'preventD3': false,
+            'trace_off': v => true,
         }
     }
 };
@@ -101,7 +102,7 @@ isAstNode = blockpy.isAstNode;
 _IMPORTED_DATASETS = {};
 AbstractInterpreter = blockpy.AbstractInterpreter;
 NodeVisitor = blockpy.NodeVisitor;
-datasets = ['publishers', 'state_demographics', 'school_scores'];
+datasets = ['publishers', 'state_demographics', 'school_scores', 'weather', 'tate', 'earthquakes'];
 datasets.forEach(slug => {
     readModuleFile('./data_analysis/corgis/'+slug+'_skulpt.js', function (err, words) {
         Sk.builtinFiles['files']['src/lib/'+slug+'/__init__.js'] = words;
@@ -109,16 +110,25 @@ datasets.forEach(slug => {
     require('./data_analysis/corgis/'+slug+'_abstract.js')
     require('./data_analysis/corgis/'+slug+'_dataset.js')
 });
-console.log(AbstractInterpreter.MODULES)
+for (var name in _IMPORTED_DATASETS) {
+    for (var key in _IMPORTED_DATASETS[name]) {
+        var original = _IMPORTED_DATASETS[name][key]['data'];
+        _IMPORTED_DATASETS[name][key]['data'] = [1, 100, 200, 50, 25, 37, -10, -5, -3, 0, 0, 0, 0, 0]; //original.slice(0, 10);
+    }
+}
+//console.log(AbstractInterpreter.MODULES)
 
 // Actual work
 final_result = []
+// 'data_analysis/ct_experimental_post_run_submissions.json'
+filename = process.argv[2];
 loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions => {
     // f17_ct_8-5_change_steps
     // s17_post_run_submissions
     // quick_test.json
     // ct_f17_post_run_submissions.json
-    loadJsonFile('data_analysis/s17_post_run_submissions.json').then(data => {
+    // ct_experimental_post_run_submissions
+    loadJsonFile(filename).then(data => {
         subs = data.submissions;
         var next = function(subi, stui) {
             processSub(subs[subi][stui], function() {
@@ -132,8 +142,9 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                 } else {
                     //f17_ct_stepped_new_8-5
                     //f17_post_checked
-                    fs.writeFile('./data_analysis/s17_post_checked.json', 
-                                 JSON.stringify(final_result), 
+                    // './data_analysis/ct_experimental_post_checked.json'
+                    fs.writeFile(filename.slice(0, -5)+'-post.json', 
+                                 JSON.stringify(final_result, undefined, 2), 
                                  {'spaces':2}, 
                                  function (err) {
                          if (err) {
@@ -144,17 +155,27 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
             });
         };
         function processSub(sub, callback) {
+            if (sub === undefined) {
+                callback();
+                return;
+            }
             var instructor_code = assignment_solutions[""+sub.aid];
             var student_code = sub.code;
             if (student_code == "") {
                 final_result.push({
                     'aid': sub.aid,
                     'assignment': sub.assignment,
+                    'semester': sub.semester,
+                    'time_spent': sub.time_spent,
+                    'step_number': sub['step number'],
+                    'run_number': sub['run number'],
                     'user': sub.user,
                     'uid': sub.uid,
                     'timestamp': sub.timestamp,
                     'code': sub.code,
                     'messages': ['nocode'],
+                    'ran': false,
+                    'analyzers': [],
                     'complete': false
                 })
                 callback();
@@ -166,16 +187,30 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                     var ms = Sk.executionReports.instructor.complaint ?
                              Sk.executionReports.instructor.complaint.map(x => x.message.match(/.*\((.*)\).*/).pop()) 
                              : [];
-                    console.log(sub.user, sub.assignment, ms.length);
-                    //console.log(Sk.executionReports['student']);
+                    console.log(sub.user, sub.assignment, sub['run number'], ms.length);
+                    var analyzers = [];
+                    for (var issue in Sk.executionReports.analyzer.issues) {
+                        if (Sk.executionReports.analyzer.issues[issue].length) {
+                            analyzers.push(issue)
+                        }
+                    }
+                    /*if (Sk.executionReports.instructor.complete) {
+                        console.log(JSON.stringify(Sk.executionReports['analyzer'], null, 2));
+                    }*/
                     final_result.push({
                         'aid': sub.aid,
                         'assignment': sub.assignment,
                         'user': sub.user,
                         'uid': sub.uid,
                         'timestamp': sub.timestamp,
+                        'semester': sub.semester,
+                        'time_spent': sub.time_spent,
+                        'step_number': sub['step number'],
+                        'run_number': sub['run number'],
                         'code': sub.code,
                         'messages': ms,
+                        'ran': !!Sk.executionReports.student.success,
+                        'analyzers': analyzers,
                         'complete': !!(Sk.executionReports.instructor.complete)
                     })
                     callback();
