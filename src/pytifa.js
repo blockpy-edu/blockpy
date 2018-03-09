@@ -1512,7 +1512,7 @@ Tifa.areLiteralsEqual = function(first, second) {
 Tifa.defineSupplier = function(returnType) {
     return { "name": "Function",
              "definition": function (analyzer, type, name, args, position) {
-                return returnType;
+                return Tifa.cloneType(returnType);
               }
     };
 }
@@ -1520,7 +1520,7 @@ Tifa.defineIdentity = function(returnType) {
     return { "name": "Function",
              "definition": function (analyzer, type, name, args, position) {
                  if (args.length) {
-                    return args[0];
+                    return Tifa.cloneType(args[0]);
                  }
                  return Tifa._UNKNOWN_TYPE();
               }

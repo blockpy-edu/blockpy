@@ -92,10 +92,17 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         var fr = new FileReader();
         var files = uploadButton[0].files;
         fr.onload = function(e) {
-            main.setCode(e.target.result)
+            fn = e.target.fileName;
+            var code = e.target.result;
+            if (fn.endsWith(".ipynb")) {
+                ipynb = JSON.parse(code);
+                code = ipynb.cells.filter(x=>x.cell_type == "code").map(x=>x.source.join("\n")).join("\n");
+            }
+            main.setCode(code)
             main.components.server.logEvent('editor', 'upload')
             main.components.engine.on_run();
         };
+        fr.fileName = files[0].name;
         fr.readAsText(files[0]);
         uploadButton.val("");
     });

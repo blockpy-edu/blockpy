@@ -225,6 +225,8 @@ BlockPy.prototype.initModel = function(settings) {
             'trace_step': ko.observable(0),
             // boolean
             'show_trace': ko.observable(false),
+            // boolean
+            'trace_off': ko.observable(false),
             // object: strings => objects
             'reports': {},
             // objects: strings => boolean
