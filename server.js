@@ -110,12 +110,13 @@ datasets.forEach(slug => {
     require('./data_analysis/corgis/'+slug+'_abstract.js')
     require('./data_analysis/corgis/'+slug+'_dataset.js')
 });
+/*
 for (var name in _IMPORTED_DATASETS) {
     for (var key in _IMPORTED_DATASETS[name]) {
         var original = _IMPORTED_DATASETS[name][key]['data'];
-        _IMPORTED_DATASETS[name][key]['data'] = [1, 100, 200, 50, 25, 37, -10, -5, -3, 0, 0, 0, 0, 0]; //original.slice(0, 10);
+        _IMPORTED_DATASETS[name][key]['data'] = ; //original.slice(0, 10);
     }
-}
+}*/
 //console.log(AbstractInterpreter.MODULES)
 
 // Actual work

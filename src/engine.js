@@ -62,7 +62,7 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Limit execution to 5 seconds
     var settings = this.main.model.settings;
     Sk.execLimitFunction = function() { 
-        return settings.disable_timeout() ? Infinity : 3000; 
+        return settings.disable_timeout() ? Infinity : 10000; 
     };
     Sk.execLimit = Sk.execLimitFunction();
     // Identify the location to put new charts

@@ -106,6 +106,24 @@ BlockPy.prototype.initComponents = function() {
         }
     });
     statusBox.tooltip();
+    
+    this.model.settings.presentation_mode.subscribe(function(is_set) {
+        if (is_set) {
+            container.find('.blockpy-content-left').removeClass('col-md-6 col-sm-6');
+            container.find('.blockpy-content-left').addClass('col-md-12 col-sm-12');
+            container.find('.blockpy-content-right').hide();
+            container.find('.blockpy-toolbar-row').hide();
+            container.find('.blockpy-content-bottom').hide();
+            container.find('.blockpy-printer').css("height", "400px");
+        } else {
+            container.find('.blockpy-content-left').removeClass('col-md-12 col-sm-12');
+            container.find('.blockpy-content-left').addClass('col-md-6 col-sm-6');
+            container.find('.blockpy-content-right').show();
+            container.find('.blockpy-toolbar-row').show();
+            container.find('.blockpy-content-bottom').show();
+            container.find('.blockpy-printer').css("height", "200px");
+        }
+    });
 }
 
 /**
@@ -159,6 +177,9 @@ BlockPy.prototype.initModel = function(settings) {
             // Whether the canvas is read-only
             // boolean
             'read_only': ko.observable(false),
+            // Whether to skip tracing dynamically
+            // boolean
+            'trace_off': ko.observable(false),
             // The current filename that we are editing
             // string
             'filename': ko.observable("__main__"),
@@ -179,7 +200,9 @@ BlockPy.prototype.initModel = function(settings) {
             // function
             'completedCallback': settings.completedCallback,
             // boolean
-            'server_connected': ko.observable(true)
+            'server_connected': ko.observable(true),
+            // boolean
+            'presentation_mode': ko.observable(false)
         },
         // Assignment level settings
         'assignment': {
@@ -451,6 +474,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.settings['disable_timeout'](settings.disable_timeout || 
                                            assignment.disable_timeout);
     this.model.settings['developer'](settings.developer);
+    this.model.settings['presentation_mode'](!!settings.presentation_mode);
     if (settings.completedCallback) {
         this.model.settings['completedCallback'] = settings.completedCallback;
     }
@@ -508,6 +532,10 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.components.corgis.loadDatasets(true);
     this.components.engine.loadAllFiles(true);
     this.components.server.setStatus('Loaded');
+    if (this.model.settings.presentation_mode()) {
+        this.components.server.logEvent('editor', 'run')
+        this.components.engine.on_run();
+    }
 }
 
 /**
