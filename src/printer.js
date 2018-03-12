@@ -138,6 +138,16 @@ BlockPyPrinter.prototype.printHtml = function(chart, value) {
 }
 
 /**
+ * Unconditionally scroll to the bottom of the window.
+ * 
+ */
+BlockPyPrinter.prototype.scrollToBottom = function() {
+    this.tag.animate({
+      scrollTop: this.tag.prop('scrollHeight') - this.tag.prop('clientHeight')
+    }, 500);
+}
+
+/**
  * Creates an Input box for receiving input() from the user.
  * 
  * @param {String} promptMessage - a message to render before the input
