@@ -274,6 +274,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
     var engine = this;
     var feedback = engine.main.components.feedback;
     var model = this.main.model;
+    var printer = this.main.components.printer;
     engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
@@ -301,6 +302,11 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
             model.execution.status("complete");
             if (afterwards !== undefined) {
                 afterwards(result);
+            }
+            if (!model.execution.suppressions.student.scrolling) {
+                try {
+                    printer.scrollToBottom();
+                } catch (e) {}
             }
         });
     });

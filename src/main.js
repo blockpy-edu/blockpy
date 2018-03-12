@@ -107,7 +107,7 @@ BlockPy.prototype.initComponents = function() {
     });
     statusBox.tooltip();
     
-    this.model.settings.presentation_mode.subscribe(function(is_set) {
+    var setPresentationMode = function(is_set) {
         if (is_set) {
             container.find('.blockpy-content-left').removeClass('col-md-6 col-sm-6');
             container.find('.blockpy-content-left').addClass('col-md-12 col-sm-12');
@@ -123,7 +123,9 @@ BlockPy.prototype.initComponents = function() {
             container.find('.blockpy-content-bottom').show();
             container.find('.blockpy-printer').css("height", "200px");
         }
-    });
+    };
+    this.model.settings.presentation_mode.subscribe(setPresentationMode);
+    setPresentationMode(this.model.settings.presentation_mode());
 }
 
 /**
@@ -202,7 +204,7 @@ BlockPy.prototype.initModel = function(settings) {
             // boolean
             'server_connected': ko.observable(true),
             // boolean
-            'presentation_mode': ko.observable(false)
+            'presentation_mode': ko.observable(settings.presentation_mode)
         },
         // Assignment level settings
         'assignment': {
@@ -474,7 +476,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.settings['disable_timeout'](settings.disable_timeout || 
                                            assignment.disable_timeout);
     this.model.settings['developer'](settings.developer);
-    this.model.settings['presentation_mode'](!!settings.presentation_mode);
+    if (settings.presentation_mode !== undefined) {
+        this.model.settings['presentation_mode'](!!settings.presentation_mode);
+    }
     if (settings.completedCallback) {
         this.model.settings['completedCallback'] = settings.completedCallback;
     }
