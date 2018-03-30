@@ -277,7 +277,7 @@ Tifa.prototype.visit_Assign = function(node) {
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
                 var elt = target.elts[i];
-                var eltType = Tifa.indexSequenceType(type, i);
+                var eltType = Tifa.indexSequenceType(type, Tifa._LITERAL_NUM(i));
                 action(elt, eltType);
             }
         } else if (target._astname == "Subscript") {
@@ -691,7 +691,7 @@ Tifa.prototype.visit_comprehension = function(node) {
     }
     var iterSubtype = null;
     if (iterType !== null) {
-        iterSubtype = Tifa.indexSequenceType(iterType, 0);
+        iterSubtype = Tifa.indexSequenceType(iterType, Tifa._LITERAL_NUM(0));
     }
     
     // Handle the iteration variable
@@ -706,7 +706,7 @@ Tifa.prototype.visit_comprehension = function(node) {
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
                 var elt = target.elts[i];
-                var eltType = Tifa.indexSequenceType(type, i);
+                var eltType = Tifa.indexSequenceType(type, Tifa._LITERAL_NUM(i));
                 walkTarget(elt, eltType, position);
             }
         }
@@ -747,7 +747,7 @@ Tifa.prototype.visit_For = function(node) {
     }
     var iterSubtype = null;
     if (iterType !== null) {
-        iterSubtype = Tifa.indexSequenceType(iterType, 0);
+        iterSubtype = Tifa.indexSequenceType(iterType, Tifa._LITERAL_NUM(0));
     }
     
     // Handle the iteration variable
@@ -762,7 +762,7 @@ Tifa.prototype.visit_For = function(node) {
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
                 var elt = target.elts[i];
-                var eltType = Tifa.indexSequenceType(type, i);
+                var eltType = Tifa.indexSequenceType(type, Tifa._LITERAL_NUM(i));
                 walkTarget(elt, eltType, position);
             }
         }
@@ -991,6 +991,7 @@ Tifa.prototype.visit_Tuple = function(node) {
     var type = Tifa._TUPLE_TYPE();
     if (node.elts.length == 0) {
         type.empty = true;
+        type.subtypes = [];
     } else {
         type.empty = false;
         type.subtypes = [];
@@ -1013,7 +1014,7 @@ Tifa.prototype.visit_With = function(node) {
         } else if (target._astname == 'Tuple' || target._astname == 'List') {
             for (var i = 0, len = target.elts.length; i < len; i++) {
                 var elt = target.elts[i];
-                var eltType = Tifa.indexSequenceType(type, i);
+                var eltType = Tifa.indexSequenceType(type, Tifa._LITERAL_NUM(i));
                 walkTarget(elt, eltType, position);
             }
         }
@@ -1245,6 +1246,8 @@ Tifa._TUPLE_TYPE = function() { return {'name': 'Tuple', "subtypes": []} };
 Tifa._NONE_TYPE = function() { return {'name': 'None'} };
 Tifa._UNKNOWN_TYPE = function() { return {'name': '*Unknown'} };
 
+Tifa._LITERAL_NUM = function(i) { return {'type': 'Num', 'value': i }};
+
 Tifa.VALID_BINOP_TYPES = {
     'Add': {'Num': {'Num': Tifa._NUM_TYPE}, 
             'Str' :{'Str': Tifa._STR_TYPE}, 
@@ -1298,7 +1301,11 @@ Tifa.indexSequenceType= function(type, i) {
     
     // Handle type
     if (type.name == "Tuple") {
-        return Tifa.cloneType(type.subtypes[i]);
+        if (i.type == "Num") {
+            return Tifa.cloneType(type.subtypes[i.value]);
+        } else {
+            return Tifa.cloneType(type.subtypes[i]);
+        }
     } else if (type.name == "List") {
         return Tifa.cloneType(type.subtype);
     } else if (type.name == "Generator") {
@@ -1314,6 +1321,7 @@ Tifa.indexSequenceType= function(type, i) {
                     return Tifa.cloneType(type.values[j]);
                 }
             }
+            return Tifa._UNKNOWN_TYPE();
         } else {
             return Tifa.cloneType(type.keys);
         }
@@ -1464,7 +1472,7 @@ Tifa.mergeTypes = function(left, right) {
 
 Tifa.getLiteral = function(node) {
     switch (node._astname) {
-        case "Num": return {"type": "Num", "value": node.n.n};
+        case "Num": return {"type": "Num", "value": node.n.v};
         case "Str": return {"type": "Str", "value": node.s.v};
         case "Tuple": 
             var values = [];
@@ -1554,7 +1562,7 @@ Tifa.loadBuiltin = function(name) {
                 function (analyzer, functionType, callee, args, position) {
                     var returnType = Tifa._LIST_TYPE();
                     if (args.length) {
-                        returnType.subtype = Tifa.indexSequenceType(args[0], 0);
+                        returnType.subtype = Tifa.indexSequenceType(args[0], Tifa._LITERAL_NUM(0));
                         // TODO: Should inherit the emptiness too
                         returnType.empty = true;
                     } else {
@@ -1569,7 +1577,7 @@ Tifa.loadBuiltin = function(name) {
                 function (analyzer, functionType, callee, args, position) {
                     var returnType = Tifa._SET_TYPE();
                     if (args.length) {
-                        returnType.subtype = Tifa.indexSequenceType(args[0], 0);
+                        returnType.subtype = Tifa.indexSequenceType(args[0], Tifa._LITERAL_NUM(0));
                         // TODO: Should inherit the emptiness too
                         returnType.empty = true;
                     } else {
@@ -1591,7 +1599,7 @@ Tifa.loadBuiltin = function(name) {
             return Tifa.defineFunction(
                 function (analyzer, functionType, callee, args, position) {
                     if (args.length) {
-                        return Tifa.indexSequenceType(args[0], 0);
+                        return Tifa.indexSequenceType(args[0], Tifa._LITERAL_NUM(0));
                     }
                     return Tifa._UNKNOWN_TYPE();
                 }
@@ -1603,7 +1611,7 @@ Tifa.loadBuiltin = function(name) {
                         var tupledTypes = Tifa._TUPLE_TYPE();
                         tupledTypes.subtypes = [];
                         for (var i=0, len=args.length; i<len; i+=1) {
-                            tupledTypes.subtypes[i] = Tifa.indexSequenceType(args[i],0);
+                            tupledTypes.subtypes[i] = Tifa.indexSequenceType(args[i],Tifa._LITERAL_NUM(0));
                         }
                         return Tifa._LIST_OF_TYPE(tupledTypes);
                     } else {

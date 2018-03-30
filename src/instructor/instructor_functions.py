@@ -24,39 +24,65 @@ def match_signature(name, length, *parameters):
         gently("No function named <code>{}</code> was found.".format(name))
     return None
     
+GREEN_CHECK = "<td style='font-weight: bold;color: green;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'>&#10004;</td>"
+RED_X = "<td>&#10060;</td>"
 def output_test(name, *tests):
     if name in student.data:
         the_function = student.data[name]
         if callable(the_function):
+            result = ("<table class='blockpy-feedback-unit table table-condensed table-bordered table-hover'>"
+                      "<tr class='active'><th></th><th>Arguments</th><th>Expected</th><th>Actual</th></tr>"
+                      )
+            success = True
+            success_count = 0
             for test in tests:
                 inp = test[:-1]
+                inputs = ', '.join(["<code>{}</code>".format(repr(i)) for i in inp])
                 out = test[-1]
                 tip = ""
                 if isinstance(out, tuple):
-                    tip = "<br><br>"+out[1]
+                    tip = out[1]
                     out = out[0]
-                template = "Your <code>{}</code> function did not produce the correct printed output.<br>Given arguments: <code>{}</code><br>Expected output: <code>{}</code><br>Actual output: <code>{}</code>"
+                template = "<td><code>{}</code></td>"+("<td><pre>{}</pre></td>"*2)
                 reset_output()
                 the_function(*inp)
                 test_out = get_output()
-                inputs = ', '.join(["<code>{}</code>".format(repr(i)) for i in inp])
                 if isinstance(out, str):
                     if len(test_out) < 1:
-                        gently(template.format(name, inputs, repr(out), "<i>No output</i>", tip))
-                        return None
+                        message = template.format(inputs, repr(out), "<i>No output</i>", tip)
+                        message = "<tr class=''>"+RED_X+message+"</tr>"
+                        if tip:
+                            message += "<tr class='info'><td colspan=4>"+tip+"</td></tr>"
+                        success = False
                     elif len(test_out) > 1:
-                        gently(template.format(name, inputs, repr(out), "<i>Too many outputs</i>", tip))
-                        return None
+                        message = template.format(inputs, repr(out), "<i>Too many outputs</i>", tip)
+                        message = "<tr class=''>"+RED_X+message+"</tr>"
+                        if tip:
+                            message += "<tr class='info'><td colspan=4>"+tip+"</td></tr>"
+                        success = False
                     elif out not in test_out:
-                        gently(template.format(name, inputs, repr(out), repr(test_out[0]), tip))
-                        return None
+                        message = template.format(inputs, repr(out), repr(test_out[0]), tip)
+                        message = "<tr class=''>"+RED_X+message+"</tr>"
+                        if tip:
+                            message += "<tr class='info'><td colspan=4>"+tip+"</td></tr>"
+                        success = False
+                    else:
+                        message = template.format(inputs, repr(out), repr(test_out[0]), tip)
+                        message = "<tr class=''>"+GREEN_CHECK+message+"</tr>"
+                        success_count += 1
                 elif out != test_out:
-                    out = '<pre>{}</pre>'.format('\n'.join(out))
-                    test_out = '<pre>{}</pre>'.format('\n'.join(test_out))
-                    gently(template.format(name, inputs, out, test_out, tip))
-                    return None
-            else:
+                    message = template.format(inputs, repr(out), repr(test_out[0]), tip)
+                    message = "<tr class=''>"+RED_X+message+"</tr>"
+                    if tip:
+                        message += "<tr class='info'><td colspan=4>"+tip+"</td></tr>"
+                    success = False
+                result += message
+            if success:
                 return the_function
+            else:
+                result = "I ran your function <code>{}</code> on some new arguments, and it gave the wrong output {}/{} times.".format(name, len(tests)-success_count, len(tests))+result
+                gently(result+"</table>")
+                return None
         else:
             gently("You defined {}, but did not define it as a function.".format(name))
             return None
@@ -65,30 +91,50 @@ def output_test(name, *tests):
         return None
 
     
+'''
+Show a table
+'''
 def unit_test(name, *tests):
     if name in student.data:
         the_function = student.data[name]
         if callable(the_function):
+            result = ("<table class='blockpy-feedback-unit table table-condensed table-bordered table-hover'>"
+                      "<tr class='active'><th></th><th>Arguments</th><th>Returned</th><th>Expected</th></tr>"
+                      )
+            success = True
+            success_count = 0
             for test in tests:
                 inp = test[:-1]
+                inputs = ', '.join(["<code>{}</code>".format(repr(i)) for i in inp])
                 out = test[-1]
                 tip = ""
                 if isinstance(out, tuple):
-                    tip = "<br><br>"+out[1]
+                    tip = out[1]
                     out = out[0]
-                message = "Your <code>{}</code> function did not return the right value.<br>Given arguments: {}<br>Expected return: <code>{}</code><br>Actually returned: <code>{}</code>{}"
+                message = ("<td><code>{}</code></td>"*3)
                 test_out = the_function(*inp)
-                inputs = ', '.join(["<code>{}</code>".format(repr(i)) for i in inp])
-                message = message.format(name, inputs, repr(out), repr(test_out), tip)
+                message = message.format(inputs, repr(test_out), repr(out))
                 if (isinstance(out, float) and 
                     isinstance(test_out, (float, int)) and
                     abs(out-test_out) < DELTA):
-                    continue
+                    message = "<tr class=''>"+GREEN_CHECK+message+"</tr>"
+                    success_count += 1
                 elif out != test_out:
-                    gently(message)
-                    return None
-            else:
+                    #gently(message)
+                    message = "<tr class=''>"+RED_X+message+"</tr>"
+                    if tip:
+                        message += "<tr class='info'><td colspan=4>"+tip+"</td></tr>"
+                    success = False
+                else:
+                    message = "<tr class=''>"+GREEN_CHECK+message+"</tr>"
+                    success_count += 1
+                result += message
+            if success:
                 return the_function
+            else:
+                result = "I ran your function <code>{}</code> on some new arguments, and it failed {}/{} tests.".format(name, len(tests)-success_count, len(tests))+result
+                gently(result+"</table>")
+                return None
         else:
             gently("You defined {}, but did not define it as a function.".format(name))
             return None

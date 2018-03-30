@@ -596,10 +596,17 @@ BlockPyEngine.prototype.parseValue = function(property, value) {
                     };
         case Sk.builtin.module: return null;
         case Sk.builtin.str:
-            return {'name': property,
-                'type': "String",
-                "value": value.$r().v
-            };
+            if (value.sq$length <= 2000) {
+                return {'name': property,
+                    'type': "String",
+                    "value": value.$r().v
+                };
+            } else {
+                return {'name': property,
+                    'type': "String",
+                    "value": "["+value.sq$length()+" characters not shown]"
+                };
+            }
         case Sk.builtin.none:
             return {'name': property,
                 'type': "None",

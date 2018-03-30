@@ -96,7 +96,20 @@ BlockPyToolbar.prototype.activateToolbar = function() {
             var code = e.target.result;
             if (fn.endsWith(".ipynb")) {
                 ipynb = JSON.parse(code);
-                code = ipynb.cells.filter(x=>x.cell_type == "code").map(x=>x.source.join("\n")).join("\n");
+                var makePython = function(cell) {
+                    if (cell.cell_type == "code") {
+                        return cell.source.join("\n");
+                    } else if (cell.cell_type == "markdown" ||
+                               cell.cell_type == "raw") {
+                        return "'''"+cell.source.join("\n")+"'''";
+                    }
+                }
+                var isUsable = function(cell) {
+                    return cell.cell_type == "code" ||
+                           cell.cell_type == "markdown" ||
+                           cell.cell_type == "raw";
+                }
+                code = ipynb.cells.filter(isUsable).map(makePython).join("\n");
             }
             main.setCode(code)
             main.components.server.logEvent('editor', 'upload')

@@ -188,7 +188,9 @@ loadJsonFile('data_analysis/f17_ct_solutions.json').then(assignment_solutions =>
                     var ms = Sk.executionReports.instructor.complaint ?
                              Sk.executionReports.instructor.complaint.map(x => x.message.match(/.*\((.*)\).*/).pop()) 
                              : [];
-                    console.log(sub.user, sub.assignment, sub['run number'], ms.length);
+                    console.log(sub.user, sub.assignment, sub['run number'], 
+                                ms.length, 
+                                !!Sk.executionReports.instructor.complete);
                     var analyzers = [];
                     for (var issue in Sk.executionReports.analyzer.issues) {
                         if (Sk.executionReports.analyzer.issues[issue].length) {

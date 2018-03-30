@@ -181,6 +181,7 @@
         
         // Tuple, Multiple Assignment
         ['a,b = 1,2\n1+a\nb', ['Incompatible types'], []],
+        ['tuple_box = (6, 8, 4)\nprint(tuple_box[0])', [], []],
         
         // Sets
         ['a = set([1,2,3])\nprint(a)', ['Undefined variables'], []],
@@ -191,6 +192,7 @@
         ["x=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\ny=x[0]\nz=y['a']+0", ['Incompatible types'], []],
         ["x=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\nnot x[1]['b']", ['Incompatible types'], []],
         ["ls=[{'a': 0, 'b': True}, {'a': 1, 'b': False}]\nfor x in ls:\n    x['a']+0", ['Incompatible types'], []],
+        ['dict = {"T": "V"}\nfor key,value in dict:\n    print(key)', [], []],
         
         // While
         ['user = input("Give a word.")\nwhile user:\n    print(user)\n    user = input("Give another word.")',
