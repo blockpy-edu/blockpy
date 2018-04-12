@@ -1377,6 +1377,10 @@ PythonToBlocks.prototype.Call = function(node) {
                     return block("math_single", node.lineno, {"OP": "ABS"}, {"NUM": this.convert(args[0])})
                 case "round":
                     return block("math_round", node.lineno, {"OP": "ROUND"}, {"NUM": this.convert(args[0])})
+                case "ceil":
+                    return block("math_round", node.lineno, {"OP": "ROUNDUP"}, {"NUM": this.convert(args[0])})
+                case "floor":
+                    return block("math_round", node.lineno, {"OP": "ROUNDDOWN"}, {"NUM": this.convert(args[0])})
                 case "sum":
                     return block("math_on_list", node.lineno, {"OP": "SUM"}, {"LIST": this.convert(args[0])})
                 case "min":
