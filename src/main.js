@@ -221,6 +221,7 @@ BlockPy.prototype.initModel = function(settings) {
             'parsons': ko.observable(false),
             'upload': ko.observable(false),
             'importable': ko.observable(false),
+            'secret': ko.observable(false),
             'disable_algorithm_errors': ko.observable(false),
             'disable_timeout': ko.observable(false)
         },
@@ -509,6 +510,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     this.model.assignment['upload'](assignment.upload);
     if (assignment.importable) {
         this.model.assignment['importable'](assignment.importable);
+    }
+    if (assignment.secret) {
+        this.model.assignment['secret'](assignment.secret);
     }
     if (assignment.disable_algorithm_errors) {
         this.model.assignment['disable_algorithm_errors'](assignment.disable_algorithm_errors);
