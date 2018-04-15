@@ -31,6 +31,7 @@ BlockPyServer.prototype.createSubscriptions = function() {
     model.assignment.introduction.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.parsons.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.importable.subscribe(function(e) { server.saveAssignment(); });
+    model.assignment.secret.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
@@ -169,6 +170,7 @@ BlockPyServer.prototype.saveAssignment = function() {
         data['parsons'] = model.assignment.parsons();
         data['initial'] = model.assignment.initial_view();
         data['importable'] = model.assignment.importable();
+        data['secret'] = model.assignment.secret();
         data['disable_algorithm_errors'] = model.assignment.disable_algorithm_errors();
         data['disable_timeout'] = model.assignment.disable_timeout();
         data['name'] = model.assignment.name();
