@@ -415,8 +415,9 @@ BlockPy.prototype.initModelMethods = function() {
     }
     this.model.viewFile = function() {
         var contents = self.components.engine.openedFiles[this];
-        var newWindow = window.open('about:blank', "_blank");
-        newWindow.document.body.innerHTML += "<pre>"+contents+"</pre>";
+        self.components.dialog.show("Previewing <code>"+this+"</code>", 
+                                    "<pre>"+contents+"</pre>", 
+                                    function() {});
     }
     this.model.addFile = function() {
         var name = prompt("Please enter the filename.");
