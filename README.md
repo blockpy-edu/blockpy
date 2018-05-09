@@ -51,11 +51,11 @@ Replace the contents of that file with the information found here: http://pasteb
 
 Next, you'll need to build Blockly:
 
-    > cp blockly/msg/en.js en.js
+    > cp blockly/msg/js/en.js en.js
     > cd blockly
     > python build.py
     > cd ..
-    > mv en.js blockly/msg/en.js
+    > mv en.js blockly/msg/js/en.js
     
 
 And then you'll build Skulpt:
