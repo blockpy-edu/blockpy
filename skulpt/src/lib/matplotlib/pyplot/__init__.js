@@ -88,7 +88,7 @@ var $builtinmodule = function(name) {
     var plot_f = function(kwa) {
         // Parse arguments
         Sk.builtin.pyCheckArgs("plotk", arguments, 1, Infinity, true, false);
-        args = Array.prototype.slice.call(arguments, 1);        
+        args = Array.prototype.slice.call(arguments, 1);
         kwargs = new Sk.builtins.dict(kwa); // is pretty useless for handling kwargs
         kwargs = Sk.ffi.remapToJs(kwargs); // create a proper dict
         

@@ -18,27 +18,18 @@ var $builtinmodule = function (name) {
     }
     
     mod.iter_fields = function(node) {
-        var fieldList = [];
-        for (var i = 0; i < node._fields.length; i += 2) {
-            var field = node._fields[i];
-            var value = Sk.ffi.remapToPy(node[field]);
-            if (field in node) {
-                var item = Sk.builtin.tuple([Sk.builtin.str(field), value]);
-                fieldList.push(item);
-            }
-        }
-        return Sk.builtin.list(fieldList);
+        return node._fields;
     };
     
-    var convertValue = function(a_value) {
+    var convertValue = function(value) {
         if (value === null) {
             return Sk.builtin.none.none$;
         } else if (Array === value.constructor) {
-            subvalues = [];
+            var subvalues = [];
             for (var j = 0; j < value.length; j += 1) {
                 var subvalue = value[j];
                 var constructorName = functionName(subvalue.constructor);
-                if (subvalue instanceof Object && "_astname" in subvalue) {
+                if (isJsAst(subvalue)) {
                     subvalue = Sk.misceval.callsim(mod[constructorName], subvalue);
                     subvalues.push(subvalue);
                 }
@@ -46,13 +37,39 @@ var $builtinmodule = function (name) {
                 //  lists of AST nodes
             }
             return Sk.builtin.list(subvalues);
-        } else if (value instanceof Object && "_astname" in value) {
+        } else if (isJsAst(value)) {
             var constructorName = functionName(value.constructor)
             return Sk.misceval.callsim(mod[constructorName], value);
         } else {// Else already a Python value
             return value;
         }
     }
+    
+    var isJsAst = function(jsNode) {
+        return jsNode instanceof Object && "_astname" in jsNode;
+    }
+    var isSpecialPyAst = function(val) {
+        if (typeof val == "function") {
+            switch (functionName(val)) {
+                case "Add": case "Add": case "Sub": case "Mult": case "Div": 
+                case "Mod": case "Pow": case "LShift": case "RShift": 
+                case "BitOr": case "BitXor": case "BitAnd": case "FloorDiv":
+                case "Store": case "Load": case "Del": case "Param":
+                case "And": case "Or": case "Xor": case "Not":
+                case "Invert": case "UAdd": case "USub":
+                    return true;
+                default: return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    var isPyAst = function(pyValue) {
+        return Sk.misceval.isTrue(Sk.builtin.isinstance(pyValue, mod.AST));
+    };
+    var isPyList = function(pyValue) {
+        return Sk.misceval.isTrue(Sk.builtin.isinstance(pyValue, Sk.builtin.list));
+    };
     
     mod.iter_child_nodes = function(node) {
         var fieldList = iter_fieldsJs(node);
@@ -74,6 +91,69 @@ var $builtinmodule = function (name) {
             }
         }
         return resultList;
+    }
+    
+    /**
+     * Dump the tree in a pretty format
+    */
+    mod.dump = function(node, annotate_fields, include_attributes) {
+        // Confirm valid arguments
+        Sk.builtin.pyCheckArgs("dump", arguments, 1, 3);
+        // node argument
+        if (!isPyAst(node)) {
+            throw new Sk.builtin.TypeError("expected AST, got "+Sk.abstr.typeName(node));
+        }
+        // annotate_fields argument
+        if (annotate_fields === undefined) {
+            annotate_fields = true;
+        } else {
+            Sk.builtin.pyCheckType("annotate_fields", "boolean", Sk.builtin.checkBool(annotate_fields));
+            annotate_fields = Sk.ffi.remapToJs(annotate_fields);
+        }
+        // include_attributes argument
+        if (include_attributes === undefined) {
+            include_attributes = true;
+        } else {
+            Sk.builtin.pyCheckType("include_attributes", "boolean", Sk.builtin.checkBool(include_attributes));
+            include_attributes = Sk.ffi.remapToJs(include_attributes);
+        }
+        // recursive dump
+        var _format = function(node) {
+            if (isSpecialPyAst(node)) {
+                return functionName(node)+"()";
+            } else if (isPyAst(node)) {
+                var rv = node.jsNode._astname+"(";
+                var fieldList = node._fields.v;
+                var fieldArgs = [];
+                for (var i = 0; i < fieldList.length; i += 1) {
+                    var field = Sk.ffi.remapToJs(fieldList[i].v[0]), 
+                        value = fieldList[i].v[1];
+                    value = _format(value);
+                    if (annotate_fields) {
+                        fieldArgs.push(field+"="+value);
+                    } else {
+                        fieldArgs.push(value);
+                    }
+                }
+                var attributeList = node._attributes.v;
+                if (include_attributes) {
+                    for (var i = 0; i < attributeList.length; i += 1) {
+                        var field = Sk.ffi.remapToJs(attributeList[i]);
+                        var value = Sk.ffi.remapToJs(node.jsNode[field])
+                        fieldArgs.push(field+"="+value);
+                    }
+                }
+                fieldArgs = fieldArgs.join(", ");
+                return rv + fieldArgs + ")";
+            } else if (isPyList(node)) {
+                var nodes = node.v.map(_format);
+                nodes = nodes.join(', ');
+                return "["+nodes+"]";
+            } else {
+                return Sk.ffi.remapToJs(node.$r());
+            }
+        }
+        return Sk.ffi.remapToPy(_format(node, 0));
     }
 
     NodeVisitor = function($gbl, $loc) {
@@ -144,28 +224,34 @@ var $builtinmodule = function (name) {
         return result;
     }
     
+    var depth = 0;
     AST = function($gbl, $loc) {
         var copyFromJsNode = function(self, key, jsNode) {
             if (key in self.jsNode) {
                 Sk.abstr.sattr(self, key, Sk.ffi.remapToPy(jsNode[key]), true);
+                self._attributes.push(Sk.builtin.str(key));
             }
-        }
+        };
         $loc.__init__ = new Sk.builtin.func(function (self, jsNode) {
             self.jsNode = jsNode;
             self.astname = jsNode._astname;
             var fieldListJs = iter_fieldsJs(jsNode);
-            var _fields = [];
+            self._fields = [];
+            self._attributes = [];
             for (var i = 0; i < fieldListJs.length; i += 1) {
                 var field = fieldListJs[i][0], value = fieldListJs[i][1];
                 value = convertValue(value);
                 Sk.abstr.sattr(self, field, value, true);
-                _fields.push(Sk.builtin.tuple([Sk.builtin.str(field), value]));
+                self._fields.push(Sk.builtin.tuple([Sk.builtin.str(field), value]));
             }
-            Sk.abstr.sattr(self, '_fields', Sk.builtin.list(_fields), true);
+            self._fields = Sk.builtin.list(self._fields)
+            Sk.abstr.sattr(self, '_fields', self._fields, true);
             copyFromJsNode(self, 'lineno', self.jsNode);
             copyFromJsNode(self, 'col_offset', self.jsNode);
             copyFromJsNode(self, 'endlineno', self.jsNode);
             copyFromJsNode(self, 'col_endoffset', self.jsNode);
+            self._attributes = Sk.builtin.list(self._attributes);
+            Sk.abstr.sattr(self, '_attributes', self._attributes, true);
         });
         $loc.__str__ = new Sk.builtin.func(function (self) {
             return Sk.builtin.str("<_ast."+self.astname+" object>");
