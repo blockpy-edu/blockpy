@@ -29,9 +29,33 @@ var $builtinmodule = function (name) {
         }
         return Sk.builtin.list(fieldList);
     };
-
-    var iter_child_nodesJS = function(node) {
-        var fieldList = iter_fields(node);
+    
+    var convertValue = function(a_value) {
+        if (value === null) {
+            return Sk.builtin.none.none$;
+        } else if (Array === value.constructor) {
+            subvalues = [];
+            for (var j = 0; j < value.length; j += 1) {
+                var subvalue = value[j];
+                var constructorName = functionName(subvalue.constructor);
+                if (subvalue instanceof Object && "_astname" in subvalue) {
+                    subvalue = Sk.misceval.callsim(mod[constructorName], subvalue);
+                    subvalues.push(subvalue);
+                }
+                // No AST nodes have primitive list values, just
+                //  lists of AST nodes
+            }
+            return Sk.builtin.list(subvalues);
+        } else if (value instanceof Object && "_astname" in value) {
+            var constructorName = functionName(value.constructor)
+            return Sk.misceval.callsim(mod[constructorName], value);
+        } else {// Else already a Python value
+            return value;
+        }
+    }
+    
+    mod.iter_child_nodes = function(node) {
+        var fieldList = iter_fieldsJs(node);
         var resultList = [];
         for (var i = 0; i < fieldList.length; i += 1) {
             var field = fieldList[i][0], value = fieldList[i][1];
@@ -50,10 +74,6 @@ var $builtinmodule = function (name) {
             }
         }
         return resultList;
-    }
-    
-    mod.iter_child_nodes = function(node) {
-        
     }
 
     NodeVisitor = function($gbl, $loc) {
@@ -137,25 +157,7 @@ var $builtinmodule = function (name) {
             var _fields = [];
             for (var i = 0; i < fieldListJs.length; i += 1) {
                 var field = fieldListJs[i][0], value = fieldListJs[i][1];
-                if (value === null) {
-                    value = Sk.builtin.none.none$;
-                } else if (Array === value.constructor) {
-                    subvalues = [];
-                    for (var j = 0; j < value.length; j += 1) {
-                        var subvalue = value[j];
-                        var constructorName = functionName(subvalue.constructor);
-                        if (subvalue instanceof Object && "_astname" in subvalue) {
-                            subvalue = Sk.misceval.callsim(mod[constructorName], subvalue);
-                            subvalues.push(subvalue);
-                        }
-                        // No AST nodes have primitive list values, just
-                        //  lists of AST nodes
-                    }
-                    value = Sk.builtin.list(subvalues);
-                } else if (value instanceof Object && "_astname" in value) {
-                    var constructorName = functionName(value.constructor)
-                    value = Sk.misceval.callsim(mod[constructorName], value);
-                } // Else already a Python value
+                value = convertValue(value);
                 Sk.abstr.sattr(self, field, value, true);
                 _fields.push(Sk.builtin.tuple([Sk.builtin.str(field), value]));
             }

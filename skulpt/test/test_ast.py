@@ -44,4 +44,9 @@ import garbage
 5 is 3
 """)
 
+print(iter_fields(multiline.body[0]))
+
+print(iter_child_nodes(multiline))
+
+
 print("All tests complete.")
