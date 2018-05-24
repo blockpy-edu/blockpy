@@ -56,9 +56,11 @@ import garbage
 8 is 7
 """)
 
-#print("iter_fields:", ast.iter_fields(multiline.body[0]))
+print("iter_fields:", ast.iter_fields(multiline.body[0]))
 
-#print("iter_child_nodes:", ast.iter_child_nodes(multiline))
+print("iter_child_nodes:", ast.iter_child_nodes(multiline))
+
+print("walk:", ast.walk(multiline))
 
 print(ast.dump(multiline, True, False))
 

@@ -71,7 +71,7 @@ var $builtinmodule = function (name) {
         return Sk.misceval.isTrue(Sk.builtin.isinstance(pyValue, Sk.builtin.list));
     };
     
-    mod.iter_child_nodes = function(node) {
+    var iter_child_nodesJs = function(node) {
         var fieldList = iter_fieldsJs(node);
         var resultList = [];
         for (var i = 0; i < fieldList.length; i += 1) {
@@ -92,6 +92,29 @@ var $builtinmodule = function (name) {
         }
         return resultList;
     }
+    
+    // Python node
+    mod.iter_child_nodes = function(node) {
+        var fieldList = node._fields.v;
+        var childFields = [];
+        for (var i = 0; i < fieldList.length; i += 1) {
+            var field = Sk.ffi.remapToJs(fieldList[i].v[0]), 
+                value = fieldList[i].v[1];
+            if (isSpecialPyAst(value)) {
+                childFields.push(value);
+            } else if (isPyAst(value)) {
+                childFields.push(value);
+            } else if (isPyList(value)) {
+                for (var j = 0; j < value.v.length; j += 1) {
+                    var subvalue = value.v[j];
+                    if (isPyAst(subvalue)) {
+                        childFields.push(subvalue);
+                    }
+                }
+            }
+        }
+        return Sk.builtin.list(childFields);
+    };
     
     /**
      * Dump the tree in a pretty format
@@ -160,55 +183,57 @@ var $builtinmodule = function (name) {
         // Takes in Python Nodes, not JS Nodes
         $loc.visit = function(node) {
             /** Visit a node. **/
-            var method_name = 'visit_' + node._astname;
+            var method_name = 'visit_' + node.jsNode._astname;
             if (method_name in $loc) {
                 return $loc[method_name](node);
             } else {
                 return $loc.generic_visit(node);
             }
         }
-        $loc.walk = function(node) {
-            
+        // Takes in Python Nodes, not JS Nodes
+        $loc.generic_visit = function(node) {
+            /** Called if no explicit visitor function exists for a node. **/
+            var fieldList = iter_fields(node.jsNode);
+            for (var i = 0; i < fieldList.length; i += 1) {
+                var field = fieldList[i][0], value = fieldList[i][1];
+                if (value === null) {
+                    continue;
+                }
+                if (Array === value.constructor) {
+                    for (var j = 0; j < value.length; j += 1) {
+                        var subvalue = value[j];
+                        if (isJsAst(subvalue)) {
+                            $loc.visit(subvalue);
+                        }
+                    }
+                } else if (isJsAst(value)) {
+                    $loc.visit(value);
+                }
+            }
         }
     }
     mod.NodeVisitor = Sk.misceval.buildClass(mod, NodeVisitor, "NodeVisitor", []);
 
-    NodeVisitor.prototype.walk = function(node) {
-        var resultList = [node];
-        var childList = iter_child_nodes(node);
-        for (var i = 0; i < childList.length; i += 1) {
-            var child = childList[i];
-            resultList.concat(this.walk(child));
+    // Python node
+    mod.walk = function(node) {
+        if (isSpecialPyAst(node)) {
+            return Sk.builtin.list([]);
         }
-        return resultList;
+        var resultList = [node];
+        var childList = mod.iter_child_nodes(node);
+        for (var i = 0; i < childList.v.length; i += 1) {
+            var child = childList.v[i];
+            var children = mod.walk(child);
+            resultList = resultList.concat(children.v);
+        }
+        return Sk.builtin.list(resultList);
     }
 
-    NodeVisitor.prototype.visitList = function(nodes) {
+    /*NodeVisitor.prototype.visitList = function(nodes) {
         for (var j = 0; j < nodes.length; j += 1) {
             var node = nodes[j];
             if ("_astname" in node) {
                 this.visit(node);
-            }
-        }
-    }
-
-    NodeVisitor.prototype.generic_visit = function(node) {
-        /** Called if no explicit visitor function exists for a node. **/
-        var fieldList = iter_fields(node);
-        for (var i = 0; i < fieldList.length; i += 1) {
-            var field = fieldList[i][0], value = fieldList[i][1];
-            if (value === null) {
-                continue;
-            }
-            if (Array === value.constructor) {
-                for (var j = 0; j < value.length; j += 1) {
-                    var subvalue = value[j];
-                    if (subvalue instanceof Object && "_astname" in subvalue) {
-                        this.visit(subvalue);
-                    }
-                }
-            } else if (value instanceof Object && "_astname" in value) {
-                this.visit(value);
             }
         }
     }
@@ -222,7 +247,7 @@ var $builtinmodule = function (name) {
             result.push(node);
         }
         return result;
-    }
+    }*/
     
     var depth = 0;
     AST = function($gbl, $loc) {
@@ -259,6 +284,9 @@ var $builtinmodule = function (name) {
         $loc.__repr__ = $loc.__str__;
     }
     mod.AST = Sk.misceval.buildClass(mod, AST, "AST", []);
+    
+    //mod.literal_eval
+    // Implementation wouldn't be hard, but it does require a lot of Skulpting
     
     mod.parse = function parse(source, filename) {
         if (filename === undefined) {
