@@ -286,7 +286,7 @@ Compiler.prototype.outputInterruptTest = function () { // Added by RNL
         }
         if (Sk.yieldLimit !== null && this.u.canSuspend) {
             output += "if ($dateNow - Sk.lastYield > Sk.yieldLimit) {";
-            output += "var $susp = $saveSuspension({data: {type: 'Sk.yield'}, resume: function() {}}, '"+this.filename+"',$currLineNo,$currColNo);";
+            output += "var $susp = $saveSuspension({data: {type: 'Sk.yield'}, resume: function() {}}, '"+this.filename+"',currLineNo,currColNo);";
             output += "$susp.$blk = $blk;";
             output += "$susp.optional = true;";
             output += "return $susp;";
@@ -333,15 +333,15 @@ Compiler.prototype._checkSuspension = function(e) {
         this._jump(retblk);
         this.setBlock(retblk);
 
-        e = e || {lineno: "$currLineNo", col_offset: "$currColNo"};
+        e = e || {lineno: "currLineNo", col_offset: "currColNo"};
 
-        out ("if ($ret && $ret.$isSuspension) { return $saveSuspension($ret,'"+this.filename+"',"+e.lineno+","+e.col_offset+"); }");
+        out ("if ($ret && $ret.isSuspension) { return $saveSuspension($ret,'"+this.filename+"',"+e.lineno+","+e.col_offset+"); }");
 
         this.u.doesSuspend = true;
         this.u.tempsToSave = this.u.tempsToSave.concat(this.u.localtemps);
 
     } else {
-        out ("if ($ret && $ret.$isSuspension) { $ret = Sk.misceval.retryOptionalSuspensionOrThrow($ret); }");
+        out ("if ($ret && $ret.isSuspension) { $ret = Sk.misceval.retryOptionalSuspensionOrThrow($ret); }");
     }
 };
 Compiler.prototype.ctuplelistorset = function(e, data, tuporlist) {
@@ -964,7 +964,6 @@ Compiler.prototype.outputSuspensionHelpers = function (unit) {
             seenTemps[t] = true;
         }
     }
-
     
     output +=  "try { $ret=susp.child.resume(); } catch(err) { if (err instanceof Sk.builtin.TimeLimitError) { Sk.execStart = Date.now()} if (!(err instanceof Sk.builtin.BaseException)) { err = new Sk.builtin.ExternalError(err); } err.traceback.push({lineno: $currLineNo, colno: $currColNo, filename: '"+this.filename+"'}); if($exc.length>0) { $err=err; $blk=$exc.pop(); } else { throw err; } }" +
                 "};";
@@ -1253,7 +1252,9 @@ Compiler.prototype.ctryexcept = function (s) {
             // var isinstance = this.nameop(new Sk.builtin.str("isinstance"), Load));
             // var check = this._gr('call', "Sk.misceval.callsim(", isinstance, ", $err, ", handlertype, ")");
 
-            check = this._gr("instance", "Sk.misceval.isTrue(Sk.builtin.isinstance($err, ", handlertype, "))");
+            // this check is not right, should use isinstance, but exception objects
+            // are not yet proper Python objects
+            check = this._gr("instance", "$err instanceof ", handlertype);
             this._jumpfalse(check, next);
         }
 
@@ -1602,14 +1603,9 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         }
     }
     if (hasFree) {
-        if (vararg) {
-            this.u.varDeclsCode += "$free = arguments[arguments.length-1];"
-        } else {
-            funcArgs.push("$free");
-            this.u.tempsToSave.push("$free");
-        }
+        funcArgs.push("$free");
+        this.u.tempsToSave.push("$free");
     }
-
     this.u.prefixCode += funcArgs.join(",");
 
     this.u.prefixCode += "){";
@@ -1656,7 +1652,7 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
     // If there is a suspension, resume from it. Otherwise, initialise
     // parameters appropriately.
     //
-    this.u.varDeclsCode += "if ("+scopename+".$wakingSuspension!==undefined) { $wakeFromSuspension(); } else {";
+    this.u.varDeclsCode += "if ("+scopename+".wakingSuspension!==undefined) { $wakeFromSuspension(); } else {";
 
     //
     // initialize default arguments. we store the values of the defaults to
@@ -1701,9 +1697,8 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
     //
     if (vararg) {
         start = funcArgs.length;
-
         this.u.localnames.push(vararg.v);
-        this.u.varDeclsCode += vararg.v + "=new Sk.builtins['tuple'](Array.prototype.slice.call(arguments," + start + (hasFree ? ",-1)" : ")") + "); /*vararg*/";
+        this.u.varDeclsCode += vararg.v + "=new Sk.builtins['tuple'](Array.prototype.slice.call(arguments," + start + ")); /*vararg*/";
     }
 
     //
@@ -1768,9 +1763,6 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         out(scopename, ".$defaults=[", defaults.join(","), "];");
     }
 
-    if (decos.length > 0) {
-        out(scopename, ".$decorators=[", decos.join(","), "];");
-    }
 
     //
     // attach co_varnames (only the argument names) for keyword argument
@@ -1826,13 +1818,6 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         }
     }
     else {
-        var res;
-        if (decos.length > 0) {
-            out("$ret = Sk.misceval.callsimOrSuspend(", scopename, ".$decorators[0], new Sk.builtins['function'](", scopename, ",$gbl", frees, "));");
-            this._checkSuspension();
-            return this._gr("funcobj", "$ret");
-        }
-
         return this._gr("funcobj", "new Sk.builtins['function'](", scopename, ",$gbl", frees, ")");
     }
 };
@@ -2416,7 +2401,7 @@ Compiler.prototype.cmod = function (mod) {
         this.u.varDeclsCode += "if (typeof Sk.lastYield === 'undefined') {Sk.lastYield = Date.now()}";
     }
 
-    this.u.varDeclsCode += "if ("+modf+".$wakingSuspension!==undefined) { $wakeFromSuspension(); }" +
+    this.u.varDeclsCode += "if ("+modf+".wakingSuspension!==undefined) { $wakeFromSuspension(); }" +
         "if (Sk.retainGlobals) {" +
         "    if (Sk.globals) { $gbl = Sk.globals; Sk.globals = $gbl; $loc = $gbl; }" +
         "    else { Sk.globals = $gbl; }" +
@@ -2484,9 +2469,9 @@ Sk.compile = function (source, filename, mode, canSuspend) {
     var c = new Compiler(filename, st, flags.cf_flags, canSuspend, source); // todo; CO_xxx
     var funcname = c.cmod(ast);
 
-    var ret = "$compiledmod = function() {" + c.result.join("") + "\nreturn " + funcname + ";}();";
+    var ret = c.result.join("");
     return {
-        funcname: "$compiledmod",
+        funcname: funcname,
         code    : ret
     };
 };

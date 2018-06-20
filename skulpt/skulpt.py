@@ -736,6 +736,7 @@ def dist(options):
     ret = 0 #test()
     if ret != 0:
         print("Tests failed on uncompressed version.")
+
         #sys.exit(1);
 
     # compress

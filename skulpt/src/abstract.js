@@ -861,6 +861,8 @@ Sk.abstr.iter = function(obj) {
     var iter;
     var getit;
     var ret;
+    
+    //print(something);
 
     /**
      * Builds an iterator around classes that have a __getitem__ method.
@@ -909,7 +911,8 @@ Sk.abstr.iter = function(obj) {
         // create internal iterobject if __getitem__
         return new seqIter(obj);
     }
-    throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable");
+    
+    throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable", "Can't iterate over the value "+obj.$r().v+" because it is "+Sk.abstr.typeName(obj)+", not list.");
 };
 goog.exportSymbol("Sk.abstr.iter", Sk.abstr.iter);
 

@@ -20,7 +20,6 @@ Sk.builtin.BaseException = function (args) {
         o.constructor.apply(o, arguments);
         return o;
     }
-
     args = Array.prototype.slice.call(arguments);
     // hackage to allow shorter throws
     for (i = 0; i < args.length; ++i) {
@@ -29,6 +28,7 @@ Sk.builtin.BaseException = function (args) {
         }
     }
     this.args = new Sk.builtin.tuple(args);
+    
     this.traceback = [];
 
     // For errors occurring during normal execution, the line/col/etc
@@ -53,7 +53,6 @@ Sk.abstr.setUpInheritance("BaseException", Sk.builtin.BaseException, Sk.builtin.
 Sk.builtin.BaseException.prototype.tp$str = function () {
     var i;
     var ret = "";
-
     ret += this.tp$name;
     if (this.args) {
         ret += ": " + (this.args.v.length > 0 ? this.args.v[0].v : "");
