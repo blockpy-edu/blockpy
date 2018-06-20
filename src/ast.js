@@ -327,15 +327,15 @@ function astForExceptClause (c, exc, body) {
     REQ(exc, SYM.except_clause);
     REQ(body, SYM.suite);
     if (NCH(exc) === 1) {
-        return new ExceptHandler(null, null, astForSuite(c, body), exc.lineno, exc.col_offset);
+        return new ExceptHandler(null, null, astForSuite(c, body), exc.lineno, exc.col_offset, exc.endlineno, exc.col_endoffset);
     }
     else if (NCH(exc) === 2) {
-        return new ExceptHandler(astForExpr(c, CHILD(exc, 1)), null, astForSuite(c, body), exc.lineno, exc.col_offset);
+        return new ExceptHandler(astForExpr(c, CHILD(exc, 1)), null, astForSuite(c, body), exc.lineno, exc.col_offset, exc.endlineno, exc.col_endoffset);
     }
     else if (NCH(exc) === 4) {
         e = astForExpr(c, CHILD(exc, 3));
         setContext(c, e, Store, CHILD(exc, 3));
-        return new ExceptHandler(astForExpr(c, CHILD(exc, 1)), e, astForSuite(c, body), exc.lineno, exc.col_offset);
+        return new ExceptHandler(astForExpr(c, CHILD(exc, 1)), e, astForSuite(c, body), exc.lineno, exc.col_offset, exc.endlineno, exc.col_endoffset);
     }
     goog.asserts.fail("wrong number of children for except clause");
 }
@@ -380,7 +380,7 @@ function astForTryStmt (c, n) {
         for (i = 0; i < nexcept; ++i) {
             handlers[i] = astForExceptClause(c, CHILD(n, 3 + i * 3), CHILD(n, 5 + i * 3));
         }
-        exceptSt = new TryExcept(body, handlers, orelse, n.lineno, n.col_offset);
+        exceptSt = new TryExcept(body, handlers, orelse, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 
         if (!finally_) {
             return exceptSt;
@@ -392,7 +392,7 @@ function astForTryStmt (c, n) {
     }
 
     goog.asserts.assert(finally_ !== null);
-    return new TryFinally(body, finally_, n.lineno, n.col_offset);
+    return new TryFinally(body, finally_, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 
@@ -406,10 +406,10 @@ function astForDottedName (c, n) {
     lineno = n.lineno;
     col_offset = n.col_offset;
     id = strobj(CHILD(n, 0).value);
-    e = new Name(id, Load, lineno, col_offset);
+    e = new Name(id, Load, lineno, col_offset, n.endlineno, n.col_endoffset);
     for (i = 2; i < NCH(n); i += 2) {
         id = strobj(CHILD(n, i).value);
-        e = new Attribute(e, id, Load, lineno, col_offset);
+        e = new Attribute(e, id, Load, lineno, col_offset, n.endlineno, n.col_endoffset);
     }
     return e;
 }
@@ -427,7 +427,7 @@ function astForDecorator (c, n) {
     }
     else if (NCH(n) === 5) // call with no args
     {
-        return new Call(nameExpr, [], [], null, null, n.lineno, n.col_offset);
+        return new Call(nameExpr, [], [], null, null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else {
         return astForCall(c, CHILD(n, 3), nameExpr);
@@ -462,6 +462,8 @@ function astForDecorated (c, n) {
     if (thing) {
         thing.lineno = n.lineno;
         thing.col_offset = n.col_offset;
+        thing.endlineno = n.endlineno;
+        thing.col_endoffset = n.col_endoffset
     }
     return thing;
 }
@@ -486,7 +488,7 @@ function astForWithStmt (c, n) {
         setContext(c, optionalVars, Store, n);
         suiteIndex = 4;
     }
-    return new With_(contextExpr, optionalVars, astForSuite(c, CHILD(n, suiteIndex)), n.lineno, n.col_offset);
+    return new With_(contextExpr, optionalVars, astForSuite(c, CHILD(n, suiteIndex)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForExecStmt (c, n) {
@@ -503,7 +505,7 @@ function astForExecStmt (c, n) {
     if (nchildren === 6) {
         locals = astForExpr(c, CHILD(n, 5));
     }
-    return new Exec(expr1, globals, locals, n.lineno, n.col_offset);
+    return new Exec(expr1, globals, locals, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForIfStmt (c, n) {
@@ -522,7 +524,7 @@ function astForIfStmt (c, n) {
         return new If_(
             astForExpr(c, CHILD(n, 1)),
             astForSuite(c, CHILD(n, 3)),
-            [], n.lineno, n.col_offset);
+            [], n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
     s = CHILD(n, 4).value;
@@ -532,7 +534,7 @@ function astForIfStmt (c, n) {
             astForExpr(c, CHILD(n, 1)),
             astForSuite(c, CHILD(n, 3)),
             astForSuite(c, CHILD(n, 6)),
-            n.lineno, n.col_offset);
+            n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else if (decider === "i") {
         nElif = NCH(n) - 4;
@@ -555,7 +557,9 @@ function astForIfStmt (c, n) {
                     astForSuite(c, CHILD(n, NCH(n) - 4)),
                     astForSuite(c, CHILD(n, NCH(n) - 1)),
                     CHILD(n, NCH(n) - 6).lineno,
-                    CHILD(n, NCH(n) - 6).col_offset)];
+                    CHILD(n, NCH(n) - 6).col_offset,
+                    CHILD(n, NCH(n) - 6).endlineno, 
+                    CHILD(n, NCH(n) - 6).col_endoffset)];
             nElif--;
         }
 
@@ -567,12 +571,14 @@ function astForIfStmt (c, n) {
                     astForSuite(c, CHILD(n, off + 2)),
                     orelse,
                     CHILD(n, off).lineno,
-                    CHILD(n, off).col_offset)];
+                    CHILD(n, off).col_offset,
+                    CHILD(n, NCH(n) - 6).endlineno, 
+                    CHILD(n, NCH(n) - 6).col_endoffset)];
         }
         return new If_(
             astForExpr(c, CHILD(n, 1)),
             astForSuite(c, CHILD(n, 3)),
-            orelse, n.lineno, n.col_offset);
+            orelse, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
     goog.asserts.fail("unexpected token in 'if' statement");
@@ -597,7 +603,7 @@ function astForExprlist (c, n, context) {
 function astForDelStmt (c, n) {
     /* del_stmt: 'del' exprlist */
     REQ(n, SYM.del_stmt);
-    return new Delete_(astForExprlist(c, CHILD(n, 1), Del), n.lineno, n.col_offset);
+    return new Delete_(astForExprlist(c, CHILD(n, 1), Del), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForGlobalStmt (c, n) {
@@ -608,17 +614,17 @@ function astForGlobalStmt (c, n) {
     for (i = 1; i < NCH(n); i += 2) {
         s[(i - 1) / 2] = strobj(CHILD(n, i).value);
     }
-    return new Global(s, n.lineno, n.col_offset);
+    return new Global(s, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForAssertStmt (c, n) {
     /* assert_stmt: 'assert' test [',' test] */
     REQ(n, SYM.assert_stmt);
     if (NCH(n) === 2) {
-        return new Assert(astForExpr(c, CHILD(n, 1)), null, n.lineno, n.col_offset);
+        return new Assert(astForExpr(c, CHILD(n, 1)), null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else if (NCH(n) === 4) {
-        return new Assert(astForExpr(c, CHILD(n, 1)), astForExpr(c, CHILD(n, 3)), n.lineno, n.col_offset);
+        return new Assert(astForExpr(c, CHILD(n, 1)), astForExpr(c, CHILD(n, 3)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     goog.asserts.fail("improper number of parts to assert stmt");
 }
@@ -696,6 +702,8 @@ function astForImportStmt (c, n) {
     REQ(n, SYM.import_stmt);
     lineno = n.lineno;
     col_offset = n.col_offset;
+    var endlineno = n.endlineno;
+    var col_endoffset = n.col_endoffset;
     n = CHILD(n, 0);
     if (n.type === SYM.import_name) {
         n = CHILD(n, 1);
@@ -704,7 +712,7 @@ function astForImportStmt (c, n) {
         for (i = 0; i < NCH(n); i += 2) {
             aliases[i / 2] = aliasForImportName(c, CHILD(n, i));
         }
-        return new Import_(aliases, lineno, col_offset);
+        return new Import_(aliases, lineno, col_offset, endlineno, col_endoffset);
     }
     else if (n.type === SYM.import_from) {
         mod = null;
@@ -754,7 +762,7 @@ function astForImportStmt (c, n) {
             }
         }
         modname = mod ? mod.name.v : "";
-        return new ImportFrom(strobj(modname), aliases, ndots, lineno, col_offset);
+        return new ImportFrom(strobj(modname), aliases, ndots, lineno, col_offset, endlineno, col_endoffset);
     }
     throw new Sk.builtin.SyntaxError("unknown import statement", c.c_filename, n.lineno);
 }
@@ -854,7 +862,7 @@ function astForListcomp (c, n) {
             lc = new comprehension(t[0], expression, []);
         }
         else {
-            lc = new comprehension(new Tuple(t, Store, ch.lineno, ch.col_offset), expression, []);
+            lc = new comprehension(new Tuple(t, Store, ch.lineno, ch.col_offset, ch.endlineno, ch.col_endoffset), expression, []);
         }
 
         if (NCH(ch) === 5) {
@@ -877,7 +885,7 @@ function astForListcomp (c, n) {
         }
         listcomps[i] = lc;
     }
-    return new ListComp(elt, listcomps, n.lineno, n.col_offset);
+    return new ListComp(elt, listcomps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForFactor (c, n) {
@@ -907,11 +915,11 @@ function astForFactor (c, n) {
     expression = astForExpr(c, CHILD(n, 1));
     switch (CHILD(n, 0).type) {
         case TOK.T_PLUS:
-            return new UnaryOp(UAdd, expression, n.lineno, n.col_offset);
+            return new UnaryOp(UAdd, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_MINUS:
-            return new UnaryOp(USub, expression, n.lineno, n.col_offset);
+            return new UnaryOp(USub, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_TILDE:
-            return new UnaryOp(Invert, expression, n.lineno, n.col_offset);
+            return new UnaryOp(Invert, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
     goog.asserts.fail("unhandled factor");
@@ -933,13 +941,13 @@ function astForForStmt (c, n) {
         target = _target[0];
     }
     else {
-        target = new Tuple(_target, Store, n.lineno, n.col_offset);
+        target = new Tuple(_target, Store, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
     return new For_(target,
         astForTestlist(c, CHILD(n, 3)),
         astForSuite(c, CHILD(n, 5)),
-        seq, n.lineno, n.col_offset);
+        seq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForCall (c, n, func) {
@@ -1033,7 +1041,7 @@ function astForCall (c, n, func) {
             kwarg = astForExpr(c, CHILD(n, ++i));
         }
     }
-    return new Call(func, args, keywords, vararg, kwarg, func.lineno, func.col_offset);
+    return new Call(func, args, keywords, vararg, kwarg, func.lineno, func.col_offset, func.endlineno, func.col_endoffset);
 }
 
 function astForTrailer (c, n, leftExpr) {
@@ -1050,21 +1058,21 @@ function astForTrailer (c, n, leftExpr) {
     REQ(n, SYM.trailer);
     if (CHILD(n, 0).type === TOK.T_LPAR) {
         if (NCH(n) === 2) {
-            return new Call(leftExpr, [], [], null, null, n.lineno, n.col_offset);
+            return new Call(leftExpr, [], [], null, null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         }
         else {
             return astForCall(c, CHILD(n, 1), leftExpr);
         }
     }
     else if (CHILD(n, 0).type === TOK.T_DOT) {
-        return new Attribute(leftExpr, strobj(CHILD(n, 1).value), Load, n.lineno, n.col_offset);
+        return new Attribute(leftExpr, strobj(CHILD(n, 1).value), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else {
         REQ(CHILD(n, 0), TOK.T_LSQB);
         REQ(CHILD(n, 2), TOK.T_RSQB);
         n = CHILD(n, 1);
         if (NCH(n) === 1) {
-            return new Subscript(leftExpr, astForSlice(c, CHILD(n, 0)), Load, n.lineno, n.col_offset);
+            return new Subscript(leftExpr, astForSlice(c, CHILD(n, 0)), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         }
         else {
             /* The grammar is ambiguous here. The ambiguity is resolved 
@@ -1081,7 +1089,7 @@ function astForTrailer (c, n, leftExpr) {
                 slices[j / 2] = slc;
             }
             if (!simple) {
-                return new Subscript(leftExpr, new ExtSlice(slices), Load, n.lineno, n.col_offset);
+                return new Subscript(leftExpr, new ExtSlice(slices), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             elts = [];
             for (j = 0; j < slices.length; ++j) {
@@ -1089,8 +1097,8 @@ function astForTrailer (c, n, leftExpr) {
                 goog.asserts.assert(slc.constructor === Index && slc.value !== null && slc.value !== undefined);
                 elts[j] = slc.value;
             }
-            e = new Tuple(elts, Load, n.lineno, n.col_offset);
-            return new Subscript(leftExpr, new Index(e), Load, n.lineno, n.col_offset);
+            e = new Tuple(elts, Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
+            return new Subscript(leftExpr, new Index(e), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         }
     }
 }
@@ -1111,38 +1119,38 @@ function astForFlowStmt (c, n) {
     ch = CHILD(n, 0);
     switch (ch.type) {
         case SYM.break_stmt:
-            return new Break_(n.lineno, n.col_offset);
+            return new Break_(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case SYM.continue_stmt:
-            return new Continue_(n.lineno, n.col_offset);
+            return new Continue_(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case SYM.yield_stmt:
-            return new Expr(astForExpr(c, CHILD(ch, 0)), n.lineno, n.col_offset);
+            return new Expr(astForExpr(c, CHILD(ch, 0)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case SYM.return_stmt:
             if (NCH(ch) === 1) {
-                return new Return_(null, n.lineno, n.col_offset);
+                return new Return_(null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             else {
-                return new Return_(astForTestlist(c, CHILD(ch, 1)), n.lineno, n.col_offset);
+                return new Return_(astForTestlist(c, CHILD(ch, 1)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             break;
         case SYM.raise_stmt:
             if (NCH(ch) === 1) {
-                return new Raise(null, null, null, n.lineno, n.col_offset);
+                return new Raise(null, null, null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             else if (NCH(ch) === 2) {
-                return new Raise(astForExpr(c, CHILD(ch, 1)), null, null, n.lineno, n.col_offset);
+                return new Raise(astForExpr(c, CHILD(ch, 1)), null, null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             else if (NCH(ch) === 4) {
                 return new Raise(
                     astForExpr(c, CHILD(ch, 1)),
                     astForExpr(c, CHILD(ch, 3)),
-                    null, n.lineno, n.col_offset);
+                    null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             else if (NCH(ch) === 6) {
                 return new Raise(
                     astForExpr(c, CHILD(ch, 1)),
                     astForExpr(c, CHILD(ch, 3)),
                     astForExpr(c, CHILD(ch, 5)),
-                    n.lineno, n.col_offset);
+                    n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             break;
         default:
@@ -1227,7 +1235,7 @@ function astForArguments (c, n) {
                     if (CHILD(ch, 0).type === TOK.T_NAME) {
                         forbiddenCheck(c, n, CHILD(ch, 0).value, n.lineno);
                         id = strobj(CHILD(ch, 0).value);
-                        args[k++] = new Name(id, Param, ch.lineno, ch.col_offset);
+                        args[k++] = new Name(id, Param, ch.lineno, ch.col_offset, n.endlineno, n.col_endoffset);
                     }
                     i += 2;
                     if (parenthesized) {
@@ -1263,7 +1271,7 @@ function astForFuncdef (c, n, decoratorSeq) {
     forbiddenCheck(c, CHILD(n, 1), CHILD(n, 1).value, n.lineno);
     args = astForArguments(c, CHILD(n, 2));
     body = astForSuite(c, CHILD(n, 4));
-    return new FunctionDef(name, args, body, decoratorSeq, n.lineno, n.col_offset);
+    return new FunctionDef(name, args, body, decoratorSeq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForClassBases (c, n) {
@@ -1285,15 +1293,15 @@ function astForClassdef (c, n, decoratorSeq) {
     forbiddenCheck(c, n, CHILD(n, 1).value, n.lineno);
     classname = strobj(CHILD(n, 1).value);
     if (NCH(n) === 4) {
-        return new ClassDef(classname, [], astForSuite(c, CHILD(n, 3)), decoratorSeq, n.lineno, n.col_offset);
+        return new ClassDef(classname, [], astForSuite(c, CHILD(n, 3)), decoratorSeq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     if (CHILD(n, 3).type === TOK.T_RPAR) {
-        return new ClassDef(classname, [], astForSuite(c, CHILD(n, 5)), decoratorSeq, n.lineno, n.col_offset);
+        return new ClassDef(classname, [], astForSuite(c, CHILD(n, 5)), decoratorSeq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
     bases = astForClassBases(c, CHILD(n, 3));
     s = astForSuite(c, CHILD(n, 6));
-    return new ClassDef(classname, bases, s, decoratorSeq, n.lineno, n.col_offset);
+    return new ClassDef(classname, bases, s, decoratorSeq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForLambdef (c, n) {
@@ -1308,7 +1316,7 @@ function astForLambdef (c, n) {
         args = astForArguments(c, CHILD(n, 1));
         expression = astForExpr(c, CHILD(n, 3));
     }
-    return new Lambda(args, expression, n.lineno, n.col_offset);
+    return new Lambda(args, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForComprehension(c, n) {
@@ -1387,7 +1395,7 @@ function astForComprehension(c, n) {
         if (NCH(forch) === 1) {
             comp = new comprehension(t[0], expression, []);
         } else {
-            comp = new comprehension(new Tuple(t, Store, n.lineno, n.col_offset), expression, []);
+            comp = new comprehension(new Tuple(t, Store, n.lineno, n.col_offset, n.endlineno, n.col_endoffset), expression, []);
         }
         if (NCH(n) === 5) {
             n = CHILD(n, 4);
@@ -1419,9 +1427,9 @@ function astForIterComp(c, n, type) {
     elt = astForExpr(c, CHILD(n, 0));
     comps = astForComprehension(c, CHILD(n, 1));
     if (type === COMP_GENEXP) {
-        return new GeneratorExp(elt, comps, n.lineno, n.col_offset);
+        return new GeneratorExp(elt, comps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     } else if (type === COMP_SETCOMP) {
-        return new SetComp(elt, comps, n.lineno, n.col_offset);
+        return new SetComp(elt, comps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 }
 
@@ -1433,7 +1441,7 @@ function astForDictComp(c, n) {
     key = astForExpr(c, CHILD(n, 0));
     value = astForExpr(c, CHILD(n, 2));
     comps = astForComprehension(c, CHILD(n, 3));
-    return new DictComp(key, value, comps, n.lineno, n.col_offset);
+    return new DictComp(key, value, comps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 function astForGenExpr(c, n) {
@@ -1450,10 +1458,10 @@ function astForWhileStmt (c, n) {
     /* while_stmt: 'while' test ':' suite ['else' ':' suite] */
     REQ(n, SYM.while_stmt);
     if (NCH(n) === 4) {
-        return new While_(astForExpr(c, CHILD(n, 1)), astForSuite(c, CHILD(n, 3)), [], n.lineno, n.col_offset);
+        return new While_(astForExpr(c, CHILD(n, 1)), astForSuite(c, CHILD(n, 3)), [], n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else if (NCH(n) === 7) {
-        return new While_(astForExpr(c, CHILD(n, 1)), astForSuite(c, CHILD(n, 3)), astForSuite(c, CHILD(n, 6)), n.lineno, n.col_offset);
+        return new While_(astForExpr(c, CHILD(n, 1)), astForSuite(c, CHILD(n, 3)), astForSuite(c, CHILD(n, 6)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     goog.asserts.fail("wrong number of tokens for 'while' stmt");
 }
@@ -1506,13 +1514,13 @@ function astForBinop (c, n) {
         astForExpr(c, CHILD(n, 0)),
         getOperator(CHILD(n, 1)),
         astForExpr(c, CHILD(n, 2)),
-        n.lineno, n.col_offset);
+        n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     var nops = (NCH(n) - 1) / 2;
     for (i = 1; i < nops; ++i) {
         nextOper = CHILD(n, i * 2 + 1);
         newoperator = getOperator(nextOper);
         tmp = astForExpr(c, CHILD(n, i * 2 + 2));
-        result = new BinOp(result, newoperator, tmp, nextOper.lineno, nextOper.col_offset);
+        result = new BinOp(result, newoperator, tmp, nextOper.lineno, nextOper.col_offset, n.endlineno, n.col_endoffset);
     }
     return result;
 
@@ -1539,7 +1547,7 @@ function astForTestlist(c, n) {
         return astForExpr(c, CHILD(n, 0));
     }
     else {
-        return new Tuple(seqForTestlist(c, n), Load, n.lineno, n.col_offset);
+        return new Tuple(seqForTestlist(c, n), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 
 }
@@ -1563,7 +1571,7 @@ function astForExprStmt (c, n) {
      test: ... here starts the operator precendence dance
      */
     if (NCH(n) === 1) {
-        return new Expr(astForTestlist(c, CHILD(n, 0)), n.lineno, n.col_offset);
+        return new Expr(astForTestlist(c, CHILD(n, 0)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else if (CHILD(n, 1).type === SYM.augassign) {
         ch = CHILD(n, 0);
@@ -1593,7 +1601,7 @@ function astForExprStmt (c, n) {
             expr2 = astForExpr(c, ch);
         }
 
-        return new AugAssign(expr1, astForAugassign(c, CHILD(n, 1)), expr2, n.lineno, n.col_offset);
+        return new AugAssign(expr1, astForAugassign(c, CHILD(n, 1)), expr2, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     else {
         // normal assignment
@@ -1615,7 +1623,7 @@ function astForExprStmt (c, n) {
         else {
             expression = astForExpr(c, value);
         }
-        return new Assign(targets, expression, n.lineno, n.col_offset);
+        return new Assign(targets, expression, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
 }
 
@@ -1626,7 +1634,7 @@ function astForIfexpr (c, n) {
         astForExpr(c, CHILD(n, 2)),
         astForExpr(c, CHILD(n, 0)),
         astForExpr(c, CHILD(n, 4)),
-        n.lineno, n.col_offset);
+        n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
 /**
@@ -1885,7 +1893,7 @@ function astForSlice (c, n) {
     if (ch.type === SYM.sliceop) {
         if (NCH(ch) === 1) {
             ch = CHILD(ch, 0);
-            step = new Name(strobj("None"), Load, ch.lineno, ch.col_offset);
+            step = new Name(strobj("None"), Load, ch.lineno, ch.col_offset, ch.endlineno, ch.col_endoffset);
         }
         else {
             ch = CHILD(ch, 1);
@@ -1913,15 +1921,15 @@ function astForAtom(c, n) {
     switch (ch.type) {
         case TOK.T_NAME:
             // All names start in Load context, but may be changed later
-            return new Name(strobj(ch.value), Load, n.lineno, n.col_offset);
+            return new Name(strobj(ch.value), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_STRING:
-            return new Str(parsestrplus(c, n), n.lineno, n.col_offset);
+            return new Str(parsestrplus(c, n), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_NUMBER:
-            return new Num(parsenumber(c, ch.value, n.lineno), n.lineno, n.col_offset);
+            return new Num(parsenumber(c, ch.value, n.lineno), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         case TOK.T_LPAR: // various uses for parens
             ch = CHILD(n, 1);
             if (ch.type === TOK.T_RPAR) {
-                return new Tuple([], Load, n.lineno, n.col_offset);
+                return new Tuple([], Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             if (ch.type === SYM.yield_expr) {
                 return astForExpr(c, ch);
@@ -1933,11 +1941,11 @@ function astForAtom(c, n) {
         case TOK.T_LSQB: // list or listcomp
             ch = CHILD(n, 1);
             if (ch.type === TOK.T_RSQB) {
-                return new List([], Load, n.lineno, n.col_offset);
+                return new List([], Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
             REQ(ch, SYM.listmaker);
             if (NCH(ch) === 1 || CHILD(ch, 1).type === TOK.T_COMMA) {
-                return new List(seqForTestlist(c, ch), Load, n.lineno, n.col_offset);
+                return new List(seqForTestlist(c, ch), Load, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             return astForListcomp(c, ch);
             
@@ -1951,7 +1959,7 @@ function astForAtom(c, n) {
             ch = CHILD(n, 1);
             if (n.type === TOK.T_RBRACE) {
                 //it's an empty dict
-                return new Dict([], null, n.lineno, n.col_offset);
+                return new Dict([], null, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             else if (NCH(ch) === 1 || (NCH(ch) !== 0 && CHILD(ch, 1).type === TOK.T_COMMA)) {
                 //it's a simple set
@@ -1961,7 +1969,7 @@ function astForAtom(c, n) {
                     var expression = astForExpr(c, CHILD(ch, i));
                     elts[i / 2] = expression;
                 }
-                return new Set(elts, n.lineno, n.col_offset);
+                return new Set(elts, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             } 
             else if (NCH(ch) !== 0 && CHILD(ch, 1).type == SYM.comp_for) {
                 //it's a set comprehension
@@ -1977,11 +1985,11 @@ function astForAtom(c, n) {
                     keys[i / 4] = astForExpr(c, CHILD(ch, i));
                     values[i / 4] = astForExpr(c, CHILD(ch, i + 2));
                 }
-                return new Dict(keys, values, n.lineno, n.col_offset);
+                return new Dict(keys, values, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             }
         case TOK.T_BACKQUOTE:
             //throw new Sk.builtin.SyntaxError("backquote not supported, use repr()", c.c_filename, n.lineno);
-            return new Repr(astForTestlist(c, CHILD(n, 1)), n.lineno, n.col_offset);
+            return new Repr(astForTestlist(c, CHILD(n, 1)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
         default:
             goog.asserts.fail("unhandled atom", ch.type);
 
@@ -2009,11 +2017,13 @@ function astForPower (c, n) {
         tmp = astForTrailer(c, ch, e);
         tmp.lineno = e.lineno;
         tmp.col_offset = e.col_offset;
+        tmp.endlineno = e.endlineno;
+        tmp.col_endoffset = e.col_endoffset;
         e = tmp;
     }
     if (CHILD(n, NCH(n) - 1).type === SYM.factor) {
         f = astForExpr(c, CHILD(n, NCH(n) - 1));
-        e = new BinOp(e, Pow, f, n.lineno, n.col_offset);
+        e = new BinOp(e, Pow, f, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
     }
     return e;
 }
@@ -2071,17 +2081,17 @@ function astForExpr (c, n) {
                     seq[i / 2] = astForExpr(c, CHILD(n, i));
                 }
                 if (CHILD(n, 1).value === "and") {
-                    return new BoolOp(And, seq, n.lineno, n.col_offset);
+                    return new BoolOp(And, seq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 goog.asserts.assert(CHILD(n, 1).value === "or");
-                return new BoolOp(Or, seq, n.lineno, n.col_offset);
+                return new BoolOp(Or, seq, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.not_test:
                 if (NCH(n) === 1) {
                     n = CHILD(n, 0);
                     continue LOOP;
                 }
                 else {
-                    return new UnaryOp(Not, astForExpr(c, CHILD(n, 1)), n.lineno, n.col_offset);
+                    return new UnaryOp(Not, astForExpr(c, CHILD(n, 1)), n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 break;
             case SYM.comparison:
@@ -2096,7 +2106,7 @@ function astForExpr (c, n) {
                         ops[(i - 1) / 2] = astForCompOp(c, CHILD(n, i));
                         cmps[(i - 1) / 2] = astForExpr(c, CHILD(n, i + 1));
                     }
-                    return new Compare(astForExpr(c, CHILD(n, 0)), ops, cmps, n.lineno, n.col_offset);
+                    return new Compare(astForExpr(c, CHILD(n, 0)), ops, cmps, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
                 }
                 break;
             case SYM.expr:
@@ -2115,7 +2125,7 @@ function astForExpr (c, n) {
                 if (NCH(n) === 2) {
                     exp = astForTestlist(c, CHILD(n, 1));
                 }
-                return new Yield(exp, n.lineno, n.col_offset);
+                return new Yield(exp, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.factor:
                 if (NCH(n) === 1) {
                     n = CHILD(n, 0);
@@ -2150,10 +2160,10 @@ function astForPrintStmt (c, n) {
         seq[j] = astForExpr(c, CHILD(n, i));
     }
     nl = (CHILD(n, NCH(n) - 1)).type === TOK.T_COMMA ? false : true;
-    return new Print(dest, seq, nl, n.lineno, n.col_offset);
+    return new Print(dest, seq, nl, n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
 }
 
-function astForStmt (c, n) {
+function astForStmt(c, n) {
     var ch;
     if (n.type === SYM.stmt) {
         goog.asserts.assert(NCH(n) === 1);
@@ -2178,7 +2188,7 @@ function astForStmt (c, n) {
             case SYM.del_stmt:
                 return astForDelStmt(c, n);
             case SYM.pass_stmt:
-                return new Pass(n.lineno, n.col_offset);
+                return new Pass(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             case SYM.flow_stmt:
                 return astForFlowStmt(c, n);
             case SYM.import_stmt:
@@ -2190,7 +2200,7 @@ function astForStmt (c, n) {
             case SYM.assert_stmt:
                 return astForAssertStmt(c, n);
             case SYM.debugger_stmt:
-                return new Debugger_(n.lineno, n.col_offset);
+                return new Debugger_(n.lineno, n.col_offset, n.endlineno, n.col_endoffset);
             default:
                 goog.asserts.fail("unhandled small_stmt");
         }
