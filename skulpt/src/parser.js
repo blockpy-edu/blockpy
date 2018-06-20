@@ -349,7 +349,7 @@ function makeParser(filename, style) {
 
 Sk.parse = function parse(filename, input) {
     var i;
-    var ret
+    var ret;
     var lines;
     var parseFunc = makeParser(filename);
     if (input.substr(input.length - 1, 1) !== "\n") {
@@ -360,6 +360,7 @@ Sk.parse = function parse(filename, input) {
     for (i = 0; i < lines.length; ++i) {
         ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
     }
+
     /*
      * Small adjustments here in order to return th flags and the cst
      */

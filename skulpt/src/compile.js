@@ -286,7 +286,7 @@ Compiler.prototype.outputInterruptTest = function () { // Added by RNL
         }
         if (Sk.yieldLimit !== null && this.u.canSuspend) {
             output += "if ($dateNow - Sk.lastYield > Sk.yieldLimit) {";
-            output += "var $susp = $saveSuspension({data: {type: 'Sk.yield'}, resume: function() {}}, '"+this.filename+"',currLineNo,currColNo);";
+            output += "var $susp = $saveSuspension({data: {type: 'Sk.yield'}, resume: function() {}}, '"+this.filename+"',$currLineNo,$currColNo);";
             output += "$susp.$blk = $blk;";
             output += "$susp.optional = true;";
             output += "return $susp;";
@@ -333,15 +333,15 @@ Compiler.prototype._checkSuspension = function(e) {
         this._jump(retblk);
         this.setBlock(retblk);
 
-        e = e || {lineno: "currLineNo", col_offset: "currColNo"};
+        e = e || {lineno: "$currLineNo", col_offset: "$currColNo"};
 
-        out ("if ($ret && $ret.isSuspension) { return $saveSuspension($ret,'"+this.filename+"',"+e.lineno+","+e.col_offset+"); }");
+        out ("if ($ret && $ret.$isSuspension) { return $saveSuspension($ret,'"+this.filename+"',"+e.lineno+","+e.col_offset+"); }");
 
         this.u.doesSuspend = true;
         this.u.tempsToSave = this.u.tempsToSave.concat(this.u.localtemps);
 
     } else {
-        out ("if ($ret && $ret.isSuspension) { $ret = Sk.misceval.retryOptionalSuspensionOrThrow($ret); }");
+        out ("if ($ret && $ret.$isSuspension) { $ret = Sk.misceval.retryOptionalSuspensionOrThrow($ret); }");
     }
 };
 Compiler.prototype.ctuplelistorset = function(e, data, tuporlist) {
@@ -1144,11 +1144,10 @@ Compiler.prototype.cfor = function (s) {
         // if we're in a generator, we have to store the iterator to a local
         // so it's preserved (as we cross blocks here and assume it survives)
         iter = "$loc." + this.gensym("iter");
-        out(iter, "=Sk.abstr.iter(", toiter, ", "+s.constructor.name+");");
+        out(iter, "=Sk.abstr.iter(", toiter, ");");
     }
     else {
-        //print(JSON.stringify(s.iter))
-        iter = this._gr("iter", "Sk.abstr.iter(", toiter, ", "+JSON.stringify(s.iter)+")");
+        iter = this._gr("iter", "Sk.abstr.iter(", toiter, ")");
         this.u.tempsToSave.push(iter); // Save it across suspensions
     }
 
@@ -1252,9 +1251,7 @@ Compiler.prototype.ctryexcept = function (s) {
             // var isinstance = this.nameop(new Sk.builtin.str("isinstance"), Load));
             // var check = this._gr('call', "Sk.misceval.callsim(", isinstance, ", $err, ", handlertype, ")");
 
-            // this check is not right, should use isinstance, but exception objects
-            // are not yet proper Python objects
-            check = this._gr("instance", "$err instanceof ", handlertype);
+            check = this._gr("instance", "Sk.misceval.isTrue(Sk.builtin.isinstance($err, ", handlertype, "))");
             this._jumpfalse(check, next);
         }
 
@@ -1264,6 +1261,7 @@ Compiler.prototype.ctryexcept = function (s) {
 
         this.vseqstmt(handler.body);
 
+        // Should jump to finally, but finally is not implemented yet
         this._jump(end);
     }
 
@@ -1274,8 +1272,8 @@ Compiler.prototype.ctryexcept = function (s) {
 
     this.setBlock(orelse);
     this.vseqstmt(s.orelse);
-    // Should jump to finally, but finally is not implemented yet
     this._jump(end);
+
     this.setBlock(end);
 };
 
@@ -1291,25 +1289,32 @@ Compiler.prototype.outputFinallyCascade = function (thisFinally) {
     //		
     // (NB we do NOT deal with re-raising exceptions here. That's handled		
     // elsewhere, because 'with' does special things with exceptions.)		
+
     if (this.u.finallyBlocks.length == 0) {		
         // No nested 'finally' block. Easy.		
         out("if($postfinally!==undefined) { if ($postfinally.returning) { return $postfinally.returning; } else { $blk=$postfinally.gotoBlock; $postfinally=undefined; continue; } }");		
     } else {		
+
         // OK, we're nested. Do we jump straight to the outer 'finally' block?		
         // Depends on how we got here here.		
+
         // Normal execution ($postfinally===undefined)? No, we're done here.		
+
         // Returning ($postfinally.returning)? Yes, we want to execute all the		
         // 'finally' blocks on the way out.		
+
         // Breaking ($postfinally.isBreak)? It depends. Is the outer 'finally'		
         // block inside or outside the loop we're breaking out of? We compare		
         // its breakDepth to ours to find out. If we're at the same breakDepth,		
         // we're both inside the innermost loop, so we both need to execute.		
         // ('continue' is the same thing as 'break' for us)		
+
         nextFinally = this.peekFinallyBlock();		
         		
         out("if($postfinally!==undefined) {",		
                 "if ($postfinally.returning",		
                     (nextFinally.breakDepth == thisFinally.breakDepth) ? "|| $postfinally.isBreak" : "", ") {",		
+
                         "$blk=",nextFinally.blk,";continue;",		
                 "} else {",		
                     "$blk=$postfinally.gotoBlock;$postfinally=undefined;continue;",		
@@ -1319,11 +1324,13 @@ Compiler.prototype.outputFinallyCascade = function (thisFinally) {
 };
 
 Compiler.prototype.ctryfinally = function (s) {
+
     var finalBody = this.newBlock("finalbody");
-    var exceptionHandler = this.newBlock("finalexh");
+    var exceptionHandler = this.newBlock("finalexh")
     var exceptionToReRaise = this._gr("finally_reraise", "undefined");		
     var thisFinally;		
     this.u.tempsToSave.push(exceptionToReRaise);		
+
     this.pushFinallyBlock(finalBody);		
     thisFinally = this.peekFinallyBlock();		
     this.setupExcept(exceptionHandler);		
@@ -1331,70 +1338,88 @@ Compiler.prototype.ctryfinally = function (s) {
     this.endExcept();		
     // Normal execution falls through to finally body		
     this._jump(finalBody);		
+
     this.setBlock(exceptionHandler);		
     // Exception handling also goes to the finally body,		
     // stashing the original exception to re-raise		
     out(exceptionToReRaise,"=$err;");		
     this._jump(finalBody);		
+
     this.setBlock(finalBody);		
     this.popFinallyBlock();		
     this.vseqstmt(s.finalbody);		
     // If finalbody executes normally, AND we have an exception		
     // to re-raise, we raise it.		
     out("if(",exceptionToReRaise,"!==undefined) { throw ",exceptionToReRaise,";}");		
+
     this.outputFinallyCascade(thisFinally);		
     // Else, we continue from here.		
 };		
+
 Compiler.prototype.cwith = function (s) {		
     var mgr, exit, value, exception;		
     var exceptionHandler = this.newBlock("withexh"), tidyUp = this.newBlock("withtidyup");		
     var carryOn = this.newBlock("withcarryon");		
     var thisFinallyBlock;		
+
     // NB this does not *quite* match the semantics in PEP 343, which		
     // specifies "exit = type(mgr).__exit__" rather than getattr()ing,		
     // presumably for performance reasons.		
+
     mgr = this._gr("mgr", this.vexpr(s.context_expr));		
+
     // exit = mgr.__exit__		
     out("$ret = Sk.abstr.gattr(",mgr,",'__exit__', true);");		
     this._checkSuspension(s);		
     exit = this._gr("exit", "$ret");		
     this.u.tempsToSave.push(exit);		
+
     // value = mgr.__enter__()		
     out("$ret = Sk.abstr.gattr(",mgr,",'__enter__', true);");		
     this._checkSuspension(s);		
     out("$ret = Sk.misceval.callsimOrSuspend($ret);");		
     this._checkSuspension(s);		
     value = this._gr("value", "$ret");		
+
     // try:		
     this.pushFinallyBlock(tidyUp);		
     thisFinallyBlock = this.u.finallyBlocks[this.u.finallyBlocks.length-1];		
     this.setupExcept(exceptionHandler);		
+
     //    VAR = value		
     if (s.optional_vars) {		
         this.nameop(s.optional_vars.id, Store, value);		
     }		
+
     //    (try body)		
     this.vseqstmt(s.body);		
     this.endExcept();		
     this._jump(tidyUp);		
+
     // except:		
     this.setBlock(exceptionHandler);		
+
     //   if not exit(*sys.exc_info()):		
     //     raise		
     out("$ret = Sk.misceval.applyOrSuspend(",exit,",undefined,Sk.builtin.getExcInfo($err),undefined,[]);");		
     this._checkSuspension(s);		
     this._jumptrue("$ret", carryOn);		
     out("throw $err;");		
+
     // finally: (kinda. NB that this is a "finally" that doesn't run in the		
     //           exception case!)		
     this.setBlock(tidyUp);		
     this.popFinallyBlock();		
+
     //   exit(None, None, None)		
     out("$ret = Sk.misceval.callsimOrSuspend(",exit,",Sk.builtin.none.none$,Sk.builtin.none.none$,Sk.builtin.none.none$);");		
     this._checkSuspension(s);		
     // Ignore $ret.		
+
     this.outputFinallyCascade(thisFinallyBlock);		
+
     this._jump(carryOn);		
+
     this.setBlock(carryOn);
 };
 
@@ -1603,9 +1628,14 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         }
     }
     if (hasFree) {
+        if (vararg) {
+            this.u.varDeclsCode += "$free = arguments[arguments.length-1];"
+        } else {
         funcArgs.push("$free");
         this.u.tempsToSave.push("$free");
     }
+    }
+
     this.u.prefixCode += funcArgs.join(",");
 
     this.u.prefixCode += "){";
@@ -1652,7 +1682,7 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
     // If there is a suspension, resume from it. Otherwise, initialise
     // parameters appropriately.
     //
-    this.u.varDeclsCode += "if ("+scopename+".wakingSuspension!==undefined) { $wakeFromSuspension(); } else {";
+    this.u.varDeclsCode += "if ("+scopename+".$wakingSuspension!==undefined) { $wakeFromSuspension(); } else {";
 
     //
     // initialize default arguments. we store the values of the defaults to
@@ -1697,8 +1727,9 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
     //
     if (vararg) {
         start = funcArgs.length;
+
         this.u.localnames.push(vararg.v);
-        this.u.varDeclsCode += vararg.v + "=new Sk.builtins['tuple'](Array.prototype.slice.call(arguments," + start + ")); /*vararg*/";
+        this.u.varDeclsCode += vararg.v + "=new Sk.builtins['tuple'](Array.prototype.slice.call(arguments," + start + (hasFree ? ",-1)" : ")") + "); /*vararg*/";
     }
 
     //
@@ -1763,6 +1794,9 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         out(scopename, ".$defaults=[", defaults.join(","), "];");
     }
 
+    if (decos.length > 0) {
+        out(scopename, ".$decorators=[", decos.join(","), "];");
+    }
 
     //
     // attach co_varnames (only the argument names) for keyword argument
@@ -1818,6 +1852,13 @@ Compiler.prototype.buildcodeobj = function (n, coname, decorator_list, args, cal
         }
     }
     else {
+        var res;
+        if (decos.length > 0) {
+            out("$ret = Sk.misceval.callsimOrSuspend(", scopename, ".$decorators[0], new Sk.builtins['function'](", scopename, ",$gbl", frees, "));");
+            this._checkSuspension();
+            return this._gr("funcobj", "$ret");
+        }
+
         return this._gr("funcobj", "new Sk.builtins['function'](", scopename, ",$gbl", frees, ")");
     }
 };
@@ -2013,8 +2054,10 @@ Compiler.prototype.ccontinue = function (s) {
         this._jump(gotoBlock);		
     }		
 };		
+
 Compiler.prototype.cbreak = function (s) {		
     var nextFinally = this.peekFinallyBlock(), gotoBlock;		
+
     if (this.u.breakBlocks.length === 0) {		
         throw new SyntaxError("'break' outside loop");		
     }		
@@ -2401,7 +2444,7 @@ Compiler.prototype.cmod = function (mod) {
         this.u.varDeclsCode += "if (typeof Sk.lastYield === 'undefined') {Sk.lastYield = Date.now()}";
     }
 
-    this.u.varDeclsCode += "if ("+modf+".wakingSuspension!==undefined) { $wakeFromSuspension(); }" +
+    this.u.varDeclsCode += "if ("+modf+".$wakingSuspension!==undefined) { $wakeFromSuspension(); }" +
         "if (Sk.retainGlobals) {" +
         "    if (Sk.globals) { $gbl = Sk.globals; Sk.globals = $gbl; $loc = $gbl; }" +
         "    else { Sk.globals = $gbl; }" +
@@ -2459,7 +2502,6 @@ Sk.compile = function (source, filename, mode, canSuspend) {
     //print("FILE:", filename);
     var parse = Sk.parse(filename, source);
     var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
-    //print(JSON.stringify(ast, null, 2));
 
     // compilers flags, later we can add other ones too
     var flags = {};
@@ -2469,9 +2511,9 @@ Sk.compile = function (source, filename, mode, canSuspend) {
     var c = new Compiler(filename, st, flags.cf_flags, canSuspend, source); // todo; CO_xxx
     var funcname = c.cmod(ast);
 
-    var ret = c.result.join("");
+    var ret = "$compiledmod = function() {" + c.result.join("") + "\nreturn " + funcname + ";}();";
     return {
-        funcname: funcname,
+        funcname: "$compiledmod",
         code    : ret
     };
 };

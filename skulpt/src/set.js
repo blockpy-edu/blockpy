@@ -144,6 +144,22 @@ Sk.builtin.set.prototype.ob$ge = function (other) {
     return this["issuperset"].func_code(this, other);
 };
 
+Sk.builtin.set.prototype.nb$and = function(other){
+    return this["intersection"].func_code(this, other);
+};
+
+Sk.builtin.set.prototype.nb$or = function(other){
+    return this["union"].func_code(this, other);
+};
+
+Sk.builtin.set.prototype.nb$xor = function(other){
+    return this["symmetric_difference"].func_code(this, other);
+};
+
+Sk.builtin.set.prototype.nb$subtract = function(other){
+    return this["difference"].func_code(this, other);
+};
+
 Sk.builtin.set.prototype["__iter__"] = new Sk.builtin.func(function (self) {
     Sk.builtin.pyCheckArgs("__iter__", arguments, 0, 0, false, true);
     return new Sk.builtin.set_iter_(self);
@@ -435,10 +451,10 @@ Sk.builtin.set_iter_.prototype.__iter__ = new Sk.builtin.func(function (self) {
     return self;
 });
 
-Sk.builtin.set_iter_.prototype["next"] = new Sk.builtin.func(function (self) {
+Sk.builtin.set_iter_.prototype.next$ = function (self) {
     var ret = self.tp$iternext();
     if (ret === undefined) {
         throw new Sk.builtin.StopIteration();
     }
     return ret;
-});
+};

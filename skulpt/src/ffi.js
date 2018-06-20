@@ -81,9 +81,7 @@ Sk.ffi.remapToJs = function (obj) {
     } else if (obj instanceof Sk.builtin.int_) {
         return Sk.builtin.asnum$(obj);
     } else if (obj instanceof Sk.builtin.float_) {
-        // If you use builtin.asnum, you'll let 0.0 -> 0
-        //return Sk.builtin.asnum$(obj);
-        return obj.v;
+        return Sk.builtin.asnum$(obj);
     } else if (obj instanceof Sk.builtin.lng) {
         return Sk.builtin.asnum$(obj);
     } else if (typeof obj === "number" || typeof obj === "boolean") {

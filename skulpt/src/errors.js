@@ -20,6 +20,7 @@ Sk.builtin.BaseException = function (args) {
         o.constructor.apply(o, arguments);
         return o;
     }
+
     args = Array.prototype.slice.call(arguments);
     // hackage to allow shorter throws
     for (i = 0; i < args.length; ++i) {
@@ -28,7 +29,6 @@ Sk.builtin.BaseException = function (args) {
         }
     }
     this.args = new Sk.builtin.tuple(args);
-    
     this.traceback = [];
 
     // For errors occurring during normal execution, the line/col/etc
@@ -41,18 +41,13 @@ Sk.builtin.BaseException = function (args) {
         this.traceback.push({lineno: this.args.v[2],
                              filename: this.args.v[1].v || "<unknown>"});
     }
-    
-    if (arguments.length >= 2) {
-        this.enhanced = arguments[1];
-    } else {
-        this.enhanced = "";
-    }
 };
 Sk.abstr.setUpInheritance("BaseException", Sk.builtin.BaseException, Sk.builtin.object);
 
 Sk.builtin.BaseException.prototype.tp$str = function () {
     var i;
     var ret = "";
+
     ret += this.tp$name;
     if (this.args) {
         ret += ": " + (this.args.v.length > 0 ? this.args.v[0].v : "");
@@ -71,10 +66,6 @@ Sk.builtin.BaseException.prototype.tp$str = function () {
         ret += "^\n";
     }
     
-    if (this.enhanced !== "") {
-        ret += "\n"+this.enhanced+"\n";
-    }
-
     /*for (i = 0; i < this.traceback.length; i++) {
         ret += "\n  at " + this.traceback[i].filename + " line " + this.traceback[i].lineno;
         if ("colno" in this.traceback[i]) {
@@ -87,6 +78,15 @@ Sk.builtin.BaseException.prototype.tp$str = function () {
 
 Sk.builtin.BaseException.prototype.toString = function () {
     return this.tp$str().v;
+};
+
+// Create a descriptor to return the 'args' of an exception.
+// This is a hack to get around a weird mismatch between builtin
+// objects and proper types
+Sk.builtin.BaseException.prototype.args = {
+    "tp$descr_get": function(self, clstype) {
+        return self.args;
+    }
 };
 
 goog.exportSymbol("Sk.builtin.BaseException", Sk.builtin.BaseException);
@@ -534,6 +534,7 @@ Sk.builtin.StopIteration = function (args) {
 };
 Sk.abstr.setUpInheritance("StopIteration", Sk.builtin.StopIteration, Sk.builtin.Exception);
 goog.exportSymbol("Sk.builtin.StopIteration", Sk.builtin.StopIteration);
+
 
 // TODO: Extract into sys.exc_info(). Work out how the heck
 // to find out what exceptions are being processed by parent stack frames...

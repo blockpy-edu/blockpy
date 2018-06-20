@@ -106,25 +106,30 @@ Sk.builtin.file.prototype["isatty"] = new Sk.builtin.func(function isatty(self) 
 
 Sk.builtin.file.prototype["read"] = new Sk.builtin.func(function read(self, size) {
     var ret;
-    var len;
+    var len = self.data$.length;
+    var l_size;
     if (self.closed) {
         throw new Sk.builtin.ValueError("I/O operation on closed file");
     }
-    len = self.data$.length;
+
     if (size === undefined) {
-        size = len;
+        l_size = len;
+    } else {
+        l_size = Sk.ffi.remapToJs(size);
     }
-    ret = new Sk.builtin.str(self.data$.substr(self.pos$, size));
+
+    ret = new Sk.builtin.str(self.data$.substr(self.pos$, l_size));
     self.pos$ += size;
     if (self.pos$ >= len) {
         self.pos$ = len;
     }
+
     return ret;
 });
 
 Sk.builtin.file.$readline = function (self, size, prompt) {
     if (self.fileno === 0) {
-        var x, resolution, susp;
+        var x, susp;
         
         var lprompt = Sk.ffi.remapToJs(prompt);
 
@@ -136,18 +141,16 @@ Sk.builtin.file.$readline = function (self, size, prompt) {
             susp = new Sk.misceval.Suspension();
 
             susp.resume = function() {
-                return new Sk.builtin.str(resolution);
+                if (susp.data.error) {
+                    throw susp.data.error;
+                }
+
+                return new Sk.builtin.str(susp.data.result);
             };
 
             susp.data = {
                 type: "Sk.promise",
-                promise: x.then(function(value) {
-                    resolution = value;
-                    return value;
-                }, function(err) {
-                    resolution = "";
-                    return err;
-                })
+                promise: x
             };
 
             return susp;
@@ -182,37 +185,41 @@ Sk.builtin.file.prototype["readlines"] = new Sk.builtin.func(function readlines(
 });
 
 Sk.builtin.file.prototype["seek"] = new Sk.builtin.func(function seek(self, offset, whence) {
+    var l_offset =  Sk.ffi.remapToJs(offset);
+
     if (whence === undefined) {
-        whence = 1;
+        whence = 0;
     }
-    if (whence == 1) {
-        self.pos$ = offset;
-    } else {
-        self.pos$ = self.data$ + offset;
+    if (whence === 0) {
+        self.pos$ = l_offset;
+    } else if (whence == 1) {
+        self.pos$ = self.data$.length + l_offset;
+    } else if (whence == 2) {
+        self.pos$ = self.data$.length + l_offset;
     }
+
+    return Sk.builtin.none.none$;
 });
 
 Sk.builtin.file.prototype["tell"] = new Sk.builtin.func(function tell(self) {
-    return self.pos$;
+    return Sk.ffi.remapToPy(self.pos$);
 });
-
 
 Sk.builtin.file.prototype["truncate"] = new Sk.builtin.func(function truncate(self, size) {
     goog.asserts.fail();
 });
 
 Sk.builtin.file.prototype["write"] = new Sk.builtin.func(function write(self, str) {
-    //var mode = Sk.ffi.remapToJs(self.mode);
+    var mode = Sk.ffi.remapToJs(self.mode);
+    if (mode === "w" || mode === "wb" || mode === "a" || mode === "ab") {
     if (self.fileno === 1) {
         Sk.output(Sk.ffi.remapToJs(str));
     } else {
         goog.asserts.fail();
     }
-    return Sk.builtin.none.none$;
-    /*if (mode === "w" || mode === "wb" || mode === "a" || mode === "ab") {
     } else {
         goog.asserts.fail();
-    }*/
+    }
 });
 
 
