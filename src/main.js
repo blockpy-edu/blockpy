@@ -25,8 +25,8 @@ function BlockPy(settings, assignment, programs) {
  */
 BlockPy.DEFAULT_MODULES = ['Variables', 'Decisions', 
                            'Iteration',
-                           'Calculation', 'Output', 
-                           'Values', 
+                           'Calculation', 'Output', 'Input',
+                           'Values', 'Conversion',
                            'Lists', 'Dictionaries']
 
 /**

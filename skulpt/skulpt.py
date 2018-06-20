@@ -1113,7 +1113,8 @@ Sk.misceval.asyncToPromise(function() {
     //print(outputList)
 }, function(e) {
     print("UNCAUGHT EXCEPTION: " + e);
-    print(e.stack);
+    //print(e.stack);
+    //print(JSON.stringify(e, null, 2));
 });
     """ % (fn, os.path.split(fn)[0], p3on, debugon, modname, dumpJS))
     f.close()

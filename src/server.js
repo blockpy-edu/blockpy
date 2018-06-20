@@ -120,6 +120,10 @@ BlockPyServer.prototype.logEvent = function(event_name, action, body) {
     }
 }
 
+BlockPyServer.prototype.post = function(URL, data, success) {
+    return $.post(URL, data, success);
+}
+
 BlockPyServer.prototype.markSuccess = function(success, callback, hide_correctness) {
     var model = this.main.model;
     var server = this;

@@ -24,6 +24,9 @@ var $builtinmodule = function (name) {
     var convertValue = function(value) {
         if (value === null) {
             return Sk.builtin.none.none$;
+        } else if (isSpecialPyAst(value)) {
+            var constructorName = functionName(value);
+            return Sk.misceval.callsim(mod[constructorName], constructorName, true);
         } else if (Array === value.constructor) {
             var subvalues = [];
             for (var j = 0; j < value.length; j += 1) {
@@ -181,36 +184,46 @@ var $builtinmodule = function (name) {
 
     NodeVisitor = function($gbl, $loc) {
         // Takes in Python Nodes, not JS Nodes
-        $loc.visit = function(node) {
+        $loc.visit = new Sk.builtin.func(function(self, node) {
             /** Visit a node. **/
+            print("VISIT", node.jsNode._astname)
             var method_name = 'visit_' + node.jsNode._astname;
-            if (method_name in $loc) {
-                return $loc[method_name](node);
-            } else {
-                return $loc.generic_visit(node);
+            method_name = Sk.ffi.remapToPy(method_name)
+            method = Sk.builtin.getattr(self, method_name, $loc.generic_visit)
+            if (method.im_self) {
+                //print(method.im_func.func_code)
+                result = Sk.misceval.callsim(method, node);
+                print(node.jsNode._astname, "COMING BACK WITH", Sk.ffi.remapToJs(result.$r()))
+                return result;
+            }else {
+                result = Sk.misceval.callsim(method, self, node);
+                print(node.jsNode._astname, "COMING BACK WITH", result)
+                return result;
             }
-        }
+            
+        });
         // Takes in Python Nodes, not JS Nodes
-        $loc.generic_visit = function(node) {
+        $loc.generic_visit = new Sk.builtin.func(function(self, node) {
             /** Called if no explicit visitor function exists for a node. **/
-            var fieldList = iter_fields(node.jsNode);
+            var fieldList = mod.iter_fields(node).v;
             for (var i = 0; i < fieldList.length; i += 1) {
-                var field = fieldList[i][0], value = fieldList[i][1];
+                var field = fieldList[i].v[0].v, value = fieldList[i].v[1];
                 if (value === null) {
                     continue;
-                }
-                if (Array === value.constructor) {
-                    for (var j = 0; j < value.length; j += 1) {
-                        var subvalue = value[j];
-                        if (isJsAst(subvalue)) {
-                            $loc.visit(subvalue);
+                } else if (isPyList(value)) {
+                    for (var j = 0; j < value.v.length; j += 1) {
+                        var subvalue = value.v[j];
+                        if (isPyAst(subvalue)) {
+                            //print(self.visit)
+                            Sk.misceval.callsim(self.visit, self, subvalue);
                         }
                     }
-                } else if (isJsAst(value)) {
-                    $loc.visit(value);
+                } else if (isPyAst(value)) {
+                    //print(self.visit)
+                    Sk.misceval.callsim(self.visit, self, value);
                 }
             }
-        }
+        });
     }
     mod.NodeVisitor = Sk.misceval.buildClass(mod, NodeVisitor, "NodeVisitor", []);
 
@@ -257,26 +270,40 @@ var $builtinmodule = function (name) {
                 self._attributes.push(Sk.builtin.str(key));
             }
         };
-        $loc.__init__ = new Sk.builtin.func(function (self, jsNode) {
-            self.jsNode = jsNode;
-            self.astname = jsNode._astname;
-            var fieldListJs = iter_fieldsJs(jsNode);
-            self._fields = [];
-            self._attributes = [];
-            for (var i = 0; i < fieldListJs.length; i += 1) {
-                var field = fieldListJs[i][0], value = fieldListJs[i][1];
-                value = convertValue(value);
-                Sk.abstr.sattr(self, field, value, true);
-                self._fields.push(Sk.builtin.tuple([Sk.builtin.str(field), value]));
+        $loc.__init__ = new Sk.builtin.func(function (self, jsNode, partial) {
+            depth+=1;
+            if (partial === true) {
+                // Alternative constructor for Skulpt's weird nodes
+                print(" ".repeat(depth)+"S:", jsNode);
+                self.jsNode = {'_astname': jsNode};
+                self.astname = jsNode;
+                self._fields = Sk.builtin.list([]);
+                self._attributes = Sk.builtin.list([]);
+                Sk.abstr.sattr(self, '_fields', self._fields, true);
+                Sk.abstr.sattr(self, '_attributes', self._attributes, true);
+            } else {
+                print(" ".repeat(depth)+"P:", jsNode._astname);
+                self.jsNode = jsNode;
+                self.astname = jsNode._astname;
+                var fieldListJs = iter_fieldsJs(jsNode);
+                self._fields = [];
+                self._attributes = [];
+                for (var i = 0; i < fieldListJs.length; i += 1) {
+                    var field = fieldListJs[i][0], value = fieldListJs[i][1];
+                    value = convertValue(value);
+                    Sk.abstr.sattr(self, field, value, true);
+                    self._fields.push(Sk.builtin.tuple([Sk.builtin.str(field), value]));
+                }
+                self._fields = Sk.builtin.list(self._fields)
+                Sk.abstr.sattr(self, '_fields', self._fields, true);
+                copyFromJsNode(self, 'lineno', self.jsNode);
+                copyFromJsNode(self, 'col_offset', self.jsNode);
+                copyFromJsNode(self, 'endlineno', self.jsNode);
+                copyFromJsNode(self, 'col_endoffset', self.jsNode);
+                self._attributes = Sk.builtin.list(self._attributes);
+                Sk.abstr.sattr(self, '_attributes', self._attributes, true);
             }
-            self._fields = Sk.builtin.list(self._fields)
-            Sk.abstr.sattr(self, '_fields', self._fields, true);
-            copyFromJsNode(self, 'lineno', self.jsNode);
-            copyFromJsNode(self, 'col_offset', self.jsNode);
-            copyFromJsNode(self, 'endlineno', self.jsNode);
-            copyFromJsNode(self, 'col_endoffset', self.jsNode);
-            self._attributes = Sk.builtin.list(self._attributes);
-            Sk.abstr.sattr(self, '_attributes', self._attributes, true);
+            depth -= 1;
         });
         $loc.__str__ = new Sk.builtin.func(function (self) {
             return Sk.builtin.str("<_ast."+self.astname+" object>");

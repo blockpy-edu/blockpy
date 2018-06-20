@@ -63,5 +63,17 @@ print("iter_child_nodes:", ast.iter_child_nodes(multiline))
 print("walk:", ast.walk(multiline))
 
 print(ast.dump(multiline, True, False))
+print("*"*40)
+class VisitStuff(ast.NodeVisitor):
+    def __init__(self):
+        self.nums = 0
+    def visit_Num(self, node):
+        print("Found a ", node.n)
+        self.nums += 1
+vs = VisitStuff()
+p = ast.parse('''a = 0\nprint(a+5) or 5''')
+vs.generic_visit(p)
+assert vs.nums == 3, "Did not find 3 nums, only: "+str(vs.nums)
+
 
 print("All tests complete.")

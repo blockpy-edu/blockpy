@@ -909,6 +909,7 @@ Sk.abstr.iter = function(obj) {
         // create internal iterobject if __getitem__
         return new seqIter(obj);
     }
+    
     throw new Sk.builtin.TypeError("'" + Sk.abstr.typeName(obj) + "' object is not iterable");
 };
 goog.exportSymbol("Sk.abstr.iter", Sk.abstr.iter);

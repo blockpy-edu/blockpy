@@ -1449,6 +1449,7 @@ Tifa.traceState = function(state, method, position) {
 
 /**
  * Correctly clones a type, returning mutable types unchanged.
+ * This is necessary for parameters that mutate their passed in types
  */
 Tifa.copyType = function(type) {
     switch (type.name) {
