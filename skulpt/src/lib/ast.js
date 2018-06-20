@@ -182,22 +182,25 @@ var $builtinmodule = function (name) {
         return Sk.ffi.remapToPy(_format(node, 0));
     }
 
+    var depth = 0;
     NodeVisitor = function($gbl, $loc) {
         // Takes in Python Nodes, not JS Nodes
         $loc.visit = new Sk.builtin.func(function(self, node) {
+            depth += 1;
             /** Visit a node. **/
-            print("VISIT", node.jsNode._astname)
+            //print(" ".repeat(depth), "VISIT", node.jsNode._astname)
             var method_name = 'visit_' + node.jsNode._astname;
+            //print(" ".repeat(depth), "I'm looking for", method_name)
             method_name = Sk.ffi.remapToPy(method_name)
             method = Sk.builtin.getattr(self, method_name, $loc.generic_visit)
             if (method.im_self) {
                 //print(method.im_func.func_code)
                 result = Sk.misceval.callsim(method, node);
-                print(node.jsNode._astname, "COMING BACK WITH", Sk.ffi.remapToJs(result.$r()))
+                depth -= 1;
                 return result;
             }else {
                 result = Sk.misceval.callsim(method, self, node);
-                print(node.jsNode._astname, "COMING BACK WITH", result)
+                depth -= 1;
                 return result;
             }
             
@@ -205,6 +208,7 @@ var $builtinmodule = function (name) {
         // Takes in Python Nodes, not JS Nodes
         $loc.generic_visit = new Sk.builtin.func(function(self, node) {
             /** Called if no explicit visitor function exists for a node. **/
+            //print(" ".repeat(depth), "Generically checked", node.astname)
             var fieldList = mod.iter_fields(node).v;
             for (var i = 0; i < fieldList.length; i += 1) {
                 var field = fieldList[i].v[0].v, value = fieldList[i].v[1];
@@ -223,6 +227,7 @@ var $builtinmodule = function (name) {
                     Sk.misceval.callsim(self.visit, self, value);
                 }
             }
+            return Sk.builtin.none.none$;
         });
     }
     mod.NodeVisitor = Sk.misceval.buildClass(mod, NodeVisitor, "NodeVisitor", []);
@@ -274,7 +279,7 @@ var $builtinmodule = function (name) {
             depth+=1;
             if (partial === true) {
                 // Alternative constructor for Skulpt's weird nodes
-                print(" ".repeat(depth)+"S:", jsNode);
+                //print(" ".repeat(depth)+"S:", jsNode);
                 self.jsNode = {'_astname': jsNode};
                 self.astname = jsNode;
                 self._fields = Sk.builtin.list([]);
@@ -282,7 +287,7 @@ var $builtinmodule = function (name) {
                 Sk.abstr.sattr(self, '_fields', self._fields, true);
                 Sk.abstr.sattr(self, '_attributes', self._attributes, true);
             } else {
-                print(" ".repeat(depth)+"P:", jsNode._astname);
+                //print(" ".repeat(depth)+"P:", jsNode._astname);
                 self.jsNode = jsNode;
                 self.astname = jsNode._astname;
                 var fieldListJs = iter_fieldsJs(jsNode);

@@ -217,7 +217,7 @@ unit_tests = [
 class TestCode(unittest.TestCase):
     pass
 
-SILENCE_EXCEPT = 0
+SILENCE_EXCEPT = None
 class o:
     def fail(s, message):
         print(message)
@@ -225,7 +225,7 @@ self = o()
 
 def make_tester(code, nones, somes):
     def test_code(self):
-        tifa = Tifa()
+        tifa = Tifa(False)
         try:
             tifa.process_code(code)
         except Exception as e:
@@ -247,3 +247,13 @@ for i, (code, nones, somes) in enumerate(unit_tests):
 
 #if __name__ == '__main__':
     #unittest.main()
+tifa = Tifa(False)
+tifa.process_code('''
+a = 0
+for y in [1,2,3]:
+    print(a + y)
+with open("lacrimosa.txt") as inp:
+    for line in inp:
+        print(line.strip())
+''')
+print(tifa.report)

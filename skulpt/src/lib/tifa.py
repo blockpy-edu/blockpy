@@ -65,6 +65,8 @@ class Type:
     immutable = False
     def clone(self):
         return self.__class__()
+    def __str__(self):
+        return str(self.__class__.__name__)
     def clone_mutably(self):
         if self.immutable:
             return self.clone()
@@ -177,7 +179,7 @@ class ListType(Type):
                     self.empty = False
                     self.subtype = args[0]
             return FunctionType(_append, 'append')
-        return Type.load_attr(attr, tifa, callee, callee_position)
+        return Type.load_attr(self, attr, tifa, callee, callee_position)
     def is_empty(self):
         return self.empty
 
@@ -189,50 +191,50 @@ class StrType(Type):
 
 StrType.fields.update({
     # Methods that return strings
-    "capitalize": FunctionType('capitalize', returns=StrType()),
-    "center": FunctionType('center', returns=StrType()),
-    "expandtabs": FunctionType('expandtabs', returns=StrType()),
-    "join": FunctionType('join', returns=StrType()),
-    "ljust": FunctionType('ljust', returns=StrType()),
-    "lower": FunctionType('lower', returns=StrType()),
-    "lstrip": FunctionType('lstrip', returns=StrType()),
-    "replace": FunctionType('replace', returns=StrType()),
-    "rjust": FunctionType('rjust', returns=StrType()),
-    "rstrip": FunctionType('rstrip', returns=StrType()),
-    "strip": FunctionType('strip', returns=StrType()),
-    "swapcase": FunctionType('swapcase', returns=StrType()),
-    "title": FunctionType('title', returns=StrType()),
-    "translate": FunctionType('translate', returns=StrType()),
-    "upper": FunctionType('upper', returns=StrType()),
-    "zfill": FunctionType('zfill', returns=StrType()),
+    "capitalize": FunctionType(name='capitalize', returns=StrType()),
+    "center": FunctionType(name='center', returns=StrType()),
+    "expandtabs": FunctionType(name='expandtabs', returns=StrType()),
+    "join": FunctionType(name='join', returns=StrType()),
+    "ljust": FunctionType(name='ljust', returns=StrType()),
+    "lower": FunctionType(name='lower', returns=StrType()),
+    "lstrip": FunctionType(name='lstrip', returns=StrType()),
+    "replace": FunctionType(name='replace', returns=StrType()),
+    "rjust": FunctionType(name='rjust', returns=StrType()),
+    "rstrip": FunctionType(name='rstrip', returns=StrType()),
+    "strip": FunctionType(name='strip', returns=StrType()),
+    "swapcase": FunctionType(name='swapcase', returns=StrType()),
+    "title": FunctionType(name='title', returns=StrType()),
+    "translate": FunctionType(name='translate', returns=StrType()),
+    "upper": FunctionType(name='upper', returns=StrType()),
+    "zfill": FunctionType(name='zfill', returns=StrType()),
     # Methods that return numbers
-    "count": FunctionType('count', returns=NumType()),
-    "find": FunctionType('find', returns=NumType()),
-    "rfind": FunctionType('rfind', returns=NumType()),
-    "index": FunctionType('index', returns=NumType()),
-    "rindex": FunctionType('rindex', returns=NumType()),
+    "count": FunctionType(name='count', returns=NumType()),
+    "find": FunctionType(name='find', returns=NumType()),
+    "rfind": FunctionType(name='rfind', returns=NumType()),
+    "index": FunctionType(name='index', returns=NumType()),
+    "rindex": FunctionType(name='rindex', returns=NumType()),
     # Methods that return booleans
-    "startswith": FunctionType('startswith', returns=BoolType()),
-    "endswith": FunctionType('endswith', returns=BoolType()),
-    "isalnum": FunctionType('isalnum', returns=BoolType()),
-    "isalpha": FunctionType('isalpha', returns=BoolType()),
-    "isdigit": FunctionType('isdigit', returns=BoolType()),
-    "islower": FunctionType('islower', returns=BoolType()),
-    "isspace": FunctionType('isspace', returns=BoolType()),
-    "istitle": FunctionType('istitle', returns=BoolType()),
-    "isupper": FunctionType('isupper', returns=BoolType()),
+    "startswith": FunctionType(name='startswith', returns=BoolType()),
+    "endswith": FunctionType(name='endswith', returns=BoolType()),
+    "isalnum": FunctionType(name='isalnum', returns=BoolType()),
+    "isalpha": FunctionType(name='isalpha', returns=BoolType()),
+    "isdigit": FunctionType(name='isdigit', returns=BoolType()),
+    "islower": FunctionType(name='islower', returns=BoolType()),
+    "isspace": FunctionType(name='isspace', returns=BoolType()),
+    "istitle": FunctionType(name='istitle', returns=BoolType()),
+    "isupper": FunctionType(name='isupper', returns=BoolType()),
     # Methods that return List of Strings
-    "rsplit": FunctionType('rsplit', returns=ListType(StrType())),
-    "split": FunctionType('split', returns=ListType(StrType())),
-    "splitlines": FunctionType('splitlines', returns=ListType(StrType()))
+    "rsplit": FunctionType(name='rsplit', returns=ListType(StrType())),
+    "split": FunctionType(name='split', returns=ListType(StrType())),
+    "splitlines": FunctionType(name='splitlines', returns=ListType(StrType()))
 })
 class FileType(Type):
     def index(self, i):
         return StrType()
     fields = _dict_extends(Type.fields, {
-        'close': FunctionType('close', returns='void'),
-        'read': FunctionType('read', returns=StrType()),
-        'readlines': FunctionType('readlines', returns=ListType(StrType(), False))
+        'close': FunctionType(name='close', returns='void'),
+        'read': FunctionType(name='read', returns=StrType()),
+        'readlines': FunctionType(name='readlines', returns=ListType(StrType(), False))
     })
     
 class DictType(Type):
@@ -278,7 +280,7 @@ class DictType(Type):
                 else:
                     return ListType(self.values[0])
             return FunctionType(_values, 'values')
-        return Type.load_attr(attr, tifa, callee, callee_position)
+        return Type.load_attr(self, attr, tifa, callee, callee_position)
 
 class ModuleType(Type):
     def __init__(self, name="*UnknownModule", submodules=None, fields=None):
@@ -389,17 +391,17 @@ MODULES = {
         }),
 }
 
-def _builtin_sequence_constructor(constructor):
+def _builtin_sequence_constructor(sequence_type):
     '''
     Helper function for creating constructors for the Set and List types.
     These constructors use the subtype of the arguments.
     
     Args:
-        constructor (Type): A function for creating new sequence types.
+        sequence_type (Type): A function for creating new sequence types.
     '''
     def sequence_call(tifa, function_type, callee, args, position):
-    # TODO: Should inherit the emptiness too
-        return_type = constructor(empty=True)
+        # TODO: Should inherit the emptiness too
+        return_type = sequence_type(empty=True)
         if args:
             return_type.subtype = args[0].index(LiteralNum(0))
         return return_type
@@ -528,7 +530,7 @@ def are_types_equal(left, right):
         return False
     elif isinstance(left, UnknownType) or isinstance(right, UnknownType):
         return False
-    elif type(left) != type(right):
+    elif type(left) is not type(right):
         return False
     elif isinstance(left, (GeneratorType, ListType)):
         if left.empty or right.empty:
@@ -848,8 +850,9 @@ class Tifa(ast.NodeVisitor):
         main_path_vars = self.name_map[self.path_chain[0]]
         for full_name in main_path_vars:
             split_name = full_name.split("/")
-            if len(split_name) == 2 and split_name[0] == self.scope_chain[0]:
-                self.report.top_level_variables[split_name[1]] = main_path_vars[fullName]
+            if len(split_name) == 2 and split_name[0] == str(self.scope_chain[0]):
+                name = split_name[1]
+                self.report['top_level_variables'][name] = main_path_vars[full_name]
     
     def _reset(self):
         '''
@@ -909,7 +912,7 @@ class Tifa(ast.NodeVisitor):
         '''
         for path in self.name_map.values():
             for full_name in path:
-                unscoped_name = full_name.rsplit("/", maxsplit=1)[-1]
+                unscoped_name = full_name.split("/")[-1]
                 if name == unscoped_name:
                     return Identifier(True, False, unscoped_name, path[full_name])
         return Identifier(False)
@@ -964,8 +967,6 @@ class Tifa(ast.NodeVisitor):
         # No? All good, let's enter the node
         self.final_node = node
         result = ast.NodeVisitor.visit(self, node)
-        print("BACK:", node)
-        print("TYPE:", result)
         
         # Pop the node out of the chain
         self.ast_id -= 1
@@ -1526,7 +1527,7 @@ class Tifa(ast.NodeVisitor):
                 self._walk_target(item.optional_vars, type_value)
         else:
             type_value = self.visit(node.context_expr)
-            self.visit_statements(node.optional_vars)
+            #self.visit(node.optional_vars)
             self._walk_target(node.optional_vars, type_value)
         # Handle the bodies
         self.visit_statements(node.body)
