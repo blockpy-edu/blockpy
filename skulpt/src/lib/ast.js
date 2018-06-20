@@ -183,7 +183,7 @@ var $builtinmodule = function (name) {
     }
 
     var depth = 0;
-    NodeVisitor = function($gbl, $loc) {
+    var NodeVisitor = function($gbl, $loc) {
         // Takes in Python Nodes, not JS Nodes
         $loc.visit = new Sk.builtin.func(function(self, node) {
             depth += 1;
@@ -342,37 +342,11 @@ var $builtinmodule = function (name) {
         return ret;
     }
     
-    var INHERITANCE_MAP = {
-        'mod': [Module, Interactive, Expression, Suite],
-        'stmt': [FunctionDef, ClassDef, Return_,
-                  Delete_, Assign, AugAssign,
-                  For_, While_, If_, With_,
-                  Raise, TryExcept, TryFinally, Assert,
-                  Import_, ImportFrom, Exec, Global, Expr, 
-                  Pass, Break_, Continue_, Debugger_],
-        'expr': [BoolOp, BinOp, UnaryOp, Lambda, IfExp,
-                 Dict, Set, ListComp, SetComp, DictComp,
-                 GeneratorExp, Yield, Compare, Call, Repr,
-                 Num, Str, Attribute, Subscript, Name, List, Tuple],
-        'expr_context': [Load, Store, Del, AugLoad, AugStore, Param],
-        'slice': [Ellipsis, Slice, ExtSlice, Index],
-        'boolop': [And, Or],
-        'operator': [Add, Sub, Mult, Div, Mod, Pow, LShift,
-                     RShift, BitOr, BitXor, BitAnd, FloorDiv],
-        'unaryop': [Invert, Not, UAdd, USub],
-        'cmpop': [Eq, NotEq, Lt, LtE, Gt, GtE, Is, IsNot, In_, NotIn],
-        'comprehension': [],
-        'excepthandler': [ExceptHandler],
-        'arguments_': [],
-        'keyword': [],
-        'alias': []
-    };
-    
-    for (var base in INHERITANCE_MAP) {
+    for (var base in Sk.INHERITANCE_MAP) {
         var baseClass = function($gbl, $loc) { return this;};
         mod[base] = Sk.misceval.buildClass(mod, baseClass, base, [mod.AST]);
-        for (var i=0; i < INHERITANCE_MAP[base].length; i++) {
-            var nodeType = INHERITANCE_MAP[base][i];
+        for (var i=0; i < Sk.INHERITANCE_MAP[base].length; i++) {
+            var nodeType = Sk.INHERITANCE_MAP[base][i];
             var nodeName = functionName(nodeType);
             var nodeClass = function($gbl, $loc) { return this;};
             mod[nodeName] = Sk.misceval.buildClass(mod, nodeClass, nodeName, [mod[base]])
