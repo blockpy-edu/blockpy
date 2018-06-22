@@ -1065,6 +1065,8 @@ class Tifa(ast.NodeVisitor):
         self.load_variable(name)
         if isinstance(left, UnknownType) or isinstance(right, UnknownType):
             return UnknownType()
+        elif isinstance(left, RecursedType) or isinstance(right, RecursedType):
+            return RecursedType()
         elif type(node.op) in VALID_BINOP_TYPES:
             op_lookup = VALID_BINOP_TYPES[type(node.op)]
             if type(left) in op_lookup:
@@ -1095,6 +1097,8 @@ class Tifa(ast.NodeVisitor):
         # Handle operation
         if isinstance(left, UnknownType) or isinstance(right, UnknownType):
             return UnknownType()
+        elif isinstance(left, RecursedType) or isinstance(right, RecursedType):
+            return RecursedType()
         elif type(node.op) in VALID_BINOP_TYPES:
             op_lookup = VALID_BINOP_TYPES[type(node.op)]
             if type(left) in op_lookup:
@@ -1163,7 +1167,11 @@ class Tifa(ast.NodeVisitor):
         comparators = [self.visit(compare) for compare in node.comparators]
         
         # Handle ops
+        if isinstance(left, RecursedType):
+            return BoolType()
         for op, right in zip(node.ops, comparators):
+            if isinstance(right, RecursedType):
+                continue
             if isinstance(op, (ast.Eq, ast.NotEq, ast.Is, ast.IsNot)):
                 continue
             elif isinstance(op, (ast.Lt, ast.LtE, ast.GtE, ast.Gt)):

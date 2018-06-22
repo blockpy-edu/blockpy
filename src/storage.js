@@ -44,6 +44,15 @@ LocalStorageWrapper.prototype.get = function(key) {
 };
 
 /**
+ * A method for retrieving the time associated with the given key.
+ *
+ * @param {String} key - The name of the key to retrieve the time for.
+ */
+LocalStorageWrapper.prototype.getTime = function(key) {
+    return parseInt(localStorage.getItem(this.namespace+"_"+key+"_timestamp"));
+};
+
+/**
  * A method for retrieving the value associated with the given key.
  * If the key does not exist, then the default value is used instead.
  * This default will be set.
@@ -81,3 +90,4 @@ LocalStorageWrapper.prototype.is_new = function(key, server_time) {
     var stored_time = localStorage.getItem(this.namespace+"_"+key+"_timestamp");
     return (server_time >= stored_time+5000);
 };
+
