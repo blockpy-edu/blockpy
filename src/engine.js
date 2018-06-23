@@ -285,6 +285,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 engine.main.components.toolbar.notifyFeedbackUpdate();
             }
             var result = feedback.presentFeedback();
+            // hide_correctness is now superceded by model.assignment.secret
             var hide_correctness = !!Sk.executionReports.instructor.hide_correctness;
             var completed = !!Sk.executionReports.instructor.complete;
             var success_level = 0;
@@ -295,10 +296,12 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 }
             }
             success_level = Math.max(0.0, Math.min(1.0, success_level));
+            var old_status = model.settings.completion_status();
+            model.settings.completion_status(Math.max(old_status, success_level));
             if (result == 'success' || (result == 'no errors' && completed)) {
-                engine.main.components.server.markSuccess(1.0, model.settings.completedCallback, hide_correctness);
+                engine.main.components.server.markSuccess(1.0);
             } else {
-                engine.main.components.server.markSuccess(success_level, model.settings.completedCallback, hide_correctness);
+                engine.main.components.server.markSuccess(success_level);
             }
             model.execution.status("complete");
             if (afterwards !== undefined) {
