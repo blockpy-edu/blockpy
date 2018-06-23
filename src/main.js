@@ -204,7 +204,9 @@ BlockPy.prototype.initModel = function(settings) {
             // boolean
             'server_connected': ko.observable(true),
             // boolean
-            'presentation_mode': ko.observable(settings.presentation_mode)
+            'presentation_mode': ko.observable(settings.presentation_mode),
+            // Completion status (0 incomplete, 1 complete, (0,1) is partial
+            'completion_status': ko.observable(0),
         },
         // Assignment level settings
         'assignment': {
@@ -274,7 +276,7 @@ BlockPy.prototype.initModel = function(settings) {
             'server_error': ko.observable(''),
             // Dataset loading
             // List of promises
-            'dataset_loading': ko.observableArray()
+            'dataset_loading': ko.observableArray(),
         },
         // Constant globals for this page, cannot be changed
         'constants': {
@@ -494,6 +496,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     if (assignment.files) {
         this.model.assignment['files'](assignment.files);
     }
+    this.model.settings['completion_status'](settings.status);
     this.model.assignment['assignment_id'](assignment.assignment_id);
     this.model.assignment['group_id'] = assignment.group_id;
     this.model.assignment['student_id'] = assignment.student_id;

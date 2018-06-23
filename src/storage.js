@@ -47,6 +47,7 @@ LocalStorageWrapper.prototype.get = function(key) {
  * A method for retrieving the time associated with the given key.
  *
  * @param {String} key - The name of the key to retrieve the time for.
+ * @returns {Integer} - The timestamp (local epoch) when the key was last set.
  */
 LocalStorageWrapper.prototype.getTime = function(key) {
     return parseInt(localStorage.getItem(this.namespace+"_"+key+"_timestamp"));
