@@ -342,7 +342,7 @@ BlockPy.prototype.initModelMethods = function() {
             case 'Saved': return ['label-success', 'Saved'];
             case 'Ungraded': return ['label-warning', 'Ungraded']
             case 'Disconnected': return ['label-danger', 'Disconnected'];
-            case 'Error': return ['label-danger', 'Error'];
+            case 'Error': return ['label-danger', 'Errors'];
         }
     }, this.model);
     // Helper function to map Execution status messages to UI elements

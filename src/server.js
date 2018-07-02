@@ -42,6 +42,18 @@ function BlockPyServer(main) {
     this.checkCaches();
 }
 
+BlockPyServer.prototype.checkIP = function(newIP) {
+    if (this.storage.has("IP")) {
+        var oldIP = this.storage.get("IP");
+        if (oldIP != newIP) {
+            this.logEvent("editor", "changeIP", oldIP+"|"+newIP);
+            this.storage.set("IP", newIP);
+        }
+    } else {
+        this.storage.set("IP", newIP);
+    }
+}
+
 BlockPyServer.prototype.checkCaches = function() {
     if (this.storage.has('ASSIGNMENTS_CACHE')) {
         var data = JSON.parse(this.storage.get('ASSIGNMENTS_CACHE'));
@@ -132,6 +144,7 @@ BlockPyServer.prototype.setStatus = function(status, server_error) {
 BlockPyServer.prototype.defaultResponse = function(response) {
     if (response.success) {
         this.setStatus('Saved');
+        this.checkIP(response.ip);
     } else {
         console.error(response);
         this.setStatus('Error', response.message);
@@ -194,16 +207,15 @@ BlockPyServer.prototype._postRetry = function(data, url, cache, delay, callback)
             server._dequeueData(cache, data);
             if (response.success) {
                 server.setStatus('Saved');
+                server.checkIP(response.ip);
             } else {
                 console.error(response);
                 server.setStatus('Error', response.message);
             }
-            console.log("Well, that's over.", callback, response);
             callback(response);
         })
         // If server request is the latest one, then let's try it again in a bit
         .fail(function(error, textStatus) {
-            console.log("I'm going to try this again!");
             server.defaultFailure(error, textStatus);
             server._postRetry(data, url, cache, delay+server.FAIL_DELAY, callback);
         });
@@ -416,6 +428,9 @@ BlockPyServer.prototype._postBlocking = function(url, data, attempts, success, f
     .done(function(response) {
         server.hideOverlay();
         server.setStatus('Loaded');
+        if (response.success) {
+            server.checkIP(response.ip);
+        }
         success(response);
     })
     .fail(function(e, textStatus, errorThrown) {
