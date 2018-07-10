@@ -207,12 +207,14 @@ BlockPyServer.prototype._postRetry = function(data, url, cache, delay, callback)
             server._dequeueData(cache, data);
             if (response.success) {
                 server.setStatus('Saved');
-                server.checkIP(response.ip);
             } else {
                 console.error(response);
                 server.setStatus('Error', response.message);
             }
             callback(response);
+            if (response.success) {
+                server.checkIP(response.ip);
+            }
         })
         // If server request is the latest one, then let's try it again in a bit
         .fail(function(error, textStatus) {
@@ -428,10 +430,10 @@ BlockPyServer.prototype._postBlocking = function(url, data, attempts, success, f
     .done(function(response) {
         server.hideOverlay();
         server.setStatus('Loaded');
+        success(response);
         if (response.success) {
             server.checkIP(response.ip);
         }
-        success(response);
     })
     .fail(function(e, textStatus, errorThrown) {
         if (attempts <= 0) {
