@@ -21,7 +21,9 @@ function BlockPyEngine(main) {
     this.openedFiles = {};
 }
 
-BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+//BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+BlockPyEngine.prototype.PREVENT_INSTRUCTOR_MODULE = 'raise NotImplementedError("instructor module not available to students.")';
+BlockPyEngine.prototype.ORIGINAL_INSTRUCTOR_MODULE = Sk.builtinFiles.files['src/lib/instructor/__init__.py'];
 
 /**
  * Initializes the Python Execution engine and the Printer (console).
@@ -70,10 +72,11 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
     // Unlink the instructor module to prevent abuse
-    delete Sk.builtinFiles['files']['src/lib/instructor.js'];
-    for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
+    Sk.builtinFiles.files['src/lib/instructor/__init__.py'] = this.PREVENT_INSTRUCTOR_MODULE;
+    //delete Sk.builtinFiles['files']['src/lib/instructor.js'];
+    /*for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
         delete Sk.builtinFiles['files']['src/lib/'+module_name];
-    }
+    }*/
     // Unmute everything
     Sk.console.skipDrawing = !!settings.preventD3;
     this.main.model.settings.mute_printer(false);
@@ -86,10 +89,11 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = null;
     // Create the instructor module
-    Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
+    /*Sk.builtinFiles['files']['src/lib/instructor.js'] = this.INSTRUCTOR_MODULE_CODE;
     for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
         Sk.builtinFiles['files']['src/lib/'+module_name] = $INSTRUCTOR_MODULES_EXTENDED[module_name];
-    }
+    }*/
+    Sk.builtinFiles.files['src/lib/instructor/__init__.py'] = this.ORIGINAL_INSTRUCTOR_MODULE;
     // Mute everything
     Sk.console.skipDrawing = true;
     this.main.model.settings.mute_printer(true);
@@ -206,7 +210,7 @@ BlockPyEngine.prototype.loadAllFiles = function() {
 }
 
 /**
- * Resets the state of the execution engine, including reinitailizing
+ * Resets the state of the execution engine, including reinititializing
  * the execution buffer (trace, step, etc.), reseting the printer, and
  * hiding the trace button.
  *
@@ -278,7 +282,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
     engine.resetReports();
     engine.verifyCode();
     engine.updateParse();
-    engine.analyzeParse();
+    //engine.analyzeParse();
     engine.runStudentCode(function() {
         engine.runInstructorCode('give_feedback', function() {
             if (!feedback.isFeedbackVisible()) {
@@ -505,7 +509,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     var instructorCode = this.main.model.programs[filename]();
     var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
-        'from instructor import *\n'+
+        'from instructor.plugins.blockpy_compatibility import *\n'+
         'def run_student():\n'+
         '    limit_execution_time()\n'+
         '    try:\n'+
