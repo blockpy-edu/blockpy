@@ -29,9 +29,17 @@ BlockPyToolbar.prototype.notifyFeedbackUpdate = function() {
  */
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
-    this.tag.find('.blockpy-run').click(function() {
+    this.tag.find('.blockpy-run').click(function(e) {
         main.components.server.logEvent('editor', 'run')
-        main.components.engine.on_run();
+        var backup = this;
+        $(this).html("Running").removeClass("btn-success").addClass("btn-warning");
+        console.log(backup);
+        setTimeout(function() {
+            main.components.engine.on_run();
+            $(backup).html('<span class="glyphicon glyphicon-play"></span> Run')
+                    .removeClass("btn-warning")
+                    .addClass("btn-success");
+        }, 0);
     });
     this.tags.mode_set_text.click(function() {
         main.components.server.logEvent('editor', 'text')

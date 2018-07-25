@@ -23,6 +23,12 @@ function BlockPyFeedback(main, tag) {
     this.original.hide();
 };
 
+BlockPyFeedback.prototype.scrollIntoView = function() {
+    $('html, body').animate({
+        scrollTop: this.tag.offset().top
+    }, 1000);
+}
+
 BlockPyFeedback.prototype.isFeedbackVisible = function () {
     var top_of_element = this.tag.offset().top;
     var bottom_of_element = this.tag.offset().top + this.tag.outerHeight();
@@ -248,6 +254,7 @@ BlockPyFeedback.prototype.prettyPrintError = function(error) {
         return error;
     } else {
         // A weird skulpt thing?
+        console.error(error);
         if (error.tp$str !== undefined) {
             return error.tp$str().v;
         } else {
@@ -455,6 +462,9 @@ BlockPyFeedback.prototype.TYPE_DESCRIPTION = {
 
 BlockPyFeedback.prototype.presentAnalyzerFeedback = function() {
     var report = this.main.model.execution.reports['analyzer'].issues;
+    if (report === undefined) {
+        return false;
+    }
     var suppress = this.main.model.execution.suppressions['analyzer'] || {};
     if (suppress === true) {
         // Suppress all types of analyzer errors
