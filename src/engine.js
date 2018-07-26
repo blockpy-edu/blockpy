@@ -16,7 +16,7 @@ function BlockPyEngine(main) {
     
     // Keeps track of the tracing while the program is executing
     this.executionBuffer = {};
-    this.abstractInterpreter = new Tifa();
+    //this.abstractInterpreter = new Tifa();
     
     this.openedFiles = {};
 }
@@ -71,12 +71,6 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     Sk.console = this.main.components.printer.getConfiguration();
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = this.step.bind(this);
-    // Unlink the instructor module to prevent abuse
-    Sk.builtinFiles.files['src/lib/instructor/__init__.py'] = this.PREVENT_INSTRUCTOR_MODULE;
-    delete Sk.builtinFiles['files']['src/lib/instructor_deprecated.js'];
-    for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
-        delete Sk.builtinFiles['files']['src/lib/'+module_name];
-    }
     // Unmute everything
     Sk.console.skipDrawing = !!settings.preventD3;
     this.main.model.settings.mute_printer(false);
@@ -88,12 +82,6 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     Sk.execLimit = undefined;
     // Stepper! Executed after every statement.
     Sk.afterSingleExecution = null;
-    // Create the instructor module
-    Sk.builtinFiles['files']['src/lib/instructor_deprecated.js'] = this.INSTRUCTOR_MODULE_CODE;
-    for (var module_name in $INSTRUCTOR_MODULES_EXTENDED) {
-        Sk.builtinFiles['files']['src/lib/'+module_name] = $INSTRUCTOR_MODULES_EXTENDED[module_name];
-    }
-    Sk.builtinFiles.files['src/lib/instructor/__init__.py'] = this.ORIGINAL_INSTRUCTOR_MODULE;
     // Mute everything
     Sk.console.skipDrawing = true;
     this.main.model.settings.mute_printer(true);
@@ -279,9 +267,9 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
     var feedback = engine.main.components.feedback;
     var model = this.main.model;
     var printer = this.main.components.printer;
-    engine.resetReports();
-    engine.verifyCode();
-    engine.updateParse();
+    //engine.resetReports();
+    //engine.verifyCode();
+    //engine.updateParse();
     //engine.analyzeParse();
     engine.runStudentCode(function() {
         engine.runInstructorCode('give_feedback', function() {
@@ -358,18 +346,18 @@ BlockPyEngine.prototype.on_change = function() {
  */
 BlockPyEngine.prototype.resetReports = function() {
     var report = this.main.model.execution.reports;
-    report['verifier'] = {};
-    report['parser'] = {};
-    report['analyzer'] = {'success': true};
+    //report['verifier'] = {};
+    //report['parser'] = {};
+    //report['analyzer'] = {'success': true};
     report['student'] = {};
     report['instructor'] = {};
     var suppress = this.main.model.execution.suppressions;
-    suppress['verifier'] = false;
+    /*suppress['verifier'] = false;
     suppress['parser'] = false;
     suppress['analyzer'] = false;
     suppress['student'] = false;
     suppress['instructor'] = false;
-    suppress['no errors'] = false;
+    suppress['no errors'] = false;*/
 }
 
 BlockPyEngine.prototype.verifyCode = function() {
@@ -504,27 +492,31 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
-    if (!report['parser'].success || !report['verifier'].success) {
+    studentCode = JSON.stringify(studentCode);
+    /*if (!report['parser'].success || !report['verifier'].success) {
         studentCode = 'pass';
-    }
+    }*/
     var instructorCode = this.main.model.programs[filename]();
     var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
         //'from instructor.plugins.blockpy_compatibility import *\n'+
-        'from instructor_deprecated import *\n'+
-        'import instructor.tifa.tifa as tifa\n'+
+        //'from instructor_deprecated import *\n'+
+        'from pedal.source import set_source\n'+
+        'set_source('+studentCode+')\n'+
         'def run_student():\n'+
         '    limit_execution_time()\n'+
         '    try:\n'+
-        indent(indent(studentCode))+'\n'+
+        '        execf('+studentCode+')\n'+
         '    except Exception as error:\n'+
         '        unlimit_execution_time()\n'+
         '        return error\n'+
         '    unlimit_execution_time()\n'+
         '    return None\n'+
-        'tifa = tifa.Tifa()\n'+
-        'analyzer = tifa.process_code(get_program())\n'+
-        instructorCode
+        'from pedal.tifa import tifa_analysis\n'+
+        'tifa_analysis()\n'+
+        instructorCode+'\n'+
+        'from pedal.resolver import simple\n'+
+        'SUCCESS, MESSAGE = simple.select()'
     );
     console.log(instructorCode);
     lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
@@ -709,9 +701,10 @@ BlockPyEngine.prototype.executionEnd_ = function() {
     }
 };
 
+Tifa = {};
 if (typeof exports !== 'undefined') {
     exports.BlockPyEngine = BlockPyEngine;
-    exports.AbstractInterpreter = Tifa;
+    //exports.AbstractInterpreter = Tifa;
     exports.NodeVisitor = NodeVisitor;
     exports.StretchyTreeMatcher = StretchyTreeMatcher;
     exports.isSkBuiltin = isSkBuiltin;
