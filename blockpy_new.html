@@ -138,7 +138,9 @@
             {
                 'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
                 'name': "#1.3",
-                'give_feedback': 'explain("Hey, Listen!")',
+                'give_feedback': "",
+                //'give_feedback': 'run_student()\nexplain("Hey, Listen!")',
+                //'give_feedback': 'import utility\nfrom pedal.cait.cait_api import parse_program, find_match, data_type\nparse_program()\nmatch = find_match("fun = __expr__")\nutility.log(data_type("fun"))\nutility.log(match)\ngently("Hello")',
                 //'give_feedback': 'from instructor_functions import *\nsuppress("analyzer", "Incompatible types")\nmatch_signature("curve_grade", 1, "old")\n#unit_test("curve_grade", (64, True), (0, 0), (100, 100))\noutput_test("curve_grade", (1, "1"), (2, "2"))',
                 //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
                 //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
@@ -165,7 +167,8 @@
             },
             // programs
             {
-                '__main__': 'ss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
+                '__main__': 'import json\njson.loads("0") + "1"',
+                //'__main__': 'import random\nprint(random.random())\nss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
                 //'__main__': 'print("Hello world"[1:5])',
                 //'__main__':  decodeURIComponent(getQueryParams()["code"]) || 'a = 0\nprint(a)',
                 //'__main__': 'num = input("")\nnum_list = [int(n) for n in num.split("*")]\nfor n in num_list:\n    n*n\n    return 4\nprint(n)',

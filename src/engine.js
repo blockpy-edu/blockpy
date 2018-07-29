@@ -21,9 +21,8 @@ function BlockPyEngine(main) {
     this.openedFiles = {};
 }
 
-BlockPyEngine.prototype.INSTRUCTOR_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
-BlockPyEngine.prototype.PREVENT_INSTRUCTOR_MODULE = 'raise NotImplementedError("instructor module not available to students.")';
-BlockPyEngine.prototype.ORIGINAL_INSTRUCTOR_MODULE = Sk.builtinFiles.files['src/lib/instructor/__init__.py'];
+BlockPyEngine.prototype.UTILITY_MODULE_CODE = 'var $builtinmodule = '+$sk_mod_instructor.toString();
+BlockPyEngine.prototype.PREVENT_UTILITY_MODULE = 'raise NotImplementedError("utility module not available to students.")';
 
 /**
  * Initializes the Python Execution engine and the Printer (console).
@@ -76,6 +75,8 @@ BlockPyEngine.prototype.setStudentEnvironment = function() {
     this.main.model.settings.mute_printer(false);
     // Create an input box
     Sk.inputfun = this.inputFunction.bind(this);
+    // Disable utility module
+    Sk.builtinFiles.files['src/lib/utility/__init__.js'] = this.PREVENT_UTILITY_MODULE;
 }
 BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Instructors have no limits
@@ -88,6 +89,8 @@ BlockPyEngine.prototype.setInstructorEnvironment = function() {
     // Disable input box
     Sk.queuedInput = [];
     Sk.inputfun = this.inputMockFunction.bind(this);
+    // Enable utility mode
+    Sk.builtinFiles.files['src/lib/utility/__init__.js'] = this.UTILITY_MODULE_CODE;
 }
 
 /**
@@ -257,6 +260,16 @@ BlockPyEngine.prototype.lastStep = function() {
     execution.line_number(this.executionBuffer.line_number)
 }
 
+BlockPyEngine.prototype.lookForLines = function(feedbackData) {
+    var line = null;
+    for (var i = 0; i < feedbackData.length; i+= 1) {
+        if ('line' in feedbackData[i]) {
+            line = feedbackData[i].line;
+        }
+    }
+    return line;
+}
+
 /**
  * Activated whenever the Run button is clicked
  */
@@ -267,16 +280,30 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
     var feedback = engine.main.components.feedback;
     var model = this.main.model;
     var printer = this.main.components.printer;
-    //engine.resetReports();
-    //engine.verifyCode();
-    //engine.updateParse();
+    engine.resetReports();
+    engine.verifyCode();
+    engine.updateParse();
     //engine.analyzeParse();
     engine.runStudentCode(function() {
-        engine.runInstructorCode('give_feedback', function() {
-            if (!feedback.isFeedbackVisible()) {
-                engine.main.components.toolbar.notifyFeedbackUpdate();
-                feedback.scrollIntoView();
+        engine.runInstructorCode('give_feedback', function(module) {
+            if (Sk.executionReports['instructor']['success']) {
+                // SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE
+                var success = Sk.ffi.remapToJs(module.$d.SUCCESS);
+                var message = Sk.ffi.remapToJs(module.$d.MESSAGE);
+                var category = Sk.ffi.remapToJs(module.$d.CATEGORY);
+                console.log(module.$d);
+                var data = Sk.ffi.remapToJs(module.$d.DATA);
+                var hide = Sk.ffi.remapToJs(module.$d.HIDE);
+                var line = engine.lookForLines(data);
+                feedback.instructorFeedback(category, message, line);
+                if (!feedback.isFeedbackVisible()) {
+                    engine.main.components.toolbar.notifyFeedbackUpdate();
+                    feedback.scrollIntoView();
+                }
+            } else {
+                feedback.presentInstructorError();
             }
+            return;
             var result = feedback.presentFeedback();
             // hide_correctness is now superceded by model.assignment.secret
             var hide_correctness = !!Sk.executionReports.instructor.hide_correctness;
@@ -291,7 +318,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
             success_level = Math.max(0.0, Math.min(1.0, success_level));
             var old_status = model.settings.completion_status();
             model.settings.completion_status(Math.max(old_status, success_level));
-            if (result == 'success' || (result == 'no errors' && completed)) {
+            if (success || (result == 'no errors' && completed)) {
                 engine.main.components.server.markSuccess(1.0);
             } else {
                 engine.main.components.server.markSuccess(success_level);
@@ -346,15 +373,15 @@ BlockPyEngine.prototype.on_change = function() {
  */
 BlockPyEngine.prototype.resetReports = function() {
     var report = this.main.model.execution.reports;
-    //report['verifier'] = {};
-    //report['parser'] = {};
+    report['verifier'] = {};
+    report['parser'] = {};
     //report['analyzer'] = {'success': true};
     report['student'] = {};
     report['instructor'] = {};
     var suppress = this.main.model.execution.suppressions;
-    /*suppress['verifier'] = false;
+    suppress['verifier'] = false;
     suppress['parser'] = false;
-    suppress['analyzer'] = false;
+    /*suppress['analyzer'] = false;
     suppress['student'] = false;
     suppress['instructor'] = false;
     suppress['no errors'] = false;*/
@@ -492,33 +519,48 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
-    studentCode = JSON.stringify(studentCode);
-    /*if (!report['parser'].success || !report['verifier'].success) {
+    //studentCode = JSON.stringify(studentCode);
+    if (!report['parser'].success || !report['verifier'].success) {
         studentCode = 'pass';
-    }*/
+    }
+    Sk.builtinFiles.files['src/lib/pedal/sandbox/sandbox.py'] = 'class Sandbox: pass'
     var instructorCode = this.main.model.programs[filename]();
     var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
-        //'from instructor.plugins.blockpy_compatibility import *\n'+
-        //'from instructor_deprecated import *\n'+
+        //'from utility import *\n'+
+        //'timeit("initial")\n'+
+        'from pedal.report.imperative import *\n'+
+        //'timeit("imported imperative")\n'+
+        'from pedal.sandbox.compatibility import raise_exception\n'+
+        'from utility import *\n'+
+        'raise_exception(get_student_error(), report=MAIN_REPORT)\n'+
+        //'timeit("re-imported utility")\n'+
         'from pedal.source import set_source\n'+
-        'set_source('+studentCode+')\n'+
+        //'timeit("imported source")\n'+
+        'set_source('+JSON.stringify(studentCode)+', report=MAIN_REPORT)\n'+
+        //'timeit("set source")\n'+
         'def run_student():\n'+
-        '    limit_execution_time()\n'+
+        '    #limit_execution_time()\n'+
         '    try:\n'+
-        '        execf('+studentCode+')\n'+
+        indent(indent(studentCode))+'\n'+
+        //'        execf('+studentCode+')\n'+
         '    except Exception as error:\n'+
-        '        unlimit_execution_time()\n'+
+        '        #unlimit_execution_time()\n'+
         '        return error\n'+
-        '    unlimit_execution_time()\n'+
+        '    #unlimit_execution_time()\n'+
         '    return None\n'+
+        //'timeit("created run_student")\n'+
         'from pedal.tifa import tifa_analysis\n'+
-        'tifa_analysis()\n'+
+        //'timeit("imported tifa")\n'+
+        'tifa_analysis(report=MAIN_REPORT)\n'+
+        //'timeit("tifa analysis")\n'+
         instructorCode+'\n'+
-        'from pedal.resolver import simple\n'+
-        'SUCCESS, MESSAGE = simple.select()'
+        //'timeit("instructor code")\n'+
+        'from pedal.resolvers import simple\n'+
+        //'timeit("resolver")\n'+
+        'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve(MAIN_REPORT)'
     );
-    console.log(instructorCode);
+    //console.log(instructorCode);
     lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
     var engine = this;
     report['instructor'] = {
@@ -532,7 +574,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         // Success
         function (module) {
             report['instructor']['success'] = true;
-            after();
+            after(module);
         },
         // Failure
         function (error) {
@@ -545,7 +587,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
                 report['instructor']['error'] = error;
                 report['instructor']['line_offset'] = lineOffset;
             }
-            after();
+            after(error);
         }
     );
 }

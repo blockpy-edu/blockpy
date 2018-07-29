@@ -324,6 +324,27 @@ BlockPyFeedback.priorityComparator = function(a, b) {
     }
 };
 
+BlockPyFeedback.prototype.presentInstructorError = function() {
+    var instructor = this.main.model.execution.reports['instructor'];
+    var error = instructor.error;
+    if (!error.traceback) {
+        this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        console.error(error);
+        return 'instructor';
+    } else if (error.traceback[0].filename == "__main__.py") {
+        this.printError(error);
+        return 'student';
+    } else {
+        if (error.traceback[0].filename == instructor.filename) {
+            error.traceback[0].lineno -= instructor.line_offset;
+        }
+        //report['instructor']['line_offset']
+        this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+        console.error(error);
+        return 'instructor';
+    }
+};
+
 /**
  * Present any accumulated feedback
  */
@@ -360,23 +381,7 @@ BlockPyFeedback.prototype.presentFeedback = function() {
     }
     // Error in Instructor Feedback code
     if (!report['instructor'].success) {
-        var error = report['instructor'].error;
-        if (!error.traceback) {
-            this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-            console.error(error);
-            return 'instructor';
-        } else if (error.traceback[0].filename == "__main__.py") {
-            this.printError(report['instructor'].error);
-            return 'student';
-        } else {
-            if (error.traceback[0].filename == report['instructor'].filename) {
-                error.traceback[0].lineno -= report['instructor']['line_offset'];
-            }
-            //report['instructor']['line_offset']
-            this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
-            console.error(error);
-            return 'instructor';
-        }
+        this.presentInstructorError();
     }
     if (report['instructor'].compliments && report['instructor'].compliments.length) {
         //this.compliment(report['instructor'].compliments);
