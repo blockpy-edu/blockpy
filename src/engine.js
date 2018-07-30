@@ -288,49 +288,40 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
         engine.runInstructorCode('give_feedback', function(module) {
             if (Sk.executionReports['instructor']['success']) {
                 // SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE
+                console.log(module.$d);
                 var success = Sk.ffi.remapToJs(module.$d.SUCCESS);
+                var score = Sk.ffi.remapToJs(module.$d.SCORE);
                 var message = Sk.ffi.remapToJs(module.$d.MESSAGE);
                 var category = Sk.ffi.remapToJs(module.$d.CATEGORY);
-                console.log(module.$d);
+                var label = Sk.ffi.remapToJs(module.$d.LABEL);
                 var data = Sk.ffi.remapToJs(module.$d.DATA);
                 var hide = Sk.ffi.remapToJs(module.$d.HIDE);
                 var line = engine.lookForLines(data);
-                feedback.instructorFeedback(category, message, line);
+                feedback.presentFeedback(category, label, message, line);
                 if (!feedback.isFeedbackVisible()) {
                     engine.main.components.toolbar.notifyFeedbackUpdate();
                     feedback.scrollIntoView();
                 }
+                score = Math.max(0.0, Math.min(1.0, score));
+                var old_status = model.settings.completion_status();
+                model.settings.completion_status(Math.max(old_status, score));
+                if (success || (category == "Instructor" && 
+                                label == "no errors")) {
+                    engine.main.components.server.markSuccess(1.0);
+                } else {
+                    engine.main.components.server.markSuccess(score);
+                }
+                model.execution.status("complete");
+                if (afterwards !== undefined) {
+                    afterwards(result);
+                }
+                if (!Sk.executionReports.instructor.scrolling) {
+                    try {
+                        printer.scrollToBottom();
+                    } catch (e) {}
+                }
             } else {
                 feedback.presentInstructorError();
-            }
-            return;
-            var result = feedback.presentFeedback();
-            // hide_correctness is now superceded by model.assignment.secret
-            var hide_correctness = !!Sk.executionReports.instructor.hide_correctness;
-            var completed = !!Sk.executionReports.instructor.complete;
-            var success_level = 0;
-            var partials = Sk.executionReports.instructor.partials;
-            if (partials) {
-                for (var i = 0, len = partials.length; i < len; i = i+1) {
-                    success_level = success_level + partials[i].value;
-                }
-            }
-            success_level = Math.max(0.0, Math.min(1.0, success_level));
-            var old_status = model.settings.completion_status();
-            model.settings.completion_status(Math.max(old_status, success_level));
-            if (success || (result == 'no errors' && completed)) {
-                engine.main.components.server.markSuccess(1.0);
-            } else {
-                engine.main.components.server.markSuccess(success_level);
-            }
-            model.execution.status("complete");
-            if (afterwards !== undefined) {
-                afterwards(result);
-            }
-            if (!model.execution.suppressions.student.scrolling) {
-                try {
-                    printer.scrollToBottom();
-                } catch (e) {}
             }
         });
     });
@@ -519,46 +510,38 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
     this.setInstructorEnvironment();
     // Actually run the python code
     var studentCode = this.main.model.programs['__main__']();
+    var studentCodeSafe = studentCode;
     //studentCode = JSON.stringify(studentCode);
     if (!report['parser'].success || !report['verifier'].success) {
-        studentCode = 'pass';
+        studentCodeSafe = 'pass';
     }
     Sk.builtinFiles.files['src/lib/pedal/sandbox/sandbox.py'] = 'class Sandbox: pass'
     var instructorCode = this.main.model.programs[filename]();
     var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
-        //'from utility import *\n'+
         //'timeit("initial")\n'+
-        'from pedal.report.imperative import *\n'+
-        //'timeit("imported imperative")\n'+
-        'from pedal.sandbox.compatibility import raise_exception\n'+
-        'from utility import *\n'+
-        'raise_exception(get_student_error(), report=MAIN_REPORT)\n'+
-        //'timeit("re-imported utility")\n'+
+        'from pedal.report import *\n'+
         'from pedal.source import set_source\n'+
-        //'timeit("imported source")\n'+
-        'set_source('+JSON.stringify(studentCode)+', report=MAIN_REPORT)\n'+
-        //'timeit("set source")\n'+
+        'set_source('+JSON.stringify(studentCode)+')\n'+
         'def run_student():\n'+
         '    #limit_execution_time()\n'+
         '    try:\n'+
-        indent(indent(studentCode))+'\n'+
+        indent(indent(studentCodeSafe))+'\n'+
         //'        execf('+studentCode+')\n'+
         '    except Exception as error:\n'+
         '        #unlimit_execution_time()\n'+
         '        return error\n'+
         '    #unlimit_execution_time()\n'+
         '    return None\n'+
-        //'timeit("created run_student")\n'+
         'from pedal.tifa import tifa_analysis\n'+
-        //'timeit("imported tifa")\n'+
-        'tifa_analysis(report=MAIN_REPORT)\n'+
-        //'timeit("tifa analysis")\n'+
+        'tifa_analysis()\n'+
+        'from pedal.sandbox.compatibility import raise_exception\n'+
+        'from utility import *\n'+
+        'raise_exception(get_student_error())\n'+
         instructorCode+'\n'+
-        //'timeit("instructor code")\n'+
         'from pedal.resolvers import simple\n'+
         //'timeit("resolver")\n'+
-        'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve(MAIN_REPORT)'
+        'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()'
     );
     //console.log(instructorCode);
     lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;

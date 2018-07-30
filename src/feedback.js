@@ -298,32 +298,6 @@ BlockPyFeedback.prototype.printError = function(error) {
     this.main.components.server.logEvent('feedback', "Runtime", original);
 }
 
-/**
- * Static method to convert a priority level into a number.
- */
-BlockPyFeedback.priorityNumConvert = function(priority){
-    switch(priority){
-        case 'low': return 1;
-        case 'high': return 3;
-        default: case 'medium': return 2;
-    }
-};
-
-/**
- * Static method to compare two priority labels.
- */
-BlockPyFeedback.priorityComparator = function(a, b) {
-    var priorityA = BlockPyFeedback.priorityNumConvert(a.priority);
-    var priorityB = BlockPyFeedback.priorityNumConvert(b.priority);
-    if (priorityA > priorityB) {
-        return -1;
-    } else if (priorityB > priorityA) {
-        return 1;
-    } else {
-        return 0;
-    }
-};
-
 BlockPyFeedback.prototype.presentInstructorError = function() {
     var instructor = this.main.model.execution.reports['instructor'];
     var error = instructor.error;
@@ -348,8 +322,22 @@ BlockPyFeedback.prototype.presentInstructorError = function() {
 /**
  * Present any accumulated feedback
  */
-BlockPyFeedback.prototype.presentFeedback = function() {
+BlockPyFeedback.prototype.presentFeedback = function(category, label, message, line) {
     this.clear(false);
+    
+    if (category.toLowerCase() == "instructor" && 
+        label.toLowerCase() == "explain") {
+        this.title.html("Instructor Feedback");
+    } else {
+        this.title.html(label);
+    }
+    this.body.html(message);
+    this.main.model.status.error(category);
+    this.main.components.server.logEvent('feedback', category+"|"+label, message);
+    console.error(message);
+    
+    return;
+    
     var report = this.main.model.execution.reports;
     var suppress = this.main.model.execution.suppressions;
     

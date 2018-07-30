@@ -317,14 +317,14 @@ BlockPy.prototype.initModelMethods = function() {
     
     // Helper function to map error statuses to UI elements
     this.model.status_feedback_class = ko.computed(function() {
-        switch (this.status.error()) {
+        switch (this.status.error().toLowerCase()) {
             default: case 'none': return ['label-none', ''];
             case 'runtime': return ['label-runtime-error', 'Runtime Error'];
             case 'syntax': return ['label-syntax-error', 'Syntax Error'];
             case 'editor': return ['label-syntax-error', 'Editor Error'];
             case 'internal': return ['label-internal-error', 'Internal Error'];
-            case 'semantic': return ['label-semantic-error', 'Algorithm Error'];
-            case 'feedback': return ['label-feedback-error', 'Incorrect Answer'];
+            case 'semantic': case 'analyzer': return ['label-semantic-error', 'Algorithm Error'];
+            case 'feedback': case "instructor": return ['label-feedback-error', 'Incorrect Answer'];
             case 'complete': return ['label-problem-complete', 'Complete'];
             case 'no errors': return ['label-no-errors', 'No errors'];
         }
@@ -496,7 +496,7 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     if (assignment.files) {
         this.model.assignment['files'](assignment.files);
     }
-    this.model.settings['completion_status'](settings.status);
+    this.model.settings['completion_status'](settings.status || 0);
     this.model.assignment['assignment_id'](assignment.assignment_id);
     this.model.assignment['group_id'] = assignment.group_id;
     this.model.assignment['student_id'] = assignment.student_id;
