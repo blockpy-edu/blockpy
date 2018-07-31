@@ -207,3 +207,9 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     cursor: pointer;
     display: block;
 }
+
+.green-check-mark {
+    font-weight: bold;
+    color: green;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}

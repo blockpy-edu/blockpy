@@ -534,11 +534,15 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         'from pedal.tifa import tifa_analysis\n'+
         'tifa_analysis()\n'+
-        'from pedal.sandbox.compatibility import raise_exception, set_sandbox\n'+
+        'from pedal.sandbox import compatibility\n'+
         'from utility import *\n'+
         'student = get_student_data()\n'+
-        'set_sandbox(student)\n'+
-        'raise_exception(get_student_error())\n'+
+        'compatibility.set_sandbox(student)\n'+
+        'compatibility.raise_exception(get_student_error())\n'+
+        'compatibility.run_student = run_student\n'+
+        'compatibility.get_output = get_output\n'+
+        'compatibility.reset_output = reset_output\n'+
+        'compatibility.capture_output = capture_output\n'+
         instructorCode+'\n'+
         'from pedal.resolvers import simple\n'+
         'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()'

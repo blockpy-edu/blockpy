@@ -168,9 +168,10 @@
             },
             // programs
             {
+                '__main__': $("#testing-student-code").text(),
                 //'__main__': 'import json\njson.loads("0") + "1"',
                 //'__main__': 'import random\nprint(random.random())\nss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
-                '__main__': 'print("Hello world"[1:5])',
+                //'__main__': 'print("Hello world"[1:5])',
                 //'__main__':  decodeURIComponent(getQueryParams()["code"]) || 'a = 0\nprint(a)',
                 //'__main__': 'num = input("")\nnum_list = [int(n) for n in num.split("*")]\nfor n in num_list:\n    n*n\n    return 4\nprint(n)',
                 //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
@@ -229,11 +230,25 @@ function getQueryParams(){
 }
 </script>
 
-<div style='display:none' id='testing-give-feedback'>
-from pedal.cait.cait_api import parse_program
+<div style='display:none' id='testing-student-code'>
+def a():
+    pass
+a()
+</div>
 
-ast = parse_program()
-defs = ast.find_all('FunctionDef')
+<div style='display:none' id='testing-give-feedback'>
+#log(student.data)
+#log(compatibility.MAIN_REPORT['sandbox']['run'].data)
+#from pedal.sandbox import compatibility
+#log(compatibility.get_student_data().data)
+from pedal.toolkit.functions import match_signature, unit_test
+match_signature('a', 0)
+#log(get_student_data().data)
+
+#from pedal.cait.cait_api import parse_program
+#ast = parse_program()
+#defs = ast.find_all('FunctionDef')
+
 </div>
 
   
