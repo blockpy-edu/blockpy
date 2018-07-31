@@ -527,7 +527,6 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    #limit_execution_time()\n'+
         '    try:\n'+
         indent(indent(studentCodeSafe))+'\n'+
-        //'        execf('+studentCode+')\n'+
         '    except Exception as error:\n'+
         '        #unlimit_execution_time()\n'+
         '        return error\n'+
@@ -535,12 +534,13 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    return None\n'+
         'from pedal.tifa import tifa_analysis\n'+
         'tifa_analysis()\n'+
-        'from pedal.sandbox.compatibility import raise_exception\n'+
+        'from pedal.sandbox.compatibility import raise_exception, set_sandbox\n'+
         'from utility import *\n'+
+        'student = get_student_data()\n'+
+        'set_sandbox(student)\n'+
         'raise_exception(get_student_error())\n'+
         instructorCode+'\n'+
         'from pedal.resolvers import simple\n'+
-        //'timeit("resolver")\n'+
         'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()'
     );
     //console.log(instructorCode);

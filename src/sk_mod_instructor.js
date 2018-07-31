@@ -196,5 +196,10 @@ var $sk_mod_instructor = function(name) {
     });
     mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);
     
+    mod.get_student_data = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_student_data", arguments, 0, 0);
+        return mod.student;
+    });
+    
     return mod;
 }

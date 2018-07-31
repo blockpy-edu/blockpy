@@ -32,13 +32,17 @@ BlockPyToolbar.prototype.activateToolbar = function() {
     this.tag.find('.blockpy-run').click(function(e) {
         main.components.server.logEvent('editor', 'run')
         var backup = this;
-        $(this).html("Running").removeClass("btn-success").addClass("btn-warning");
+        main.components.feedback.clear();
+        $(this).removeClass("btn-success").addClass("btn-warning")
+            //.html("Running")
+            ;
         setTimeout(function() {
             main.components.engine.on_run();
-            $(backup).html('<span class="glyphicon glyphicon-play"></span> Run')
+            $(backup)
+                //.html('<span class="glyphicon glyphicon-play"></span> Run')
                     .removeClass("btn-warning")
                     .addClass("btn-success");
-        }, 0);
+        }, 20);
     });
     this.tags.mode_set_text.click(function() {
         main.components.server.logEvent('editor', 'text')
