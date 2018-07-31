@@ -75,18 +75,6 @@ var $sk_mod_instructor = function(name) {
         }
     });
     
-    mod.capture_output = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("queue_input", arguments, 1, Infinity);
-        if (!Sk.executionReports['student'].success) {
-            return Sk.ffi.remapToPy([]);
-        }
-        Sk.executionReports['student']['output'].removeAll();
-        var func = arguments[0];
-        Sk.misceval.callsim(func);
-        var args = arguments.slice(1);
-        return mixedRemapToPy(Sk.executionReports['student']['output']());
-    }
-    
     /**
      * This function is called by instructors to get the students' code as a string.
     **/

@@ -231,23 +231,14 @@ function getQueryParams(){
 </script>
 
 <div style='display:none' id='testing-student-code'>
-def a():
-    pass
-a()
+def a(x):
+    print(x+1)
+a(1)
 </div>
 
 <div style='display:none' id='testing-give-feedback'>
-#log(student.data)
-#log(compatibility.MAIN_REPORT['sandbox']['run'].data)
-#from pedal.sandbox import compatibility
-#log(compatibility.get_student_data().data)
-from pedal.toolkit.functions import match_signature, unit_test
-match_signature('a', 0)
-#log(get_student_data().data)
-
-#from pedal.cait.cait_api import parse_program
-#ast = parse_program()
-#defs = ast.find_all('FunctionDef')
+from pedal.toolkit.functions import output_test
+output_test('a', (0, "0"))
 
 </div>
 

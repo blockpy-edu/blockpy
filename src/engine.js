@@ -533,7 +533,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '    #unlimit_execution_time()\n'+
         '    return None\n'+
         'from pedal.tifa import tifa_analysis\n'+
-        'tifa_analysis()\n'+
+        'tifa_analysis(False)\n'+
         'from pedal.sandbox import compatibility\n'+
         'from utility import *\n'+
         'student = get_student_data()\n'+
@@ -542,6 +542,10 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         'compatibility.run_student = run_student\n'+
         'compatibility.get_output = get_output\n'+
         'compatibility.reset_output = reset_output\n'+
+        'def capture_output(func, *args):\n'+
+        '   reset_output()\n'+
+        '   func(*args)\n'+
+        '   return get_output()\n'+
         'compatibility.capture_output = capture_output\n'+
         instructorCode+'\n'+
         'from pedal.resolvers import simple\n'+
