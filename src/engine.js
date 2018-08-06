@@ -13,6 +13,7 @@
 function BlockPyEngine(main) {
     this.main = main;
     this.configureSkulpt();
+    this.setStudentEnvironment();
     
     // Keeps track of the tracing while the program is executing
     this.executionBuffer = {};
@@ -285,7 +286,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
     engine.updateParse();
     //engine.analyzeParse();
     engine.runStudentCode(function() {
-        engine.runInstructorCode('give_feedback', function(module) {
+        engine.runInstructorCode('give_feedback',false,  function(module) {
             if (Sk.executionReports['instructor']['success']) {
                 // SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE
                 console.log(module.$d);
@@ -350,12 +351,27 @@ BlockPyEngine.prototype.on_change = function() {
     this.main.model.execution.suppressions['student'] = true;
     this.main.model.execution.suppressions['parser'] = true;
     this.main.model.execution.suppressions['no errors'] = true;
-    engine.runInstructorCode(FILENAME, function() {
-        var feedback_type = feedback.presentFeedback();
-        if (!feedback.isFeedbackVisible()) {
-            engine.main.components.toolbar.notifyFeedbackUpdate();
+    engine.runInstructorCode(FILENAME, true, function(module) {
+        if (Sk.executionReports['instructor']['success']) {
+            // SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE
+            var success = Sk.ffi.remapToJs(module.$d.SUCCESS);
+            var score = Sk.ffi.remapToJs(module.$d.SCORE);
+            var message = Sk.ffi.remapToJs(module.$d.MESSAGE);
+            var category = Sk.ffi.remapToJs(module.$d.CATEGORY);
+            var label = Sk.ffi.remapToJs(module.$d.LABEL);
+            var data = Sk.ffi.remapToJs(module.$d.DATA);
+            var hide = Sk.ffi.remapToJs(module.$d.HIDE);
+            var line = engine.lookForLines(data);
+            if (!success &&
+                !(category == "Instructor" &&  label == "No errors")) {
+                feedback.presentFeedback(category, label, message, line);
+                if (!feedback.isFeedbackVisible()) {
+                    engine.main.components.toolbar.notifyFeedbackUpdate();
+                    feedback.scrollIntoView();
+                }
+            }
+            engine.main.model.execution.status("complete");
         }
-        engine.main.model.execution.status("complete");
     });
     engine.main.components.server.logEvent('engine', 'on_change')
 }
@@ -505,7 +521,7 @@ var NEW_LINE_REGEX = /\r\n|\r|\n/;
 /**
  * Run the instructor code
  */
-BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
+BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
     this.main.model.execution.status("instructor");
     var report = this.main.model.execution.reports;
     // Prepare execution
@@ -534,8 +550,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '        return error\n'+
         '    #unlimit_execution_time()\n'+
         '    return None\n'+
-        'from pedal.tifa import tifa_analysis\n'+
-        'tifa_analysis(False)\n'+
+        (quick ? '': 'from pedal.tifa import tifa_analysis\n')+
+        (quick ? '': 'tifa_analysis(False)\n')+
         'from pedal.sandbox import compatibility\n'+
         'from utility import *\n'+
         'student = get_student_data()\n'+
@@ -555,7 +571,6 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         'from pedal.resolvers import simple\n'+
         'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()'
     );
-    //console.log(instructorCode);
     lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
     var engine = this;
     report['instructor'] = {

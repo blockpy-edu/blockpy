@@ -88,14 +88,18 @@ var $sk_mod_instructor = function(name) {
      */
     mod.get_student_error = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_student_error", arguments, 0, 0);
+        var none = Sk.builtin.none.none$;
         if (Sk.executionReports['student'].success) {
-            var none = Sk.builtin.none.none$;
             return new Sk.builtin.tuple([none, none]);
         } else {
             var error = Sk.executionReports['student'].error,
                 position = {};
-            if (error.traceback.length > 0) {
-                position['line'] = error.traceback[0].lineno;
+            if (error) {
+                if (error.traceback.length > 0) {
+                    position['line'] = error.traceback[0].lineno;
+                }
+            } else {
+                error = none;
             }
             position = Sk.ffi.remapToPy(position);
             return new Sk.builtin.tuple([error, position]);

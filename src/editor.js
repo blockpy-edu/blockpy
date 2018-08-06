@@ -61,7 +61,7 @@ function BlockPyEditor(main, tag) {
                 clearTimeout(editor.triggerOnChange);
             }
             var engine = editor.main.components.engine;
-            editor.triggerOnChange = setTimeout(engine.on_change.bind(engine), 1000);
+            editor.triggerOnChange = setTimeout(engine.on_change.bind(engine), 2500);
         }
         firstEdit = false;
     });
