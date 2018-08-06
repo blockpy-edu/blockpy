@@ -617,7 +617,7 @@ BlockPyEditor.prototype.updateTextFromModel = function() {
  */
 BlockPyEditor.prototype.updateBlocksFromModel = function() {
     if (this.silenceModel == 0) {
-        var code = this.main.model.program().trim();
+        var code = this.main.model.program();
         this.silenceBlock = true;
         this.setBlocks(code);
         this.resetBlockSilence();

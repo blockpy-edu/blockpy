@@ -435,13 +435,17 @@ BlockPyFeedback.prototype.presentFeedback = function(category, label, message, l
 }
 
 BlockPyFeedback.prototype.convertSkulptSyntax = function(skulptError) {
-    var convertedError = Sk.ffi.remapToJs(skulptError.args);
-    console.log(convertedError);
-    var codeLine = '.';
-    if (convertedError.length > 3 && convertedError[4]) {
-        codeLine = ', where it says:<br><code>'+convertedError[4]+'</code>';
+    try {
+        var convertedError = Sk.ffi.remapToJs(skulptError.args);
+        console.log(convertedError);
+        var codeLine = '.';
+        if (convertedError.length > 3 && convertedError[4]) {
+            codeLine = ', where it says:<br><code>'+convertedError[4]+'</code>';
+        }
+        this.editorError(skulptError, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ convertedError[2]+codeLine, convertedError[2]);
+    } catch (e) {
+        console.error(e);
     }
-    this.editorError(skulptError, "While attempting to process your Python code, I found a syntax error. In other words, your Python code has a mistake in it (e.g., mispelled a keyword, bad indentation, unnecessary symbol). You should check to make sure that you have written all of your code correctly. To me, it looks like the problem is on line "+ convertedError[2]+codeLine, convertedError[2]);
 }
 
 BlockPyFeedback.prototype.OPERATION_DESCRIPTION = {
