@@ -38,6 +38,7 @@ BlockPyCorgis.prototype.loadDatasets = function(silently) {
         }
         editor.updateToolbox(true);
     }).fail(function(e) {
+        console.log(arguments);
         console.error(e);
     }).always(function() {
         server.finalizeSubscriptions();

@@ -263,8 +263,8 @@ BlockPyEngine.prototype.lastStep = function() {
 BlockPyEngine.prototype.lookForLines = function(feedbackData) {
     var line = null;
     for (var i = 0; i < feedbackData.length; i+= 1) {
-        if ('line' in feedbackData[i]) {
-            line = feedbackData[i].line;
+        if ('position' in feedbackData[i]) {
+            line = feedbackData[i].position.line;
         }
     }
     return line;
@@ -296,6 +296,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 var label = Sk.ffi.remapToJs(module.$d.LABEL);
                 var data = Sk.ffi.remapToJs(module.$d.DATA);
                 var hide = Sk.ffi.remapToJs(module.$d.HIDE);
+                console.log(data);
                 var line = engine.lookForLines(data);
                 feedback.presentFeedback(category, label, message, line);
                 if (!feedback.isFeedbackVisible()) {
@@ -490,8 +491,9 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
         function (error) {
             report['student'] = {
                 'success': false,
-                'error': error
+                'error': error,
             }
+            console.error(error);
             after();
             engine.executionEnd_();
         }
@@ -538,7 +540,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         'from utility import *\n'+
         'student = get_student_data()\n'+
         'compatibility.set_sandbox(student)\n'+
-        'compatibility.raise_exception(get_student_error())\n'+
+        'error, position = get_student_error()\n'+
+        'compatibility.raise_exception(error, position)\n'+
         'compatibility.run_student = run_student\n'+
         'compatibility.get_output = get_output\n'+
         'compatibility.reset_output = reset_output\n'+
@@ -547,6 +550,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, after) {
         '   func(*args)\n'+
         '   return get_output()\n'+
         'compatibility.capture_output = capture_output\n'+
+        'from pedal.cait.cait_api import parse_program\n'+
         instructorCode+'\n'+
         'from pedal.resolvers import simple\n'+
         'SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()'

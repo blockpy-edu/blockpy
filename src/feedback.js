@@ -311,9 +311,13 @@ BlockPyFeedback.prototype.presentInstructorError = function() {
     } else {
         if (error.traceback[0].filename == instructor.filename) {
             error.traceback[0].lineno -= instructor.line_offset;
+            if (error.traceback[0].lineno < 0) {
+                error.traceback[0].lineno += instructor.line_offset;
+                this.internalError(error, "Feedback Engine Error", "Error in BlockPy's feedback generation. Please show the above message to an instructor so they can contact a developer!");
+            } else {
+                this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
+            }
         }
-        //report['instructor']['line_offset']
-        this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
         console.error(error);
         return 'instructor';
     }
@@ -333,6 +337,9 @@ BlockPyFeedback.prototype.presentFeedback = function(category, label, message, l
     }
     this.body.html(message);
     this.main.model.status.error(category);
+    if (line !== null && line !== undefined) {
+        this.main.components.editor.highlightError(line-1);
+    }
     this.main.components.server.logEvent('feedback', category+"|"+label, message);
     console.error(message);
     

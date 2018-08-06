@@ -96,6 +96,10 @@
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
     
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_dataset.js"></script>
+    
     <!--<script type="text/javascript" src="test_corgis/blockpy/tate/publishers_blockly.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/publishers_skulpt.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/publishers_dataset.js"></script>-->
@@ -231,56 +235,11 @@ function getQueryParams(){
 </script>
 
 <div style='display:none' id='testing-student-code'>
-def a(x):
-    print(x+1)
-a(1)
+1
 </div>
 
 <div style='display:none' id='testing-give-feedback'>
-from pedal.toolkit.printing import *
-from pedal.toolkit.utilities import *
-from pedal.toolkit.functions import *
-from pedal.toolkit.imports import *
-from pedal.toolkit.files import *
-
-suppress("analyzer", "Non-list iterations")
-
-prevent_advanced_iteration()
-ast = parse_program()
-
-str_values = [s.s for s in ast.find_all('Str')]
-
-if ensure_imports('requests'):
-    pass
-elif "'''" in get_program():
-    gently("You do not need triple-quoted strings anymore! Use the <code>requests</code> module.")
-elif '"""' in get_program():
-    gently("You do not need triple-quoted strings anymore! Use the <code>requests</code> module.")
-elif not function_is_called('get'):
-    gently("You need to use the <code>get</code> function!")
-elif sum(len(s) for s in str_values) > 1000:
-    gently("Oh no, did you embed the entire text of the book in your program? Don't do that, use the requests module!!!!")
-elif "http://www.gutenberg.org/cache/epub/345/pg345.txt" not in str_values:
-    gently("You need the URL in your code. Make sure you have it EXACTLY the same as it is given in the description.")
-elif function_is_called("json"):
-    gently("You do not need the <code>json</code> function.")
-elif function_is_called("text"):
-    explain("The <code>text</code> field of the Response object is an attribute, not a method. You do not use parentheses.")
-else:
-    import requests
-    text = requests.get("http://www.gutenberg.org/cache/epub/345/pg345.txt").text
-    if "<Response>" in get_output():
-        gently("You are printing the response object, not the <code>text</code> of the response object.")
-    elif not get_output():
-        gently("You are not printing.")
-    elif text in get_output():
-        gently("Don't print the book text, just print the number of times that <code>'Dracula'</code> appears.")
-    elif prevent_literal(text.count('Dracula')):
-        pass
-    elif str(text.count('Dracula')) in get_output():
-        set_success()
-    else:
-        gently("You are not printing the right result")
+set_success()
 </div>
 
   
