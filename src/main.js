@@ -213,9 +213,9 @@ BlockPy.prototype.initModel = function(settings) {
             'modules': ko.observableArray(BlockPy.DEFAULT_MODULES),
             'files': ko.observableArray([]),
             'assignment_id': ko.observable(null),
-            'student_id': null,
-            'course_id': null,
-            'group_id': null,
+            'student_id': ko.observable(null),
+            'course_id': ko.observable(null),
+            'group_id': ko.observable(null),
             'version': ko.observable(0),
             'name': ko.observable('Untitled'),
             'introduction': ko.observable(''),
@@ -446,9 +446,9 @@ BlockPy.prototype.resetSystem = function() {
  * Function for initializing user, course, and assignment group info.
  */
 BlockPy.prototype.setUserData = function(student_id, course_id, group_id) {
-    this.model.assignment['group_id'] = group_id;
-    this.model.assignment['student_id'] = student_id;
-    this.model.assignment['course_id'] = course_id;
+    this.model.assignment['group_id'](group_id);
+    this.model.assignment['student_id'](student_id);
+    this.model.assignment['course_id'](course_id);
 }
 
 /**
@@ -498,9 +498,9 @@ BlockPy.prototype.setAssignment = function(settings, assignment, programs) {
     }
     this.model.settings['completion_status'](settings.status || 0);
     this.model.assignment['assignment_id'](assignment.assignment_id);
-    this.model.assignment['group_id'] = assignment.group_id;
-    this.model.assignment['student_id'] = assignment.student_id;
-    this.model.assignment['course_id'] = assignment.course_id;
+    this.model.assignment['group_id'](assignment.group_id);
+    this.model.assignment['student_id'](assignment.student_id);
+    this.model.assignment['course_id'](assignment.course_id);
     this.model.assignment['version'](assignment.version);
     this.model.assignment['name'](assignment.name);
     this.model.assignment['introduction'](assignment.introduction);

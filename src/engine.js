@@ -307,7 +307,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 var old_status = model.settings.completion_status();
                 model.settings.completion_status(Math.max(old_status, score));
                 if (success || (category == "Instructor" && 
-                                label == "no errors")) {
+                                label == "No errors")) {
                     engine.main.components.server.markSuccess(1.0);
                 } else {
                     engine.main.components.server.markSuccess(score);
