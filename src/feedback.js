@@ -336,7 +336,11 @@ BlockPyFeedback.prototype.presentFeedback = function(category, label, message, l
         this.title.html(label);
     }
     this.body.html(message);
-    this.main.model.status.error(category);
+    if (category == "Instructor" && label == "No errors") {
+        this.main.model.status.error("no errors");
+    } else {
+        this.main.model.status.error(category);
+    }
     if (line !== null && line !== undefined) {
         this.main.components.editor.highlightError(line-1);
     }
