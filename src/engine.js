@@ -297,7 +297,6 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 var label = Sk.ffi.remapToJs(module.$d.LABEL);
                 var data = Sk.ffi.remapToJs(module.$d.DATA);
                 var hide = Sk.ffi.remapToJs(module.$d.HIDE);
-                console.log(data);
                 var line = engine.lookForLines(data);
                 feedback.presentFeedback(category, label, message, line);
                 if (!feedback.isFeedbackVisible()) {
@@ -307,8 +306,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 score = Math.max(0.0, Math.min(1.0, score));
                 var old_status = model.settings.completion_status();
                 model.settings.completion_status(Math.max(old_status, score));
-                if (success || (category == "Instructor" && 
-                                label == "No errors")) {
+                if (success) {
                     engine.main.components.server.markSuccess(1.0);
                 } else {
                     engine.main.components.server.markSuccess(score);
@@ -575,7 +573,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
     var engine = this;
     report['instructor'] = {
         'compliments': [],
-        'filename': filename+".py"
+        'filename': filename+".py",
+        'code': instructorCode,
         //'complete': false // Actually, let's use undefined for now.
     };
     Sk.misceval.asyncToPromise(function() {
@@ -591,8 +590,8 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
             if (error.tp$name === 'GracefulExit') {
                 report['instructor']['success'] = true;
             } else {
-                console.log(error.args.v);
-                console.log(error);
+                console.log(report['instructor']['code']);
+                console.error(error);
                 report['instructor']['success'] = false;
                 report['instructor']['error'] = error;
                 report['instructor']['line_offset'] = lineOffset;

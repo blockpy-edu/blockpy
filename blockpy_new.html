@@ -234,13 +234,29 @@ function getQueryParams(){
 }
 </script>
 
-<div style='display:none' id='testing-student-code'>credits = [3, 3, 4]
-for credit in credits:
-    print(credit)</div>
+<div style='display:none' id='testing-student-code'>from pprint import pprint</div>
 
 <div style='display:none' id='testing-give-feedback'>
-from pedal.mistakes.instructor_iteration import iteration_group
-iteration_group()
+#parse_program()
+import ast
+module = MAIN_REPORT['source']['ast']
+my_field_generator = ast.iter_fields(module)
+for field, value in my_field_generator:
+    if value is None:
+        continue
+    if not isinstance(value, list):
+        value = [value]
+    for sub_value in value:
+        if isinstance(sub_value, ast.AST):
+            vs = ast.iter_fields(sub_value)
+            for f, v in vs:
+                log(f)
+                log(type(v))
+                if v is None:
+                    continue
+                if not isinstance(v, list):
+                    v = [v]
+parse_program()
 </div>
 
   

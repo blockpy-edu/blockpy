@@ -301,7 +301,7 @@ BlockPyFeedback.prototype.printError = function(error) {
 BlockPyFeedback.prototype.presentInstructorError = function() {
     var instructor = this.main.model.execution.reports['instructor'];
     var error = instructor.error;
-    if (!error.traceback) {
+    if (!error.traceback || error.traceback.length == 0) {
         this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
         console.error(error);
         return 'instructor';
@@ -345,7 +345,6 @@ BlockPyFeedback.prototype.presentFeedback = function(category, label, message, l
         this.main.components.editor.highlightError(line-1);
     }
     this.main.components.server.logEvent('feedback', category+"|"+label, message);
-    console.error(message);
     
     return;
     
