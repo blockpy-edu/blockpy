@@ -234,29 +234,21 @@ function getQueryParams(){
 }
 </script>
 
-<div style='display:none' id='testing-student-code'>from pprint import pprint</div>
+<div style='display:none' id='testing-student-code'>
+import matplotlib.pyplot as plt
+plt.hist([4,5,6])
+plt.show()
+plt.plot([1,2,3])
+plt.scatter([7,9], [10, 11])
+plt.show()
+plt.plot([12, 13, 14])
+plt.show()
+</div>
 
 <div style='display:none' id='testing-give-feedback'>
-#parse_program()
-import ast
-module = MAIN_REPORT['source']['ast']
-my_field_generator = ast.iter_fields(module)
-for field, value in my_field_generator:
-    if value is None:
-        continue
-    if not isinstance(value, list):
-        value = [value]
-    for sub_value in value:
-        if isinstance(sub_value, ast.AST):
-            vs = ast.iter_fields(sub_value)
-            for f, v in vs:
-                log(f)
-                log(type(v))
-                if v is None:
-                    continue
-                if not isinstance(v, list):
-                    v = [v]
-parse_program()
+from pedal.toolkit.plotting import *
+log(check_for_plot('hist', [4,5,6,7]))
+log(check_for_plot('hist', [4,5,6]))
 </div>
 
   

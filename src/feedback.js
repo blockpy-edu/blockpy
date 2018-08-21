@@ -328,6 +328,12 @@ BlockPyFeedback.prototype.presentInstructorError = function() {
  */
 BlockPyFeedback.prototype.presentFeedback = function(category, label, message, line) {
     this.clear(false);
+    var hideCorrectness = this.main.model.assignment.secret();
+    if (hideCorrectness && category.toLowerCase() == "complete") {
+        category = "Instructor";
+        label = "No errors";
+        message = "No errors reported";
+    }
     
     if (category.toLowerCase() == "instructor" && 
         label.toLowerCase() == "explain") {

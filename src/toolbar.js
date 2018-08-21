@@ -30,7 +30,7 @@ BlockPyToolbar.prototype.notifyFeedbackUpdate = function() {
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
     this.tag.find('.blockpy-run').click(function(e) {
-        main.components.server.logEvent('editor', 'run')
+        //main.components.server.logEvent('editor', 'run')
         var backup = this;
         main.components.feedback.clear();
         $(this).removeClass("btn-success").addClass("btn-warning")

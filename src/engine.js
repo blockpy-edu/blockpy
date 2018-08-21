@@ -306,7 +306,7 @@ BlockPyEngine.prototype.on_run = function(afterwards) {
                 score = Math.max(0.0, Math.min(1.0, score));
                 var old_status = model.settings.completion_status();
                 model.settings.completion_status(Math.max(old_status, score));
-                if (success) {
+                if (success && category.toLowerCase() == "complete") {
                     engine.main.components.server.markSuccess(1.0);
                 } else {
                     engine.main.components.server.markSuccess(score);
@@ -557,6 +557,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
         'error, position = get_student_error()\n'+
         'compatibility.raise_exception(error, position)\n'+
         'compatibility.run_student = run_student\n'+
+        'compatibility.get_plots = get_plots\n'+
         'compatibility.get_output = get_output\n'+
         'compatibility.reset_output = reset_output\n'+
         'def capture_output(func, *args):\n'+
