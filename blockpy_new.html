@@ -235,20 +235,17 @@ function getQueryParams(){
 </script>
 
 <div style='display:none' id='testing-student-code'>
-import matplotlib.pyplot as plt
-plt.hist([4,5,6])
-plt.show()
-plt.plot([1,2,3])
-plt.scatter([7,9], [10, 11])
-plt.show()
-plt.plot([12, 13, 14])
-plt.show()
+def make_receipt(price):
+    discountedPrice = price*.9
+    print(price)
+    print(discountedPrice)
+    return discountedPrice
+make_receipt(make_receipt(20))
 </div>
 
 <div style='display:none' id='testing-give-feedback'>
-from pedal.toolkit.plotting import *
-log(check_for_plot('hist', [4,5,6,7]))
-log(check_for_plot('hist', [4,5,6]))
+from pedal.toolkit.functions import *
+output_test('make_receipt', (10, ['10', '9.0']))
 </div>
 
   

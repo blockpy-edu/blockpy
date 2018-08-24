@@ -309,14 +309,18 @@ BlockPyFeedback.prototype.presentInstructorError = function() {
         this.printError(error);
         return 'student';
     } else {
-        if (error.traceback[0].filename == instructor.filename) {
-            error.traceback[0].lineno -= instructor.line_offset;
-            if (error.traceback[0].lineno < 0) {
-                error.traceback[0].lineno += instructor.line_offset;
+        var last_traceback = error.traceback.slice(-1)[0];
+        //if (last_traceback.filename == instructor.filename) {
+        if (last_traceback.length == 1) {
+            last_traceback.lineno -= instructor.line_offset;
+            if (last_traceback.lineno < 0) {
+                last_traceback.lineno += instructor.line_offset;
                 this.internalError(error, "Feedback Engine Error", "Error in BlockPy's feedback generation. Please show the above message to an instructor so they can contact a developer!");
             } else {
                 this.internalError(error, "Instructor Feedback Error", "Error in instructor feedback. Please show the above message to an instructor!");
             }
+        } else {
+            this.internalError(error, "Feedback Engine Error", "Critical Error in BlockPy's feedback generation. Please show the above message to an instructor so they can contact a developer!<br>The error was in <code>"+error.traceback[0].filename+"</code>.");
         }
         console.error(error);
         return 'instructor';
