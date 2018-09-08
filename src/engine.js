@@ -277,6 +277,7 @@ BlockPyEngine.prototype.lookForLines = function(feedbackData) {
 BlockPyEngine.prototype.on_run = function(afterwards) {
     this.main.model.execution.status("running");
     clearTimeout(this.main.components.editor.triggerOnChange);
+    this.main.components.server.saveCode();
     var engine = this;
     var feedback = engine.main.components.feedback;
     var model = this.main.model;
@@ -338,6 +339,7 @@ BlockPyEngine.prototype.on_change = function() {
         return false;
     }
     this.main.model.execution.status("changing");
+    this.main.components.server.saveCode();
     // On step does not perform parse analysis by default or run student code
     var engine = this;
     var feedback = this.main.components.feedback;

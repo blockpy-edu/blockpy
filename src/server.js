@@ -84,7 +84,7 @@ BlockPyServer.prototype.checkCaches = function() {
 
 BlockPyServer.prototype.createSubscriptions = function() {
     var server = this, model = this.main.model;
-    model.program.subscribe(function() { server.saveCode(); });
+    model.program_updated.subscribe(function() { server.saveCode(); });
     model.assignment.name.subscribe(function(e) { server.saveAssignment();});
     model.assignment.introduction.subscribe(function(e) { server.saveAssignment(); });
     model.assignment.parsons.subscribe(function(e) { server.saveAssignment(); });

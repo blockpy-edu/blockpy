@@ -302,7 +302,12 @@ BlockPy.prototype.initModelMethods = function() {
     // The code for the current active program file (e.g., "__main__")
     this.model.program = ko.computed(function() {
         return this.programs[this.settings.filename()]();
-    }, this.model) //.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 400 } });
+    }, this.model)
+    this.model.program_updated = ko.computed(function() {
+        return this.programs[this.settings.filename()]();
+    }, this.model).extend({ rateLimit: { 
+        method: "notifyWhenChangesStop", timeout: 1000
+    }});
     
     // Whether this URL has been specified
     this.model.server_is_connected = function(url) {
