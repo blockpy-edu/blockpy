@@ -1,4 +1,7 @@
 # BlockPy stuff
+
+blockly/
+
 Thumbs.db
 ignore/
 kennel_dist/
