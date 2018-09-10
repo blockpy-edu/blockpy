@@ -96,9 +96,9 @@
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
     
-    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_blockly.js"></script>
+    <!--<script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_blockly.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_skulpt.js"></script>
-    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_dataset.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_dataset.js"></script>-->
     
     <!--<script type="text/javascript" src="test_corgis/blockpy/tate/publishers_blockly.js"></script>
     <script type="text/javascript" src="test_corgis/blockpy/tate/publishers_skulpt.js"></script>
@@ -115,7 +115,7 @@
     <script>
     $(document).ready(function() {
         blockpy = new BlockPy({
-            'blocklyPath': "blockly/",
+            'blocklyPath': "../blockly/",
             'attachmentPoint': document.getElementById('blockpy-div'),
             'instructor': !getQueryParams()["instructor"] || getQueryParams()["instructor"]=="true",
             'developer': true,
