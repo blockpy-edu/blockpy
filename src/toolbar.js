@@ -116,9 +116,13 @@ BlockPyToolbar.prototype.activateToolbar = function() {
                     }
                 }
                 var isUsable = function(cell) {
-                    return cell.cell_type == "code" ||
-                           cell.cell_type == "markdown" ||
-                           cell.cell_type == "raw";
+                    if (cell.cell_type == "code") {
+                        return cell.source.length > 0 && 
+                               !cell.source[0].startsWith("%");
+                    } else {
+                        return cell.cell_type == "markdown" ||
+                               cell.cell_type == "raw";
+                    }
                 }
                 code = ipynb.cells.filter(isUsable).map(makePython).join("\n");
             }
