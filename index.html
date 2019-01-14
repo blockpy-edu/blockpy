@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Blockpy</title>
+    
+    <link rel="stylesheet" href="libs/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/codemirror/codemirror.css">
+    <link rel="stylesheet" href="libs/font-awesome.min.css">
+    <link rel="stylesheet" href="libs/summernote/summernote.css">
+    <link rel="stylesheet" href="libs/multi-select.css">
+    <link rel="stylesheet" href="src/blockpy.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
+    
+    <!-- JQuery, D3, Math.js, Bootstrap -->
+    <script type="text/javascript" src="libs/jquery.js"></script>
+    <script type="text/javascript" src="libs/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="libs/jquery.multi-select.js"></script>
+    <script type="text/javascript" src="libs/d3.min.js"></script>
+    <script type="text/javascript" src="libs/math.0.19.0.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap.min.js"></script>
+    <script type="text/javascript" src="libs/bootstrap-wysiwyg.js"></script>
+    <script type="text/javascript" src="libs/mindmup-editabletable.js"></script>
+    <script type="text/javascript" src="libs/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="libs/codemirror/python.js"></script>
+    <script type="text/javascript" src="libs/codemirror/htmlmixed.js"></script>
+    <script type="text/javascript" src="libs/codemirror/xml.js"></script>
+    <script type="text/javascript" src="libs/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="libs/stringify.js"></script>
+    
+    <!-- Summernote, a rich text editor -->
+    <script type="text/javascript" src="libs/summernote/summernote.min.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-hint.js"></script>
+    <script type="text/javascript" src="libs/summernote/summernote-ext-video.js"></script>
+    
+    <!-- Blockly -->
+    <script type="text/javascript" src="../blockly/blockly_uncompressed.js"></script>
+    <script type="text/javascript" src="../blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="../blockly/python_compressed.js"></script>
+    <script type="text/javascript" src="../blockly/pseudo_compressed.js"></script>
+    <script type="text/javascript" src="../blockly/javascript_compressed.js"></script>
+    <script type="text/javascript" src="../blockly/msg/js/en.js"></script>
+    
+    <!-- Skulpt -->
+    <script type="text/javascript" src="../skulpt/dist/skulpt.min.js"></script>
+    <script type="text/javascript" src="../skulpt/dist/skulpt-stdlib.js"></script>
+    
+    <!-- Source Code -->
+    <script type="text/javascript" src="src/utilities.js"></script>
+    <script type="text/javascript" src="src/python_errors.js"></script>
+    <script type="text/javascript" src="src/ast_node_visitor.js"></script>
+    <!--<script type="text/javascript" src="src/abstract_interpreter.js"></script>
+    <script type="text/javascript" src="src/pytifa.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_definitions.js"></script>
+    <script type="text/javascript" src="src/abstract_interpreter_tests.js"></script>-->
+    <script type="text/javascript" src="src/python_to_blockly.js"></script>
+    <script type="text/javascript" src="src/imported.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/class.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comment.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/comprehensions.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/dict.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/if.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/io.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/lists.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/sets.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/loops.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/parking.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/tuple.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/turtles.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/text.js"></script>
+    <script type="text/javascript" src="src/blockly_blocks/plots.js"></script>
+    <script type="text/javascript" src="src/dialog.js"></script>
+    <script type="text/javascript" src="src/storage.js"></script>
+    <script type="text/javascript" src="src/printer.js"></script>
+    <script type="text/javascript" src="src/interface.js"></script>
+    <script type="text/javascript" src="src/server.js"></script>
+    <script type="text/javascript" src="src/english.js"></script>
+    <script type="text/javascript" src="src/corgis.js"></script>
+    <script type="text/javascript" src="src/history.js"></script>
+    <script type="text/javascript" src="src/presentation.js"></script>
+    <script type="text/javascript" src="src/editor.js"></script>
+    <script type="text/javascript" src="src/feedback.js"></script>
+    <script type="text/javascript" src="src/toolbar.js"></script>
+    <script type="text/javascript" src="src/sk_mod_instructor_extended.js"></script>
+    <script type="text/javascript" src="src/sk_mod_instructor.js"></script>
+    <script type="text/javascript" src="src/engine.js"></script>
+    <script type="text/javascript" src="src/main.js"></script>
+    
+    <!-- CORGIS -->
+    <!--<script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_dataset.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/school_scores/school_scores_skulpt.js"></script>-->
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/tate/tate_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/tate_dataset.js"></script>-->
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/broadway/broadway_dataset.js"></script>-->
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/tate/publishers_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/publishers_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/tate/publishers_dataset.js"></script>-->
+    
+    <!--<script type="text/javascript" src="test_corgis/blockpy/weather/weather_blockly.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/weather/weather_skulpt.js"></script>
+    <script type="text/javascript" src="test_corgis/blockpy/weather/weather_dataset.js"></script>-->
+    
+    <style>
+
+    </style>
+    
+    <script>
+    $(document).ready(function() {
+        blockpy = new BlockPy({
+            'blocklyPath': "../blockly/",
+            'attachmentPoint': document.getElementById('blockpy-div'),
+            'instructor': !getQueryParams()["instructor"] || getQueryParams()["instructor"]=="true",
+            'developer': true,
+            'editor': getQueryParams()["mode"] || 'Split',
+            'urls': {
+                'import_datasets': '../datasets/datasets/',
+                //'walk_old_code': 'http://localhost:8000/walk_code/',
+                //'log_event': 'http://localhost:8000/save_events/'
+                /*'save_code': 'http://localhost:8000/save_code/',
+                'save_success': 'http://localhost:8000/submit_grade/',
+                'log_event': 'http://localhost:8000/save_events/'*/
+            }
+        });
+        blockpy.setAssignment(
+            // settings
+            {
+                'editor': getQueryParams()["mode"] || 'Split',
+                'read_only': getQueryParams()["upload"]=="true",
+                'disable_semantic_errors': false,
+                'disable_timeout': true,
+                'presentation_mode': getQueryParams()["presentation"]=="true",
+            },
+            // assignment
+            {
+                'introduction': "Use the canvas below to calculate the sum of a list of 4 numbers.",
+                'name': "#1.3",
+                'give_feedback': $("#testing-give-feedback").text(),
+                //'give_feedback': "",
+                //'give_feedback': 'run_student()\nexplain("Hey, Listen!")',
+                //'give_feedback': 'import utility\nfrom pedal.cait.cait_api import parse_program, find_match, data_type\nparse_program()\nmatch = find_match("fun = __expr__")\nutility.log(data_type("fun"))\nutility.log(match)\ngently("Hello")',
+                //'give_feedback': 'from instructor_functions import *\nsuppress("analyzer", "Incompatible types")\nmatch_signature("curve_grade", 1, "old")\n#unit_test("curve_grade", (64, True), (0, 0), (100, 100))\noutput_test("curve_grade", (1, "1"), (2, "2"))',
+                //'give_feedback': 'from instructor_functions import *\n5+""\nsuppress("analyzer", "Incompatible types")\nmatch_signature("rate_animal", 1, "old")\nunit_test("rate_animal", (64, True))',
+                //'give_feedback': "log(parse_program().find_all('FunctionDef')[0].args.args[0].arg)",
+                //'give_feedback': 'set_success()',
+                //'give_feedback': 'from instructor_utility import *\nfrom instructor_printing import *\n\nsuppress("analyzer")\nsuppress("instructor")\nhide_correctness()\n\nast = parse_program()\n\nall_checked = True\nanswers = [("1*2*3", "6"), ("3*4","12"), ("0","0"), ("5*-5", "-25")]\nfor an_input, result in answers:\n    reset_output()\n    queue_input(an_input)\n    run_student()\n    if not get_output():\n        all_checked = False\n    elif result not in get_output():\n        if str(float(result)) in get_output():\n            give_partial(.1/len(answers), "Checking Float "+an_input)\n        all_checked = False\n    else:\n        give_partial(.2/len(answers), "Checking "+an_input)',
+                //'give_feedback': "from instructor_utility import *\nensure_operation('in')",
+                //'give_feedback': 'for x in range(2):\n    reset_output()\n    queue_input("Test", "")\n    e = run_student()\n    if e:\n        gently(str(e))\n    log(get_output())\nif not e:\n    set_success()',
+                //'give_feedback': "from instructor_files import *\nfiles_not_handled_correctly('example.txt')",
+                //'give_feedback': "from instructor_imports import *\nensure_imports('math', 'random')",
+                //'give_feedback': "from instructor_plotting import * \nprevent_incorrect_plt() \nensure_correct_plot('plot') \nensure_show() \ncheck_for_plot('line', [[1,2,3],[4,5,6]])",
+                //'give_feedback': 'ast = parse_program()\nassignments = ast.find_all("Assign")\nfor assignment in assignments:\n    if assignment.targets.id == "parking_allowed":\n        log(assignment.targets.data_type)',
+                'on_change': '',
+                //'on_change': 'gently("Test")',
+                'parsons': false,
+                'starting_code': '',
+                'importable': true,
+                'initial_view': getQueryParams()["mode"] || 'Split',
+                'upload': getQueryParams()["upload"]=="true",
+                'modules': {
+                    'added': ['Functions', 'Classes', 'Data - Parking', 'Tuples', 'Conversion'],
+                    // , 'Data - Publishers'
+                    'removed': []
+                }
+            },
+            // programs
+            {
+                '__main__': $("#testing-student-code").text(),
+                //'__main__': 'import json\njson.loads("0") + "1"',
+                //'__main__': 'import random\nprint(random.random())\nss = ["Testing", "Here"]\nfor a in ss:\n    print(a)\nfor b in a:\n    print(b)',
+                //'__main__': 'print("Hello world"[1:5])',
+                //'__main__':  decodeURIComponent(getQueryParams()["code"]) || 'a = 0\nprint(a)',
+                //'__main__': 'num = input("")\nnum_list = [int(n) for n in num.split("*")]\nfor n in num_list:\n    n*n\n    return 4\nprint(n)',
+                //'__main__': 'def rate_animal(an_animal):\n    if an_animal != "dog":\n        1 + ""\nrate_animal("dog")',
+                //'__main__': 'round(float("9.5", ___))',
+                //'__main__': getQueryParams()["code"] || "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3],[4, 5, 6])\nplt.show()",
+                //'__main__': 'i=0\nwhile i!="0":\n    i=input("")\n    print(i)',
+                //'__main__': "import requests\nprint(requests.get('https://pastebin.com/raw/V7tWn1Rj').text)"
+                //'__main__': "print(open('example.txt').read())"
+                //'__main__': "import math\nmath\nfrom random import choice\nchoice"
+                //'__main__': "from random import randint\nprint(5+randint(1,10))"
+                //'__main__': 'print(input("Prompt:"))',
+                //'__main__': 'import parking\nparking_allowed = parking.now()\nif parking.now() > parking.Time(8,30,"AM") and parking.now() < parking.Time(5,30,"PM"):\n    parking_allowed = False\nelse:\n    parking_allowed = True \nprint(parking_allowed)'
+                //'__main__': 'print("Banana"[:int(len("Banana")/2)])',
+                //'__main__': 'def curve_grade(old):\n    print(old)\n    return (old ** .3) * 10\n\nprint(90, "becomes", curve_grade(90))\nprint(50, "becomes", curve_grade(50))\nprint(20, "becomes", curve_grade(20))'
+                //'__main__': 't=(100*"A")*8671',
+                //'__main__': 'print(1 != 2 and 2 != 1)'
+            }
+        )
+        
+        function inIframe () {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+        if (inIframe()) {
+            $("#blockpy-container").width("100%");
+        }
+    });
+    </script>
+  
+</head>
+<body>
+<div style="width:900px;  margin:0 auto;" id='blockpy-container'> <!-- 900px -->
+    <div id="blockpy-div" style='height:100%'></div>
+</div>
+<div id="blockpy-div2" style='height:100%'></div>
+<script>
+
+function getQueryParams(){
+    try{
+        url = window.location.href;
+        query_str = url.substr(url.indexOf('?')+1, url.length-1);
+        r_params = query_str.split('&');
+        params = {}
+        for( i in r_params){
+            param = r_params[i].split('=');
+            params[ param[0] ] = param[1];
+        }
+        return params;
+    }
+    catch(e){
+       return {};
+    }
+}
+</script>
+
+<div style='display:none' id='testing-student-code'>
+import matplotlib.pyplot as plt
+
+plt.plot([1,2,3])
+plt.show()
+</div>
+
+<div style='display:none' id='testing-give-feedback'>
+log(get_output())
+reset_output()
+run_student()
+log(get_output())
+</div>
+
+  
+<!-- Google Analytics -->
+<script>
+switch(window.location.protocol) {
+case 'file:':
+    break;
+default:
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-38802329-2', 'auto');
+    ga('send', 'pageview');
+    }
+</script>
+
+</body>
+</html>

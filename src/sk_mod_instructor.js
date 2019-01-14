@@ -94,10 +94,8 @@ var $sk_mod_instructor = function(name) {
         } else {
             var error = Sk.executionReports['student'].error,
                 position = {};
-            if (error) {
-                if (error.traceback.length > 0) {
-                    position['line'] = error.traceback[0].lineno;
-                }
+            if (error && error.traceback && error.traceback.length > 0) {
+                position['line'] = error.traceback[0].lineno;
             } else {
                 error = none;
             }

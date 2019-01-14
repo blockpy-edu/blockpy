@@ -228,6 +228,7 @@ BlockPyServer.prototype._postRetry = function(data, url, cache, delay, callback)
 BlockPyServer.prototype.markSuccess = function(success) {
     var model = this.main.model;
     var callback = model.settings.completedCallback;
+    var forceUpdate = model.settings.forceUpdate;
     var hideCorrectness = model.assignment.secret();
     var server = this;
     if (model.server_is_connected('save_success')) {
@@ -235,6 +236,7 @@ BlockPyServer.prototype.markSuccess = function(success) {
         data['code'] = model.programs.__main__;
         data['status'] = success;
         data['hide_correctness'] = hideCorrectness;
+        data['force_update'] = forceUpdate;
         this.main.components.editor.getPngFromBlocks(function(pngData, img) {
             data['image'] = pngData;
             if (img.remove) {

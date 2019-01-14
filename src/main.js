@@ -196,6 +196,8 @@ BlockPy.prototype.initModel = function(settings) {
             // boolean
             'auto_upload': ko.observable(true),
             // boolean
+            'forceUpdate': ko.observable(false),
+            // boolean
             'developer': ko.observable(false),
             // boolean
             'mute_printer': ko.observable(false),

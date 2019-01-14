@@ -1,7 +1,7 @@
 corgis-blockly
 ==============
 
-![CORGIS BlockPy](/images/blockly-corgi-logo.png?raw=true "CORGIS BlockPy")
+![CORGIS BlockPy](images/blockly-corgi-logo.png?raw=true "CORGIS BlockPy")
 
 BlockPy is a web-based Python environment that lets you work with blocks, text, or both. Designed for Data Science and equipped with powerful tools like the State Explorer and Guided Feedback, the goal of BlockPy is to let you solve authentic, real-world problems.
 
