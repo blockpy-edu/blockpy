@@ -533,7 +533,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
     if (!report['parser'].success || !report['verifier'].success) {
         studentCodeSafe = 'pass';
     }
-    Sk.builtinFiles.files['src/lib/pedal/sandbox/sandbox.py'] = 'class Sandbox: pass'
+    Sk.builtinFiles.files['src/lib/pedal/sandbox/sandbox.py'] = 'class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n';
     var instructorCode = this.main.model.programs[filename]();
     var lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
     instructorCode = (
