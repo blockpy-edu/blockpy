@@ -83,6 +83,15 @@ var $sk_mod_instructor = function(name) {
         return Sk.ffi.remapToPy(Sk.executionReports['verifier'].code);
     });
     
+    mod.trace_lines = new Sk.builtin.func(function() {
+        if (Sk.executionReports['student'].success) {
+            var lines = Sk.executionReports['student'].lines;
+            return new Sk.builtin.list(lines);
+        } else {
+            return new Sk.builtin.list([]);
+        }
+    });
+    
     /**
      *
      */

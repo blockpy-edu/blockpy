@@ -497,6 +497,7 @@ BlockPyEngine.prototype.runStudentCode = function(after) {
             report['student'] = {
                 'success': true,
                 'trace': engine.executionBuffer.trace,
+                'lines': engine.executionBuffer.trace.map(x => x.line),
                 'module': module,
                 'output': engine.main.model.execution.output
             }
@@ -562,6 +563,7 @@ BlockPyEngine.prototype.runInstructorCode = function(filename, quick, after) {
         'compatibility.get_plots = get_plots\n'+
         'compatibility.get_output = get_output\n'+
         'compatibility.reset_output = reset_output\n'+
+        'compatibility.trace_lines = trace_lines\n'+
         'def capture_output(func, *args):\n'+
         '   reset_output()\n'+
         '   func(*args)\n'+
@@ -617,7 +619,9 @@ BlockPyEngine.prototype.parseGlobals = function(variables) {
     if (!this.main.model.settings.trace_off()) {
         for (var property in variables) {
             var value = variables[property];
-            if (property !== "__name__" && property !== "__doc__") {
+            if (property !== "__name__" && 
+                property !== "__doc__" && 
+                property !== "__package__") {
                 property = property.replace('_$rw$', '')
                                    .replace('_$rn$', '');
                 var parsed = this.parseValue(property, value);
