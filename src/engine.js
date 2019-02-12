@@ -624,7 +624,13 @@ BlockPyEngine.prototype.parseGlobals = function(variables) {
                 property !== "__package__") {
                 property = property.replace('_$rw$', '')
                                    .replace('_$rn$', '');
-                var parsed = this.parseValue(property, value);
+                var parsed = {"name": property, "type": "Unknown",
+                              "value": value.toString()};
+                try {
+                    parsed = this.parseValue(property, value);
+                } catch {
+                    // Can't really do anything
+                }
                 if (parsed !== null) {
                     result.push(parsed);
                 } else if (value.constructor == Sk.builtin.module) {

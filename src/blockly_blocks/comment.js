@@ -44,6 +44,6 @@ Blockly.Blocks['string_multiline'] = {
 Blockly.Python['string_multiline'] = function(block) {
   var text_body = block.getFieldValue('TEXT');
   // TODO: Assemble JavaScript into code variable.
-  var code = '"""'+text_body+'"""\n';
+  var code = '"""\n'+text_body+'\n"""\n';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };

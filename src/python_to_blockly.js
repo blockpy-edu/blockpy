@@ -429,8 +429,12 @@ PythonToBlocks.prototype.Module = function(node)
 }
 
 PythonToBlocks.prototype.Comment = function(txt, lineno) {
+    var commentText = txt.slice(1);
+    if (commentText.length && commentText[0] == " ") {
+        commentText = commentText.substring(1);
+    }
     return block("comment_single", lineno, {
-        "BODY": txt.slice(1)
+        "BODY": commentText
     }, {}, {}, {}, {})
 }
 
@@ -1440,6 +1444,29 @@ PythonToBlocks.prototype.Num_value = function(node)
     return Sk.ffi.remapToJs(n);
 }
 
+function isWhitespaceOrEmpty(str) {
+    return !/[^\s]/.test(str);
+}
+
+function dedentMultiline(str) {
+    var lines = str.split("\n");
+    if (isWhitespaceOrEmpty(lines[0])) {
+        lines.shift();
+    }
+    if (lines.length && isWhitespaceOrEmpty(lines[lines.length-1])) {
+        lines.pop();
+    }
+    if (lines.length) {
+        var skip_amount = lines[0].search(/\S|$/);
+        for (var i=0; i < lines.length; i += 1) {
+            lines[i] = lines[i].substring(skip_amount);
+        }
+        return lines.join("\n");
+    } else {
+        return "";
+    }
+}
+
 /*
  * s: string
  *
@@ -1449,7 +1476,7 @@ PythonToBlocks.prototype.Str = function(node)
     var s = node.s;
     var strValue = Sk.ffi.remapToJs(s);
     if (strValue.split("\n").length > 1) {
-        return block("string_multiline", node.lineno, {"TEXT": strValue});
+        return block("string_multiline", node.lineno, {"TEXT": dedentMultiline(strValue)});
     } else {
         return block("text", node.lineno, {"TEXT": strValue});
     }

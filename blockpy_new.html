@@ -235,17 +235,37 @@ function getQueryParams(){
 </script>
 
 <div style='display:none' id='testing-student-code'>
-import matplotlib.pyplot as plt
+from cisc108 import assert_equal
 
-plt.plot([1,2,3])
-plt.show()
+def halve(number):
+    '''
+    Args:
+        number (int):
+    Returns:
+        int
+    '''
+    return number / 2
+
+# Correctly handles floating points
+assert_equal(halve(10), 5.0)
+assert_equal(halve(10), 5)
+
+#import matplotlib.pyplot as plt
+
+#plt.plot([1,2,3])
+#plt.show()
 </div>
 
 <div style='display:none' id='testing-give-feedback'>
-log(get_output())
-reset_output()
-run_student()
-log(get_output())
+#log(get_output())
+#reset_output()
+#run_student()
+#log(get_output())
+suppress("analyzer")
+from pedal.toolkit.functions import ensure_coverage
+ensure_coverage()
+from pedal.toolkit.signatures import function_signature
+log(function_signature('halve', returns='int', number='int'))
 </div>
 
   

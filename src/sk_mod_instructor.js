@@ -86,7 +86,7 @@ var $sk_mod_instructor = function(name) {
     mod.trace_lines = new Sk.builtin.func(function() {
         if (Sk.executionReports['student'].success) {
             var lines = Sk.executionReports['student'].lines;
-            return new Sk.builtin.list(lines);
+            return Sk.ffi.remapToPy(lines);
         } else {
             return new Sk.builtin.list([]);
         }
