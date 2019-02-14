@@ -107,6 +107,10 @@ BlockPy.prototype.initComponents = function() {
     });
     statusBox.tooltip();
     
+    main.model.assignment.name.subscribe(function(newValue) {
+        document.title = "BlockPy: "+newValue;
+    });
+    
     var setPresentationMode = function(is_set) {
         if (is_set) {
             container.find('.blockpy-content-left').removeClass('col-md-6 col-sm-6');
