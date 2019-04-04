@@ -60,15 +60,19 @@ Next, you'll need to build Blockly. The en.js file doesn't quite build correctly
     > cd blockly
     > python build.py
     > cd ..
-    > mv en.js blockly/msg/en.js
-    
+    > mv -force en.js blockly/msg/js/en.js
+
+Note that blockly builds in python2
 
 And then you'll build Skulpt:
 
     > cd skulpt
     > python skulpt.py dist
     > cd ..
-    
+
+Note: You may have to create a "dist" folder in the skulpt directory
+Note: skulpt builds in python3
+
 If you are on windows, you may encounter the message "No gzip executable", you can safely ignore this.
     
 And now you should be able to try out the example file!
