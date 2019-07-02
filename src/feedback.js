@@ -70,7 +70,7 @@ BlockPyFeedback.prototype.clear = function(printer) {
     this.original.hide();
     this.body.html("");
     this.main.model.status.error("none");
-    this.main.components.editor.unhighlightLines();
+    this.main.components.editor.unhighlightAllLines();
     if (printer !== undefined && printer) {
         this.main.components.printer.resetPrinter()
     }
@@ -114,7 +114,7 @@ BlockPyFeedback.prototype.complete = function() {
     this.original.hide();
     this.body.html("Great work!");
     this.main.model.status.error("complete");
-    this.main.components.editor.unhighlightLines();
+    this.main.components.editor.unhighlightAllLines();
     this.main.components.server.logEvent('feedback', "Success");
 }
 
@@ -127,7 +127,7 @@ BlockPyFeedback.prototype.finished = function() {
     this.original.hide();
     this.body.html("Your program ran successfully, without any errors. However, this problem does not have a correct solution. When you are satisfied with your program, you may stop working.");
     this.main.model.status.error("no errors");
-    this.main.components.editor.unhighlightLines();
+    this.main.components.editor.unhighlightAllLines();
     this.main.components.server.logEvent('feedback', "Finished");
 }
 
@@ -141,7 +141,7 @@ BlockPyFeedback.prototype.noErrors = function() {
     this.original.hide();
     this.body.html("No errors reported. View your output on the left.");
     this.main.model.status.error("no errors");
-    this.main.components.editor.unhighlightLines();
+    this.main.components.editor.unhighlightAllLines();
     this.main.components.server.logEvent('feedback', "No Errors", '');
 }
 

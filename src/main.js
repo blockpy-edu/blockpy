@@ -133,7 +133,7 @@ BlockPy.prototype.initComponents = function() {
 }
 
 /**
- * Initiailizes certain development data, useful for testing out new modules in
+ * Initializes certain development data, useful for testing out new modules in
  * Skulpt.
  */
 BlockPy.prototype.initDevelopment = function () {

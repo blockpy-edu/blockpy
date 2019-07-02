@@ -127,6 +127,7 @@ BlockPyEditor.prototype.initBlockly = function() {
     this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
     // Force the proper window size
     this.blockly.resize();
+    this.makeToolboxAccessible();
     // Keep the toolbox width set
     this.blocklyToolboxWidth = this.getToolbarWidth();
     
@@ -193,14 +194,20 @@ BlockPyEditor.prototype.initText = function() {
                                         indentWithTabs: false,
                                         matchBrackets: true,
                                         extraKeys: {"Tab": "indentMore", 
-                                                    "Shift-Tab": "indentLess"},
+                                                    "Shift-Tab": "indentLess",
+                                                    "Ctrl-Enter": function() {
+                                                        editor.main.components.toolbar.tag.find('.blockpy-run').click();
+                                                    },
+                                                    "Esc": function() {
+                                                        editor.codeMirror.display.input.blur();
+                                        }},
                                       });
     // Register model changer
     var editor = this;
     this.codeMirror.on("change", function() {
         //editor.main.components.feedback.clearEditorErrors();
         editor.updateText()
-        editor.unhighlightLines();
+        editor.unhighlightAllLines();
     });
 
     // Ensure that it fills the editor area
@@ -573,7 +580,7 @@ BlockPyEditor.prototype.updateText = function() {
         // Update Blocks
         this.silenceBlock = true;
         this.setBlocks(newCode);
-        this.unhighlightLines();
+        this.unhighlightAllLines();
         this.resetBlockSilence();
     }
     this.silenceText = false;
@@ -1072,11 +1079,21 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
     xml += '</xml>';
     if (only_set && !this.main.model.settings.read_only()) {
         this.blockly.updateToolbox(xml);
+        this.makeToolboxAccessible();
         this.blockly.resize();
     } else {
         return xml;
     }
 };
+
+BlockPyEditor.prototype.makeToolboxAccessible = function() {
+    document.getElementById(':0.label').innerText = "Block categories";
+    var separators = document.getElementsByClassName('blocklyTreeSeparator');
+    for (var i = 0; i < separators.length; i++) {
+        separators[i].children[2].innerText = 'Separator';
+        separators[i].children[2].style.display = 'none';
+    }
+}
 
 BlockPyEditor.prototype.DOCTYPE = '<?xml version="1.0" standalone="no"?>' + '<' + '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 BlockPyEditor.prototype.cssData = null;
