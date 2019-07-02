@@ -1,7 +1,7 @@
 <div class='blockpy-content container-fluid' style='background-color :#fcf8e3; border: 1px solid #faebcc; '>
     <div class='blockpy-popup modal' style='display:none'>
         <div class='modal-dialog' style='width:750px'>
-            <div class='modal-content' id='modal-message' >
+            <div class='modal-content'>
                 <div class='modal-header'>
                     <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
                     <h4 class='modal-title'>Dynamic Content</h4>
@@ -239,7 +239,7 @@
                 <span class='glyphicon glyphicon-list-alt'></span> Settings
             </button>
             
-            <b class='blockpy-toolbar-feedback text-muted pull-right' style='z-index:100; margin-top:10px; right:0px; position:absolute; display: none; color: red'>New feedback &uarr;</b>
+            <strong class='blockpy-toolbar-feedback text-muted pull-right' style='z-index:100; margin-top:10px; right:0px; position:absolute; display: none; color: red'>New feedback &uarr;</strong>
 
             <!--
             <button type='button' class='btn btn-default blockpy-toolbar-english'>
@@ -277,11 +277,15 @@
          style='padding-bottom: 10px; border: 1px solid #faebcc'>
         <div class='blockpy-editor col-md-12 col-sm-12'>
             <div class='blockpy-blocks blockpy-editor-menu' 
-                 style='height:100%'>
+                 style='height:100%'
+                 role='application'
+                 title='BlockPy Block Editor'>
                 <div class='blockly-div' style='height:450px; width: 100%' '></div>
                 <!-- <div class='blockly-area'></div> -->
             </div>
-            <div class='blockpy-text blockpy-editor-menu' style='height: 450px'>
+            <div class='blockpy-text blockpy-editor-menu' style='height: 450px'
+                 role='application'
+                 title='BlockPy Textual Editor'>
                 <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>
                 <!--
                 <button type='button' class='btn btn-default blockpy-text-insert-if'>Decision (If)</button>
@@ -293,7 +297,7 @@
             </div>
             <div class='blockpy-instructor-popup modal' style='display:none' role='dialog'>
                 <div class='modal-dialog' role='document'>
-                    <div class='modal-content' id='modal-message' >
+                    <div class='modal-content' >
                         <div class='modal-header'>
                             <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
                             <h4 class='modal-title'>Assignment Settings</h4>

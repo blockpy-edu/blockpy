@@ -212,13 +212,32 @@ BlockPyEditor.prototype.initText = function() {
 
     // Ensure that it fills the editor area
     this.codeMirror.setSize(null, "100%");
+    
+    this.makeCodeMirrorAccessible();
+};
+
+BlockPyEditor.prototype.makeCodeMirrorAccessible = function() {
+    $('.CodeMirror textarea,textarea.codemirror-div')
+        .attr('aria-hidden', 'true')
+        .attr("title", "Hidden Codemirror Textarea");
 };
 
 BlockPyEditor.prototype.reloadIntroduction = function() {
     var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
     var model = this.main.model;
     introductionEditor.code(model.assignment.introduction());
-}
+    this.makeSummernoteAccessible();
+};
+
+BlockPyEditor.prototype.makeSummernoteAccessible = function() {
+    $('input.note-image-input').prev().append($('input.note-image-input'));
+    $('input.note-image-url').prev().append($('input.note-image-url'));
+    $('input.note-link-text').prev().append($('input.note-link-text'));
+    $('input.note-link-url').prev().append($('input.note-link-url'));
+    $('input.note-video-url').prev().append($('input.note-video-url'));
+    $('.note-codable').attr('title', 'Problem Introduction text editor');
+    
+};
 
 /**
  * Initializes the Instructor tab, which has a number of buttons and menus for
@@ -1093,6 +1112,7 @@ BlockPyEditor.prototype.makeToolboxAccessible = function() {
         separators[i].children[2].innerText = 'Separator';
         separators[i].children[2].style.display = 'none';
     }
+    $('.blocklyTreeRow,.blocklyTreeSeparator').next().attr("aria-label", "blockly-tree-group");
 }
 
 BlockPyEditor.prototype.DOCTYPE = '<?xml version="1.0" standalone="no"?>' + '<' + '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
