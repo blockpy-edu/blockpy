@@ -218,14 +218,13 @@ BlockPyEditor.prototype.initText = function() {
 
 BlockPyEditor.prototype.makeCodeMirrorAccessible = function() {
     $('.CodeMirror textarea,textarea.codemirror-div')
-        .attr('aria-hidden', 'true')
-        .attr("title", "Hidden Codemirror Textarea");
+        .attr("title", "Programming Textarea");
 };
 
 BlockPyEditor.prototype.reloadIntroduction = function() {
     var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
     var model = this.main.model;
-    introductionEditor.code(model.assignment.introduction());
+    introductionEditor.summernote('code', model.assignment.introduction());
     this.makeSummernoteAccessible();
 };
 
@@ -236,7 +235,15 @@ BlockPyEditor.prototype.makeSummernoteAccessible = function() {
     $('input.note-link-url').prev().append($('input.note-link-url'));
     $('input.note-video-url').prev().append($('input.note-video-url'));
     $('.note-codable').attr('title', 'Problem Introduction text editor');
+    $('.note-editable').attr('title', 'Problem Introduction text editor visual');
+    $('i').attr('role', 'presentation');
+    $('.note-popover').attr('role', 'presentation');
+    // Oh good lord.
+    $('[role=seperator]').attr('role', 'separator')
     
+    // Override tabs in summernote.
+    delete $.summernote.options.keyMap.pc.TAB;
+    delete $.summernote.options.keyMap.mac.TAB;
 };
 
 /**
@@ -247,6 +254,7 @@ BlockPyEditor.prototype.makeSummernoteAccessible = function() {
 BlockPyEditor.prototype.initInstructor = function() {
     var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
     var model = this.main.model;
+    
     introductionEditor.summernote({
         codemirror: { // codemirror options
             theme: 'monokai'
@@ -255,10 +263,11 @@ BlockPyEditor.prototype.initInstructor = function() {
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['font', ['fontname', 'fontsize']],
-            ['insert', ['link', 'table', 'ul', 'ol', 'image']],
+            ['insert', ['link', 'table', 'ul', 'ol']],
             ['misc', ['codeview', 'help']]
-        ]
+        ],
     });
+    
     this.reloadIntroduction();
     
     this.availableModules = this.tag.find('.blockpy-available-modules');

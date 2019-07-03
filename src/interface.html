@@ -1,7 +1,10 @@
 <div class='blockpy-content container-fluid' style='background-color :#fcf8e3; border: 1px solid #faebcc; '>
-    <div class='blockpy-popup modal' style='display:none'>
+    <div class='blockpy-popup modal hidden'
+         role="dialog"
+         aria-label='Dialog'
+         aria-modal="true">
         <div class='modal-dialog' style='width:750px'>
-            <div class='modal-content'>
+            <div class='modal-content' role='region' aria-label='Dialog content'>
                 <div class='modal-header'>
                     <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
                     <h4 class='modal-title'>Dynamic Content</h4>
@@ -15,12 +18,16 @@
         </div>
     </div>
     <canvas id='capture-canvas' style='display:none'></canvas>
-    <div class='row blockpy-top-row' style='padding-bottom: 10px; border-bottom: 1px solid #faebcc; '>
+    <div class='row blockpy-top-row' style='padding-bottom: 10px; border-bottom: 1px solid #faebcc; '
+         role='region'
+         aria-label='Problem Introduction'>
         <div class='blockpy-content-top col-md-9 col-sm-9'>
-            <span class='blockpy-alert pull-right text-muted' data-bind="visible: false, text: status.text"></span>
-            <strong>BlockPy: </strong> 
-            <span class='blockpy-presentation-name'
-                  data-bind='text: assignment.name'></span>
+            <span class='blockpy-alert pull-right text-muted-less' data-bind="visible: false, text: status.text"></span>
+            <span role='heading' aria-level='1'>
+                <strong>BlockPy: </strong> 
+                <span class='blockpy-presentation-name'
+                      data-bind='text: assignment.name'></span>
+            </span>
             <div class='blockpy-presentation' data-bind="html: assignment.introduction">
             </div>
             <br>
@@ -37,9 +44,9 @@
             </div>
         </div>
         <div class='blockpy-content-topright col-md-3 col-sm-3'>
-            <span class='text-muted' data-bind="visible: status.dataset_loading().length">Loading Dataset!</span>
+            <span class='text-muted-less' data-bind="visible: status.dataset_loading().length">Loading Dataset!</span>
             <div class='pull-right' style='clear:both'>
-                <small class='text-muted'>Server: </small>
+                <small class='text-muted-less'>Server: </small>
                 <span class='label label-default blockpy-status-box pull-right'
                     data-bind="css: status_server_class()[0],
                                 text: status_server_class()[1],
@@ -47,7 +54,7 @@
                     data-toggle="tooltip" data-placement="left">Loading</span>
             </div>
             <div class='pull-right' style='clear:both'>
-                <small class='text-muted'>Execution: </small>
+                <small class='text-muted-less'>Execution: </small>
                 <span class='label label-default'
                       data-bind="css: execution_status_class()[0],
                                  text: execution_status_class()[1],
@@ -97,7 +104,9 @@
             <!--<img src="images/corgi.png" class='img-responsive' />-->
         </div>
     </div>
-    <div class='row blockpy-middle-row' style=''>
+    <div class='row blockpy-middle-row' style=''
+         role='region'
+         aria-label='Console and Feedback'>
         <div class='blockpy-content-left col-md-6 col-sm-6'
              style='padding:10px'>
             <strong>Console</strong>
@@ -106,7 +115,7 @@
         </div>
         <div class='blockpy-content-right col-md-6 col-sm-6 bubble'
              style='padding:10px'>
-            <div class='blockpy-feedback'>
+            <div class='blockpy-feedback' aria-live="polite">
                 <button type='button' class='btn btn-sm btn-default blockpy-feedback-trace pull-right' 
                         data-bind="visible: !execution.show_trace() && (status.error() == 'feedback' || status.error() == 'no errors'|| status.error() == 'complete' || status.error() == 'semantic')">
                     <span class='glyphicon glyphicon-circle-arrow-down'></span> Trace Variables
@@ -168,6 +177,8 @@
         </div>
     </div>
     <div class="row blockpy-toolbar-row"
+         role='region'
+         aria-label='Toolbar'
          style='background-color :#fcf8e3; padding-bottom: 10px; border: 1px solid #faebcc'>
         <div class='col-md-12 col-sm-12 blockpy-toolbar btn-toolbar' role='toolbar'>
             
@@ -239,7 +250,7 @@
                 <span class='glyphicon glyphicon-list-alt'></span> Settings
             </button>
             
-            <strong class='blockpy-toolbar-feedback text-muted pull-right' style='z-index:100; margin-top:10px; right:0px; position:absolute; display: none; color: red'>New feedback &uarr;</strong>
+            <strong class='blockpy-toolbar-feedback text-muted-less pull-right' style='z-index:100; margin-top:10px; right:0px; position:absolute; display: none; color: red'>New feedback &uarr;</strong>
 
             <!--
             <button type='button' class='btn btn-default blockpy-toolbar-english'>
@@ -279,13 +290,15 @@
             <div class='blockpy-blocks blockpy-editor-menu' 
                  style='height:100%'
                  role='application'
-                 title='BlockPy Block Editor'>
+                 aria-label='Block Editor'
+                 title='Block Editor'>
                 <div class='blockly-div' style='height:450px; width: 100%' '></div>
                 <!-- <div class='blockly-area'></div> -->
             </div>
             <div class='blockpy-text blockpy-editor-menu' style='height: 450px'
                  role='application'
-                 title='BlockPy Textual Editor'>
+                 aria-label='Textual Editor'
+                 title='Textual Editor'>
                 <div class='blockpy-text-sidebar' style='width:150px; height: 100%; float:left; background-color: #ddd'>
                 <!--
                 <button type='button' class='btn btn-default blockpy-text-insert-if'>Decision (If)</button>
@@ -295,9 +308,10 @@
                 <textarea class='codemirror-div language-python'
                            style='height:100%'></textarea>
             </div>
-            <div class='blockpy-instructor-popup modal' style='display:none' role='dialog'>
+            <div class='blockpy-instructor-popup modal' style='display:none' role='dialog'
+                 aria-label='Assignment Settings'>
                 <div class='modal-dialog' role='document'>
-                    <div class='modal-content' >
+                    <div class='modal-content'  role='region' aria-label='Assignment Settings content'>
                         <div class='modal-header'>
                             <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
                             <h4 class='modal-title'>Assignment Settings</h4>
@@ -305,12 +319,12 @@
                         <div class='modal-body form-inline' style='width:100%'>
                         
                             <!-- Name -->
-                            <form class="form-inline" style='display:inline-block'>
+                            <div class="form-inline" style='display:inline-block'>
                             <label>Name:
                             <input type='text' class='blockpy-presentation-name-editor form-control'
                                    data-bind='textInput: assignment.name'> 
                             </label>
-                            </form><br>
+                            </div><br>
                             
                             <!-- Introduction -->
                             <label>Introduction:</label>

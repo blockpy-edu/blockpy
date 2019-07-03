@@ -1,89 +1,81 @@
-(function (factory) {
+(function(factory) {
   /* global define */
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node/CommonJS
+    module.exports = factory(require('jquery'));
   } else {
-    // Browser globals: jQuery
+    // Browser globals
     factory(window.jQuery);
   }
-}(function ($) {
-  // template
-  var tmpl = $.summernote.renderer.getTemplate();
-
-  /**
-   * @class plugin.hello 
-   * 
-   * Hello Plugin  
-   */
-  $.summernote.addPlugin({
-    /** @property {String} name name of plugin */
-    name: 'hello',
-    /** 
-     * @property {Object} buttons 
-     * @property {Function} buttons.hello   function to make button
-     * @property {Function} buttons.helloDropdown   function to make button
-     * @property {Function} buttons.helloImage   function to make button
-     */
-    buttons: { // buttons
-      hello: function (lang, options) {
-
-        return tmpl.iconButton(options.iconPrefix + 'header', {
-          event : 'hello',
-          title: 'hello',
-          hide: true
-        });
-      },
-      helloDropdown: function (lang, options) {
-
-
-        var list = '<li><a data-event="helloDropdown" href="#" data-value="summernote">summernote</a></li>';
-        list += '<li><a data-event="helloDropdown" href="#" data-value="codemirror">Code Mirror</a></li>';
-        var dropdown = '<ul class="dropdown-menu">' + list + '</ul>';
-
-        return tmpl.iconButton(options.iconPrefix + 'header', {
-          title: 'hello',
-          hide: true,
-          dropdown : dropdown
-        });
-      },
-      helloImage : function (lang, options) {
-        return tmpl.iconButton(options.iconPrefix + 'file-image-o', {
-          event : 'helloImage',
-          title: 'helloImage',
-          hide: true
-        });
-      }
-
-    },
-
+}(function($) {
+  // Extends plugins for adding hello.
+  //  - plugin is external module for customizing.
+  $.extend($.summernote.plugins, {
     /**
-     * @property {Object} events 
-     * @property {Function} events.hello  run function when button that has a 'hello' event name  fires click
-     * @property {Function} events.helloDropdown run function when button that has a 'helloDropdown' event name  fires click
-     * @property {Function} events.helloImage run function when button that has a 'helloImage' event name  fires click
+     * @param {Object} context - context object has status of editor.
      */
-    events: { // events
-      hello: function (event, editor, layoutInfo) {
-        // Get current editable node
-        var $editable = layoutInfo.editable();
+    'hello': function(context) {
+      var self = this;
 
-        // Call insertText with 'hello'
-        editor.insertText($editable, 'hello ');
-      },
-      helloDropdown: function (event, editor, layoutInfo, value) {
-        // Get current editable node
-        var $editable = layoutInfo.editable();
+      // ui has renders to build ui elements.
+      //  - you can create a button with `ui.button`
+      var ui = $.summernote.ui;
 
-        // Call insertText with 'hello'
-        editor.insertText($editable, 'hello ' + value + '!!!!');
-      },
-      helloImage : function (event, editor, layoutInfo) {
-        var $editable = layoutInfo.editable();
+      // add hello button
+      context.memo('button.hello', function() {
+        // create button
+        var button = ui.button({
+          contents: '<i class="fa fa-child"/> Hello',
+          tooltip: 'hello',
+          click: function() {
+            self.$panel.show();
+            self.$panel.hide(500);
+            // invoke insertText method with 'hello' on editor module.
+            context.invoke('editor.insertText', 'hello');
+          },
+        });
 
-        var img = $('<img src="http://upload.wikimedia.org/wikipedia/commons/b/b0/NewTux.svg" />');
-        editor.insertNode($editable, img[0]);
-      }
-    }
+        // create jQuery object from button instance.
+        var $hello = button.render();
+        return $hello;
+      });
+
+      // This events will be attached when editor is initialized.
+      this.events = {
+        // This will be called after modules are initialized.
+        'summernote.init': function(we, e) {
+          console.log('summernote initialized', we, e);
+        },
+        // This will be called when user releases a key on editable.
+        'summernote.keyup': function(we, e) {
+          console.log('summernote keyup', we, e);
+        },
+      };
+
+      // This method will be called when editor is initialized by $('..').summernote();
+      // You can create elements for plugin
+      this.initialize = function() {
+        this.$panel = $('<div class="hello-panel"/>').css({
+          position: 'absolute',
+          width: 100,
+          height: 100,
+          left: '50%',
+          top: '50%',
+          background: 'red',
+        }).hide();
+
+        this.$panel.appendTo('body');
+      };
+
+      // This methods will be called when editor is destroyed by $('..').summernote('destroy');
+      // You should remove elements on `initialize`.
+      this.destroy = function() {
+        this.$panel.remove();
+        this.$panel = null;
+      };
+    },
   });
 }));

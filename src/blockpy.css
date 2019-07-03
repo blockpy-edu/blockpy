@@ -213,3 +213,23 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     color: green;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
+
+.note-editor .modal a{
+    text-decoration: underline;
+}
+
+.text-muted-less {
+    color: #444;
+}
+
+.label-default{
+    background-color: #666;
+}
+
+button.blockpy-run {
+    background-color: rgb(40, 130, 40);
+}
+
+button.blockpy-run:focus {
+    background-color: rgb(20, 100, 20);
+}
