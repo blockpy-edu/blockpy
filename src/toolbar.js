@@ -127,7 +127,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
                 code = ipynb.cells.filter(isUsable).map(makePython).join("\n");
             }
             main.setCode(code)
-            main.components.server.logEvent('editor', 'upload')
+            main.components.server.logEvent('editor', 'upload', code)
             main.components.engine.on_run();
         };
         fr.fileName = files[0].name;

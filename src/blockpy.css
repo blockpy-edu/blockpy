@@ -233,3 +233,7 @@ button.blockpy-run {
 button.blockpy-run:focus {
     background-color: rgb(20, 100, 20);
 }
+
+.label-success {
+    background-color: #358535;
+}
