@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Skulpt" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/../skulpt/dist/skulpt.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../skulpt/dist/skulpt-stdlib.js" />
+      <root url="file://$PROJECT_DIR$/../skulpt/dist/skulpt.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

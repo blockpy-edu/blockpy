@@ -19,10 +19,10 @@ function BlockPyEditor(main, tag) {
     this.converter = new PythonToBlocks();
     
     // HTML DOM accessors
-    this.blockTag = tag.find('.blockpy-blocks');
-    this.blocklyDiv = this.blockTag.find('.blockly-div');
-    this.textTag = tag.find('.blockpy-text');
-    this.instructorTag = tag.find('.blockpy-instructor');
+    this.blockTag = tag.find(".blockpy-blocks");
+    this.blocklyDiv = this.blockTag.find(".blockly-div");
+    this.textTag = tag.find(".blockpy-text");
+    this.instructorTag = tag.find(".blockpy-instructor");
     this.textSidebarTag = this.textTag.find(".blockpy-text-sidebar");
     
     // Blockly and CodeMirror instances
@@ -68,10 +68,10 @@ function BlockPyEditor(main, tag) {
     
     // Handle mode switching
     var settings = this.main.model.settings;
-    settings.editor.subscribe(function() {editor.setMode()});
+    settings.editor.subscribe(function() {editor.setMode();});
     var updateReadOnly = function() {
         var newValue = !!(settings.read_only() && !settings.instructor());
-        editor.codeMirror.setOption('readOnly', newValue);
+        editor.codeMirror.setOption("readOnly", newValue);
         tag.toggleClass("blockpy-read-only", newValue);
     };
     settings.read_only.subscribe(updateReadOnly);
@@ -79,15 +79,15 @@ function BlockPyEditor(main, tag) {
     
     // Handle filename switching
     this.main.model.settings.filename.subscribe(function (name) {
-        if (name == 'give_feedback') {
-            editor.setMode('Text');
+        if (name == "give_feedback") {
+            editor.setMode("Text");
         }
     });
     
     // Handle Upload mode turned on
     this.main.model.assignment.upload.subscribe(function(uploadsMode) {
         if (uploadsMode) {
-            editor.setMode('Text');
+            editor.setMode("Text");
         }
     });
     
@@ -105,12 +105,12 @@ function BlockPyEditor(main, tag) {
 BlockPyEditor.prototype.initBlockly = function() {
     this.blockly = Blockly.inject(this.blocklyDiv[0],
                                   { path: this.main.model.constants.blocklyPath, 
-                                    scrollbars: this.main.model.constants.blocklyScrollbars, 
-                                    readOnly: this.main.model.settings.read_only(),
-                                    zoom: {enabled: false},
-                                    oneBasedIndex: false,
-                                    comments: false,
-                                    toolbox: this.updateToolbox(false)});
+                                      scrollbars: this.main.model.constants.blocklyScrollbars, 
+                                      readOnly: this.main.model.settings.read_only(),
+                                      zoom: {enabled: false},
+                                      oneBasedIndex: false,
+                                      comments: false,
+                                      toolbox: this.updateToolbox(false)});
     // Register model changer
     var editor = this;
     this.blockly.addChangeListener(function(evt) { 
@@ -124,7 +124,7 @@ BlockPyEditor.prototype.initBlockly = function() {
             editor.updateBlocksFromModel()
         }*/
     });
-    this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true)});
+    this.main.model.assignment.modules.subscribe(function() {editor.updateToolbox(true);});
     // Force the proper window size
     this.blockly.resize();
     this.makeToolboxAccessible();
@@ -172,41 +172,41 @@ BlockPyEditor.prototype.getToolbarWidth = function() {
     } else {
         return this.blockly.toolbox_.width;
     }
-}
+};
 
 /**
  * Initializes the CodeMirror instance. This handles text editing (with syntax highlighting)
  * and also attaches a listener for change events to update the internal code represntation.
  */
 BlockPyEditor.prototype.initText = function() {
-    var codeMirrorDiv = this.textTag.find('.codemirror-div')[0];
+    var codeMirrorDiv = this.textTag.find(".codemirror-div")[0];
     this.codeMirror = CodeMirror.fromTextArea(codeMirrorDiv, {
-                                        mode: { name: "python", 
-                                                version: 3, 
-                                                singleLineStringErrors: false
-                                        },
-                                        readOnly: this.main.model.settings.read_only(),
-                                        showCursorWhenSelecting: true,
-                                        lineNumbers: true,
-                                        firstLineNumber: 1,
-                                        indentUnit: 4,
-                                        tabSize: 4,
-                                        indentWithTabs: false,
-                                        matchBrackets: true,
-                                        extraKeys: {"Tab": "indentMore", 
-                                                    "Shift-Tab": "indentLess",
-                                                    "Ctrl-Enter": function() {
-                                                        editor.main.components.toolbar.tag.find('.blockpy-run').click();
-                                                    },
-                                                    "Esc": function() {
-                                                        editor.codeMirror.display.input.blur();
-                                        }},
-                                      });
+        mode: { name: "python", 
+            version: 3, 
+            singleLineStringErrors: false
+        },
+        readOnly: this.main.model.settings.read_only(),
+        showCursorWhenSelecting: true,
+        lineNumbers: true,
+        firstLineNumber: 1,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        matchBrackets: true,
+        extraKeys: {"Tab": "indentMore", 
+            "Shift-Tab": "indentLess",
+            "Ctrl-Enter": function() {
+                editor.main.components.toolbar.tag.find(".blockpy-run").click();
+            },
+            "Esc": function() {
+                editor.codeMirror.display.input.blur();
+            }},
+    });
     // Register model changer
     var editor = this;
     this.codeMirror.on("change", function() {
         //editor.main.components.feedback.clearEditorErrors();
-        editor.updateText()
+        editor.updateText();
         editor.unhighlightAllLines();
     });
 
@@ -217,29 +217,29 @@ BlockPyEditor.prototype.initText = function() {
 };
 
 BlockPyEditor.prototype.makeCodeMirrorAccessible = function() {
-    $('.CodeMirror textarea,textarea.codemirror-div')
+    $(".CodeMirror textarea,textarea.codemirror-div")
         .attr("title", "Programming Textarea");
 };
 
 BlockPyEditor.prototype.reloadIntroduction = function() {
-    var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
+    var introductionEditor = this.tag.find(".blockpy-presentation-body-editor");
     var model = this.main.model;
-    introductionEditor.summernote('code', model.assignment.introduction());
+    introductionEditor.summernote("code", model.assignment.introduction());
     this.makeSummernoteAccessible();
 };
 
 BlockPyEditor.prototype.makeSummernoteAccessible = function() {
-    $('input.note-image-input').prev().append($('input.note-image-input'));
-    $('input.note-image-url').prev().append($('input.note-image-url'));
-    $('input.note-link-text').prev().append($('input.note-link-text'));
-    $('input.note-link-url').prev().append($('input.note-link-url'));
-    $('input.note-video-url').prev().append($('input.note-video-url'));
-    $('.note-codable').attr('title', 'Problem Introduction text editor');
-    $('.note-editable').attr('title', 'Problem Introduction text editor visual');
-    $('i').attr('role', 'presentation');
-    $('.note-popover').attr('role', 'presentation');
+    $("input.note-image-input").prev().append($("input.note-image-input"));
+    $("input.note-image-url").prev().append($("input.note-image-url"));
+    $("input.note-link-text").prev().append($("input.note-link-text"));
+    $("input.note-link-url").prev().append($("input.note-link-url"));
+    $("input.note-video-url").prev().append($("input.note-video-url"));
+    $(".note-codable").attr("title", "Problem Introduction text editor");
+    $(".note-editable").attr("title", "Problem Introduction text editor visual");
+    $("i").attr("role", "presentation");
+    $(".note-popover").attr("role", "presentation");
     // Oh good lord.
-    $('[role=seperator]').attr('role', 'separator')
+    $("[role=seperator]").attr("role", "separator");
     
     // Override tabs in summernote.
     delete $.summernote.options.keyMap.pc.TAB;
@@ -252,27 +252,27 @@ BlockPyEditor.prototype.makeSummernoteAccessible = function() {
  * SummerNote instance used for editing the Introduction of the assignment.
  */
 BlockPyEditor.prototype.initInstructor = function() {
-    var introductionEditor = this.tag.find('.blockpy-presentation-body-editor');
+    var introductionEditor = this.tag.find(".blockpy-presentation-body-editor");
     var model = this.main.model;
     
     introductionEditor.summernote({
         codemirror: { // codemirror options
-            theme: 'monokai'
+            theme: "monokai"
         },
         onChange: model.assignment.introduction,
         toolbar: [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['fontname', 'fontsize']],
-            ['insert', ['link', 'table', 'ul', 'ol']],
-            ['misc', ['codeview', 'help']]
+            ["style", ["bold", "italic", "underline", "clear"]],
+            ["font", ["fontname", "fontsize"]],
+            ["insert", ["link", "table", "ul", "ol"]],
+            ["misc", ["codeview", "help"]]
         ],
     });
     
     this.reloadIntroduction();
     
-    this.availableModules = this.tag.find('.blockpy-available-modules');
+    this.availableModules = this.tag.find(".blockpy-available-modules");
     this.availableModules.multiSelect({ selectableOptgroup: true });
-}
+};
 
 /**
  * Makes the module available in the availableModules multi-select menu by adding
@@ -281,10 +281,10 @@ BlockPyEditor.prototype.initInstructor = function() {
  * @param {String} name - The name of the module (human-friendly version, as opposed to the slug) to be added.
  */
 BlockPyEditor.prototype.addAvailableModule = function(name) {
-    this.availableModules.multiSelect('addOption', { 
-        'value': name, 'text': name
+    this.availableModules.multiSelect("addOption", { 
+        "value": name, "text": name
     });
-    this.availableModules.multiSelect('select', name);
+    this.availableModules.multiSelect("select", name);
 };
 
 /**
@@ -293,7 +293,7 @@ BlockPyEditor.prototype.addAvailableModule = function(name) {
 BlockPyEditor.prototype.hideSplitMenu = function() {
     this.hideTextMenu();
     this.hideBlockMenu();
-}
+};
 
 /**
  * Shows the Text tab, which requires restoring its height, showing AND refreshing
@@ -303,23 +303,23 @@ BlockPyEditor.prototype.showSplitMenu = function() {
     this.showBlockMenu();
     this.showTextMenu();
     
-    this.textTag.css('width', '40%');
-    this.blockTag.css('width', '60%');
-    this.textSidebarTag.css('width', '0px');
-    this.textTag.addClass('col-md-6');
-    this.blockTag.addClass('col-md-6');
+    this.textTag.css("width", "40%");
+    this.blockTag.css("width", "60%");
+    this.textSidebarTag.css("width", "0px");
+    this.textTag.addClass("col-md-6");
+    this.blockTag.addClass("col-md-6");
     Blockly.svgResize(this.blockly);
-}
+};
 
 /**
  * Hides the Text tab, which involves shrinking it and hiding its CodeMirror too.
  */
 BlockPyEditor.prototype.hideTextMenu = function() {
-    this.textTag.css('height', '0%');
+    this.textTag.css("height", "0%");
     $(this.codeMirror.getWrapperElement()).hide();
     this.textSidebarTag.hide();
     this.textTag.hide();
-}
+};
 
 /**
  * Shows the Text tab, which requires restoring its height, showing AND refreshing
@@ -328,20 +328,20 @@ BlockPyEditor.prototype.hideTextMenu = function() {
 BlockPyEditor.prototype.showTextMenu = function() {
     this.textTag.show();
     // Adjust height
-    this.textTag.css('height', '450px');
-    this.textTag.css('width', '100%');
+    this.textTag.css("height", "450px");
+    this.textTag.css("width", "100%");
     // Show CodeMirror
     $(this.codeMirror.getWrapperElement()).show();
     // CodeMirror doesn't know its changed size
     this.codeMirror.refresh();
     
     // Resize sidebar
-    var codemirrorGutterWidth = $('.CodeMirror-gutters').width();
+    var codemirrorGutterWidth = $(".CodeMirror-gutters").width();
     var sideBarWidth = this.blocklyToolboxWidth-codemirrorGutterWidth-2;
-    this.textSidebarTag.css('width', sideBarWidth+'px');
+    this.textSidebarTag.css("width", sideBarWidth+"px");
     this.textSidebarTag.show();
-    this.textTag.removeClass('col-md-6');
-}
+    this.textTag.removeClass("col-md-6");
+};
 
 /**
  * Hides the Block tab, which involves shrinking it and hiding the Blockly instance.
@@ -349,39 +349,39 @@ BlockPyEditor.prototype.showTextMenu = function() {
 BlockPyEditor.prototype.hideBlockMenu = function() {
     
     this.blocklyToolboxWidth = this.getToolbarWidth();
-    this.blockTag.css('height', '0%');
+    this.blockTag.css("height", "0%");
     this.blocklyDiv.css("width", "0");
     this.blockly.setVisible(false);
-}
+};
 
 /**
  * Shows the Block tab, which involves restoring its height and showing the Blockly instance.
  */
 BlockPyEditor.prototype.showBlockMenu = function() {
-    this.blockTag.css('height', '100%');
-    this.blockTag.css('width', '100%');
+    this.blockTag.css("height", "100%");
+    this.blockTag.css("width", "100%");
     this.blocklyDiv.css("width", "100%");
     this.blockly.resize();
     this.blockly.setVisible(true);
-    this.blockTag.removeClass('col-md-6');
+    this.blockTag.removeClass("col-md-6");
     Blockly.svgResize(this.blockly);
-}
+};
 
 /**
  * Hides the Instructor tab, which shrinking it.
  */
 BlockPyEditor.prototype.hideInstructorMenu = function() {
     this.instructorTag.hide();
-    this.instructorTag.css('height', '0%');
-}
+    this.instructorTag.css("height", "0%");
+};
 
 /**
  * Shows the Instructor tab, which involves restoring its height.
  */
 BlockPyEditor.prototype.showInstructorMenu = function() {
-    this.instructorTag.css('height', '100%');
+    this.instructorTag.css("height", "100%");
     this.instructorTag.show();
-}
+};
 
 /**
  * Sets the current editor mode to Text, hiding the other menus.
@@ -392,7 +392,7 @@ BlockPyEditor.prototype.setModeToText = function() {
     this.hideInstructorMenu();
     this.showTextMenu();
     // Update the text model from the blocks
-}
+};
 
 /**
  * Sets the current editor mode to Blocks, hiding the other menus.
@@ -423,7 +423,7 @@ BlockPyEditor.prototype.setModeToBlocks = function() {
             main.components.toolbar.tags.mode_set_text.click();
         }, 0);
     }*/
-}
+};
 
 /**
  * Sets the current editor mode to Split mode, hiding the other menus.
@@ -436,7 +436,7 @@ BlockPyEditor.prototype.setModeToSplit = function() {
     if (this.blocksFailed !== false) {
         this.showConversionError();
     }
-}
+};
 
 /**
  * Sets the current editor mode to the Instructor mode, hiding the other menus.
@@ -447,7 +447,7 @@ BlockPyEditor.prototype.setModeToInstructor = function() {
     this.showInstructorMenu();
     //TODO: finish upload mode
     //this.main.reportError("editor", "Instructor mode has not been implemented");
-}
+};
 
 BlockPyEditor.prototype.changeMode = function() {
     if (main.model.settings.editor() == "Blocks") {
@@ -455,7 +455,7 @@ BlockPyEditor.prototype.changeMode = function() {
     } else {
         main.model.settings.editor("Blocks");
     }
-}
+};
 
 /**
  * Dispatch method to set the mode to the given argument.
@@ -471,20 +471,20 @@ BlockPyEditor.prototype.setMode = function(mode) {
         this.main.model.settings.editor(mode);
     }
     // Dispatch according to new mode
-    if (mode == 'Blocks') {
+    if (mode == "Blocks") {
         this.setModeToBlocks();
-    } else if (mode == 'Text') {
+    } else if (mode == "Text") {
         this.setModeToText();
-    } else if (mode == 'Split') {
+    } else if (mode == "Split") {
         this.setModeToSplit();
-    } else if (mode == 'Instructor') {
+    } else if (mode == "Instructor") {
         this.setModeToInstructor();
-    } else if (mode == 'Upload') {
+    } else if (mode == "Upload") {
         this.setModeToText();
     } else {
-        this.main.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.")
+        this.main.components.feedback.internalError(""+mode, "Invalid Mode", "The editor attempted to change to an invalid mode.");
     }
-}
+};
 
 /**
  * Actually changes the value of the CodeMirror instance
@@ -499,12 +499,12 @@ BlockPyEditor.prototype.setText = function(code) {
     }
     // Ensure that we maintain proper highlighting
     this.refreshHighlight();
-}
+};
 
 BlockPyEditor.prototype.showConversionError = function() {
     var error = this.blocksFailed;
     this.main.components.feedback.convertSkulptSyntax(error);
-}
+};
 
 BlockPyEditor.prototype.setBlocks = function(python_code) {
     if (!(!this.main.model.assignment.upload() &&
@@ -513,7 +513,7 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
         return false;
     }
     var xml_code = "";
-    if (python_code !== '' && python_code !== undefined && python_code.trim().charAt(0) !== '<') {
+    if (python_code !== "" && python_code !== undefined && python_code.trim().charAt(0) !== "<") {
         var result = this.converter.convertSource(python_code);
         xml_code = result.xml;
         window.clearTimeout(this.blocksFailedTimeout);
@@ -521,10 +521,10 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
             this.blocksFailed = result.error;
             var editor = this;
             this.blocksFailedTimeout = window.setTimeout(function() {
-                if (editor.main.model.settings.editor() != 'Text') {
+                if (editor.main.model.settings.editor() != "Text") {
                     editor.showConversionError();
                 }
-            }, 500)
+            }, 500);
         } else {
             this.blocksFailed = false;
             this.main.components.feedback.clearEditorErrors();
@@ -532,9 +532,9 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
     }
     var error_code = this.converter.convertSourceToCodeBlock(python_code);
     var errorXml = Blockly.Xml.textToDom(error_code);
-    if (python_code == '' || python_code == undefined || python_code.trim() == '') {
+    if (python_code == "" || python_code == undefined || python_code.trim() == "") {
         this.blockly.clear();
-    } else if (xml_code !== '' && xml_code !== undefined) {
+    } else if (xml_code !== "" && xml_code !== undefined) {
         var blocklyXml = Blockly.Xml.textToDom(xml_code);
         try {
             this.setBlocksFromXml(blocklyXml);
@@ -556,7 +556,7 @@ BlockPyEditor.prototype.setBlocks = function(python_code) {
     if (this.previousLine !== null) {
         this.refreshBlockHighlight(this.previousLine);
     }
-}
+};
 
 BlockPyEditor.prototype.clearDeadBlocks = function() {
     var all_blocks = this.blockly.getAllBlocks();
@@ -565,7 +565,7 @@ BlockPyEditor.prototype.clearDeadBlocks = function() {
             elem.dispose(true);
         }
     });
-}
+};
 
 /**
  * Attempts to update the model for the current code file from the 
@@ -591,7 +591,7 @@ BlockPyEditor.prototype.updateBlocks = function() {
             this.setText(newCode);
         }
     }
-}
+};
 
 /**
  * Attempts to update the model for the current code file from the 
@@ -612,7 +612,7 @@ BlockPyEditor.prototype.updateText = function() {
         this.resetBlockSilence();
     }
     this.silenceText = false;
-}
+};
 
 /**
  * Resets the silenceBlock after a short delay
@@ -641,7 +641,7 @@ BlockPyEditor.prototype.updateTextFromModel = function() {
     } else {
         this.silenceModel -= 1;
     }
-}
+};
 
 /**
  * Updates the block editor from the current code file in the
@@ -659,7 +659,7 @@ BlockPyEditor.prototype.updateBlocksFromModel = function() {
     } else {
         this.silenceModel -= 1;
     }
-}
+};
 
 /**
  * Helper function for retrieving the current Blockly workspace as
@@ -669,7 +669,7 @@ BlockPyEditor.prototype.updateBlocksFromModel = function() {
  */
 BlockPyEditor.prototype.getBlocksFromXml = function() {
     return Blockly.Xml.workspaceToDom(this.blockly);
-}
+};
           
 /**
  * Helper function for setting the current Blockly workspace to
@@ -679,7 +679,7 @@ BlockPyEditor.prototype.setBlocksFromXml = function(xml) {
     //this.blockly.clear();
     Blockly.Xml.domToWorkspaceDestructive(xml, this.blockly);
     //console.log(this.blockly.getAllBlocks());
-}
+};
 
 /** 
  * @property {Number} previousLine - Keeps track of the previously highlighted line.
@@ -693,11 +693,11 @@ BlockPyEditor.prototype.previousLine = null;
 BlockPyEditor.prototype.refreshHighlight = function() {
     if (this.previousLine !== null) {
         if (this.previousLine < this.codeMirror.lineCount()) {
-            this.codeMirror.addLineClass(this.previousLine, 'text', 'editor-error-line');
+            this.codeMirror.addLineClass(this.previousLine, "text", "editor-error-line");
         }
     }
     // TODO: Shouldn't this refresh the highlight in the block side too?
-}
+};
 
 /**
  * Highlights a line of code in the CodeMirror instance. This applies the "active" style
@@ -708,15 +708,15 @@ BlockPyEditor.prototype.refreshHighlight = function() {
 BlockPyEditor.prototype.highlightLine = function(line) {
     if (this.previousLine !== null) {
         if (this.previousLine < this.codeMirror.lineCount()) {
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-active-line");
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-error-line");
         }
     }
     if (line < this.codeMirror.lineCount()) {
-        this.codeMirror.addLineClass(line, 'text', 'editor-active-line');
+        this.codeMirror.addLineClass(line, "text", "editor-active-line");
     }
     this.previousLine = line;
-}
+};
 
 /**
  * Highlights a line of code in the CodeMirror instance. This applies the "error" style
@@ -727,16 +727,16 @@ BlockPyEditor.prototype.highlightLine = function(line) {
 BlockPyEditor.prototype.highlightError = function(line) {
     if (this.previousLine !== null) {
         if (this.previousLine < this.codeMirror.lineCount()) {
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-active-line");
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-error-line");
         }
     }
     if (line < this.codeMirror.lineCount()) {
-        this.codeMirror.addLineClass(line, 'text', 'editor-error-line');
+        this.codeMirror.addLineClass(line, "text", "editor-error-line");
     }
     this.refreshBlockHighlight(line);
     this.previousLine = line;
-}
+};
 
 /**
  * Highlights a block in Blockly. Unfortunately, this is the same as selecting it.
@@ -745,7 +745,7 @@ BlockPyEditor.prototype.highlightError = function(line) {
  */
 BlockPyEditor.prototype.highlightBlock = function(block) {
     //this.blockly.highlightBlock(block);
-}
+};
 
 /**
  * Used to restore a block's highlight when travelling from the code tab. This
@@ -787,14 +787,14 @@ BlockPyEditor.prototype.refreshBlockHighlight = function(line) {
             this.blockly.highlightBlock(hblocks[0].id, true);
         }*/
     }
-}
+};
 
 /**
  * Removes the outline around a block. Currently unused.
  */
 BlockPyEditor.prototype.unhighlightBlock = function() {
     // TODO:
-}
+};
 
 /**
  * Removes any highlight in the text code editor.
@@ -803,12 +803,12 @@ BlockPyEditor.prototype.unhighlightBlock = function() {
 BlockPyEditor.prototype.unhighlightLines = function() {
     if (this.previousLine !== null) {
         if (this.previousLine < this.codeMirror.lineCount()) {
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-active-line');
-            this.codeMirror.removeLineClass(this.previousLine, 'text', 'editor-error-line');
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-active-line");
+            this.codeMirror.removeLineClass(this.previousLine, "text", "editor-error-line");
         }
     }
     this.previousLine = null;
-}
+};
 
 /**
  * Removes any highlight in the text code editor.
@@ -818,9 +818,9 @@ BlockPyEditor.prototype.unhighlightAllLines = function() {
     var editor = this.codeMirror;
     var count = editor.lineCount(), i;
     for (i = 0; i < count; i++) {
-        editor.removeLineClass(i, 'text', 'editor-error-line');
+        editor.removeLineClass(i, "text", "editor-error-line");
     }
-}
+};
 
 /**
  * DEPRECATED, thankfully
@@ -835,8 +835,8 @@ BlockPyEditor.prototype.unhighlightAllLines = function() {
 BlockPyEditor.prototype.getHighlightMap = function() {
     // Protect the current STATEMENT_PREFIX
     var backup = Blockly.Python.STATEMENT_PREFIX;
-    Blockly.Python.STATEMENT_PREFIX = '__HIGHLIGHT__(%1);';
-    Blockly.Python.addReservedWords('__HIGHLIGHT__');
+    Blockly.Python.STATEMENT_PREFIX = "__HIGHLIGHT__(%1);";
+    Blockly.Python.addReservedWords("__HIGHLIGHT__");
     // Get the source code, injected with __HIGHLIGHT__(id)
     var highlightedCode = Blockly.Python.workspaceToCode(this.blockly);
     Blockly.Python.STATEMENT_PREFIX = backup;
@@ -852,7 +852,7 @@ BlockPyEditor.prototype.getHighlightMap = function() {
         }
     }
     return highlightMap;
-}
+};
 
 /**
  * Updates the current file being edited in the editors.
@@ -878,7 +878,7 @@ BlockPyEditor.prototype.changeProgram = function(name) {
  */
 BlockPyEditor.prototype.setLevel = function() {
     var level = this.main.model.settings.level();
-}
+};
 
 /**
  * Maps short category names in the toolbox to the full XML used to
@@ -887,9 +887,9 @@ BlockPyEditor.prototype.setLevel = function() {
  * individual blocks.
  */
 BlockPyEditor.CATEGORY_MAP = {
-    'Variables': '<category name="Variables" custom="VARIABLE" colour="240">'+
-                  '</category>',
-    'Decisions': '<category name="Decisions" colour="330">'+
+    "Variables": '<category name="Variables" custom="VARIABLE" colour="240">'+
+                  "</category>",
+    "Decisions": '<category name="Decisions" colour="330">'+
                     '<block type="controls_if_better"></block>'+
                     '<block type="controls_if_better"><mutation else="1"></mutation></block>'+
                     //'<block type="controls_if"></block>'+
@@ -897,19 +897,19 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="logic_compare"></block>'+
                     '<block type="logic_operation"></block>'+
                     '<block type="logic_negate"></block>'+
-                  '</category>',
-    'Iteration': '<category name="Iteration" colour="300">'+
+                  "</category>",
+    "Iteration": '<category name="Iteration" colour="300">'+
                     '<block type="controls_forEach"></block>'+
-                '</category>',
-    'Functions': '<category name="Functions" custom="PROCEDURE" colour="210">'+
-                '</category>',
-    'Classes': '<category name="Classes" colour="210">'+
+                "</category>",
+    "Functions": '<category name="Functions" custom="PROCEDURE" colour="210">'+
+                "</category>",
+    "Classes": '<category name="Classes" colour="210">'+
                     '<block type="class_creation"></block>'+
                     '<block type="class_creation">'+
                         '<mutation value="k"></mutation>'+
-                    '</block>'+
-                '</category>',
-    'Calculation': '<category name="Calculation" colour="270">'+
+                    "</block>"+
+                "</category>",
+    "Calculation": '<category name="Calculation" colour="270">'+
                     //'<block type="raw_table"></block>'+
                     '<block type="math_arithmetic"></block>'+
                     //'<block type="type_check"></block>'+
@@ -917,32 +917,32 @@ BlockPyEditor.CATEGORY_MAP = {
                     //'<block type="math_single"></block>'+
                     //'<block type="math_number_property"></block>'+
                     '<block type="math_round"></block>'+
-                    //'<block type="text_join"></block>'+
-                '</category>',
-    'Conversion': '<category name="Conversion" colour="275">'+
+    //'<block type="text_join"></block>'+
+                "</category>",
+    "Conversion": '<category name="Conversion" colour="275">'+
                     '<block type="procedures_callreturn" inline="true">'+
                         '<mutation name="int"><arg name="">'+
-                        '</arg></mutation>'+
-                    '</block>'+
+                        "</arg></mutation>"+
+                    "</block>"+
                     '<block type="procedures_callreturn" inline="true">'+
                         '<mutation name="float"><arg name="">'+
-                        '</arg></mutation>'+
-                    '</block>'+
+                        "</arg></mutation>"+
+                    "</block>"+
                     '<block type="procedures_callreturn" inline="true">'+
                         '<mutation name="str"><arg name="">'+
-                        '</arg></mutation>'+
-                    '</block>'+
+                        "</arg></mutation>"+
+                    "</block>"+
                     '<block type="procedures_callreturn" inline="true">'+
                         '<mutation name="bool"><arg name="">'+
-                        '</arg></mutation>'+
-                    '</block>'+
-                '</category>',
-    'Python':   '<category name="Python" colour="180">'+
+                        "</arg></mutation>"+
+                    "</block>"+
+                "</category>",
+    "Python":   '<category name="Python" colour="180">'+
                     '<block type="raw_block"></block>'+
                     '<block type="raw_expression"></block>'+
-                    //'<block type="function_call"></block>'+
-                '</category>',
-    'Output':   '<category name="Output" colour="160">'+
+    //'<block type="function_call"></block>'+
+                "</category>",
+    "Output":   '<category name="Output" colour="160">'+
                     '<block type="text_print"></block>'+
                     //'<block type="text_print_multiple"></block>'+
                     '<block type="plot_line"></block>'+
@@ -952,64 +952,64 @@ BlockPyEditor.CATEGORY_MAP = {
                     '<block type="plot_title"></block>'+
                     '<block type="plot_xlabel"></block>'+
                     '<block type="plot_ylabel"></block>'+
-                '</category>',
-    'Input':   '<category name="Input" colour="165">'+
+                "</category>",
+    "Input":   '<category name="Input" colour="165">'+
                     '<block type="text_input"></block>'+
-                '</category>',
-    'Turtles': '<category name="Turtles" colour="180">'+
+                "</category>",
+    "Turtles": '<category name="Turtles" colour="180">'+
                     '<block type="turtle_create"></block>'+
                     '<block type="turtle_forward"></block>'+
                     '<block type="turtle_backward"></block>'+
                     '<block type="turtle_left"></block>'+
                     '<block type="turtle_right"></block>'+
                     '<block type="turtle_color"></block>'+
-                '</category>',
-    'Values':   '<category name="Values" colour="100">'+
+                "</category>",
+    "Values":   '<category name="Values" colour="100">'+
                     '<block type="text"></block>'+
                     '<block type="math_number"></block>'+
                     '<block type="logic_boolean"></block>'+
-                '</category>',
-    'Tuples': '<category name="Tuples" colour="40">'+
+                "</category>",
+    "Tuples": '<category name="Tuples" colour="40">'+
                 '<block type="tuple_create"></block>'+
-              '</category>',
-    'Lists':    '<category name="Lists" colour="30">'+
+              "</category>",
+    "Lists":    '<category name="Lists" colour="30">'+
                     //'<block type="lists_create"></block>'+
                     '<block type="lists_create_with">'+
                         '<value name="ADD0">'+
                           '<block type="math_number"><field name="NUM">0</field></block>'+
-                        '</value>'+
+                        "</value>"+
                         '<value name="ADD1">'+
                           '<block type="math_number"><field name="NUM">0</field></block>'+
-                        '</value>'+
+                        "</value>"+
                         '<value name="ADD2">'+
                           '<block type="math_number"><field name="NUM">0</field></block>'+
-                        '</value>'+
-                    '</block>'+
+                        "</value>"+
+                    "</block>"+
                     '<block type="lists_create_with"></block>'+
                     '<block type="lists_create_empty"></block>'+
                     '<block type="lists_append"></block>'+
                     '<block type="procedures_callreturn" inline="true">'+
                         '<mutation name="range"><arg name="">'+
                             '<block type="math_number"><field name="NUM">10</field></block>'+
-                        '</arg></mutation>'+
+                        "</arg></mutation>"+
                         '<value name="ARG0">'+
                             '<block type="math_number"><field name="NUM">10</field></block>'+
-                        '</value>'+
-                    '</block>'+
-                    /*'<block type="lists_length"></block>'+*/
-                    /*'<block type="lists_index">'+
+                        "</value>"+
+                    "</block>"+
+    /*'<block type="lists_length"></block>'+*/
+    /*'<block type="lists_index">'+
                         '<value name="ITEM">'+
                           '<shadow type="math_number">'+
                             '<field name="NUM">0</field>'+
                           '</shadow>'+
                         '</value>'+
                     '</block>'+*/
-                '</category>',
-    'Dictionaries': '<category name="Dictionaries" colour="0">'+
+                "</category>",
+    "Dictionaries": '<category name="Dictionaries" colour="0">'+
                     '<block type="dicts_create_with"></block>'+
                     '<block type="dict_get_literal"></block>'+
-                    //'<block type="dict_keys"></block>'+
-                '</category>',
+    //'<block type="dict_keys"></block>'+
+                "</category>",
     /*
     'Data - Weather': '<category name="Data - Weather" colour="70">'+
                     '<block type="weather_temperature"></block>'+
@@ -1036,7 +1036,7 @@ BlockPyEditor.CATEGORY_MAP = {
     'Data - Books': '<category name="Data - Books" colour="50">'+
                     '<block type="books_get"></block>'+
                 '</category>',*/
-    'Data - Parking': '<category name="Data - Parking" colour="45">'+
+    "Data - Parking": '<category name="Data - Parking" colour="45">'+
                     '<block type="datetime_day"></block>'+
                     '<block type="datetime_time"></block>'+
                     '<block type="logic_compare">'+
@@ -1047,21 +1047,21 @@ BlockPyEditor.CATEGORY_MAP = {
                             '<field name="HOUR">1</field>'+
                             '<field name="MINUTE">00</field>'+
                             '<field name="MERIDIAN">PM</field>'+
-                          '</block>'+
-                        '</value>'+
-                    '</block>'+
+                          "</block>"+
+                        "</value>"+
+                    "</block>"+
                     '<block type="logic_compare">'+
                         '<field name="OP">EQ</field>'+
                         '<value name="A">'+
                           '<block type="datetime_day">'+
                             '<field name="DAY">Monday</field>'+
-                          '</block>'+
-                        '</value>'+
-                    '</block>'+
-                    //'<block type="datetime_check_day"></block>'+
-                    //'<block type="datetime_check_time"></block>'+
-                '</category>',
-    'Separator': '<sep></sep>'
+                          "</block>"+
+                        "</value>"+
+                    "</block>"+
+    //'<block type="datetime_check_day"></block>'+
+    //'<block type="datetime_check_time"></block>'+
+                "</category>",
+    "Separator": "<sep></sep>"
 };
 
 /**
@@ -1080,19 +1080,19 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
         started_data = false;
     for (var i = 0, length = modules.length; i < length; i = i+1) {
         var module = modules[i];
-        if (!started_misc && ['Calculation', 'Conversion', 'Output', 'Input', 'Python'].indexOf(module) != -1) {
+        if (!started_misc && ["Calculation", "Conversion", "Output", "Input", "Python"].indexOf(module) != -1) {
             started_misc = true;
-            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+            xml += BlockPyEditor.CATEGORY_MAP["Separator"];
         }
-        if (!started_values && ['Values', 'Lists', 'Dictionaries'].indexOf(module) != -1) {
+        if (!started_values && ["Values", "Lists", "Dictionaries"].indexOf(module) != -1) {
             started_values = true;
-            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+            xml += BlockPyEditor.CATEGORY_MAP["Separator"];
         }
-        if (!started_data && module.slice(0, 6) == 'Data -') {
+        if (!started_data && module.slice(0, 6) == "Data -") {
             started_data = true;
-            xml += BlockPyEditor.CATEGORY_MAP['Separator'];
+            xml += BlockPyEditor.CATEGORY_MAP["Separator"];
         }
-        if (typeof module == 'string') {
+        if (typeof module == "string") {
             xml += BlockPyEditor.CATEGORY_MAP[module];
         } else {
             var category = '<category name="'+module.name+'" colour="'+module.color+'">';
@@ -1100,11 +1100,11 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
                 var block = module.blocks[j];
                 category += '<block type="'+block+'"></block>';
             }
-            category += '</category>';
+            category += "</category>";
         }
         //'<sep></sep>'+
     }
-    xml += '</xml>';
+    xml += "</xml>";
     if (only_set && !this.main.model.settings.read_only()) {
         this.blockly.updateToolbox(xml);
         this.makeToolboxAccessible();
@@ -1115,95 +1115,16 @@ BlockPyEditor.prototype.updateToolbox = function(only_set) {
 };
 
 BlockPyEditor.prototype.makeToolboxAccessible = function() {
-    document.getElementById(':0.label').innerText = "Block categories";
-    var separators = document.getElementsByClassName('blocklyTreeSeparator');
+    document.getElementById(":0.label").innerText = "Block categories";
+    var separators = document.getElementsByClassName("blocklyTreeSeparator");
     for (var i = 0; i < separators.length; i++) {
-        separators[i].children[2].innerText = 'Separator';
-        separators[i].children[2].style.display = 'none';
+        separators[i].children[2].innerText = "Separator";
+        separators[i].children[2].style.display = "none";
     }
-    $('.blocklyTreeRow,.blocklyTreeSeparator').next().attr("aria-label", "blockly-tree-group");
-}
+    $(".blocklyTreeRow,.blocklyTreeSeparator").next().attr("aria-label", "blockly-tree-group");
+};
 
-BlockPyEditor.prototype.DOCTYPE = '<?xml version="1.0" standalone="no"?>' + '<' + '!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
-BlockPyEditor.prototype.cssData = null;
-BlockPyEditor.prototype.loadCss = function() {
-    if (this.cssData == null) {
-        var txt = '.blocklyDraggable {}\n';
-        txt += Blockly.Css.CONTENT.join('\n');
-        if (Blockly.FieldDate) {
-            txt += Blockly.FieldDate.CSS.join('\n');
-        }
-        // Strip off any trailing slash (either Unix or Windows).
-        this.cssData = txt.replace(/<<<PATH>>>/g, Blockly.Css.mediaPath_);
-    }
-}
 
-/**
- * Generates a PNG version of the current workspace. This PNG is stored in a Base-64 encoded
- * string as part of a data URL (e.g., "data:image/png;base64,...").
- * TODO: There seems to be some problems capturing blocks that don't start with
- * statement level blocks (e.g., expression blocks).
- * 
- * @param {Function} callback - A function to be called with the results. This function should take two parameters, the URL (as a string) of the generated base64-encoded PNG and the IMG tag.
- */
-BlockPyEditor.prototype.getPngFromBlocks = function(callback) {
-    this.loadCss();
-    try {
-        // Retreive the entire canvas, strip some unnecessary tags
-        var blocks = this.blockly.svgBlockCanvas_.cloneNode(true);
-        blocks.removeAttribute("width");
-        blocks.removeAttribute("height");
-        // Ensure that we have some content
-        if (blocks.childNodes[0] !== undefined) {
-            // Remove tags that offset
-            blocks.removeAttribute("transform");
-            blocks.childNodes[0].removeAttribute("transform");
-            blocks.childNodes[0].childNodes[0].removeAttribute("transform");
-            // Add in styles
-            var linkElm = document.createElementNS("http://www.w3.org/1999/xhtml", "style");
-            linkElm.textContent = this.cssData + '\n\n';
-            blocks.insertBefore(linkElm, blocks.firstChild);
-            // Get the bounding box
-            var bbox = document.getElementsByClassName("blocklyBlockCanvas")[0].getBBox();
-            // Create the XML representation of the SVG
-            var xml = new XMLSerializer().serializeToString(blocks);
-            xml = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="'+bbox.width+'" height="'+bbox.height+'" viewBox="0 0 '+bbox.width+' '+bbox.height+'"><rect width="100%" height="100%" fill="white"></rect>'+xml+'</svg>';
-            // create a file blob of our SVG.
-            // Unfortunately, this crashes modern chrome for unknown reasons.
-            //var blob = new Blob([ this.DOCTYPE + xml], { type: 'image/svg+xml' });
-            //var url = window.URL.createObjectURL(blob);
-            // Old method: this failed on IE
-            var url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
-            // Create an IMG tag to hold the new element
-            var img  = document.createElement("img");
-            img.style.display = 'block';
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width = bbox.width;
-                canvas.height = bbox.height;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                var canvasUrl;
-                try {
-                    canvasUrl = canvas.toDataURL("image/png");
-                } catch (e) {
-                    canvasUrl = url;
-                }
-                img.onload = null;
-                callback(canvasUrl, img);
-            }
-            img.onerror = function() {
-                callback("", img);
-            }
-            img.setAttribute('src', url);
-        } else {
-            callback("", document.createElement("img"))
-        }
-    } catch (e) {
-        callback("", document.createElement("img"));
-        console.error("PNG image creation not supported!", e);
-    }
-}
 
 /**
  * Shows a dialog window with the current block workspace encoded as a
@@ -1213,18 +1134,18 @@ BlockPyEditor.prototype.copyImage = function() {
     var dialog = this.main.components.dialog;
     this.getPngFromBlocks(function(canvasUrl, img) {
         img.onload = function() {
-            var span = document.createElement('span');
-            span.textContent = "Right-click and copy the image below."
-            var newWindow = document.createElement('button');
-            var newWindowInner = document.createElement('span');
+            var span = document.createElement("span");
+            span.textContent = "Right-click and copy the image below.";
+            var newWindow = document.createElement("button");
+            var newWindowInner = document.createElement("span");
             newWindow.className += "btn btn-default btn-xs";
             newWindowInner.className += "glyphicon glyphicon-new-window";
             newWindow.onclick = function() {
                 var output = img.src;
                 window.open(img.src);
-            }
+            };
             newWindow.appendChild(newWindowInner);
-            var div = document.createElement('div');
+            var div = document.createElement("div");
             div.appendChild(span);
             div.appendChild(newWindow);
             div.appendChild(img);
@@ -1232,4 +1153,4 @@ BlockPyEditor.prototype.copyImage = function() {
         };
         img.src = canvasUrl;
     });
-}
+};

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="BlockMirror" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/../BlockMirror/dist/block_mirror.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../BlockMirror/dist/block_mirror.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

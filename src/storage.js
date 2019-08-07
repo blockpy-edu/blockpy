@@ -9,7 +9,7 @@
  * @this {LocalStorageWrapper}
  * @param {String} namespace - A namespace to use in grouping access to localstorage. This keeps access clean and organized, while also making it possible to have multiple LocalStorage connections.
  */
-function LocalStorageWrapper(namespace) {
+export function LocalStorageWrapper(namespace) {
     this.namespace = namespace;
 }
 /**
@@ -91,4 +91,3 @@ LocalStorageWrapper.prototype.is_new = function(key, server_time) {
     var stored_time = localStorage.getItem(this.namespace+"_"+key+"_timestamp");
     return (server_time >= stored_time+5000);
 };
-

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BlockPy Example</title>
+
+    <!-- D3 -->
+    <script src="../libs/d3/d3.min.js"></script>
+
+    <!-- FontAwesome 5 -->
+    <link rel="stylesheet" href="../libs/fontawesome/all.min.css">
+
+    <!-- JQuery -->
+    <script src="../libs/jquery/jquery-3.4.1.min.js"></script>
+
+    <!-- JQuery UI -->
+    <script src="../libs/jquery/jquery-ui.min.js"></script>
+
+    <!-- JQuery Multi-select -->
+    <link rel="stylesheet" href="../libs/jquery/multi-select.css">
+    <script src="../libs/jquery/jquery.multi-select.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../libs/bootstrap/bootstrap.min.css">
+    <script src="../libs/bootstrap/popper.min.js"></script>
+    <script src="../libs/bootstrap/bootstrap.min.js"></script>
+
+    <!-- Knockout -->
+    <script src="../libs/knockout/knockout-3.5.0.js"></script>
+
+    <!-- HighlightJS -->
+    <link rel="stylesheet" href="../libs/highlight/default.min.css">
+    <script src="../libs/highlight/highlight.min.js"></script>
+
+    <!-- EasyMD -->
+    <link rel="stylesheet" href="../libs/easymde/easymde.css">
+    <script src="../libs/easymde/easymde.min.js"></script>
+
+    <!-- Code Mirror -->
+    <link rel="stylesheet" href="../libs/codemirror/codemirror.css">
+    <link rel="stylesheet" href="../libs/codemirror/fullscreen.css">
+    <script src="../libs/codemirror/codemirror.js"></script>
+    <script src="../libs/codemirror/diff.js"></script>
+    <script src="../libs/codemirror/django.js"></script>
+    <script src="../libs/codemirror/fullscreen.js"></script>
+    <script src="../libs/codemirror/markdown.js"></script>
+    <script src="../libs/codemirror/python.js"></script>
+    <script src="../libs/codemirror/shell.js"></script>
+    <script src="../libs/codemirror/yaml-frontmatter.js"></script>
+
+    <!-- Blockly -->
+    <script src="../../blockly/blockly_compressed.js" type="text/javascript"></script>
+    <script src="../../blockly/blocks_compressed.js" type="text/javascript"></script>
+    <script src="../../blockly/msg/js/en.js" type="text/javascript"></script>
+    <script src="../../blockly/python_compressed.js" type="text/javascript"></script>
+
+    <!-- Skulpt -->
+    <script src="../../skulpt/dist/skulpt.js" type="text/javascript"></script>
+    <script src="../../skulpt/dist/skulpt-stdlib.js" type="text/javascript"></script>
+
+    <!-- BlockMirror -->
+    <link rel="stylesheet" href="../../BlockMirror/dist/block_mirror.css">
+    <script src="../../BlockMirror/dist/block_mirror.js" type="text/javascript"></script>
+
+    <!-- BlockPy -->
+    <link rel="stylesheet" href="../dist/blockpy.css">
+    <script src="../dist/blockpy.js"></script>
+
+</head>
+<body>
+
+<div style="width:900px;  margin:0 auto;">
+
+<div id="main-editor"></div>
+
+<script>
+    $(document).ready(function() {
+        editor = new blockpy.BlockPy({
+            'attachment.point': '#main-editor',
+            "submission.code": `
+print("Hello world!")
+name = input("What is your name?")
+print("Hello there", name)`
+        });
+        blockmirror = editor.components.editors.registered_[1].bm;
+    });
+</script>
+
+</div>
+
+</body>
+</html>

@@ -1,5 +1,25 @@
-_IMPORTED_DATASETS = {};
-_IMPORTED_COMPLETE_DATASETS = {};
+import {slug} from "./utilities";
+
+// TODO: editor.bm.blockEditor.extraTools[]
+
+export let _IMPORTED_DATASETS = {};
+export let _IMPORTED_COMPLETE_DATASETS = {};
+
+/**
+ * This is a very simplistic helper function that will transform
+ * a given button into a "Loaded" state (disabled, pressed state, etc.).
+ *
+ * @param {HTMLElement} btn - An HTML element to change the text of.
+ */
+let setButtonLoaded = function (btn) {
+    btn.addClass("active")
+        .addClass("btn-success")
+        .removeClass("btn-primary")
+        .prop("disabled", true)
+        .text("Loaded")
+        .attr("aria-pressed", "true");
+};
+
 
 /**
  * Module that connects to the CORGIS datasets and manages interactions
@@ -10,40 +30,37 @@ _IMPORTED_COMPLETE_DATASETS = {};
  * @this {BlockPyCorgis}
  * @param {Object} main - The main BlockPy instance
  */
-function BlockPyCorgis(main) {
+export function BlockPyCorgis(main) {
     this.main = main;
-    
+
     this.loadedDatasets = [];
     this.loadDatasets();
 }
 
-BlockPyCorgis.prototype.loadDatasets = function(silently) {
+BlockPyCorgis.prototype.loadDatasets = function (silently) {
     // Load in each the datasets
-    var corgis = this,
-        model = this.main.model,
-        editor = this.main.components.editor,
+    let model = this.main.model,
+        editor = this.main.components.pythonEditor,
         server = this.main.components.server;
-    var imports = [];
-    model.assignment.modules().forEach(function(name) {
-        var post_prefix = name.substring(7).replace(/\s/g, '_').toLowerCase();
-        if (!(name in BlockPyEditor.CATEGORY_MAP)) {
-            imports.push.apply(imports, corgis.importDataset(post_prefix, name, silently));
+    let imports = [];
+    model.assignment.settings.datasets().split(",").forEach((name) => {
+        if (name && !(name in BlockMirrorBlockEditor.EXTRA_TOOLS)) {
+            imports.push.apply(imports, this.importDataset(slug(name), name, silently));
         }
     });
-    
+
     // When datasets are loaded, update the toolbox.
-    $.when.apply($, imports).done(function() {
-        if (model.settings.editor() == "Blocks") {
-            editor.updateBlocksFromModel();
-        }
-        editor.updateToolbox(true);
-    }).fail(function(e) {
+    $.when.apply($, imports).done(function () {
+        console.log("TRIGGERED");
+        editor.bm.forceBlockRefresh();
+        editor.bm.blockEditor.remakeToolbox();
+    }).fail(function (e) {
         console.log(arguments);
         console.error(e);
-    }).always(function() {
+    }).always(function () {
         server.finalizeSubscriptions();
     });
-}
+};
 
 /**
  * Loads the definitions for a dataset into the environment, including
@@ -57,39 +74,30 @@ BlockPyCorgis.prototype.loadDatasets = function(silently) {
  * @param {String} name - The user-friendly version of the dataset name.
  * @returns {Array.<Deferred>} - Returns the async requests as deferred objects.
  */
-BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
-    var url_retrievals = [];
-    if (this.main.model.server_is_connected('import_datasets')) {
-        var root = this.main.model.constants.urls.import_datasets+'blockpy/'+slug+'/'+slug;
-        this.main.model.status.dataset_loading.push(name);
+BlockPyCorgis.prototype.importDataset = function (slug, name) {
+    let url_retrievals = [];
+    if (this.main.model.ui.server.isEndpointConnected("importDatasets")) {
+        let root = this.main.model.configuration.urls.importDatasets + "blockpy/" + slug + "/" + slug;
+        this.main.model.display.loadingDatasets.push(name);
         // Actually get data
-        var get_dataset = $.getScript(root+'_dataset.js');
-        var get_complete = $.getScript(root+'_complete.js');
-        // Load get_complete silently in the background
-        var get_skulpt = $.get(root+'_skulpt.js', function(data) {
-            Sk.builtinFiles['files']['src/lib/'+slug+'/__init__.js'] = data;
+        let getDataset = $.getScript(root + "_dataset.js");
+        // Load getComplete silently in the background because its big :(
+        let getComplete = $.getScript(root + "_complete.js");
+        let getSkulpt = $.get(root + "_skulpt.js", function (data) {
+            Sk.builtinFiles["files"]["src/lib/" + slug + "/__init__.js"] = data;
         });
-        var get_blockly = $.getScript(root+'_blockly.js');
+        let getBlockly = $.getScript(root + "_blockly.js");
         // On completion, update menus.
-        var corgis = this;
-        $.when(get_dataset, get_skulpt, 
-               get_blockly).done(function() {
-            corgis.loadedDatasets.push(slug);
-            if (silently) {
-                corgis.main.model.settings.server_connected(false);
-                corgis.main.model.assignment.modules.push(name);
-                corgis.main.components.editor.addAvailableModule(name);
-                corgis.main.model.settings.server_connected(true);
-            } else {
-                corgis.main.model.assignment.modules.push(name);
-                corgis.main.components.editor.addAvailableModule(name);
-            }
-            corgis.main.model.status.dataset_loading.pop();
+        $.when(getDataset, getSkulpt, getBlockly).done(() => {
+            this.loadedDatasets.push(slug);
+            this.main.components.pythonEditor.bm.forceBlockRefresh();
+            this.main.components.pythonEditor.bm.blockEditor.remakeToolbox();
+            this.main.model.display.loadingDatasets.remove(name);
         });
-        url_retrievals.push(get_dataset, get_skulpt, get_blockly);
+        url_retrievals.push(getDataset, getSkulpt, getBlockly);
     }
     return url_retrievals;
-}
+};
 
 /**
  * Opens a dialog box to present the user with the datasets available
@@ -97,60 +105,37 @@ BlockPyCorgis.prototype.importDataset = function(slug, name, silently) {
  * completes asynchronously. The dialog is composed of a table with
  * buttons to load the datasets (More than one dataset can be loaded
  * from within the dialog at a time).
- * 
- * @param {String} name - The name of the dataset to open. This is basically the user friendly version of the name, though it will be mangled into a slug.
  */
-BlockPyCorgis.prototype.openDialog = function(name) {
-    var corgis = this;
-    if (this.main.model.server_is_connected('import_datasets')) {
-        var root = this.main.model.constants.urls.import_datasets;
-        $.getJSON(root+'index.json', function(data) {
+BlockPyCorgis.prototype.openDialog = function () {
+    if (this.main.model.ui.server.isEndpointConnected("importDatasets")) {
+        let root = this.main.model.configuration.urls.importDatasets;
+        $.getJSON(root + "index.json",  (data) => {
             // Make up the Body
-            var datasets = data.blockpy.datasets;
-            // TODO: Hardcoding a URL is bad.
-            var start = $("<p>Documentation is available at <a href='https://think.cs.vt.edu/corgis/blockpy/' target=_blank>url</a></p>");
-            var body = $('<table></table>', {'class': 'table-bordered table-condensed table-striped'});
-            Object.keys(datasets).sort().map(function(name) {
-                var title_name = name;
-                name = name.replace(/\s/g, '_').toLowerCase();
-                var btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');
-                if (corgis.loadedDatasets.indexOf(name) > -1) {
-                    set_button_loaded(btn);
+            let datasets = data.blockpy.datasets;
+            let documentation = data.blockpy.documentation;
+            let start = $(`<p>Documentation is available at <a href='${documentation}' target=_blank>url</a></p>`);
+            let body = $("<table></table>", {"class": "table table-bordered table-sm table-striped"});
+            Object.keys(datasets).sort().map((name) => {
+                let titleName = name;
+                let btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');
+                if (this.loadedDatasets.indexOf(name) > -1) {
+                    setButtonLoaded(btn);
                 } else {
-                    btn.click(function() {
-                        corgis.importDataset(name.toLowerCase(), 'Data - '+title_name);
-                        set_button_loaded(btn);
+                    btn.click( () => {
+                        this.importDataset(name.toLowerCase(), "Data - " + titleName);
+                        setButtonLoaded(btn);
                     });
                 }
                 $("<tr></tr>")
-                    .append($("<td class='col-md-4'>"+title_name+"</td>"))
-                    .append($("<td>"+datasets[title_name]['short']+"</td>"))
-                    .append($("<td class='col-md-2'></td>").append(btn))
+                    .append($("<td>" + titleName + "</td>"))
+                    .append($("<td>" + datasets[titleName]["short"] + "</td>"))
+                    .append($("<td></td>").append(btn))
                     .appendTo(body);
             });
-            body.appendTo(start)
+            body.appendTo(start);
             // Show the actual dialog
-            var editor = corgis.main.components.editor;
-            corgis.main.components.dialog.show("Import Datasets", start, function() {
-                if (editor.main.model.settings.editor() == "Blocks") {
-                    editor.updateBlocksFromModel();
-                }
-            });
+            this.main.components.dialog.show("Import Datasets", start, null);
         });
     }
 };
 
-/**
- * This is a very simplistic helper function that will transform
- * a given button into a "Loaded" state (disabled, pressed state, etc.).
- *
- * @param {HTMLElement} btn - An HTML element to change the text of.
- */
-var set_button_loaded = function(btn) {
-    btn.addClass("active")
-       .addClass('btn-success')
-       .removeClass('btn-primary')
-       .prop("disabled", true)
-       .text("Loaded")
-       .attr("aria-pressed", "true");
-}

@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Knockout" type="javaScript">
+    <properties>
+      <option name="frameworkName" value="Knockout" />
+      <option name="frameworkVersion" value="3.5.0" />
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/libs/knockout/knockout-3.5.0.debug.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/libs/knockout/knockout-3.5.0.debug.js" />
+      <root url="file://$PROJECT_DIR$/libs/knockout/knockout-3.5.0.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

@@ -5060,7 +5060,7 @@
        */
       CodeView.prototype.purify = function (value) {
           if (this.options.codeviewFilter) {
-              // filter code view regex
+              // filter code editor regex
               value = value.replace(this.options.codeviewFilterRegex, '');
               // allow specific iframe tag
               if (this.options.codeviewIframeFilter) {
@@ -5084,7 +5084,7 @@
           return value;
       };
       /**
-       * activate code view
+       * activate code editor
        */
       CodeView.prototype.activate = function () {
           var _this = this;
@@ -5124,7 +5124,7 @@
           }
       };
       /**
-       * deactivate code view
+       * deactivate code editor
        */
       CodeView.prototype.deactivate = function () {
           // deactivate CodeMirror as codable

@@ -85,4 +85,4 @@ If you make edits to either Blockly or Skulpt, you'll need to rerun their build 
 
     > python build.py
     
-Otherwise, you should be able to edit the ``src/*.js`` files freely. To get a sense of the dependencies, check out the ``blockpy_new.html`` file and then the ``src/main.js`` file. These should be good starting points.
+Otherwise, you should be able to edit the ``src/*.js`` files freely. To get a sense of the dependencies, check out the ``blockpy_new.html`` file and then the ``src/main_v4.js`` file. These should be good starting points.

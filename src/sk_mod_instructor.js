@@ -4,17 +4,17 @@
  * This module is loaded in by getting the functions' source code from toString.
  * Isn't that crazy?
  *
- * @param {String} name - The name of the module (should always be 'instructor')
  *
  */
-var $sk_mod_instructor = function(name) {
+export let $sk_mod_instructor = function() {
     // Main module object that gets returned at the end.
-    var mod = {};
+    let mod = {};
+    let none = Sk.builtin.none.none$;
     
-    var prior = null;
+    let prior = null;
     mod.timeit = new Sk.builtin.func(function(name) {
         Sk.builtin.pyCheckArgs("timeit", arguments, 1, 1);
-        var difference;
+        let difference;
         if (prior === null) {
             difference = 0;
         } else {
@@ -40,17 +40,18 @@ var $sk_mod_instructor = function(name) {
         console.log(message);
     });
 
-    
     /**
      * This function coverts the output in the student report to a python 
      * list and returns it.
     **/
     mod.get_output = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_output", arguments, 0, 0);
-        if (Sk.executionReports['student'].success) {
-            return mixedRemapToPy(Sk.executionReports['student']['output']());
+        if (Sk.executionReports["student"].success) {
+            let output = Sk.executionReports["student"]["output"]();
+            output = output.map(function(item) { return item.toSkulpt(); });
+            return Sk.builtin.list(output);
         } else {
-            return Sk.ffi.remapToPy([]);
+            return new Sk.builtin.list([]);
         }
     });
     
@@ -60,16 +61,16 @@ var $sk_mod_instructor = function(name) {
      */
     mod.reset_output = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("reset_output", arguments, 0, 0);
-        if (Sk.executionReports['student'].success) {
-            Sk.executionReports['student']['output'].removeAll();
+        if (Sk.executionReports["student"].success) {
+            Sk.executionReports["student"].output.removeAll();
         }
     });
     
     mod.queue_input = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("queue_input", arguments, 1, Infinity);
-        var args = arguments;
-        for (var i = args.length-1; i >= 0; i--) {
-            var input = args[i];
+        let args = arguments;
+        for (let i = args.length-1; i >= 0; i--) {
+            let input = args[i];
             Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
             Sk.queuedInput.push(Sk.ffi.remapToJs(input));
         }
@@ -80,12 +81,12 @@ var $sk_mod_instructor = function(name) {
     **/
     mod.get_program = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_program", arguments, 0, 0);
-        return Sk.ffi.remapToPy(Sk.executionReports['verifier'].code);
+        return Sk.ffi.remapToPy(Sk.executionReports["verifier"].code);
     });
     
     mod.trace_lines = new Sk.builtin.func(function() {
-        if (Sk.executionReports['student'].success) {
-            var lines = Sk.executionReports['student'].lines;
+        if (Sk.executionReports["student"].success) {
+            let lines = Sk.executionReports["student"].lines;
             return Sk.ffi.remapToPy(lines);
         } else {
             return new Sk.builtin.list([]);
@@ -97,14 +98,13 @@ var $sk_mod_instructor = function(name) {
      */
     mod.get_student_error = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_student_error", arguments, 0, 0);
-        var none = Sk.builtin.none.none$;
-        if (Sk.executionReports['student'].success) {
+        if (Sk.executionReports["student"].success) {
             return new Sk.builtin.tuple([none, none]);
         } else {
-            var error = Sk.executionReports['student'].error,
+            let error = Sk.executionReports["student"].error,
                 position = {};
             if (error && error.traceback && error.traceback.length > 0) {
-                position['line'] = error.traceback[0].lineno;
+                position["line"] = error.traceback[0].lineno;
             } else {
                 error = none;
             }
@@ -112,15 +112,16 @@ var $sk_mod_instructor = function(name) {
             return new Sk.builtin.tuple([error, position]);
         }
     });
+
     
     mod.had_execution_time_error = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("had_execution_time_error", arguments, 0, 0);
-        return !Sk.executionReports['student'].success && 
-                Sk.executionReports['student'].error &&
-                Sk.executionReports['student'].error.tp$name == 'TimeLimitError';
+        return !Sk.executionReports["student"].success && 
+                Sk.executionReports["student"].error &&
+                Sk.executionReports["student"].error.tp$name === "TimeLimitError";
     });
     
-    var backupTime = undefined;
+    let backupTime = undefined;
     mod.limit_execution_time = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("limit_execution_time", arguments, 0, 0);
         backupTime = Sk.execLimit;
@@ -132,13 +133,14 @@ var $sk_mod_instructor = function(name) {
     mod.unlimit_execution_time = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("unlimit_execution_time", arguments, 0, 0);
         Sk.execLimit = backupTime;
-        Sk.execStart = Date.now()
+        Sk.execStart = Date.now();
     });
     
     mod.suppress_scrolling = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("suppress_scrolling", arguments, 0, 0);
         Sk.executionReports.instructor.scrolling = true;
     });
+
     
     /*
     def hist(self, data, **kwargs):
@@ -157,42 +159,43 @@ var $sk_mod_instructor = function(name) {
     */
     mod.get_plots = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("get_plots", arguments, 0, 0);
-        if (Sk.executionReports['student'].success) {
-            var outputs = Sk.executionReports['student']['output']();
+        if (Sk.executionReports["student"].success) {
+            let outputs = Sk.executionReports["student"]["output"]();
             outputs = outputs.filter(function(output) { 
-                return typeof output != "string"; 
+                return output.type === "plot";
             }).map(function(graph) {
-                return {'data': graph.map(function(plot) {
-                    var newPlot = { 'type': plot.type,
-                                    'label': '' };
-                    if (plot.type == "line" || plot.type == 'scatter') {
-                        newPlot['x'] = plot.data.map(function(v) { return v.x });
-                        newPlot['y'] = plot.data.map(function(v) { return v.y });
-                    } else if (plot.type == "hist") {
-                        newPlot['values'] = plot.data;
+                return {"data": graph.map(function(plot) {
+                    let newPlot = { "type": plot.type,
+                        "label": "" };
+                    if (plot.type === "line" || plot.type === "scatter") {
+                        newPlot["x"] = plot.data.map(function(v) { return v.x; });
+                        newPlot["y"] = plot.data.map(function(v) { return v.y; });
+                    } else if (plot.type === "hist") {
+                        newPlot["values"] = plot.data;
                     }
                     return newPlot;
                 }), 
-                    'xlabel': '', 'ylabel': '', 
-                    'title': '', 'legend': false
-                }
+                "xlabel": "", "ylabel": "", 
+                "title": "", "legend": false
+                };
             });
-            return mixedRemapToPy(outputs);
+            return Sk.ffi.remapToPy(outputs);
         } else {
             return Sk.ffi.remapToPy([]);
         }
     });
+
     
     // Provides `student` as an object with all the data that the student declared.
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
             //self.data = Sk.builtin.dict();
-            var newDict = Sk.builtin.dict();
-            Sk.abstr.sattr(self, 'data', newDict, true);
-            self.module = Sk.executionReports['student'].module;
+            let newDict = Sk.builtin.dict();
+            Sk.abstr.sattr(self, Sk.builtin.str("data"), newDict, true);
+            self.module = Sk.executionReports["student"].results;
             if (self.module !== undefined) {
                 self.module = self.module.$d;
-                for (var key in self.module) {
+                for (let key in self.module) {
                     if (self.module.hasOwnProperty(key)) {
                         newDict.mp$ass_subscript(Sk.ffi.remapToPy(key), 
                                                  self.module[key]);
@@ -210,14 +213,16 @@ var $sk_mod_instructor = function(name) {
                 Sk.builtin.pyCheckType("exclude_builtins", "boolean", Sk.builtin.checkBool(exclude_builtins));
                 exclude_builtins = Sk.ffi.remapToJs(exclude_builtins);
             }
-            var result = [];
-            for (var property in self.module) {
-                if (self.module[property].tp$name == type.tp$name) {
-                    //console.log(exclude_builtins);
-                    if (exclude_builtins && property.startsWith("__")) {
-                        continue;
+            let result = [];
+            for (let property in self.module) {
+                if (self.module.hasOwnProperty(property)) {
+                    if (self.module[property].tp$name === type.tp$name) {
+                        //console.log(exclude_builtins);
+                        if (exclude_builtins && property.startsWith("__")) {
+                            continue;
+                        }
+                        result.push(Sk.ffi.remapToPy(property));
                     }
-                    result.push(Sk.ffi.remapToPy(property));
                 }
             }
             return Sk.builtin.list(result);
@@ -231,13 +236,15 @@ var $sk_mod_instructor = function(name) {
                 Sk.builtin.pyCheckType("exclude_builtins", "boolean", Sk.builtin.checkBool(exclude_builtins));
                 exclude_builtins = Sk.ffi.remapToJs(exclude_builtins);
             }
-            var result = [];
-            for (var property in self.module) {
-                if (self.module[property].tp$name == type.tp$name) {
-                    if (exclude_builtins && property.startsWith("__")) {
-                        continue;
+            let result = [];
+            for (let property in self.module) {
+                if (self.module.hasOwnProperty(property)) {
+                    if (self.module[property].tp$name === type.tp$name) {
+                        if (exclude_builtins && property.startsWith("__")) {
+                            continue;
+                        }
+                        result.push(self.module[property]);
                     }
-                    result.push(self.module[property]);
                 }
             }
             return Sk.builtin.list(result);
@@ -251,4 +258,4 @@ var $sk_mod_instructor = function(name) {
     });
     
     return mod;
-}
+};
