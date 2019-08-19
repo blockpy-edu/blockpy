@@ -60,10 +60,10 @@ export class BlockPyEngine {
     resetStudentModel() {
         let student = this.executionModel.student;
         student.currentStep(null);
+        student.currentTraceStep(0);
         student.lastStep(0);
         student.currentLine(null);
         student.currentTraceData.removeAll();
-        student.currentTraceStep(0);
         student.results = null;
     }
 
@@ -110,8 +110,24 @@ export class BlockPyEngine {
     }
 
     evaluate() {
-        this.configuration = this.configurations.eval.use(this);
-        this.execute();
+        this.main.model.status.onExecution(StatusState.ACTIVE);
+        let evaluationInput = this.main.components.console.evaluate();
+        console.log(evaluationInput);
+        evaluationInput.then((userInput) => {
+            this.configuration = this.configurations.eval.use(this, userInput);
+            this.execute().then(
+                this.configuration.success.bind(this.configuration),
+                this.configuration.failure.bind(this.configuration)
+            ).then(this.onEval.bind(this));
+        });
+    }
+
+    onEval() {
+        this.configuration = this.configurations.onEval.use(this);
+        this.execute().then(
+            this.configuration.success.bind(this.configuration),
+            this.configuration.failure.bind(this.configuration)
+        ).then(this.evaluate.bind(this));
     }
 
     onChange() {

@@ -24,7 +24,7 @@ export let FILES_HTML = `
 
     ${makeTab("answer.py")}
     ${makeTab("!instructions.md", "Instructions")}
-    ${makeTab("!assignment_settings.blockpy", "Assignment Settings")}
+    ${makeTab("!assignment_settings.blockpy", "Settings")}
     ${makeTab("^starting_code.py", "Starting Code")}
     ${makeTab("!on_run.py", "On Run")}
     ${makeTab("!on_change.py", "On Change", true)}

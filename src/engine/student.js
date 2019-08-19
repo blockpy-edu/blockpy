@@ -1,4 +1,4 @@
-import {Configuration} from "./configurations";
+import {Configuration, EMPTY_MODULE} from "./configurations";
 
 export class StudentConfiguration extends Configuration {
     use(engine) {
@@ -18,7 +18,7 @@ export class StudentConfiguration extends Configuration {
         // Proxy requests
         Sk.requestsGet = (filename) => this.openURL(filename, "url");
 
-        Sk.builtinFiles.files["src/lib/utility/__init__.js"] = "pass";
+        Sk.builtinFiles.files["src/lib/utility/__init__.js"] = EMPTY_MODULE;
 
         return this;
     }
@@ -55,10 +55,14 @@ export class StudentConfiguration extends Configuration {
      *                                Think of it as the "X" position to the lineNumber's "Y" position.
      * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
      */
-    step(variables, lineNumber, columnNumber, filename) {
+    step(variables, locals, lineNumber, columnNumber, filename) {
         if (filename === "answer.py") {
             let currentStep = this.engine.executionBuffer.step;
             let globals = this.main.components.trace.parseGlobals(variables);
+            // TODO: Trace local variables properly
+            //console.log(globals, locals);
+            //let locals = this.main.components.trace.parseGlobals(locals);
+            //Object.assign(globals, locals);
             this.engine.executionBuffer.trace.push({
                 "step": currentStep,
                 "filename": filename,
@@ -104,7 +108,7 @@ export class StudentConfiguration extends Configuration {
                 "error": error
             };
             console.error(error);
-            console.log(this.filename, code);
+            console.log(this.filename, this.code);
             return false;
         }
         // Successful parse

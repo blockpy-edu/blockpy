@@ -21,16 +21,13 @@ export const TRACE_HTML = `
                 <span class='fas fa-step-backward'></span>
             </button>
             <button type='button' class='btn btn-outline-secondary'
-                data-bind="click: ui.trace.back">
+                data-bind="click: ui.trace.backward">
                 <span class='fas fa-backward'></span>
             </button>
             <span class="input-group-text">Step:</span>
             <span class="input-group-text">
                 <span data-bind='text: execution.student.currentTraceStep'></span>
                 / <span data-bind='text: execution.student.lastStep'></span>
-            </span>
-            <span class="input-group-text">
-                (<span data-bind='text: ui.trace.line'></span>)
             </span>
         </div>
         <div class="input-group-append">
@@ -42,6 +39,9 @@ export const TRACE_HTML = `
                 data-bind="click: ui.trace.last">
                 <span class='fas fa-step-forward'></span>
             </button>
+            <span class="input-group-text">
+                <span data-bind='text: ui.trace.line'></span>
+            </span>
         </div>
     </div>
     
@@ -57,7 +57,8 @@ export const TRACE_HTML = `
                 <td>
                     <code data-bind="text: value"></code>
                     <!-- ko if: type == "List" -->
-                    <a href="" data-bind="click: $root.viewExactValue(type, exact_value)">
+                    
+                    <a href="" data-bind="click: //$root.viewExactValue(type, exact_value)">
                     <span class='glyphicon glyphicon-new-window'></span>
                     </a>
                     <!-- /ko -->
@@ -75,6 +76,9 @@ export class Trace {
         this.main = main;
         this.tag = tag;
 
+        this.IGNORED_GLOBALS = ["__name__", "__doc__", "__package__",
+                                "classmethod", "property", "staticmethod"];
+
         // this.trace.click(this.buildTraceTable.bind(this));
     }
 
@@ -90,9 +94,7 @@ export class Trace {
         if (!this.main.model.display.traceExecution()) {
             for (let property in variables) {
                 let value = variables[property];
-                if (property !== "__name__" &&
-                    property !== "__doc__" &&
-                    property !== "__package__") {
+                if (this.IGNORED_GLOBALS.indexOf(property) === -1) {
                     property = property.replace("_$rw$", "")
                         .replace("_$rn$", "");
                     let parsed;
@@ -118,7 +120,7 @@ export class Trace {
      * @param {String} property
      * @param {Object} value - the skulpt value
      */
-    static parseValue(property, value) {
+    static parseValue(property, value, fullLength) {
         if (value === undefined) {
             return {"name": property,
                 "type": "Unknown",
@@ -136,7 +138,7 @@ export class Trace {
                 };
             case Sk.builtin.module: return null;
             case Sk.builtin.str:
-                if (value.sq$length <= 2000) {
+                if (fullLength || value.v.length <= 32) {
                     return {"name": property,
                         "type": "String",
                         "value": value.$r().v
@@ -219,3 +221,5 @@ export class Trace {
         }
     };
 }
+
+// TODO: viewExactValue

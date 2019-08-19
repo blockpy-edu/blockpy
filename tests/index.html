@@ -73,14 +73,23 @@
 
 <div id="main-editor"></div>
 
+    <!-- Debugging code
+import turtle
+turtle.bgpic("https://i.imgur.com/A8eQsll.jpg")
+turtle.forward(50)
+turtle.right(90)
+turtle.forward(100)
+turtle.circle(10)
+-->
+
 <script>
     $(document).ready(function() {
         editor = new blockpy.BlockPy({
             'attachment.point': '#main-editor',
+            "display.instructor": true,
             "submission.code": `
-print("Hello world!")
-name = input("What is your name?")
-print("Hello there", name)`
+a =
+`.trim()
         });
         blockmirror = editor.components.editors.registered_[1].bm;
     });

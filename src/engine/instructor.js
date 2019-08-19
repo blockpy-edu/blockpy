@@ -1,4 +1,4 @@
-import {Configuration} from "./configurations.js";
+import {Configuration, EMPTY_MODULE} from "./configurations.js";
 import {$sk_mod_instructor} from "../sk_mod_instructor";
 
 const UTILITY_MODULE_CODE = "var $builtinmodule = " + $sk_mod_instructor.toString();
@@ -15,9 +15,10 @@ export class InstructorConfiguration extends Configuration {
         // Disable input box
         Sk.queuedInput = [];
         // TODO Sk.inputfun = BlockPyEngine.inputMockFunction;
+        // TODO: Allow input function to disable the timer, somehow
         // Enable utility mode
         Sk.builtinFiles.files["src/lib/utility/__init__.js"] = UTILITY_MODULE_CODE;
-        Sk.builtinFiles.files["./_instructor/__init__.js"] = "let $builtinmod = function(mod){ return mod; }";
+        Sk.builtinFiles.files["./_instructor/__init__.js"] = EMPTY_MODULE;
         return this;
     }
 
@@ -26,6 +27,8 @@ export class InstructorConfiguration extends Configuration {
             return this.main.model.submission.code();
         } else if (filename === "./_instructor/on_run.py") {
             return this.main.model.assignment.onRun();
+        } else if (filename === "./_instructor/on_eval.py") {
+            return this.main.model.assignment.onEval() || "";
         } else if (Sk.builtinFiles === undefined ||
             Sk.builtinFiles["files"][filename] === undefined) {
             throw "File not found: '" + filename + "'";

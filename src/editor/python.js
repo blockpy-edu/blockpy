@@ -290,8 +290,8 @@ class PythonEditorView extends AbstractEditor {
         //this.bm.blockEditor.workspace.render();
         //this.bm.refresh();
         // TODO: Figure out why this doesn't end up looking right (go to a different editor, come back, and it'll be squished)
-        setTimeout(() => this.bm.refresh(), 1000);
-        console.log("Arc, reload!");
+        //this.bm.refresh();
+        setTimeout(() => this.bm.refresh(), 0);
     }
 
     updateEditor(newContents) {

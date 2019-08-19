@@ -163,7 +163,7 @@ export class BlockPy {
                  * Whether or not to be presented with the instructor settings and files
                  * @type {bool}
                  */
-                instructor: ko.observable(this.getSetting("display.instructor", "true")==="true"),
+                instructor: ko.observable(this.getSetting("display.instructor", "false").toString()==="true"),
                 /**
                  * Whether or not to prevent the printer from showing things
                  */
@@ -184,6 +184,13 @@ export class BlockPy {
                  * Whether or not the console is full width and feedback is hidden
                  */
                 bigConsole: ko.observable(false),
+                /**
+                 * The height to use for the console.
+                 *    If null, then let the height remain unchanged
+                 *    If a number, then the
+                 */
+                previousConsoleHeight: ko.observable(null),
+                currentConsoleHeight: ko.observable(null),
                 /**
                  * Which panel to show in the second row's second column
                  * @type {SecondRowSecondPanelOptions}
@@ -247,7 +254,7 @@ export class BlockPy {
                     // integer
                     currentStep: ko.observable(null),
                     // integer
-                    lastStep: ko.observable(0),
+                    lastStep: ko.observable(null),
                     // integer
                     currentLine: ko.observable(null),
                     lastLine: ko.observable(0),
@@ -257,7 +264,10 @@ export class BlockPy {
                     currentTraceStep: ko.observable(0),
                     // Actual execution results
                     results: null,
-                    globals: null
+                    globals: ko.observable(null)
+                },
+                instructor: {
+                    globals: null,
                 },
                 // Information related to feedback from the instructor run
                 feedback: {
@@ -424,6 +434,10 @@ export class BlockPy {
                         "col-md-12" :
                         "col-md-6"
                 ),
+                hideEvaluate: ko.pureComputed( ()=>
+                    model.assignment.settings.hideEvaluate() || !model.execution.student.globals() ||
+                    model.status.onExecution() === StatusState.ACTIVE
+                )
             },
             feedback: {
                 badge: ko.pureComputed(function () {
@@ -491,23 +505,27 @@ export class BlockPy {
                     let step = model.execution.student.currentTraceStep();
                     let lastStep = model.execution.student.lastStep();
                     let traceData = model.execution.student.currentTraceData();
+                    if (!traceData || step === null) {
+                        return "No trace";
+                    }
                     if (step === 0) {
                         return "Before run";
                     } else if (step === lastStep) {
                         return "Finished run";
                     } else {
-                        return traceData[step].line;
+                        // TODO: why are these numbers wonky?
+                        return "Line "+(traceData[step].line-1);
                     }
                 }),
                 first: function () {
                     model.execution.student.currentTraceStep(0);
                 },
                 backward: function () {
-                    let previous = Math.min(0, model.execution.student.currentTraceStep() - 1);
+                    let previous = Math.max(0, model.execution.student.currentTraceStep() - 1);
                     model.execution.student.currentTraceStep(previous);
                 },
                 forward: function () {
-                    let next = Math.min(model.execution.lastStep(), model.execution.student.currentTraceStep() + 1);
+                    let next = Math.min(model.execution.student.lastStep(), model.execution.student.currentTraceStep() + 1);
                     model.execution.student.currentTraceStep(next);
                 },
                 last: function () {
@@ -517,13 +535,16 @@ export class BlockPy {
                     let step = model.execution.student.currentTraceStep();
                     let lastStep = model.execution.student.lastStep();
                     let traceData = model.execution.student.currentTraceData();
+                    if (!traceData) {
+                        return [];
+                    }
                     switch (step) {
                         case 0:
                             return [];
                         case lastStep:
                             return traceData[step - 1];
                         default:
-                            traceData[step];
+                            return traceData[step];
                     }
                 }),
             },
@@ -580,14 +601,10 @@ export class BlockPy {
                     model.display.filename() ? model.ui.editors.current() : "None"
                 ),
                 reset: function() {
-                    model.submission.code(model.assignment.startingCode().map(
+                    model.submission.code(model.assignment.startingCode());
+                    model.submission.extraFiles(model.assignment.extraStartingFiles().map(
                         file => {
-                            let filename = file.filename();
-                            if (filename === "^starting_code.py") {
-                                filename = "answer.py";
-                            } else {
-                                filename = filename.substr(1);
-                            }
+                            let filename = file.filename().substr(1);
                             return makeModelFile(filename, file.contents());
                         }
                     ));
@@ -615,6 +632,8 @@ export class BlockPy {
             execute: {
                 run: () =>
                     self.components.engine.run(),
+                evaluate: () =>
+                    self.components.engine.evaluate()
             },
             server: {
                 status: (endpoint =>

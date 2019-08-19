@@ -134,6 +134,7 @@ export class BlockPyFeedback {
         this.feedbackModel.message(message);
         this.feedbackModel.category(category);
         this.feedbackModel.label(label);
+        this.main.components.server.logEvent("Intervention", category, label, message, "answer.py");
 
         // Find the first error on a line and report that
         let line = BlockPyFeedback.findFirstErrorLine(data);

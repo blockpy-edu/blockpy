@@ -2,12 +2,13 @@ import {indent} from "../utilities";
 import {StatusState} from "../server";
 import {InstructorConfiguration} from "./instructor";
 
-const NEW_LINE_REGEX = /\r\n|\r|\n/;
+export const NEW_LINE_REGEX = /\r\n|\r|\n/;
 /**
  * @return {string}
  */
-const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
+export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
     let safeCode = JSON.stringify(studentCode);
+    console.log(safeCode);
     let indentedCode = indent(indent(isSafe ? studentCode : "pass"));
     let tifaAnalysis = "";
     if (!quick) {
@@ -59,9 +60,8 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.code = this.main.model.assignment.onRun();
 
         let report = this.main.model.execution.reports;
-        // Actually run the python code
         let studentCodeSafe = this.main.model.submission.code();
-        Sk.builtinFiles.files["src/lib/pedal/sandbox/sandbox.py"] = "class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n";
+        this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         let isSafe = report["parser"].success && report["verifier"].success;
@@ -71,6 +71,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
             "compliments": [],
             "filename": "./_instructor/on_run.py",
             "code": instructorCode,
+            "lineOffset": lineOffset
             //'complete': false // Actually, let's use undefined for now.
         };
 
@@ -82,7 +83,11 @@ export class OnRunConfiguration extends InstructorConfiguration {
     }
 
     success(module) {
+        // TODO Logging!!!!
+        console.log("OnRun success");
         // TODO: Actually parse results
+        this.main.model.execution.instructor.globals = Sk.globals;
+        Sk.globals = {};
         let results = module.$d.on_run.$d;
         this.main.components.feedback.presentFeedback(results);
         this.main.model.execution.reports["instructor"]["success"] = true;
@@ -109,6 +114,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
     }
 
     failure(error) {
+        console.log("OnRun failure");
         let report = this.main.model.execution.reports;
         if (error.tp$name === "GracefulExit") {
             report["instructor"]["success"] = true;

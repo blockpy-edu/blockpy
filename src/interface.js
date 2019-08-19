@@ -29,6 +29,8 @@ export function makeExtraInterfaceSubscriptions(self, model) {
     });
 }
 
+// TODO: Get shareable link button
+
 export function makeInterface(main) {
     return `
 <div class='blockpy-content container-fluid'>

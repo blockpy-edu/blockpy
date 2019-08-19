@@ -127,6 +127,12 @@
     width: 75%;
 }
 
+.blockpy-btn-eval {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+}
+
 /** Feedback **/
 
 .blockpy-content .feedback-badge {

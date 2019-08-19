@@ -1,3 +1,5 @@
+export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }"
+
 /**
  * A container for holding settings of a particular run configuration.
  */
@@ -105,6 +107,10 @@ export class Configuration {
 
     failure(error) {
         throw new Error("Abstract failure execution");
+    }
+
+    dummyOutSandbox() {
+        Sk.builtinFiles.files["src/lib/pedal/sandbox/sandbox.py"] = "class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n";
     }
 }
 

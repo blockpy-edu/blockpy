@@ -4,6 +4,25 @@ import {DisplayModes} from "./python";
 export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
     <div>
     Assignment Settings
+    
+    <form>
+        <div class="form-group row">
+            <label for="blockpy-settings-name" class="col-sm-2 col-form-label">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-name">
+            </div>
+        </div>
+        <!--
+        url
+        reviewed
+        hidden
+        public
+        ip_ranges
+        
+        settings
+        -->
+    </form>
+    
     </div>
 `;
 
@@ -32,7 +51,7 @@ const ASSIGNMENT_SETTINGS = [
      */
     ["startView", "start_view", DisplayModes.SPLIT],
     /**
-     * The current list of datasets available
+     * The current list of datasets available on load as a comma separated string
      */
     ["datasets", "datasets", ""],
     /**
@@ -44,13 +63,15 @@ const ASSIGNMENT_SETTINGS = [
     // Whether to do any tracing
     ["disableTrace", "disable_trace", false],
     // Whether to immediately start in Interactive Console mode
-    ["startInteractive", "start_interactive", false],
+    ["onlyInteractive", "only_interactive", false],
+    ["onlyUploads", "only_uploads", false],
     // What menus/feedback to show and hide
     ["hideFiles", "hide_files", true],
     ["hideQueuedInputs", "hide_queued_inputs", true],
     ["hideEditors", "hide_editors", false],
     ["hideAll", "hide_all", false],
-    ["hideImportDatasetsButton", "hide_import_datasets_button", false],
+    ["hideEvaluate", "hide_evaluate", false],
+    ["hideImportDatasetsButton", "hide_import_datasets_button", true],
     ["hideImportStatements", "hide_import_statements", false],
     ["hideCoverageButton", "hide_coverage_button", false]
 ];
@@ -58,10 +79,11 @@ const ASSIGNMENT_SETTINGS = [
 export function saveAssignmentSettings(model) {
     let settings = {};
     ASSIGNMENT_SETTINGS.forEach(setting => {
-        let value = model.assignment.settings[setting[0]]();
+        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2];
+        let value = model.assignment.settings[clientName]();
         // Only store this setting if its different from the default
-        if (value !== setting[2]) {
-            settings[setting[0]] = value;
+        if (value !== defaultValue) {
+            settings[serverName] = value;
         }
     });
     return JSON.stringify(settings);
@@ -71,8 +93,9 @@ export function loadAssignmentSettings(model, settings) {
     if (settings) {
         settings = JSON.parse(settings);
         ASSIGNMENT_SETTINGS.forEach(setting => {
-            if (setting[0] in settings) {
-                model.assignment.settings[setting[0]](settings[setting[0]]);
+            let clientName = setting[0], serverName = setting[1];
+            if (serverName in settings) {
+                model.assignment.settings[clientName](settings[serverName]);
             }
         });
     }
@@ -81,17 +104,62 @@ export function loadAssignmentSettings(model, settings) {
 export function makeAssignmentSettingsModel(configuration) {
     let settings = {};
     ASSIGNMENT_SETTINGS.forEach(setting => {
-        if (configuration[setting[1]] === undefined) {
-            settings[setting[0]] = ko.observable(setting[2]);
+        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2];
+        if (configuration[serverName] === undefined) {
+            settings[clientName] = ko.observable(defaultValue);
         } else {
-            settings[setting[0]] = ko.observable(configuration["assignment.settings."+setting[1]]);
+            settings[clientName] = ko.observable(configuration["assignment.settings."+serverName]);
         }
     });
     return settings;
 }
 
 class AssignmentSettingsView extends AbstractEditor {
+    constructor(main, tag) {
+        super(main, tag);
+        this.dirty = false;
+    }
 
+    enter(newFilename, oldEditor) {
+        super.enter(newFilename, oldEditor);
+        console.log(this.file);
+        this.dirty = false;
+        //TODO: this.updateEditor(this.file.handle());
+        // Subscribe to the relevant File
+        // this.currentSubscription = this.file.handle.subscribe(this.updateEditor.bind(this));
+        // Notify relevant file of changes to BM
+        this.currentListener = this.updateHandle.bind(this);
+
+        //TODO: this.codeMirror.on("change", this.currentListener);
+    }
+
+    updateEditor(newContents) {
+        this.dirty = !this.dirty;
+        if (this.dirty) {
+            this.dirty = true;
+            // TODO: Do update
+
+            this.dirty = false;
+        }
+    }
+
+    updateHandle(event) {
+        this.dirty = !this.dirty;
+        if (this.dirty) {
+            this.dirty = true;
+            //this.file.handle(this.codeMirror.value());
+            // TODO: Update
+            this.dirty = false;
+        }
+    }
+
+    exit(newFilename, oldEditor, newEditor) {
+        // Remove subscriber
+        //this.currentSubscription.dispose();
+        // TODO: update
+        //this.codeMirror.off("change", this.currentListener);
+        super.exit(newFilename, oldEditor);
+    }
 }
 
 export const AssignmentSettings = {
