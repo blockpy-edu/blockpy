@@ -190,7 +190,7 @@ export class BlockPyFeedback {
             message += `<pre>${tracebackFormatted}</pre>`;
             let last_traceback = error.traceback.slice(-1)[0];
             if (last_traceback.filename === filenameExecuted) {
-                last_traceback.lineno -= this.main.model.execution.reports.instructor.line_offset;
+                last_traceback.lineno -= this.main.model.execution.reports.instructor.lineOffset;
             }
             console.error(error);
         }

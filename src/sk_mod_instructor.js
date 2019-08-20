@@ -64,6 +64,7 @@ export let $sk_mod_instructor = function() {
         if (Sk.executionReports["student"].success) {
             Sk.executionReports["student"].output.removeAll();
         }
+        return Sk.builtin.none.none$;
     });
     
     mod.queue_input = new Sk.builtin.func(function() {

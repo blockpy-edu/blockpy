@@ -8,7 +8,6 @@ export const NEW_LINE_REGEX = /\r\n|\r|\n/;
  */
 export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
     let safeCode = JSON.stringify(studentCode);
-    console.log(safeCode);
     let indentedCode = indent(indent(isSafe ? studentCode : "pass"));
     let tifaAnalysis = "";
     if (!quick) {
@@ -64,7 +63,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
-        let isSafe = report["parser"].success && report["verifier"].success;
+        let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, false, isSafe);
         lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
         report["instructor"] = {

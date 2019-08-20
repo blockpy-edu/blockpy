@@ -111,24 +111,28 @@ BlockPyCorgis.prototype.openDialog = function () {
         let root = this.main.model.configuration.urls.importDatasets;
         $.getJSON(root + "index.json",  (data) => {
             // Make up the Body
-            let datasets = data.blockpy.datasets;
-            let documentation = data.blockpy.documentation;
+            let datasets = data.blockpy;
+            let documentation = root+"blockpy/index.html";
             let start = $(`<p>Documentation is available at <a href='${documentation}' target=_blank>url</a></p>`);
             let body = $("<table></table>", {"class": "table table-bordered table-sm table-striped"});
             Object.keys(datasets).sort().map((name) => {
+                let sluggedName = slug(datasets[name].name);
                 let titleName = name;
                 let btn = $('<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Load</button>');
-                if (this.loadedDatasets.indexOf(name) > -1) {
+                let imgSrc = root+"../images/datasets/"+name+"-icon.png";
+                if (this.loadedDatasets.indexOf(sluggedName) > -1) {
                     setButtonLoaded(btn);
                 } else {
                     btn.click( () => {
-                        this.importDataset(name.toLowerCase(), "Data - " + titleName);
+                        this.importDataset(sluggedName, "Data - " + datasets[name].title);
                         setButtonLoaded(btn);
                     });
                 }
+                //let img = `<img src='${imgSrc}' class="corgis-icon">`;
                 $("<tr></tr>")
-                    .append($("<td>" + titleName + "</td>"))
-                    .append($("<td>" + datasets[titleName]["short"] + "</td>"))
+                    //.append($("<td>" + img + "</td>"))
+                    .append($("<td>" + datasets[name].title + "</td>"))
+                    .append($("<td>" + datasets[name].overview + "</td>"))
                     .append($("<td></td>").append(btn))
                     .appendTo(body);
             });

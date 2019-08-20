@@ -20,7 +20,7 @@ export let DisplayModes = {
 function makeTab(name, icon, mode) {
     return `<label class="btn btn-outline-secondary blockpy-mode-set-blocks"
                 data-bind="css: {active: display.pythonMode() === '${mode}'},
-                           click: display.pythonMode.bind($data, '${mode}')">
+                           click: ui.editors.python.updateMode.bind($data, '${mode}')">
                 <span class='fas fa-${icon}'></span>
                 <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> ${name}
             </label>`;
@@ -262,6 +262,7 @@ class PythonEditorView extends AbstractEditor {
         });
         this.dirty = false;
         this.makeSubscriptions();
+        this.oldPythonMode = this.main.model.display.pythonMode();
     }
 
     configureExtraBlockly() {
@@ -275,6 +276,7 @@ class PythonEditorView extends AbstractEditor {
     }
 
     enter(newFilename, oldEditor) {
+        let oldFilename = this.filename;
         super.enter(newFilename, oldEditor);
         this.dirty = false;
         this.updateEditor(this.file.handle());
@@ -285,6 +287,15 @@ class PythonEditorView extends AbstractEditor {
         // Notify relevant file of changes to BM
         this.currentBMListener = this.updateHandle.bind(this);
         this.bm.addChangeListener(this.currentBMListener);
+
+        if (newFilename !== "answer.py") {
+            if (oldFilename === "answer.py") {
+                this.oldPythonMode = this.main.model.display.pythonMode();
+            }
+            this.main.model.display.pythonMode(DisplayModes.TEXT);
+        } else {
+            this.main.model.display.pythonMode(this.oldPythonMode);
+        }
 
 
         //this.bm.blockEditor.workspace.render();

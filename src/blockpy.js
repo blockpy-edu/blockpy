@@ -122,8 +122,8 @@ export class BlockPy {
                 type: ko.observable(""),
                 startingCode: ko.observable(configuration["assignment.starting_code"] || ""),
                 onRun: ko.observable(configuration["assignment.on_run"] || ""),
-                onChange: ko.observable(configuration["assignment.on_change"]),
-                onEval: ko.observable(configuration["assignment.on_eval"]),
+                onChange: ko.observable(configuration["assignment.on_change"] || null),
+                onEval: ko.observable(configuration["assignment.on_eval"] || null),
                 extraInstructorFiles: ko.observableArray([]),
                 extraStartingFiles: ko.observableArray([]),
                 forkedId: ko.observable(null),
@@ -350,6 +350,7 @@ export class BlockPy {
 
     loadAssignmentData_(data) {
         console.log(data);
+        this.resetInterface();
         let wasServerConnected = this.model.configuration.serverConnected();
         // TODO: Reset UI for new assignment
         this.model.configuration.serverConnected(false);
@@ -557,7 +558,7 @@ export class BlockPy {
                         case "answer.py": return model.submission.code();
                         case "!instructions.md": return model.assignment.instructions();
                         case "!on_change.py": return model.assignment.onChange() !== null;
-                        case "!on_eval.py": return model.assignment.onEval();
+                        case "!on_eval.py": return model.assignment.onEval() !== null;
                         case "?mock_urls.blockpy": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "?mock_urls.blockpy");
                         case "!tags.blockpy": return model.assignment.tags().length;
@@ -627,6 +628,12 @@ export class BlockPy {
                         let codeMirror = self.components.pythonEditor.bm.textEditor.codeMirror;
                         return codeMirror.setOption("fullScreen", !codeMirror.getOption("fullScreen"));
                     },
+                    updateMode: (newMode) => {
+                        model.display.pythonMode(newMode);
+                        if (model.display.filename() === "answer.py") {
+                            self.components.pythonEditor.oldPythonMode = newMode;
+                        }
+                    }
                 }
             },
             execute: {
@@ -702,5 +709,10 @@ export class BlockPy {
     start() {
         this.model.display.filename("answer.py");
     }
+
+    resetInterface() {
+        this.components.engine.reset();
+    }
+
 }
 

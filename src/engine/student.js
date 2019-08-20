@@ -105,7 +105,8 @@ export class StudentConfiguration extends Configuration {
             // Report the error
             report["parser"] = {
                 "success": false,
-                "error": error
+                "error": error,
+                "empty": true
             };
             console.error(error);
             console.log(this.filename, this.code);
@@ -114,7 +115,8 @@ export class StudentConfiguration extends Configuration {
         // Successful parse
         report["parser"] = {
             "success": true,
-            "ast": ast
+            "ast": ast,
+            "empty": ast.body.length === 0,
         };
         return true;
     }

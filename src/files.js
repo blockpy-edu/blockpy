@@ -49,7 +49,8 @@ export let FILES_HTML = `
                 data-bind="hidden: assignment.onChange,
                            click: ui.files.add.bind($data, '!on_change.py')">On Change</a>
             <a class="dropdown-item" href="#"
-                data-bind="hidden: assignment.onEval">On Eval</a>
+                data-bind="hidden: assignment.onEval,
+                           click: ui.files.add.bind($data, '!on_eval.py')">On Eval</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Starting File</a>
             <a class="dropdown-item" href="#">Instructor File</a>

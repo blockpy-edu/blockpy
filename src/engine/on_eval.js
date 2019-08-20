@@ -56,7 +56,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
-        let isSafe = report["parser"].success && report["verifier"].success;
+        let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, false, isSafe);
         lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
         report["instructor"] = {

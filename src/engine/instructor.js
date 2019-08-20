@@ -35,4 +35,11 @@ export class InstructorConfiguration extends Configuration {
         }
         return Sk.builtinFiles["files"][filename];
     };
+
+    input(promptMessage) {
+        return new Promise((resolve) => {
+            resolve(Sk.queuedInput.pop());
+        });
+    }
+
 }

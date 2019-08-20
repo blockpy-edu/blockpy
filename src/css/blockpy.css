@@ -51,6 +51,10 @@
     width: 100%;
 }
 
+.corgis-icon {
+    max-width: 32px;
+}
+
 /** First Row **/
 
 .blockpy-content .blockpy-instructions * {

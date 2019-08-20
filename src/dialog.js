@@ -6,7 +6,7 @@ export let DIALOG_HTML = `
          aria-label='Dialog'
          aria-hidden="true"
          aria-modal="true">
-        <div class='modal-dialog' rol="document">
+        <div class='modal-dialog modal-lg' role="document">
             <div class='modal-content' role='region' aria-label='Dialog content'>
                 <div class='modal-header'>
                     <h4 class='modal-title'>Dynamic Content</h4>
