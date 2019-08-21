@@ -70,7 +70,7 @@ export const TRACE_HTML = `
 </div>
 `;
 
-export class Trace {
+export class BlockPyTrace {
 
     constructor(main, tag) {
         this.main = main;
@@ -99,7 +99,7 @@ export class Trace {
                         .replace("_$rn$", "");
                     let parsed;
                     try {
-                        parsed = Trace.parseValue(property, value);
+                        parsed = BlockPyTrace.parseValue(property, value);
                     } catch {
                         parsed = {"name": property, "type": "Unknown", "value": value.toString()};
                     }

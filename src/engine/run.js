@@ -6,13 +6,13 @@ export class RunConfiguration extends StudentConfiguration {
         this.main.model.execution.feedback.message("Running...");
         this.filename = "answer";
         this.code = this.main.model.submission.code();
+        this.main.components.server.saveFile("answer.py", this.code, null);
         this.main.components.server.logEvent("Compile", "", "", "", "answer.py");
 
         super.use(engine);
 
         engine.reset();
         this.updateParse();
-        this.main.components.server.saveFile("answer.py", this.code, null);
 
         this.main.model.execution.reports["verifier"] = {
             "success": Boolean(this.code.trim()),

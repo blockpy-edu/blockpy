@@ -95,10 +95,13 @@ export class BlockPyEngine {
 
     run() {
         this.configuration = this.configurations.run.use(this);
-        this.execute().then(
+        let execution = this.execute().then(
             this.configuration.success.bind(this.configuration),
             this.configuration.failure.bind(this.configuration)
-        ).then(this.onRun.bind(this));
+        );
+        if (!this.main.model.assignment.settings.disableFeedback()) {
+            execution.then(this.onRun.bind(this));
+        }
     }
 
     onRun() {
@@ -115,10 +118,13 @@ export class BlockPyEngine {
         console.log(evaluationInput);
         evaluationInput.then((userInput) => {
             this.configuration = this.configurations.eval.use(this, userInput);
-            this.execute().then(
+            let execution = this.execute().then(
                 this.configuration.success.bind(this.configuration),
                 this.configuration.failure.bind(this.configuration)
-            ).then(this.onEval.bind(this));
+            );
+            if (!this.main.model.assignment.settings.disableFeedback()) {
+                execution.then(this.onEval.bind(this));
+            }
         });
     }
 
@@ -136,7 +142,6 @@ export class BlockPyEngine {
 
     execute() {
         this.main.model.status.onExecution(StatusState.ACTIVE);
-        this.main.components.server.logEvent("Run.Program", "", "", "", this.configuration.filename);
         return Sk.misceval.asyncToPromise(() =>
             Sk.importMainWithBody(this.configuration.filename, false,
                                   this.configuration.code, true)
@@ -148,7 +153,6 @@ export class BlockPyEngine {
      */
     on_change() {
         let FILENAME = "on_change";
-        // TODO: Do we actually want to skip if this is the case?
         // Skip if the instructor has not defined anything
         if (!this.main.model.programs[FILENAME]().trim()) {
             return false;

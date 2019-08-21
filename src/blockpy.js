@@ -17,13 +17,14 @@ import {
 } from "./files";
 import {uploadFile, downloadFile} from "./editor/abstract_editor";
 import {BlockPyEngine} from "engine.js";
-import {Trace} from "./trace";
+import {BlockPyTrace} from "./trace";
 import {BlockPyConsole} from "./console";
 import {BlockPyFeedback} from "feedback.js";
 import {BlockPyServer} from "./server";
 import {BlockPyDialog} from "./dialog";
 import {loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";
 import {BlockPyCorgis, _IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS} from "./corgis";
+import {BlockPyHistory} from "./history";
 
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
 
@@ -134,7 +135,9 @@ export class BlockPy {
                 tags: ko.observableArray([]),
                 sampleSubmissions: ko.observableArray([]),
                 reviewed: ko.observable(configuration["assignment.reviewed"]),
+                public: ko.observable(configuration["assignment.public"]),
                 hidden: ko.observable(configuration["assignment.hidden"]),
+                ipRanges: ko.observable(configuration["assignment.ip_ranges"]),
                 settings: makeAssignmentSettingsModel(configuration)
             },
             submission: {
@@ -173,6 +176,11 @@ export class BlockPy {
                  * @type {DisplayModes}
                  */
                 pythonMode: ko.observable(this.getSetting("display.python.mode", DisplayModes.SPLIT)),
+                /**
+                 * Whether or not History mode is engaged.
+                 * @type {bool}
+                 */
+                historyMode: ko.observable(false),
                 /**
                  * Whether or not to be auto-saving changes in Python editor
                  * If an integer, specifies the delay that should be used (microseconds).
@@ -352,7 +360,6 @@ export class BlockPy {
         console.log(data);
         this.resetInterface();
         let wasServerConnected = this.model.configuration.serverConnected();
-        // TODO: Reset UI for new assignment
         this.model.configuration.serverConnected(false);
         let assignment = data.assignment;
         this.model.assignment.id(assignment.id);
@@ -362,8 +369,10 @@ export class BlockPy {
         this.model.assignment.forkedVersion(assignment.forked_version);
         this.model.assignment.hidden(assignment.hidden);
         this.model.assignment.reviewed(assignment.reviewed);
+        this.model.assignment.public(assignment.public);
         this.model.assignment.type(assignment.type);
         this.model.assignment.url(assignment.url);
+        this.model.assignment.ipRanges(assignment.ip_ranges);
         this.model.assignment.instructions(assignment.instructions);
         this.model.assignment.name(assignment.name);
         this.model.assignment.onChange(assignment.on_change || null);
@@ -602,6 +611,7 @@ export class BlockPy {
                     model.display.filename() ? model.ui.editors.current() : "None"
                 ),
                 reset: function() {
+                    self.components.server.logEvent("X-File.Reset", "", "", "", "answer.py");
                     model.submission.code(model.assignment.startingCode());
                     model.submission.extraFiles(model.assignment.extraStartingFiles().map(
                         file => {
@@ -629,11 +639,31 @@ export class BlockPy {
                         return codeMirror.setOption("fullScreen", !codeMirror.getOption("fullScreen"));
                     },
                     updateMode: (newMode) => {
+                        self.components.server.logEvent("X-View.Change", "", "", newMode, model.display.filename());
                         model.display.pythonMode(newMode);
                         if (model.display.filename() === "answer.py") {
                             self.components.pythonEditor.oldPythonMode = newMode;
                         }
+                    },
+                    isHistoryAvailable: ko.pureComputed(()=>
+                        model.ui.server.isEndpointConnected("loadHistory")),
+                    toggleHistoryMode: () => {
+                        if (model.display.historyMode()) {
+                            model.display.historyMode(false);
+                        } else {
+                            self.components.server.loadHistory((response) =>{
+                                if (response.success) {
+                                    self.components.history.load(response.history);
+                                    model.display.historyMode(true);
+                                } else {
+                                    self.components.dialog.ERROR_LOADING_HISTORY();
+                                }
+                            });
+                        }
                     }
+                },
+                settings: {
+                    save: () => self.components.server.saveAssignment()
                 }
             },
             execute: {
@@ -692,7 +722,7 @@ export class BlockPy {
         // reference to the relevant HTML location where it will be embedded.
         components.dialog = new BlockPyDialog(main, container.find(".blockpy-dialog"));
         components.feedback = new BlockPyFeedback(main, container.find(".blockpy-feedback"));
-        components.trace = new Trace(main);
+        components.trace = new BlockPyTrace(main);
         components.console = new BlockPyConsole(main, container.find(".blockpy-console"));
         components.engine = new BlockPyEngine(main);
         components.fileSystem = new BlockPyFileSystem(main);
@@ -700,10 +730,7 @@ export class BlockPy {
         components.pythonEditor = this.components.editors.byName("python");
         components.server = new BlockPyServer(main);
         components.corgis = new BlockPyCorgis(main);
-        /*
-        TODO
-        components.toolbar = new BlockPyToolbar(main, container.find(".blockpy-toolbar"));
-        components.history = new BlockPyHistory(main);*/
+        components.history = new BlockPyHistory(main, container.find(".blockpy-history-toolbar"));
     }
 
     start() {

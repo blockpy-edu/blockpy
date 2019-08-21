@@ -1,4 +1,5 @@
 import {LocalStorageWrapper} from "./storage";
+import {loadAssignmentSettings, saveAssignmentSettings} from "./editor/assignment_settings";
 
 /**
  *
@@ -124,20 +125,6 @@ BlockPyServer.prototype.createSubscriptions = function () {
     this.createFileSubscription(model.ui.files.extraStudentFiles, "#extraStudentFiles.blockpy");
     this.createFileSubscription(model.ui.files.extraStartingFiles, "#extraStartingFiles.blockpy");
     this.createFileSubscription(model.ui.files.extraInstructorFiles, "#extraInstructorFiles.blockpy");
-    /*
-    model.assignment.name.subscribe(function(e) { server.saveAssignment();});
-
-    model.assignment.parsons.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.importable.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.secret.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.disable_algorithm_errors.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.disable_timeout.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.initial_view.subscribe(function(e) { server.saveAssignment(); });
-    model.assignment.files.subscribe(function(e) { server.saveAssignment(); });
-    //model.settings.editor.subscribe(function(newValue) { server.logEvent('editor', newValue); });
-    model.execution.show_trace.subscribe(function(newValue) { server.logEvent("trace", newValue); });
-    model.execution.trace_step.subscribe(function(newValue) { server.logEvent("trace_step", newValue); });
-     */
 };
 
 /**
@@ -390,45 +377,35 @@ BlockPyServer.prototype.loadAssignment = function (assignment_id) {
 
 BlockPyServer.prototype.saveAssignment = function () {
     let model = this.main.model;
-    if (model.ui.server.isEndpointConnected("saveAssignment") &&
-        model.display.autoSave()) {
-        var data = this.createServerData();
-        data["introduction"] = model.assignment.introduction();
-        data["parsons"] = model.assignment.parsons();
-        data["initial"] = model.assignment.initial_view();
-        data["importable"] = model.assignment.importable();
-        data["secret"] = model.assignment.secret();
-        data["disable_algorithm_errors"] = model.assignment.disable_algorithm_errors();
-        data["disable_timeout"] = model.assignment.disable_timeout();
+    if (model.ui.server.isEndpointConnected("saveAssignment")) {
+        let data = this.createServerData();
+        data["hidden"] = model.assignment.hidden();
+        data["reviewed"] = model.assignment.reviewed();
+        data["public"] = model.assignment.public();
+        data["url"] = model.assignment.url();
+        data["ip_ranges"] = model.assignment.ipRanges();
         data["name"] = model.assignment.name();
-        // TODO: hackish, broken if ',' is in name
-        data["modules"] = model.assignment.modules().join(",");
-        data["files"] = model.assignment.files().join(",");
+        data["settings"] = saveAssignmentSettings(model);
 
-        this._postLatestRetry(data, this.urls.save_assignment, "assignment",
-                              "ASSIGNMENTS_CACHE", this.TIMER_DELAY);
+        this._postBlocking("saveAssignment", data, 3, () => 0,
+                           (e, textStatus, errorThrown) => {
+                               this.main.components.dialog.ERROR_SAVING_ASSIGNMNENT();
+                               console.error(e, textStatus, errorThrown);
+                           });
     } else {
         this.setStatus("Offline", "Server is not connected! (Save Assignment)");
     }
 };
 
-BlockPyServer.prototype.getHistory = function (callback) {
-    var model = this.main.model;
-    if (model.ui.server.isEndpointConnected("get_history")) {
-        var data = this.createServerData();
-        var server = this;
-        this._postBlocking(this.urls.get_history, data, 5,
-                           function (response) {
-                               if (response.success) {
-                                   callback(response.data);
-                               } else {
-                                   console.error(response);
-                                   server.setStatus("Error", response.message);
-                               }
+BlockPyServer.prototype.loadHistory = function (callback) {
+    if (this.main.model.ui.server.isEndpointConnected("loadHistory")) {
+        let model = this.main.model;
+        let data = this.createServerData();
+        this._postBlocking("loadHistory", data, 2, callback,
+                           (e, textStatus, errorThrown) => {
+                               this.main.components.dialog.ERROR_LOADING_HISTORY();
+                               console.error(e, textStatus, errorThrown);
                            });
-    } else {
-        this.setStatus("Offline", "Server is not connected! (Get History)");
-        callback([]);
     }
 };
 

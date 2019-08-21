@@ -41,7 +41,6 @@ Blockly.Blocks["turtle_color"] = {
 Blockly.Python["turtle_color"] = function(block) {
     var turtle = Blockly.Python.valueToCode(block, "TURTLE", Blockly.Python.ORDER_ATOMIC);
     var color = Blockly.Python.valueToCode(block, "COLOR", Blockly.Python.ORDER_ATOMIC);
-    // TODO: Assemble Python into code variable.
     var code = turtle+".color("+color+")\n";
     return code;
 };

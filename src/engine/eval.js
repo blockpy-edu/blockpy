@@ -1,6 +1,6 @@
 import {StudentConfiguration} from "./student";
 import {StatusState} from "../server";
-import {Trace} from "../trace";
+import {BlockPyTrace} from "../trace";
 
 export class EvalConfiguration extends StudentConfiguration {
     use(engine, code) {
@@ -23,13 +23,14 @@ export class EvalConfiguration extends StudentConfiguration {
 
     success(module) {
         console.log("Eval success");
+        this.main.components.server.logEvent("X-Evaluate.Program", "", "", "", "evaluations");
         this.main.model.status.onExecution(StatusState.READY);
         this.main.model.execution.student.globals(Sk.globals);
         Sk.globals = {};
         let report = this.main.model.execution.reports;
         let filename = this.filename;
         this.main.model.execution.student.results = module;
-        this.main.components.console.printValue(Trace.parseValue("_", module.$d._, true).value);
+        this.main.components.console.printValue(BlockPyTrace.parseValue("_", module.$d._, true).value);
         return new Promise((resolve, reject) => {
             //this.step(module.$d, module.$d,-1, 0, filename + ".py");
             this.lastStep();

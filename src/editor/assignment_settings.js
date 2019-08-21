@@ -1,80 +1,206 @@
 import {AbstractEditor} from "./abstract_editor";
 import {DisplayModes} from "./python";
 
-export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
-    <div>
-    Assignment Settings
-    
-    <form>
+const ASSIGNMENT_SETTINGS = [
+    ["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
+    ["startView", "start_view", DisplayModes.SPLIT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
+    ["datasets", "datasets", "", "string", "The current list of datasets available on load as a comma-separated string."],
+    ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
+    ["isParsons", "is_parsons", false, "bool", "If checked, then this is a parson's style question (jumbled)."],
+    ["disableFeedback", "disable_feedback", false, "bool", "If checked, then no instructor scripts are run (e.g., on_run and on_eval)."],
+    ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
+    ["disableEdit", "can_edit", false, "bool", "If checked, then the students' file will not be editable at all."],
+    ["disableBlocks", "can_blocks", false, "bool", "If checked, then the student cannot edit the block interface (although it is visible)."],
+    ["onlyInteractive", "only_interactive", false, "bool", "If checked, the editors are hidden, the program is automatically run, and then the console enters Eval mode (interactive)."],
+    ["onlyUploads", "only_uploads", false, "bool", "If unchecked, then the students' file will not be directly editable (they will have to upload submissions)."],
+    // What menus/feedback to show and hide
+    ["hideFiles", "hide_files", true, "bool", "If checked, then students will not see the View Files toolbar."],
+    ["hideQueuedInputs", "hide_queued_inputs", true, "bool", "INCOMPLETE: If unchecked, then the students can access the queued inputs box (makes repeated debugging easier for the input function)."],
+    ["hideEditors", "hide_editors", false, "bool", "If checked, then all of the editors are hidden."],
+    ["hideAll", "hide_all", false, "bool", "INCOMPLETE: If checked, then the entire interface is hidden."],
+    ["hideEvaluate", "hide_evaluate", false, "bool", "If checked, then the Evaluate button is not shown on the console."],
+    ["hideImportDatasetsButton", "hide_import_datasets_button", true, "bool", "If checked, then students cannot see the import datasets button."],
+    ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
+    ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."]
+];
+
+function getDocumentation(name) {
+    for (let i=0; i < ASSIGNMENT_SETTINGS.length; i++) {
+        if (ASSIGNMENT_SETTINGS[i][0] === name) {
+            return ASSIGNMENT_SETTINGS[i][4];
+        }
+    }
+    return "Documentation not found for field";
+}
+
+function makeStartViewTab(name, icon, mode) {
+    return `<label class="btn btn-outline-secondary blockpy-mode-set-blocks"
+                data-bind="css: {active: assignment.settings.startView() === '${mode}'},
+                           click: assignment.settings.startView.bind($data, '${mode}')">
+                <span class='fas fa-${icon}'></span>
+                <input type="radio" name="blockpy-start-view-set" autocomplete="off" checked> ${name}
+            </label>`;
+}
+
+const ASSIGNMENT_SETTINGS_BOOLEAN_COMPONENTS_HTML = ASSIGNMENT_SETTINGS
+    // Only handle the simple booleans this way
+    .filter((setting) => setting[3] === "bool")
+    .map((setting) => {
+        let prettyName = setting[1].split("_").map(word=>(word.charAt(0).toUpperCase()+word.slice(1))).join(" ");
+        return `
         <div class="form-group row">
-            <label for="blockpy-settings-name" class="col-sm-2 col-form-label">Name:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="blockpy-settings-name">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-${setting[0]}">${prettyName}</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-${setting[0]}"
+                    data-bind="checked: assignment.settings.${setting[0]}">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    ${setting[4]}
+                </small>
             </div>
         </div>
-        <!--
-        url
-        reviewed
-        hidden
-        public
-        ip_ranges
+        `;
+    }).join("\n\n");
+
+export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
+    <div class="blockpy-view-settings">
+    
+    <form>
+
+        <div class="form-group row">
+            <div class="col-sm-12 mx-auto">
+                <button type="button" class="btn btn-success"
+                    data-bind="click: ui.editors.settings.save">Save changes</button>
+            </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="blockpy-settings-name" class="col-sm-2 col-form-label text-right">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-name"
+                data-bind="value: assignment.name">
+                <small class="form-text text-muted">
+                    The student-facing name of the assignment. Assignments within a group are ordered alphabetically
+                    by their name, so you may want to use a naming scheme like "#43.5) Whatever".
+                </small>
+            </div>
+        </div>
         
-        settings
-        -->
+        <div class="form-group row">
+            <label for="blockpy-settings-url" class="col-sm-2 col-form-label text-right">URL:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-url"
+                data-bind="value: assignment.url">
+                <small class="form-text text-muted">
+                    The course-unique URL that can be used to consistently refer to this assignment. 
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-public">Public:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-public"
+                    data-bind="checked: assignment.public">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If not public, users outside of the course will not be able to see the assignment in course listings.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-hidden">Hidden:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-hidden"
+                    data-bind="checked: assignment.hidden">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If hidden, students will not be able to see their grade while working on the assignment.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-reviewed">Reviewed:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-reviewed"
+                    data-bind="checked: assignment.reviewed">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If reviewed, the assignment can be commented upon and regraded by the staff afterwards.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-reviewed">Starting View:</label>
+            </div>
+            <div class="col-sm-3">
+                <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                    ${makeStartViewTab("Blocks", "th-large", DisplayModes.BLOCK)}
+                    ${makeStartViewTab("Split", "columns", DisplayModes.SPLIT)}
+                    ${makeStartViewTab("Text", "align-left", DisplayModes.TEXT)}
+                 </div>
+            </div>            
+            <div class="col-sm-7">
+                <small class="form-text text-muted">
+                    ${getDocumentation("startView")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-ip-ranges" class="col-sm-2 col-form-label text-right">IP Ranges:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-ip-ranges"
+                data-bind="value: assignment.ipRanges">
+                <small class="form-text text-muted">
+                    Provide a comma-separated list of IP Addresses that will be explicitly allowed. If blank,
+                    then all addresses are allowed. If an address starts with <code>^</code> then it it is explicitly
+                    blacklisted, but that can be overridden in turn with a <code>!</code>. Addresses can also
+                    include a bit mask to allow a range of addresses.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-datasets" class="col-sm-2 col-form-label text-right">Preloaded Datasets:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-datasets"
+                data-bind="value: assignment.settings.datasets">
+                <small class="form-text text-muted">
+                    ${getDocumentation("datasets")}
+                </small>
+            </div>
+        </div>
+        
+        ${ASSIGNMENT_SETTINGS_BOOLEAN_COMPONENTS_HTML}
     </form>
     
     </div>
 `;
-
-const ASSIGNMENT_SETTINGS = [
-    /**
-     * Whether or not the user is allowed to edit the file directly
-     * @type {bool}
-     */
-    ["canEdit", "can_edit", true],
-    /**
-     * Whether or not the user can use blocks
-     * @type {bool}
-     */
-    ["canBlocks", "can_blocks", true],
-    /**
-     * Whether to prevent timeouts (potentially allow infinite loops)
-     * @type {bool}
-     */
-    ["disableTimeout", "disable_timeout", false],
-    /**
-     * What level of toolbox to present to the user
-     */
-    ["toolboxLevel", "toolbox_level", "normal"],
-    /**
-     * When the student opens this assignment, what Python editor mode to start in
-     */
-    ["startView", "start_view", DisplayModes.SPLIT],
-    /**
-     * The current list of datasets available on load as a comma separated string
-     */
-    ["datasets", "datasets", ""],
-    /**
-     * Whether this a parson's style question
-     */
-    ["isParsons", "is_parsons", false],
-    // Whether to even try to run feedback
-    ["disableFeedback", "disable_feedback", false],
-    // Whether to do any tracing
-    ["disableTrace", "disable_trace", false],
-    // Whether to immediately start in Interactive Console mode
-    ["onlyInteractive", "only_interactive", false],
-    ["onlyUploads", "only_uploads", false],
-    // What menus/feedback to show and hide
-    ["hideFiles", "hide_files", true],
-    ["hideQueuedInputs", "hide_queued_inputs", true],
-    ["hideEditors", "hide_editors", false],
-    ["hideAll", "hide_all", false],
-    ["hideEvaluate", "hide_evaluate", false],
-    ["hideImportDatasetsButton", "hide_import_datasets_button", true],
-    ["hideImportStatements", "hide_import_statements", false],
-    ["hideCoverageButton", "hide_coverage_button", false]
-];
 
 export function saveAssignmentSettings(model) {
     let settings = {};

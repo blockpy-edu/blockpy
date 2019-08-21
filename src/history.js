@@ -1,3 +1,32 @@
+export const HISTORY_TOOLBAR_HTML = `
+<div class="blockpy-history-toolbar col-md-12" data-bind="visible: display.historyMode">
+
+    <form class="form-inline">
+        <button class="btn btn-outline-secondary mr-2" type="button">
+            <span class='fas fa-step-backward'></span> Start            
+        </button>
+        <button class="btn btn-outline-secondary mr-2" type="button">
+            <span class='fas fa-backward'></span> Previous
+        </button>
+        <select class="blockpy-history-selector form-control custom-select mr-2" aria-title="History Selector">
+            <option selected>Wed Jan 24, 4:32:03pm - Code Edit</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
+        </select>
+        <button class="btn btn-outline-secondary mr-2" type="button">
+            <span class='fas fa-file-import'></span> Use
+        </button>
+        <button class="btn btn-outline-secondary mr-2" type="button">
+            <span class='fas fa-forward'></span> Next
+        </button>
+        <button class="btn btn-outline-secondary" type="button">
+            <span class='fas fa-step-forward'></span> Most Recent
+        </button>
+    </form>
+</div>
+`;
+
 /**
  * An object for displaying the user's coding logs (their history).
  * A lightweight component, its only job is to open a dialog.
@@ -6,21 +35,59 @@
  * @this {BlockPyHistory}
  * @param {Object} main - The main BlockPy instance
  */
-function BlockPyHistory(main) {
-    this.main = main;
+export class BlockPyHistory {
+    constructor(main, tag) {
+        this.main = main;
+        this.tag = tag;
+        this.history = [];
+    }
+
+    load(history) {
+        this.history = history;
+        let selector = $(".blockpy-history-selector").empty();
+        history
+            .filter((entry) => (
+                !entry.file_path.startsWith("_instructor.") &&
+                    entry.event_type !== "Compile" &&
+                    entry.event_type !== "Intervention" &&
+                    (!this.main.model.assignment.hidden() || entry.event_type !== "X-Submission.LMS")
+            ))
+            .forEach((entry, index) => {
+                let event_type = REMAP_EVENT_TYPES[entry.event_type] || entry.event_type;
+                let displayed = prettyPrintDateTime(entry.client_timestamp) +" - "+event_type;
+                let disable = (entry.event_type !== "File.Edit");
+                let option = $("<option></option>", {text: displayed, value: index, disabled: disable});
+                selector.append(option);
+            });
+    }
 }
 
-var monthNames = [
-  "Jan", "Feb", "Mar",
-  "Apr", "May", "June", "July",
-  "Aug", "Sept", "Oct",
-  "Nov", "Dec"
+const REMAP_EVENT_TYPES = {
+    "Session.Start": "Began session",
+    "X-IP.Change": "Changed IP address",
+    "File.Edit": "Edited code",
+    "Run.Program": "Ran program",
+    "Compile.Error": "Syntax error",
+    "X-Submission.LMS": "Updated grade"
+};
+
+const monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "June", "July",
+    "Aug", "Sept", "Oct",
+    "Nov", "Dec"
 ];
-var weekDays = [
+const weekDays = [
     "Sun", "Mon", "Tue",
     "Wed", "Thu", "Fri",
     "Sat"
 ];
+
+function isSameDay(first, second) {
+    return first.getDate() === second.getDate() &&
+        first.getMonth() === second.getMonth() &&
+        first.getFullYear() === second.getFullYear();
+}
 
 /**
  * Helper function to parse a date/time string and rewrite it as something
@@ -29,18 +96,27 @@ var weekDays = [
  * @returns {String} - A human-readable time string.
  */
 function prettyPrintDateTime(timeString) {
-    var year = timeString.slice(0, 4),
+    /*let year = timeString.slice(0, 4),
         month = parseInt(timeString.slice(4, 6), 10)-1,
         day = timeString.slice(6, 8),
         hour = timeString.slice(9, 11),
         minutes = timeString.slice(11, 13),
-        seconds = timeString.slice(13, 15);
-    var date = new Date(year, month, day, hour, minutes, seconds);
-    var dayStr = weekDays[date.getDay()];
-    var monthStr = monthNames[date.getMonth()];
-    var yearFull = date.getFullYear();
-    var complete = dayStr+", "+monthStr+" "+date.getDate()+", "+yearFull+" at "+date.toLocaleTimeString();
-    return complete;
+        seconds = timeString.slice(13, 15);*/
+    // TODO: Handle timezones correctly
+    let now = new Date();
+    let past = new Date(parseInt(timeString, 10));
+    if (isSameDay(now, past)) {
+        return "Today at "+past.toLocaleTimeString();
+    } else {
+        let dayStr = weekDays[past.getDay()];
+        let monthStr = monthNames[past.getMonth()];
+        let date = dayStr + ", " + monthStr + " " + past.getDate();
+        if (now.getFullYear() === past.getFullYear()) {
+            return date + " at "+past.toLocaleDateString();
+        } else {
+            return date + ", "+past.getFullYear() + " at "+past.toLocaleTimeString();
+        }
+    }
 }
 
 

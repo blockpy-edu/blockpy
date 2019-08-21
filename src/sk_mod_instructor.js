@@ -165,7 +165,7 @@ export let $sk_mod_instructor = function() {
             outputs = outputs.filter(function(output) { 
                 return output.type === "plot";
             }).map(function(graph) {
-                return {"data": graph.map(function(plot) {
+                return {"data": graph.content.map(function(plot) {
                     let newPlot = { "type": plot.type,
                         "label": "" };
                     if (plot.type === "line" || plot.type === "scatter") {

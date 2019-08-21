@@ -2,7 +2,6 @@
  * TODO: rename files, manual save, tags, sample_submissions, on_eval, non-builtin files
  * TODO: import data, history, run, url_data, assignment_settings, parsons_mode
  * TODO: delete becomes "clear" for instructor files
- * TODO: Fix capture blocks css
  */
 
 /**
@@ -10,6 +9,7 @@
  * @enum {str}
  */
 import {AbstractEditor, sluggify} from "./abstract_editor";
+import {HISTORY_TOOLBAR_HTML} from "../history";
 
 export let DisplayModes = {
     BLOCK: "block",
@@ -38,16 +38,16 @@ export const PYTHON_EDITOR_HTML = `
          </div>
          
          <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
-                ${makeTab("Blocks", "th-large", DisplayModes.BLOCK)}
-                ${makeTab("Split", "columns", DisplayModes.SPLIT)}
-                ${makeTab("Text", "align-left", DisplayModes.TEXT)}
-            </div>
+            ${makeTab("Blocks", "th-large", DisplayModes.BLOCK)}
+            ${makeTab("Split", "columns", DisplayModes.SPLIT)}
+            ${makeTab("Text", "align-left", DisplayModes.TEXT)}
+         </div>
 
-        <div class="btn-group mr-2" role="group" aria-label="Reset Group">
-            <button type="button" class="btn btn-outline-secondary"
-                data-bind="click: ui.editors.reset">
-                <span class="fas fa-sync"></span> Reset
-             </button>
+         <div class="btn-group mr-2" role="group" aria-label="Reset Group">
+             <button type="button" class="btn btn-outline-secondary"
+                 data-bind="click: ui.editors.reset">
+                 <span class="fas fa-sync"></span> Reset
+              </button>
          </div>
          
          <div class="btn-group mr-2" role="group" aria-label="Import Group">
@@ -80,7 +80,12 @@ export const PYTHON_EDITOR_HTML = `
             </div>
          
          <div class="btn-group mr-2" role="group" aria-label="History Group">
-            <button type="button" class="btn btn-outline-secondary">
+            <button type="button" class="btn btn-outline-secondary"
+                data-toggle="button" aria-pressed="false"
+                data-bind="click: ui.editors.python.toggleHistoryMode,
+                           enable: ui.editors.python.isHistoryAvailable,
+                           css: { active: display.historyMode },
+                           attr: { 'aria-pressed': display.historyMode }">
                 <span class="fas fa-history"></span> History
              </button>
          </div>
@@ -118,6 +123,8 @@ export const PYTHON_EDITOR_HTML = `
          </div>
          
     </div>
+    
+    ${HISTORY_TOOLBAR_HTML}
 
 
     <div class="blockpy-python-blockmirror">
@@ -345,8 +352,9 @@ class PythonEditorView extends AbstractEditor {
         if (filename.endsWith(".ipynb")) {
             code = convertIpynbToPython(code);
         }
+        this.main.components.server.logEvent("X-File.Upload", "", "", code, this.filename);
         this.file.handle(code);
-        // TODO: log upload event
+        this.main.components.engine.run();
         // TODO: Run code
     }
 
@@ -356,6 +364,7 @@ class PythonEditorView extends AbstractEditor {
             result.name = sluggify(this.main.model.assignment.name());
         }
         result.mimetype = "text/x-python";
+        this.main.components.server.logEvent("X-File.Download", "", "", "", result.name);
         return result;
     }
 

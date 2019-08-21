@@ -425,6 +425,11 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     width: 100%;
 }
 
+/** Assignment Settings **/
+.blockpy-view-settings .row {
+    border-bottom: 0;
+}
+
 /** Footer Row **/
 
 .blockpy-content .blockpy-status span {
