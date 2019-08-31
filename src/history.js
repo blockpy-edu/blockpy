@@ -1,26 +1,29 @@
+// TODO: Should disable buttons if we can't activate them.
+
 export const HISTORY_TOOLBAR_HTML = `
 <div class="blockpy-history-toolbar col-md-12" data-bind="visible: display.historyMode">
 
     <form class="form-inline">
-        <button class="btn btn-outline-secondary mr-2" type="button">
-            <span class='fas fa-step-backward'></span> Start            
+        <button class="blockpy-history-start btn btn-outline-secondary mr-2" type="button"
+            data-bind="click: ui.editors.python.history.start">
+            <span class='fas fa-step-backward'></span> Start
         </button>
-        <button class="btn btn-outline-secondary mr-2" type="button">
+        <button class="btn btn-outline-secondary mr-2" type="button"
+            data-bind="click: ui.editors.python.history.previous">
             <span class='fas fa-backward'></span> Previous
         </button>
         <select class="blockpy-history-selector form-control custom-select mr-2" aria-title="History Selector">
-            <option selected>Wed Jan 24, 4:32:03pm - Code Edit</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
         </select>
-        <button class="btn btn-outline-secondary mr-2" type="button">
+        <button class="btn btn-outline-secondary mr-2" type="button"
+            data-bind="click: ui.editors.python.history.use">
             <span class='fas fa-file-import'></span> Use
         </button>
-        <button class="btn btn-outline-secondary mr-2" type="button">
+        <button class="btn btn-outline-secondary mr-2" type="button"
+            data-bind="click: ui.editors.python.history.next">
             <span class='fas fa-forward'></span> Next
         </button>
-        <button class="btn btn-outline-secondary" type="button">
+        <button class="btn btn-outline-secondary" type="button"
+            data-bind="click: ui.editors.python.history.mostRecent">
             <span class='fas fa-step-forward'></span> Most Recent
         </button>
     </form>
@@ -39,12 +42,16 @@ export class BlockPyHistory {
     constructor(main, tag) {
         this.main = main;
         this.tag = tag;
+        this.currentId = null;
         this.history = [];
+        this.editEvents = [];
     }
 
     load(history) {
         this.history = history;
-        let selector = $(".blockpy-history-selector").empty();
+        this.editEvents = [];
+        this.selector = $(".blockpy-history-selector").empty();
+        let editId = 0;
         history
             .filter((entry) => (
                 !entry.file_path.startsWith("_instructor.") &&
@@ -56,16 +63,71 @@ export class BlockPyHistory {
                 let event_type = REMAP_EVENT_TYPES[entry.event_type] || entry.event_type;
                 let displayed = prettyPrintDateTime(entry.client_timestamp) +" - "+event_type;
                 let disable = (entry.event_type !== "File.Edit");
-                let option = $("<option></option>", {text: displayed, value: index, disabled: disable});
-                selector.append(option);
+                let option = $("<option></option>", {text: displayed, disabled: disable});
+                if (this.isEditEvent(entry)) {
+                    option.attr("value", editId);
+                    this.editEvents.push(entry);
+                    editId += 1;
+                }
+                this.selector.append(option);
             });
+        this.selector.val(Math.max(0, editId-1));
+        this.selector.change((evt) => {
+            this.updateEditor();
+        });
     }
+
+    moveToStart() {
+        this.selector.val(0);
+        this.updateEditor();
+    }
+
+    movePrevious() {
+        let currentId = parseInt(this.selector.val(), 10);
+        this.selector.val(Math.max(0, currentId-1));
+        this.updateEditor();
+    }
+
+    moveNext() {
+        let currentId = parseInt(this.selector.val(), 10);
+        this.selector.val(Math.min(this.editEvents.length-1, currentId+1));
+        this.updateEditor();
+    }
+
+    moveToMostRecent() {
+        this.selector.val(this.editEvents.length-1);
+        this.updateEditor();
+    }
+
+    updateEditor() {
+        if (this.editEvents.length) {
+            let currentId = parseInt(this.selector.val(), 10);
+            this.main.components.pythonEditor.bm.setCode(this.editEvents[currentId].message);
+        }
+    }
+
+    use() {
+        if (this.editEvents.length) {
+            let currentId = parseInt(this.selector.val(), 10);
+            let code = this.editEvents[currentId].message;
+            this.main.model.ui.editors.python.turnOffHistoryMode();
+            this.main.components.pythonEditor.file.handle(code);
+        }
+    }
+
+    isEditEvent(entry) {
+        return ((entry.event_type === "File.Edit" ||
+                 entry.event_type === "File.Create") &&
+                this.main.model.display.filename() === entry.file_path);
+    }
+
 }
 
 const REMAP_EVENT_TYPES = {
     "Session.Start": "Began session",
     "X-IP.Change": "Changed IP address",
     "File.Edit": "Edited code",
+    "File.Create": "Started assignment",
     "Run.Program": "Ran program",
     "Compile.Error": "Syntax error",
     "X-Submission.LMS": "Updated grade"
@@ -112,7 +174,7 @@ function prettyPrintDateTime(timeString) {
         let monthStr = monthNames[past.getMonth()];
         let date = dayStr + ", " + monthStr + " " + past.getDate();
         if (now.getFullYear() === past.getFullYear()) {
-            return date + " at "+past.toLocaleDateString();
+            return date + " at "+past.toLocaleTimeString();
         } else {
             return date + ", "+past.getFullYear() + " at "+past.toLocaleTimeString();
         }

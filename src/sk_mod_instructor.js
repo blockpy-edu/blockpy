@@ -84,6 +84,14 @@ export let $sk_mod_instructor = function() {
         Sk.builtin.pyCheckArgs("get_program", arguments, 0, 0);
         return Sk.ffi.remapToPy(Sk.executionReports["verifier"].code);
     });
+
+    /**
+     * This function is called by instructors to get the students' code as a string.
+    **/
+    mod.get_evaluation = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_evaluation", arguments, 0, 0);
+        return Sk.ffi.remapToPy(Sk.executionReports["student"].evaluation || "");
+    });
     
     mod.trace_lines = new Sk.builtin.func(function() {
         if (Sk.executionReports["student"].success) {

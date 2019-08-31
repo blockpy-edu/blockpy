@@ -176,6 +176,10 @@
     background-color: #5bc0de;
 }
 
+.blockpy-content .label-instructions {
+    background-color: #5bc0de;
+}
+
 .blockpy-content .label-success {
     background-color: #358535;
 }
@@ -383,7 +387,14 @@ button.blockpy-delete:active {
 
 .editor-error-line {
     background: #FBC4C4 !important;
-    color: #8a1f11 !important;
+}
+
+.editor-uncovered-line {
+    background: #FBFBC4 !important;
+}
+
+.editor-traced-line {
+    background: #C4FBC4 !important;
 }
 
 div.blockpy-text.blockpy-editor-menu.col-md-6 {

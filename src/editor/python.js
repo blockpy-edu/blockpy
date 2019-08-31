@@ -81,7 +81,7 @@ export const PYTHON_EDITOR_HTML = `
          
          <div class="btn-group mr-2" role="group" aria-label="History Group">
             <button type="button" class="btn btn-outline-secondary"
-                data-toggle="button" aria-pressed="false"
+                aria-pressed="false"
                 data-bind="click: ui.editors.python.toggleHistoryMode,
                            enable: ui.editors.python.isHistoryAvailable,
                            css: { active: display.historyMode },
@@ -268,7 +268,9 @@ class PythonEditorView extends AbstractEditor {
             //'height': '2000px'
         });
         this.dirty = false;
+        this.readOnly = false;
         this.makeSubscriptions();
+        this.lineErrorSubscription = null;
         this.oldPythonMode = this.main.model.display.pythonMode();
     }
 
@@ -300,8 +302,15 @@ class PythonEditorView extends AbstractEditor {
                 this.oldPythonMode = this.main.model.display.pythonMode();
             }
             this.main.model.display.pythonMode(DisplayModes.TEXT);
+            this.bm.isParsons = () => false;
+
         } else {
             this.main.model.display.pythonMode(this.oldPythonMode);
+            this.bm.isParsons = this.main.model.assignment.settings.isParsons;
+
+            this.lineErrorSubscription = this.main.model.execution.feedback.linesError.subscribe((lines) =>
+                this.bm.setHighlightedLines(lines, "editor-error-line")
+            );
         }
 
 
@@ -313,6 +322,18 @@ class PythonEditorView extends AbstractEditor {
     }
 
     updateEditor(newContents) {
+        if (newContents === undefined) {
+            if (this.file !== null) {
+                newContents = this.file.handle();
+            } else {
+                // Doesn't matter, file was already shut down.
+                newContents = "";
+            }
+        } else if (newContents === null) {
+            // We're closing this file
+            this.main.components.fileSystem.deleteFileLocally_(this.filename);
+            return;
+        }
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -323,10 +344,14 @@ class PythonEditorView extends AbstractEditor {
     }
 
     updateHandle(event) {
+        console.log(this.bm.clearHighlightedLines());
+
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
-            this.file.handle(this.bm.getCode());
+            if (!this.main.model.display.historyMode()) {
+                this.file.handle(this.bm.getCode());
+            }
             this.dirty = false;
         }
     }
@@ -336,6 +361,14 @@ class PythonEditorView extends AbstractEditor {
         this.dirty = false;
         this.currentSubscription.dispose();
         this.bm.removeChangeListener(this.currentBMListener);
+        if (this.main.model.display.historyMode()) {
+            this.main.model.ui.editors.python.turnOffHistoryMode();
+        }
+        this.bm.clearHighlightedLines();
+        if (this.lineErrorSubscription) {
+            this.lineErrorSubscription.dispose();
+            this.lineErrorSubscription = null;
+        }
         super.exit(newFilename, oldEditor);
     }
 
@@ -344,6 +377,11 @@ class PythonEditorView extends AbstractEditor {
         this.main.model.display.pythonMode.subscribe(mode => {
             this.bm.setMode(mode);
         });
+    }
+
+    setReadOnly(isReadOnly) {
+        this.readOnly = isReadOnly;
+        this.bm.setReadOnly(isReadOnly);
     }
 
     uploadFile(event) {

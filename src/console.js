@@ -84,7 +84,23 @@ class ConsoleLineTurtle extends ConsoleLine {
         if (this.visible) {
             where.prepend(this.html);
             this.html[0].scrollIntoView({ behavior: "smooth" });
-            this.html.tooltip();
+            //this.html.tooltip();
+        }
+    }
+}
+
+class ConsoleLineImage extends ConsoleLine {
+    constructor(main, content) {
+        super(main, ConsoleLineType.IMAGE, content);
+        this.html.addClass("blockpy-console-image-output");
+    }
+
+    render(where) {
+        if (this.visible) {
+            console.log(this.content);
+            this.html.append(this.content);
+            where.append(this.html);
+            //this.html.tooltip();
         }
     }
 }
@@ -98,7 +114,7 @@ class ConsoleLinePlot extends ConsoleLine {
     render(where) {
         if (this.visible) {
             where.append(this.html);
-            this.html.tooltip();
+            //this.html.tooltip();
         }
     }
 }
@@ -361,6 +377,12 @@ export class BlockPyConsole {
         this.plotBuffer = new ConsoleLinePlot(this.main, plots);
         this.plotBuffer.render(this.printerTag);
         return this.plotBuffer;
+    }
+
+    printPILImage(imageData) {
+        this.imageBuffer = new ConsoleLineImage(this.main, imageData.image);
+        this.imageBuffer.render(this.printerTag);
+        return this.imageBuffer;
     }
 
     printValue(value) {

@@ -262,7 +262,11 @@ export class BlockPyFileSystem {
         if (filename in this.files_) {
             // File already exists! Just update its handle
             let existingFile = this.files_[filename];
-            existingFile.handle = modelFile;
+            if (modelFile === undefined) {
+                this.observeFile_(existingFile);
+            } else {
+                existingFile.handle = modelFile;
+            }
             existingFile.handle(contents || "");
             return existingFile;
         } else {

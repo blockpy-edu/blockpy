@@ -98,6 +98,10 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         this.main.model.status.onExecution(StatusState.READY);
         //after(module);
 
+        /*if (success && this.main.model.configuration.callbacks.success) {
+            this.main.model.configuration.callbacks.success(this.main.model.assignment.id());
+        }*/
+
         if (!Sk.executionReports.instructor.scrolling) {
             try {
                 this.main.components.console.scrollToBottom();

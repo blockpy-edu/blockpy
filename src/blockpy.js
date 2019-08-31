@@ -376,7 +376,13 @@ export class BlockPy {
         this.model.assignment.instructions(assignment.instructions);
         this.model.assignment.name(assignment.name);
         this.model.assignment.onChange(assignment.on_change || null);
+        if (assignment.on_change) {
+            this.components.fileSystem.newFile("!on_change.py", assignment.on_change);
+        }
         this.model.assignment.onEval(assignment.on_eval || null);
+        if (assignment.on_eval) {
+            this.components.fileSystem.newFile("!on_eval.py", assignment.on_eval);
+        }
         this.model.assignment.onRun(assignment.on_run);
         this.model.assignment.startingCode(assignment.starting_code);
         this.model.assignment.ownerId(assignment.owner_id);
@@ -474,6 +480,8 @@ export class BlockPy {
                             return "label-feedback-error";
                         case "complete":
                             return "label-problem-complete";
+                        case "instructions":
+                            return "label-instructions";
                         case "no errors":
                             return "label-no-errors";
                     }
@@ -498,6 +506,8 @@ export class BlockPy {
                         case "analyzer":
                             return "Algorithm Error";
                         case "feedback":
+                        case "instructions":
+                            return "Instructions";
                         case "instructor":
                             return "Incorrect Answer";
                         case "complete":
@@ -647,19 +657,35 @@ export class BlockPy {
                     },
                     isHistoryAvailable: ko.pureComputed(()=>
                         model.ui.server.isEndpointConnected("loadHistory")),
+                    turnOffHistoryMode: () => {
+                        self.components.pythonEditor.updateEditor();
+                        self.components.pythonEditor.setReadOnly(false);
+                        model.display.historyMode(false);
+                    },
+                    turnOnHistoryMode: () => {
+                        self.components.server.loadHistory((response) =>{
+                            if (response.success) {
+                                self.components.history.load(response.history);
+                                model.display.historyMode(true);
+                                self.components.pythonEditor.setReadOnly(true);
+                            } else {
+                                self.components.dialog.ERROR_LOADING_HISTORY();
+                            }
+                        });
+                    },
                     toggleHistoryMode: () => {
                         if (model.display.historyMode()) {
-                            model.display.historyMode(false);
+                            model.ui.editors.python.turnOffHistoryMode();
                         } else {
-                            self.components.server.loadHistory((response) =>{
-                                if (response.success) {
-                                    self.components.history.load(response.history);
-                                    model.display.historyMode(true);
-                                } else {
-                                    self.components.dialog.ERROR_LOADING_HISTORY();
-                                }
-                            });
+                            model.ui.editors.python.turnOnHistoryMode();
                         }
+                    },
+                    history: {
+                        start: ()=>{ self.components.history.moveToStart(); },
+                        previous: ()=>{ self.components.history.movePrevious(); },
+                        next: ()=>{ self.components.history.moveNext(); },
+                        mostRecent: ()=>{ self.components.history.moveToMostRecent(); },
+                        use: ()=>{ self.components.history.use(); }
                     }
                 },
                 settings: {

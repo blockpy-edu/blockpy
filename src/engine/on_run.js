@@ -63,6 +63,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
+        console.log(report["parser"]);
         let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, false, isSafe);
         lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
@@ -103,6 +104,10 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.main.components.server.updateSubmission(score, success, hide, false);
         this.main.model.status.onExecution(StatusState.READY);
         //after(module);
+
+        /*if (success && this.main.model.configuration.callbacks.success) {
+            this.main.model.configuration.callbacks.success(this.main.model.assignment.id());
+        }*/
 
         if (!Sk.executionReports.instructor.scrolling) {
             try {

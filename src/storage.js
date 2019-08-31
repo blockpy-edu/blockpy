@@ -1,3 +1,19 @@
+let LOCAL_STORAGE_REF;
+try {
+    LOCAL_STORAGE_REF = localStorage;
+    let mod = "BLOCKPY_LOCALSTORAGE_TEST";
+    LOCAL_STORAGE_REF.setItem(mod, mod);
+    LOCAL_STORAGE_REF.removeItem(mod);
+} catch(e) {
+    LOCAL_STORAGE_REF = {
+        _data       : {},
+        setItem     : function(id, val) { return this._data[id] = String(val); },
+        getItem     : function(id) { return this._data.hasOwnProperty(id) ? this._data[id] : undefined; },
+        removeItem  : function(id) { return delete this._data[id]; },
+        clear       : function() { return this._data = {}; }
+    };
+}
+
 /**
  * Helper object for interfacing with the LocalStorage. The LocalStorage
  * browser API allows for offline storage. That API is very unsophisticated,
@@ -20,8 +36,8 @@ export function LocalStorageWrapper(namespace) {
  * @param {String} value - The value.
  */
 LocalStorageWrapper.prototype.set =  function(key, value) {
-    localStorage.setItem(this.namespace+"_"+key+"_value", value);
-    localStorage.setItem(this.namespace+"_"+key+"_timestamp", $.now());
+    LOCAL_STORAGE_REF.setItem(this.namespace+"_"+key+"_value", value);
+    LOCAL_STORAGE_REF.setItem(this.namespace+"_"+key+"_timestamp", $.now());
 };
 
 /**
@@ -30,8 +46,8 @@ LocalStorageWrapper.prototype.set =  function(key, value) {
  * @param {String} key - The name of the key to remove.
  */
 LocalStorageWrapper.prototype.remove = function(key) {
-    localStorage.removeItem(this.namespace+"_"+key+"_value");
-    localStorage.removeItem(this.namespace+"_"+key+"_timestamp");
+    LOCAL_STORAGE_REF.removeItem(this.namespace+"_"+key+"_value");
+    LOCAL_STORAGE_REF.removeItem(this.namespace+"_"+key+"_timestamp");
 };
 
 /**
@@ -40,7 +56,7 @@ LocalStorageWrapper.prototype.remove = function(key) {
  * @param {String} key - The name of the key to retrieve the value for.
  */
 LocalStorageWrapper.prototype.get = function(key) {
-    return localStorage.getItem(this.namespace+"_"+key+"_value");
+    return LOCAL_STORAGE_REF.getItem(this.namespace+"_"+key+"_value");
 };
 
 /**
@@ -50,7 +66,7 @@ LocalStorageWrapper.prototype.get = function(key) {
  * @returns {Integer} - The timestamp (local epoch) when the key was last set.
  */
 LocalStorageWrapper.prototype.getTime = function(key) {
-    return parseInt(localStorage.getItem(this.namespace+"_"+key+"_timestamp"));
+    return parseInt(LOCAL_STORAGE_REF.getItem(this.namespace+"_"+key+"_timestamp"));
 };
 
 /**
@@ -76,7 +92,7 @@ LocalStorageWrapper.prototype.getDefault = function(key, defaultValue) {
  * @param {String} key - The key to test existence for.
  */
 LocalStorageWrapper.prototype.has = function(key) {
-    return localStorage.getItem(this.namespace+"_"+key+"_value") !== null;
+    return LOCAL_STORAGE_REF.getItem(this.namespace+"_"+key+"_value") !== null;
 };
 
 /**
@@ -88,6 +104,6 @@ LocalStorageWrapper.prototype.has = function(key) {
  * @param {Integer} server_time - The server's time as an epoch (in milliseconds)
  */
 LocalStorageWrapper.prototype.is_new = function(key, server_time) {
-    var stored_time = localStorage.getItem(this.namespace+"_"+key+"_timestamp");
+    var stored_time = LOCAL_STORAGE_REF.getItem(this.namespace+"_"+key+"_timestamp");
     return (server_time >= stored_time+5000);
 };

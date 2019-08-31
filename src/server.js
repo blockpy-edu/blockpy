@@ -491,8 +491,8 @@ BlockPyServer.prototype.updateSubmission = function (score, correct, hiddenOverr
                                 } else {
                                     this.setStatus("updateSubmission", StatusState.FAILED, response.message);
                                 }
-                                if (callback) {
-                                    callback(data);
+                                if (!hiddenOverride && correct && callback) {
+                                    callback(data["assignment_id"]);
                                 }
                             });
         });

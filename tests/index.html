@@ -96,7 +96,11 @@ reset_output()
 log(get_output())
 `.trim(),
             "submission.code": `
-shopping_cart = [1, 2, 3]
+from PIL import Image
+
+i = Image()
+i.open("http://placecorgi.com/260/180")
+i.show()
 `.trim()
         });
         blockmirror = editor.components.editors.registered_[1].bm;

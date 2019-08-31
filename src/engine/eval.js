@@ -30,7 +30,7 @@ export class EvalConfiguration extends StudentConfiguration {
         let report = this.main.model.execution.reports;
         let filename = this.filename;
         this.main.model.execution.student.results = module;
-        this.main.components.console.printValue(BlockPyTrace.parseValue("_", module.$d._, true).value);
+        this.main.components.console.printValue(Sk.ffi.remapToJs(module.$d._.$r()));
         return new Promise((resolve, reject) => {
             //this.step(module.$d, module.$d,-1, 0, filename + ".py");
             this.lastStep();
