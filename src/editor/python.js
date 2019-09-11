@@ -127,111 +127,10 @@ export const PYTHON_EDITOR_HTML = `
     ${HISTORY_TOOLBAR_HTML}
 
 
-    <div class="blockpy-python-blockmirror">
+    <div class="blockpy-python-blockmirror"
+        data-bind="hidden: ui.menu.isSubmitted">
     </div>
 `;
-/*
-        <button type='button' class='btn blockpy-run' style='float:left',
-            data-bind='css: execution.status() == "running" ? "btn-info" :
-                            execution.status() == "error" ? "btn-danger" : "btn-success",
-                       visible: settings.instructor() || !assignment.upload()' >
-            <span class='glyphicon glyphicon-play'></span> Run
-        </button>
-
-            <div class="btn-group" data-toggle="buttons" data-bind="visible: !assignment.upload()">
-                <label class="btn btn-default blockpy-mode-set-blocks"
-                       data-bind="css: {active: settings.editor() == 'Blocks',
-                                        disabled: !areBlocksUpdating()}">
-                    <span class='glyphicon glyphicon-th-large'></span>
-                    <input type="radio" name="blockpy-mode-set" autocomplete="off" checked> Blocks
-                </label>
-                <!--<label class="btn btn-default blockpy-mode-set-instructor"
-                       data-bind="visible: settings.instructor,
-                                  css: {active: settings.editor() == 'Upload'}">
-                    <span class='glyphicon glyphicon-list-alt'></span>
-                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Instructor
-                </label>-->
-                <label class="btn btn-default blockpy-mode-set-split"
-                       data-bind="css: {active: settings.editor() == 'Split',
-                                        disabled: !areBlocksUpdating()}">
-                    <span class='glyphicon glyphicon-resize-horizontal'></span>
-                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Split
-                </label>
-                <label class="btn btn-default blockpy-mode-set-text"
-                       data-bind="css: {active: settings.editor() == 'Text'}">
-                    <span class='glyphicon glyphicon-pencil'></span>
-                    <input type="radio" name="blockpy-mode-set" autocomplete="off"> Text
-                </label>
-            </div>
-            <button type='button' class='btn btn-default blockpy-toolbar-reset'
-                    data-bind="visible: !assignment.upload()">
-                <span class='glyphicon glyphicon-refresh'></span> Reset
-            </button>
-            <!--<button type='button' class='btn btn-default blockpy-toolbar-capture'>
-                <span class='glyphicon glyphicon-picture'></span> Capture
-            </button>-->
-            <button type='button' class='btn btn-default blockpy-toolbar-import'
-                    data-bind="visible: settings.instructor() || (!assignment.upload() && assignment.importable())">
-                <span class='glyphicon glyphicon-cloud-download'></span> Import Datasets
-            </button>
-
-            <div class="btn-group">
-                <label class="btn btn-default btn-file">
-                    <span class='glyphicon glyphicon-upload'></span> Upload
-                    <input class="blockpy-toolbar-upload" type="file" style="display: none;">
-                </label>
-
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class='blockpy-toolbar-download'><span class='glyphicon glyphicon-download'></span> Download Python Code</a>
-                    </li>
-                </ul>
-            </div>
-
-            <button type='button' class='btn btn-default blockpy-toolbar-history'>
-                <span class='glyphicon glyphicon-hourglass'></span> History
-            </button>
-            <button type='button' class='btn btn-default blockpy-toolbar-instructor' data-bind="visible: settings.instructor">
-                <span class='glyphicon glyphicon-list-alt'></span> Settings
-            </button>
-
-            <!--
-            <button type='button' class='btn btn-default blockpy-toolbar-english'>
-                <span class='glyphicon glyphicon-list-alt'></span> English
-            </button>
-            -->
-            <div data-bind="visible: settings.instructor()"
-                 style='clear:both'>
-            <div class="btn-group blockpy-toolbar-filename-picker" data-toggle="buttons">
-                <label class="btn btn-default blockpy-set-filename"
-                       data-bind="css: {active: settings.filename() == '__main__'}"
-                       data-filename="__main__">
-                    <input type="radio" name="blockpy-filename-set" autocomplete="off" checked> __main__
-                </label>
-                <label class="btn btn-default blockpy-set-filename"
-                       data-bind="css: {active: settings.filename() == 'starting_code'}"
-                       data-filename="starting_code">
-                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_start
-                </label>
-                <label class="btn btn-default blockpy-set-filename"
-                       data-bind="css: {active: settings.filename() == 'give_feedback'}"
-                       data-filename="give_feedback">
-                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_run
-                </label>
-                <label class="btn btn-default blockpy-set-filename"
-                       data-bind="css: {active: settings.filename() == 'on_change'}"
-                       data-filename="on_change">
-                    <input type="radio" name="blockpy-filename-set" autocomplete="off"> on_change
-                </label>
-            </div>
-            </div>
-        </div>
-    </div>
- */
 
 
 
@@ -271,6 +170,7 @@ class PythonEditorView extends AbstractEditor {
         this.readOnly = false;
         this.makeSubscriptions();
         this.lineErrorSubscription = null;
+        this.lineUncoveredSubscription = null;
         this.oldPythonMode = this.main.model.display.pythonMode();
     }
 
@@ -288,6 +188,16 @@ class PythonEditorView extends AbstractEditor {
         let oldFilename = this.filename;
         super.enter(newFilename, oldEditor);
         this.dirty = false;
+
+        if (newFilename !== "answer.py") {
+            if (oldFilename === "answer.py") {
+                this.oldPythonMode = this.main.model.display.pythonMode();
+            }
+            this.main.model.display.pythonMode(DisplayModes.TEXT);
+        } else {
+            this.main.model.display.pythonMode(this.oldPythonMode);
+        }
+
         this.updateEditor(this.file.handle());
 
         // Subscribe to the relevant File
@@ -298,18 +208,15 @@ class PythonEditorView extends AbstractEditor {
         this.bm.addChangeListener(this.currentBMListener);
 
         if (newFilename !== "answer.py") {
-            if (oldFilename === "answer.py") {
-                this.oldPythonMode = this.main.model.display.pythonMode();
-            }
-            this.main.model.display.pythonMode(DisplayModes.TEXT);
             this.bm.isParsons = () => false;
-
         } else {
-            this.main.model.display.pythonMode(this.oldPythonMode);
             this.bm.isParsons = this.main.model.assignment.settings.isParsons;
 
-            this.lineErrorSubscription = this.main.model.execution.feedback.linesError.subscribe((lines) =>
-                this.bm.setHighlightedLines(lines, "editor-error-line")
+            this.lineErrorSubscription = this.main.model.execution.feedback.linesError.subscribe((lines) =>{
+                return this.bm.setHighlightedLines(lines, "editor-error-line");
+            });
+            this.lineUncoveredSubscription = this.main.model.execution.feedback.linesUncovered.subscribe((lines) =>
+                this.bm.setHighlightedLines(lines, "editor-uncovered-line")
             );
         }
 
@@ -344,7 +251,7 @@ class PythonEditorView extends AbstractEditor {
     }
 
     updateHandle(event) {
-        console.log(this.bm.clearHighlightedLines());
+        this.bm.clearHighlightedLines();
 
         this.dirty = !this.dirty;
         if (this.dirty) {
@@ -364,12 +271,20 @@ class PythonEditorView extends AbstractEditor {
         if (this.main.model.display.historyMode()) {
             this.main.model.ui.editors.python.turnOffHistoryMode();
         }
+        this.clearLineSubscriptions();
+        super.exit(newFilename, oldEditor);
+    }
+
+    clearLineSubscriptions() {
         this.bm.clearHighlightedLines();
         if (this.lineErrorSubscription) {
             this.lineErrorSubscription.dispose();
             this.lineErrorSubscription = null;
         }
-        super.exit(newFilename, oldEditor);
+        if (this.lineUncoveredSubscription) {
+            this.lineUncoveredSubscription.dispose();
+            this.lineUncoveredSubscription = null;
+        }
     }
 
     makeSubscriptions() {

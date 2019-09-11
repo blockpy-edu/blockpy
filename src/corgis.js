@@ -51,7 +51,7 @@ BlockPyCorgis.prototype.loadDatasets = function (silently) {
 
     // When datasets are loaded, update the toolbox.
     $.when.apply($, imports).done(function () {
-        console.log("TRIGGERED");
+        //console.log("TRIGGERED");
         editor.bm.forceBlockRefresh();
         editor.bm.blockEditor.remakeToolbox();
     }).fail(function (e) {

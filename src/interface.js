@@ -73,8 +73,14 @@ export function makeInterface(main) {
         <div class='col-md-2 blockpy-panel blockpy-quick-menu'
              role='menubar' aria-label='Quick Menu' title="Quick Menu">
             <!-- Get Shareable Link -->
-            <button class="btn btn-outline-secondary btn-sm">
-                Get shareable link</button>
+            <!--<button class="btn btn-outline-secondary btn-sm">
+                Get shareable link</button>-->
+            <span data-bind="visible: ui.menu.isSubmitted">
+                Your submission is ready to be reviewed!</span>
+            <button class="btn btn-outline-secondary btn-sm"
+                data-bind="visible: ui.menu.canMarkSubmitted,
+                           text: ui.menu.textMarkSubmitted,
+                           click: ui.menu.clickMarkSubmitted"></button>
             <!-- View as instructor -->
             <div class="form-check"
                  data-bind="visible: ui.role.isGrader">

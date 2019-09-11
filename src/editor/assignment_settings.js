@@ -8,6 +8,7 @@ const ASSIGNMENT_SETTINGS = [
     ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
     ["isParsons", "is_parsons", false, "bool", "If checked, then this is a parson's style question (jumbled)."],
     ["disableFeedback", "disable_feedback", false, "bool", "If checked, then no instructor scripts are run (e.g., on_run and on_eval)."],
+    ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
     ["disableEdit", "can_edit", false, "bool", "If checked, then the students' file will not be editable at all."],
     ["disableBlocks", "can_blocks", false, "bool", "If checked, then the student cannot edit the block interface (although it is visible)."],
@@ -21,7 +22,8 @@ const ASSIGNMENT_SETTINGS = [
     ["hideEvaluate", "hide_evaluate", false, "bool", "If checked, then the Evaluate button is not shown on the console."],
     ["hideImportDatasetsButton", "hide_import_datasets_button", true, "bool", "If checked, then students cannot see the import datasets button."],
     ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
-    ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."]
+    ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."],
+    ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle output is saved whenever the program uses it."],
 ];
 
 function getDocumentation(name) {
@@ -224,6 +226,10 @@ export function loadAssignmentSettings(model, settings) {
                 model.assignment.settings[clientName](settings[serverName]);
             }
         });
+
+        if (settings.start_view) {
+            model.display.pythonMode(settings.start_view);
+        }
     }
 }
 

@@ -67,10 +67,20 @@ BlockPyDialog.prototype.show = function (title, body, onclose) {
 };
 
 BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function () {
-    confirm("Error Loading Assignment", `BlockPy encountered an error while loading the assignment.<br>
+    this.show("Error Loading Assignment", `BlockPy encountered an error while loading the assignment.<br>
 Please reload the page and try again.`,);
 };
 
 BlockPyDialog.prototype.SCREENSHOT_BLOCKS = function () {
     // TODO
+};
+
+BlockPyDialog.prototype.ERROR_UPDATING_SUBMISSION_STATUS = function () {
+    this.show("Error Updating Submission Status", `BlockPy encountered an error while updating your submission status.<br>
+Please reload the page and try again.`);
+};
+
+BlockPyDialog.prototype.ERROR_LOADING_HISTORY = function () {
+    this.show("Error Loading History", `BlockPy encountered an error while loading your history.<br>
+Please reload the page and try again.`);
 };

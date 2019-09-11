@@ -306,6 +306,16 @@ export class BlockPyConsole {
         return this.turtleLine.html[0];
     }
 
+    finishTurtles() {
+        if (this.main.model.assignment.settings.saveTurtleOutput()) {
+            let canvas = this.turtleLine.html.find("canvas").last()[0];
+            let ctx = canvas.getContext("2d");
+            let img = new Image();
+            let dataUrl = canvas.toDataURL("image/png");
+            this.main.components.server.saveImage("turtle_output", dataUrl);
+        }
+    }
+
     // TODO: turtles should be based on the current width
     newTurtle() {
         return this;

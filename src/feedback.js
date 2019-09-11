@@ -53,6 +53,9 @@ export class BlockPyFeedback {
         this.category = this.tag.find(".blockpy-feedback-category");
         this.label = this.tag.find(".blockpy-feedback-label");
         this.message = this.tag.find(".blockpy-feedback-message");
+
+        // TODO: If they change the student extra files, also update the dirty flag
+        this.main.model.submission.code.subscribe(() => this.main.model.display.dirtySubmission(true));
     };
 
     /**
@@ -137,6 +140,9 @@ export class BlockPyFeedback {
         // TODO: Instead of tracking student file, let's track the instructor file
         this.main.components.server.logEvent("Intervention", category, label, message, "answer.py");
 
+        // Clear out any previously highlighted lines
+        this.main.components.pythonEditor.bm.clearHighlightedLines();
+
         // Find the first error on a line and report that
         let line = BlockPyFeedback.findFirstErrorLine(data);
         this.feedbackModel.linesError.removeAll();
@@ -148,11 +154,13 @@ export class BlockPyFeedback {
         let studentReport = this.main.model.execution.reports.student;
         this.feedbackModel.linesUncovered.removeAll();
         if (studentReport.success) {
-            for (let i=0; i <= this.main.model.execution.student.lastLine; i++) {
-                if (studentReport.lines.indexOf(i) === -1) {
-                    this.feedbackModel.linesUncovered.push(i);
+            let uncoveredLines = [];
+            this.main.model.execution.reports.parser.lines.forEach((line) => {
+                if (studentReport.lines.indexOf(line) === -1) {
+                    uncoveredLines.push(line);
                 }
-            }
+            });
+            this.feedbackModel.linesUncovered(uncoveredLines);
         }
     }
 
@@ -176,7 +184,6 @@ export class BlockPyFeedback {
     };
 
     presentInternalError(error, filenameExecuted) {
-        console.error(error);
         this.main.model.execution.feedback.category("internal");
         this.main.model.execution.feedback.label("Internal Error");
         let message = `
@@ -186,14 +193,14 @@ export class BlockPyFeedback {
             <pre><strong>${error.tp$name}</strong>: ${Sk.ffi.remapToJs(error.args)}</pre>`;
 
         if (error.traceback && error.traceback.length) {
-            let tracebackFormatted= error.traceback.map(frame =>
-                `File <span class="filename">"${frame.filename}"</span>, line <span class="lineno">${frame.lineno}</span>\n`).join("");
-            message += `<pre>${tracebackFormatted}</pre>`;
-            let last_traceback = error.traceback.slice(-1)[0];
-            if (last_traceback.filename === filenameExecuted) {
-                last_traceback.lineno -= this.main.model.execution.reports.instructor.lineOffset;
+            let lastTraceback = error.traceback.slice(-1)[0];
+            if (lastTraceback.filename.slice(0, -3) === filenameExecuted) {
+                lastTraceback.lineno -= this.main.model.execution.reports.instructor.lineOffset;
             }
-            console.error(error);
+            let tracebackFormatted= error.traceback.map(frame =>
+                `File <span class="filename">"${frame.filename}"</span>, `+
+                `line <span class="lineno">${frame.lineno}</span>\n`).join("");
+            message += `<pre>${tracebackFormatted}</pre>`;
         }
         this.main.model.execution.feedback.message(message);
     }

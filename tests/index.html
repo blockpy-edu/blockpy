@@ -80,6 +80,13 @@ turtle.forward(50)
 turtle.right(90)
 turtle.forward(100)
 turtle.circle(10)
+
+# Image manipulation
+from PIL import Image
+
+i = Image()
+i.open("http://placecorgi.com/260/180")
+i.show()
 -->
 
 <script>
@@ -91,16 +98,23 @@ turtle.circle(10)
             },
             "display.instructor": true,
             "assignment.on_run": `
-log(get_output())
-reset_output()
-log(get_output())
+from pedal.toolkit.functions import match_parameters
+match_parameters('complex_function', int, str)
+result = student.call('complex_function', 0, "test", inputs=['test'])
+debug(result)
+log(result._actual_value)
+debug(student.data)
+#log(1+result)
 `.trim(),
             "submission.code": `
-from PIL import Image
+def complex_function(alpha:int, beta:str):
+    if alpha:
+        a = 0
+    else:
+        a = 7
+    return input(str(a))
 
-i = Image()
-i.open("http://placecorgi.com/260/180")
-i.show()
+complex_function(4, "Test")
 `.trim()
         });
         blockmirror = editor.components.editors.registered_[1].bm;

@@ -91,22 +91,46 @@ export class StudentConfiguration extends Configuration {
         execution.student.currentTraceStep(this.engine.executionBuffer.step);
     };
 
+    getLines(ast) {
+        let visitedLines = new Set();
+        let visitBody = (node) => {
+            if (node.lineno !== undefined) {
+                visitedLines.add(node.lineno);
+            }
+            if (node.body) {
+                node.body.forEach((statement) => visitBody(statement));
+            }
+            if (node.orelse) {
+                node.orelse.forEach((statement) => visitBody(statement));
+            }
+            if (node.finalbody) {
+                node.finalbody.forEach((statement) => visitBody(statement));
+            }
+        };
+        visitBody(ast);
+        return Array.from(visitedLines);
+    }
+
     /**
      * Ensure that the parse information is up-to-date
      */
     updateParse() {
         let report = this.main.model.execution.reports;
+        // Hold all the actually discovered lines from the parse
+        let lines = [];
         // Attempt a parse
         let ast;
         try {
             let parse = Sk.parse(this.filename, this.code);
             ast = Sk.astFromParse(parse.cst, this.filename, parse.flags);
+            lines = this.getLines(ast);
         } catch (error) {
             // Report the error
             report["parser"] = {
                 "success": false,
                 "error": error,
-                "empty": true
+                "empty": true,
+                "lines": lines
             };
             console.error(error);
             console.log(this.filename, this.code);
@@ -117,6 +141,7 @@ export class StudentConfiguration extends Configuration {
             "success": true,
             "ast": ast,
             "empty": ast.body.length === 0,
+            "lines": lines
         };
         return true;
     }

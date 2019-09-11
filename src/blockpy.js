@@ -220,7 +220,14 @@ export class BlockPy {
                 /**
                  * A holder for the timer to trigger on-changes
                  */
-                triggerOnChange: null
+                triggerOnChange: null,
+                /**
+                 * Whether the current feedback and output corresponds to the current submission.
+                 * This would be false if there is no feedback/output (i.e., code has not been run),
+                 * or if the user has modified the submission after the last run (e.g., by editing
+                 * the text).
+                 */
+                dirtySubmission: ko.observable(true),
             },
             status: {
                 // @type {ServerStatus}
@@ -239,6 +246,9 @@ export class BlockPy {
                 logEvent: ko.observable(StatusState.READY),
                 logEventMessage: ko.observable(""),
                 // @type {ServerStatus}
+                saveImage: ko.observable(StatusState.READY),
+                saveImageMessage: ko.observable(""),
+                // @type {ServerStatus}
                 saveFile: ko.observable(StatusState.READY),
                 saveFileMessage: ko.observable(""),
                 // @type {ServerStatus}
@@ -247,6 +257,9 @@ export class BlockPy {
                 // @type {ServerStatus}
                 updateSubmission: ko.observable(StatusState.READY),
                 updateSubmissionMessage: ko.observable(""),
+                // @type {ServerStatus}
+                updateSubmissionStatus: ko.observable(StatusState.READY),
+                updateSubmissionStatusMessage: ko.observable(""),
                 // @type {ServerStatus}
                 onExecution: ko.observable(StatusState.READY),
             },
@@ -392,7 +405,9 @@ export class BlockPy {
         loadConcatenatedFile(assignment.extra_instructor_files, this.model.assignment.extraInstructorFiles);
         loadConcatenatedFile(assignment.extra_starting_files, this.model.assignment.extraStartingFiles);
         this.loadSubmission(data.submission);
+        this.model.display.dirtySubmission(true);
         this.model.configuration.serverConnected(wasServerConnected);
+        this.components.corgis.loadDatasets(true);
 
         this.components.server.setStatus("saveFile", StatusState.READY);
     }
@@ -416,6 +431,28 @@ export class BlockPy {
                 ),
                 reset: () =>
                     model.display.changedInstructions(null)
+            },
+            menu: {
+                canMarkSubmitted: ko.pureComputed(() =>
+                    model.assignment.hidden() || model.assignment.reviewed()
+                ),
+                textMarkSubmitted: ko.pureComputed(() =>
+                    model.ui.menu.isSubmitted()
+                        ? "Reopen for editing"
+                        : model.display.dirtySubmission()
+                            ? "Run"
+                            : "Mark as submitted"
+                ),
+                clickMarkSubmitted: () =>
+                    model.ui.menu.isSubmitted()
+                        ? self.components.server.updateSubmissionStatus("inProgress")
+                        : model.display.dirtySubmission()
+                            ? self.components.engine.run()
+                            : self.components.server.updateSubmissionStatus("Submitted")
+                ,
+                isSubmitted: ko.pureComputed(() =>
+                    model.submission.submissionStatus().toLowerCase() === "submitted"
+                )
             },
             secondRow: {
                 isFeedbackVisible: ko.pureComputed(() =>
@@ -714,15 +751,26 @@ export class BlockPy {
                     model.status.saveFileMessage() ||
                     model.status.loadDatasetMessage() ||
                     model.status.logEventMessage() ||
-                    model.status.updateSubmissionMessage() || ""
+                    model.status.saveImage() ||
+                    model.status.updateSubmissionMessage() ||
+                    model.status.updateSubmissionStatusMessage() || ""
                 ),
+                force: {
+                    updateSubmission: (data, event) => {
+                        console.log(event);
+                        self.components.server.updateSubmission(self.model.submission.score(),
+                                                                self.model.submission.correct(),
+                                                                false, true);
+                        $(event.target).fadeOut(100).fadeIn(100);
+                    }
+                }
             },
         };
         makeExtraInterfaceSubscriptions(self, model);
     }
 
     turnOnHacks() {
-        console.log("TODO");
+        //console.log("TODO");
     }
 
     /**

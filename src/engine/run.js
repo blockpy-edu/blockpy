@@ -27,6 +27,8 @@ export class RunConfiguration extends StudentConfiguration {
     success(module) {
         console.log("Run success");
         this.main.components.server.logEvent("Run.Program", "", "", "", "answer.py");
+        this.main.model.display.dirtySubmission(false);
+        this.main.components.console.finishTurtles();
         this.main.model.status.onExecution(StatusState.READY);
         this.main.model.execution.student.globals(Sk.globals);
         Sk.globals = {};

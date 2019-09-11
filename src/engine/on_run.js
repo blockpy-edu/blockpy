@@ -17,7 +17,7 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
     return `
 from pedal.report import *
 from pedal.source import set_source
-set_source(${safeCode})
+set_source(${safeCode}, "answer.py")
 def run_student():
     # limit_execution_time()
     try:
@@ -28,26 +28,39 @@ ${indentedCode}
     # unlimit_execution_time()
     return None
 ${tifaAnalysis}
+from pedal.sandbox.sandbox import Sandbox
 from pedal.sandbox import compatibility
 from utility import *
-student = get_student_data()
-compatibility.set_sandbox(student)
-error, position = get_student_error()
-compatibility.raise_exception(error, position)
-compatibility.run_student = run_student
-compatibility.get_plots = get_plots
-compatibility.get_output = get_output
-compatibility.reset_output = reset_output
+student = MAIN_REPORT['sandbox']['run'] = Sandbox()
+#student.run(MAIN_REPORT['source']['code'], MAIN_REPORT['source']['filename'], report_exceptions=False)
+#debug(student)
+student.report_exceptions_mode = True
+compatibility.run_student(raise_exceptions=False)
+#log(student.data)
+#student = get_student_data()
+#compatibility.set_sandbox(student)
+#error, position = get_student_error()
+#compatibility.raise_exception(error, position)
+#compatibility.run_student = run_student
+run_student = compatibility.run_student
+reset_output = compatibility.reset_output
+queue_input = compatibility.queue_input
+get_output = compatibility.get_output
+#compatibility.get_plots = get_plots
+#compatibility.get_output = get_output
+#compatibility.reset_output = reset_output
 compatibility.trace_lines = trace_lines
 def capture_output(func, *args):
    reset_output()
    func(*args)
    return get_output()
 compatibility.capture_output = capture_output
+
 from pedal.cait.cait_api import parse_program
 ${instructorCode}
 from pedal.resolvers import simple
 SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()
+log(MAIN_REPORT)
 #print(MAIN_REPORT.feedback[0].mistake['error'])
 `;
 };
@@ -58,6 +71,8 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.filename = "_instructor.on_run";
         this.code = this.main.model.assignment.onRun();
 
+        let disableTifa = this.main.model.assignment.settings.disableTifa();
+
         let report = this.main.model.execution.reports;
         let studentCodeSafe = this.main.model.submission.code();
         this.dummyOutSandbox();
@@ -65,8 +80,8 @@ export class OnRunConfiguration extends InstructorConfiguration {
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         console.log(report["parser"]);
         let isSafe = !report["parser"].empty && report["verifier"].success;
-        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, false, isSafe);
-        lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
+        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
+        lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
         report["instructor"] = {
             "compliments": [],
             "filename": "./_instructor/on_run.py",

@@ -206,14 +206,49 @@ export let $sk_mod_instructor = function() {
                 self.module = self.module.$d;
                 for (let key in self.module) {
                     if (self.module.hasOwnProperty(key)) {
-                        newDict.mp$ass_subscript(Sk.ffi.remapToPy(key), 
-                                                 self.module[key]);
+                        Sk.abstr.objectSetItem(newDict, Sk.ffi.remapToPy(Sk.unfixReserved(key)),
+                                               self.module[key]);
                     }
                 }
             } else {
                 self.module = {};
             }
         });
+        var call_f = function(kwa) {
+            Sk.builtin.pyCheckArgsLen("call", arguments.length, 1, Infinity, true, true);
+            var args = Array.prototype.slice.call(arguments, 1);
+            var kwargs = new Sk.builtins.dict(kwa);
+
+            var self = args[0];
+            var functionName = args[1];
+            args = args.slice(2);
+
+            var inputs = kwargs.mp$lookup(new Sk.builtin.str("inputs"));
+            if (inputs !== undefined) {
+                inputs = Sk.ffi.remapToJs(inputs);
+                if (inputs.constructor === Array) {
+                    inputs.forEach(function(item) {
+                        Sk.queuedInput.push(item);
+                    });
+                } else {
+                    Sk.queuedInput.push(input);
+                }
+            }
+
+            var data = self.tp$getattr(new Sk.builtin.str("data"));
+            var functionObject = data.mp$lookup(functionName);
+            var result = functionObject.tp$call(args);
+            return result;
+        };
+        call_f.co_kwargs = true;
+        //call_f.co_varnames = ["self", "function"];
+        call_f.co_name= new Sk.builtin.str("call");
+        $loc["call_$rn$"] = new Sk.builtin.func(call_f);
+
+        $loc["__repr__"] = new Sk.builtin.func(function(self) {
+            return new Sk.builtin.str("");
+        });
+
         $loc.get_names_by_type = new Sk.builtin.func(function(self, type, exclude_builtins) {
             Sk.builtin.pyCheckArgs("get_names_by_type", arguments, 2, 3);
             if (exclude_builtins === undefined) {
@@ -230,7 +265,7 @@ export let $sk_mod_instructor = function() {
                         if (exclude_builtins && property.startsWith("__")) {
                             continue;
                         }
-                        result.push(Sk.ffi.remapToPy(property));
+                        result.push(Sk.ffi.remapToPy(Sk.unfixReserved(property)));
                     }
                 }
             }
@@ -258,7 +293,7 @@ export let $sk_mod_instructor = function() {
             }
             return Sk.builtin.list(result);
         });
-    });
+    }, "StudentData");
     mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);
     
     mod.get_student_data = new Sk.builtin.func(function() {

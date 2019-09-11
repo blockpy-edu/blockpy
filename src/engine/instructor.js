@@ -37,9 +37,11 @@ export class InstructorConfiguration extends Configuration {
     };
 
     input(promptMessage) {
-        return new Promise((resolve) => {
+        return "ApplePie";
+        return Sk.queuedInput.pop();
+        /*return new Promise((resolve) => {
             resolve(Sk.queuedInput.pop());
-        });
+        });*/
     }
 
 }

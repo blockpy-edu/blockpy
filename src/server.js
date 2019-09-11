@@ -426,8 +426,40 @@ BlockPyServer.prototype.logEvent = function (event_type, category, label, messag
     }
 };
 
+BlockPyServer.prototype.saveImage = function (directory, image) {
+    if (this.main.model.ui.server.isEndpointConnected("saveImage")) {
+        let data = this.createServerData();
+        data["directory"] = directory;
+        data["image"] = image;
+        this.setStatus("saveImage", StatusState.ACTIVE);
+        // Trigger request
+        this._postLatestRetry(data, "turtle_output", "saveImage", 0);
+    } else {
+        this.setStatus("saveImage", StatusState.OFFLINE);
+    }
+};
+
+BlockPyServer.prototype.updateSubmissionStatus = function(newStatus) {
+    if (this.main.model.ui.server.isEndpointConnected("updateSubmissionStatus")) {
+        let data = this.createServerData();
+        data["status"] = newStatus;
+        let postStatusChange = (data) => {
+            if (data.success) {
+                this.main.model.submission.submissionStatus(newStatus);
+            }
+        };
+        this._postBlocking("updateSubmissionStatus", data, 2, postStatusChange,
+                           (e, textStatus, errorThrown) => {
+                               this.main.components.dialog.ERROR_UPDATING_SUBMISSION_STATUS();
+                               console.error(e, textStatus, errorThrown);
+                           });
+    }
+};
+
 /**
  * This function can be used to load files and web resources.
+ *
+ * DEPRECATED
  */
 BlockPyServer.prototype.loadFile = function (filename, type, callback, errorCallback) {
     var model = this.main.model;

@@ -8,7 +8,8 @@ export let FOOTER_HTML = `
         <span class="badge" data-bind="class: ui.server.status('saveFile')">Save File</span>, 
         <span class="badge" data-bind="class: ui.server.status('loadDataset')">Load Dataset</span>, 
         <span class="badge" data-bind="class: ui.server.status('logEvent')">Log Event</span>, 
-        <span class="badge" data-bind="class: ui.server.status('updateSubmission')">Update Submission</span>, 
+        <span class="badge" data-bind="class: ui.server.status('updateSubmission'),
+                                        click: ui.server.force.updateSubmission">Update Submission</span>, 
         <span class="badge" data-bind="class: ui.server.status('onExecution')">Execution</span>
     </div>
     <div

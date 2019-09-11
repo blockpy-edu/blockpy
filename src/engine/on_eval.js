@@ -51,13 +51,15 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         this.filename = "_instructor.on_eval";
         this.code = this.main.model.assignment.onEval() || "";
 
+        let disableTifa = this.main.model.assignment.settings.disableTifa();
+
         let report = this.main.model.execution.reports;
         let studentCodeSafe = this.main.model.execution.reports.student.evaluation || "None";
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         let isSafe = !report["parser"].empty && report["verifier"].success;
-        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, false, isSafe);
+        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
         lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
         report["instructor"] = {
             "compliments": [],
