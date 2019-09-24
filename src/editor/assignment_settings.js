@@ -21,6 +21,7 @@ const ASSIGNMENT_SETTINGS = [
     ["hideAll", "hide_all", false, "bool", "INCOMPLETE: If checked, then the entire interface is hidden."],
     ["hideEvaluate", "hide_evaluate", false, "bool", "If checked, then the Evaluate button is not shown on the console."],
     ["hideImportDatasetsButton", "hide_import_datasets_button", true, "bool", "If checked, then students cannot see the import datasets button."],
+    // TODO: Fix this one to be settable
     ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
     ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."],
     ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle output is saved whenever the program uses it."],

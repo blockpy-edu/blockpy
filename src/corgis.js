@@ -90,6 +90,7 @@ BlockPyCorgis.prototype.importDataset = function (slug, name) {
         // On completion, update menus.
         $.when(getDataset, getSkulpt, getBlockly).done(() => {
             this.loadedDatasets.push(slug);
+            this.main.components.pythonEditor.bm.textToBlocks.hiddenImports.push(slug);
             this.main.components.pythonEditor.bm.forceBlockRefresh();
             this.main.components.pythonEditor.bm.blockEditor.remakeToolbox();
             this.main.model.display.loadingDatasets.remove(name);

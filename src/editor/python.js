@@ -32,7 +32,8 @@ export const PYTHON_EDITOR_HTML = `
 
          <div class="btn-group mr-2" role="group" aria-label="Run Group">         
             <button type="button" class="btn blockpy-run"
-                data-bind="click: ui.execute.run">
+                data-bind="click: ui.execute.run,
+                            css: {'blockpy-run-running': ui.execute.isRunning}">
                 <span class="fas fa-play"></span> Run
              </button>
          </div>

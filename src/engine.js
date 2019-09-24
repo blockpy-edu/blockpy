@@ -55,6 +55,7 @@ export class BlockPyEngine {
         report["parser"] = {};
         report["student"] = {};
         report["instructor"] = {};
+        report["model"] = this.main.model;
     };
 
     resetStudentModel() {
@@ -92,6 +93,9 @@ export class BlockPyEngine {
         this.main.components.feedback.clear();
     }
 
+    delayedRun() {
+        setTimeout(this.run.bind(this), 1);
+    }
 
     run() {
         this.configuration = this.configurations.run.use(this);
@@ -101,6 +105,8 @@ export class BlockPyEngine {
         );
         if (!this.main.model.assignment.settings.disableFeedback()) {
             execution.then(this.onRun.bind(this));
+        } else {
+            execution.then(this.configuration.showErrors.bind(this.configuration));
         }
     }
 
@@ -124,6 +130,8 @@ export class BlockPyEngine {
             );
             if (!this.main.model.assignment.settings.disableFeedback()) {
                 execution.then(this.onEval.bind(this));
+            } else {
+                execution.then(this.configuration.showErrors.bind(this.configuration));
             }
         });
     }

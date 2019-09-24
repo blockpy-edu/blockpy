@@ -406,6 +406,7 @@ export class BlockPy {
         loadConcatenatedFile(assignment.extra_starting_files, this.model.assignment.extraStartingFiles);
         this.loadSubmission(data.submission);
         this.model.display.dirtySubmission(true);
+        this.model.display.changedInstructions(null);
         this.model.configuration.serverConnected(wasServerConnected);
         this.components.corgis.loadDatasets(true);
 
@@ -447,7 +448,7 @@ export class BlockPy {
                     model.ui.menu.isSubmitted()
                         ? self.components.server.updateSubmissionStatus("inProgress")
                         : model.display.dirtySubmission()
-                            ? self.components.engine.run()
+                            ? self.components.engine.delayedRun()
                             : self.components.server.updateSubmissionStatus("Submitted")
                 ,
                 isSubmitted: ko.pureComputed(() =>
@@ -730,8 +731,11 @@ export class BlockPy {
                 }
             },
             execute: {
+                isRunning: ko.pureComputed(() =>
+                    model.status.onExecution() === StatusState.ACTIVE
+                ),
                 run: () =>
-                    self.components.engine.run(),
+                    self.components.engine.delayedRun(),
                 evaluate: () =>
                     self.components.engine.evaluate()
             },

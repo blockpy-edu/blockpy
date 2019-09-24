@@ -98,23 +98,17 @@ i.show()
             },
             "display.instructor": true,
             "assignment.on_run": `
-from pedal.toolkit.functions import match_parameters
-match_parameters('complex_function', int, str)
-result = student.call('complex_function', 0, "test", inputs=['test'])
-debug(result)
-log(result._actual_value)
-debug(student.data)
+from pedal.questions import set_seed
+
+#set_seed(get_model_info("user.name")+get_model_info("assignment.name"))
+
+#from pedal.questions import show_question
+
+#show_question("test")
 #log(1+result)
 `.trim(),
             "submission.code": `
-def complex_function(alpha:int, beta:str):
-    if alpha:
-        a = 0
-    else:
-        a = 7
-    return input(str(a))
-
-complex_function(4, "Test")
+1+""
 `.trim()
         });
         blockmirror = editor.components.editors.registered_[1].bm;

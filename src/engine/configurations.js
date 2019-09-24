@@ -1,4 +1,4 @@
-export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }"
+export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }";
 
 /**
  * A container for holding settings of a particular run configuration.
@@ -41,7 +41,6 @@ export class Configuration {
             imageProxy: this.getImageProxy.bind(this),
             // Whether or not to keep the globals
             retainGlobals: true
-
         };
     }
 

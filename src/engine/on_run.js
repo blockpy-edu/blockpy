@@ -18,15 +18,6 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
 from pedal.report import *
 from pedal.source import set_source
 set_source(${safeCode}, "answer.py")
-def run_student():
-    # limit_execution_time()
-    try:
-${indentedCode}
-    except Exception as error:
-        # unlimit_execution_time()
-        return error
-    # unlimit_execution_time()
-    return None
 ${tifaAnalysis}
 from pedal.sandbox.sandbox import Sandbox
 from pedal.sandbox import compatibility
@@ -38,21 +29,20 @@ student.report_exceptions_mode = True
 compatibility.run_student(raise_exceptions=False)
 #log(student.data)
 #student = get_student_data()
-#compatibility.set_sandbox(student)
 #error, position = get_student_error()
 #compatibility.raise_exception(error, position)
-#compatibility.run_student = run_student
 run_student = compatibility.run_student
 reset_output = compatibility.reset_output
 queue_input = compatibility.queue_input
 get_output = compatibility.get_output
-#compatibility.get_plots = get_plots
-#compatibility.get_output = get_output
-#compatibility.reset_output = reset_output
+get_plots = compatibility.get_plots
 compatibility.trace_lines = trace_lines
+from pedal import questions
+questions.show_question = set_instructions
+# TODO: Remove the need for this hack!
 def capture_output(func, *args):
    reset_output()
-   func(*args)
+   student.call(func.__name__, *args)
    return get_output()
 compatibility.capture_output = capture_output
 
@@ -60,8 +50,6 @@ from pedal.cait.cait_api import parse_program
 ${instructorCode}
 from pedal.resolvers import simple
 SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()
-log(MAIN_REPORT)
-#print(MAIN_REPORT.feedback[0].mistake['error'])
 `;
 };
 
@@ -78,7 +66,6 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
-        console.log(report["parser"]);
         let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
         lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
@@ -110,7 +97,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.main.model.submission.correct(success || this.main.model.submission.correct());
         // Cannot exceed 1 point, cannot go below 0 points
         let score = Sk.ffi.remapToJs(results.SCORE);
-        score = Math.max(0.0, Math.min(1.0, score));
+        score = Math.max(0, Math.min(100, score));
         let oldScore = this.main.model.submission.score();
         this.main.model.submission.score(Math.max(oldScore, score));
         // Hide status

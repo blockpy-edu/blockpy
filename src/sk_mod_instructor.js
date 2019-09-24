@@ -300,6 +300,22 @@ export let $sk_mod_instructor = function() {
         Sk.builtin.pyCheckArgs("get_student_data", arguments, 0, 0);
         return mod.student;
     });
+
+    mod.set_instructions = new Sk.builtin.func(function(newInstructions) {
+        Sk.builtin.pyCheckArgs("set_instructions", arguments, 1, 2);
+        newInstructions = Sk.ffi.remapToJs(newInstructions);
+        Sk.executionReports["model"].display.changedInstructions(newInstructions);
+    });
+
+    mod.get_model_info = new Sk.builtin.func(function(keys) {
+        Sk.builtin.pyCheckArgs("get_model_info", arguments, 1, 1);
+        let model = Sk.executionReports["model"];
+        keys = Sk.ffi.remapToJs(keys).split(".");
+        for (var i=0; i < keys.length; i++) {
+            model = model[keys[i]];
+        }
+        return Sk.ffi.remapToPy(model());
+    });
     
     return mod;
 };

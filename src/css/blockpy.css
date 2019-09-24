@@ -352,6 +352,14 @@ button.blockpy-run:focus {
     background-color: rgb(20, 100, 20);
 }
 
+.blockpy-content button.blockpy-run.blockpy-run-running {
+    background-color: #f0ad4e;
+}
+
+.blockpy-content button.blockpy-run.blockpy-run-error {
+    background-color: #d9534f;
+}
+
 button.blockpy-delete {
     background-color: white;
     border-color: rgb(130, 40, 40);

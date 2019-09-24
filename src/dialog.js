@@ -66,6 +66,15 @@ BlockPyDialog.prototype.show = function (title, body, onclose) {
     });
 };
 
+BlockPyDialog.prototype.confirm = function (title, body, yes, no) {
+    this.show(title, body, no);
+    // TODO: add okay button and cancel button
+};
+
+BlockPyDialog.prototype.ASSIGNMENT_VERSION_CHANGED = function () {
+    this.confirm("Assignment Changed", `Your instructor has made changes to this assignment. Would you like to reload? All your work has been saved.`,);
+};
+
 BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function () {
     this.show("Error Loading Assignment", `BlockPy encountered an error while loading the assignment.<br>
 Please reload the page and try again.`,);

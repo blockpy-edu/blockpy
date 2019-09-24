@@ -72,12 +72,16 @@ export class BlockPyFeedback {
      * @returns {boolean}
      */
     isFeedbackVisible() {
-        let top_of_element = this.tag.offset().top;
-        let bottom_of_element = this.tag.offset().top + this.tag.outerHeight();
-        let bottom_of_screen = $(window).scrollTop() + $(window).height();
-        let top_of_screen = $(window).scrollTop();
+        let visibilityBuffer = 100;
+        let topOfElement = this.tag.offset().top;
+        //let bottomOfElement = this.tag.offset().top + this.tag.outerHeight();
+        let bottomOfElement = topOfElement + visibilityBuffer;
+        let bottomOfScreen = $(window).scrollTop() + $(window).height();
+        let topOfScreen = $(window).scrollTop();
         //bottom_of_element -= 40; // User friendly padding
-        return ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element));
+        return (
+            (topOfElement < bottomOfScreen) &&
+            (topOfScreen < bottomOfElement));
     };
 
     /**
@@ -102,6 +106,10 @@ export class BlockPyFeedback {
         return null;
     };
 
+    updateRegularFeedback() {
+
+    }
+
     /**
      * Updates the model with these new execution results
      * @param executionResults
@@ -119,7 +127,7 @@ export class BlockPyFeedback {
         if (hideScore && category.toLowerCase() === "complete") {
             category = "no errors";
             label = "No errors";
-            message = "No errors reported";
+            message = "No errors reported.";
         }
 
         // Remap to expected BlockPy labels
@@ -133,7 +141,7 @@ export class BlockPyFeedback {
         }
 
         // Update model accordingly
-        message = this.main.utilities.markdown(message);
+        message = this.main.utilities.markdown(message).replace(/<pre>\n/g, "<pre>\n\n");
         this.feedbackModel.message(message);
         this.feedbackModel.category(category);
         this.feedbackModel.label(label);
@@ -173,35 +181,92 @@ export class BlockPyFeedback {
         // TODO: Logging
         //this.main.components.server.logEvent("feedback", category+"|"+label, message);
 
+        this.notifyFeedbackUpdate();
+    };
+
+    notifyFeedbackUpdate() {
+        console.log(this.isFeedbackVisible());
         if (!this.isFeedbackVisible()) {
-            this.notifyFeedbackUpdate();
+            this.tag.find(".blockpy-floating-feedback").show().fadeOut(7000);
             this.scrollIntoView();
         }
     };
 
-    notifyFeedbackUpdate() {
-        this.tag.find(".blockpy-floating-feedback").show().fadeOut(7000);
-    };
+    presentRunError(error) {
+        let message, label, category, lineno;
+        if (error.tp$name === "SyntaxError") {
+            category = "syntax";
+            let lineno = Sk.ffi.remapToJs(error.lineno);
+            let label = Sk.ffi.remapToJs(error.msg);
+            let source, message = "";
+            try {
+                source = error.args.v[3][2];
+                if (source === undefined) {
+                    source = "";
+                } else {
+                    source = `<pre>${source}</pre>`;
+                }
+            } catch (e) {
+                source = "";
+            }
+            if (label === "bad input") {
+                label = "Bad Input";
+                message = `Bad input on line ${lineno}.<br>${source}`;
+            } else if (label === "EOF in multi-line statement") {
+                label = "EOF in multi-line statement";
+                message = `Unexpected end-of-file in multi-line statement on line ${lineno}.<br>${source}`;
+            } else {
+                label = "Syntax Error";
+                message = label + "<br>" + source;
+            }
+        } else {
+            label = error.tp$name;
+            category = "runtime";
+            message = this.convertSkulptError(error);
+        }
+        this.feedbackModel.message(message);
+        this.feedbackModel.category(category);
+        this.feedbackModel.label(label);
+        this.feedbackModel.linesError.removeAll();
+        if (lineno !== undefined && lineno !== null) {
+            this.feedbackModel.linesError.push(lineno);
+        }
+    }
+
+    convertSkulptError(error, filenameExecuted) {
+        let name = error.tp$name;
+        let args = Sk.ffi.remapToJs(error.args);
+        let top = `${name}: ${args[0]}\n<br>\n<br>`;
+        let traceback = "";
+        if (error.traceback && error.traceback.length) {
+            traceback = "Traceback:<br>\n" + error.traceback.map(frame => {
+                let lineno = frame.lineno;
+                if (frame.filename.slice(0, -3) === filenameExecuted) {
+                    lineno -= this.main.model.execution.reports.instructor.lineOffset;
+                }
+                let file = `File <code class="filename">"${frame.filename}"</code>, `;
+                let line = `on line <code class="lineno">${lineno}</code>, `;
+                let scope = (frame.scope !== "<module>" &&
+                frame.scope !== undefined) ? `in scope ${frame.scope}` : "";
+                let source = "";
+                if (frame.source !== undefined) {
+                    source = `\n<pre><code>${frame.source}</code></pre>`;
+                }
+                return file + line + scope + source;
+            }).join("\n<br>");
+            traceback = `${traceback}`;
+        }
+        return top+"\n"+traceback;
+    }
 
     presentInternalError(error, filenameExecuted) {
         this.main.model.execution.feedback.category("internal");
         this.main.model.execution.feedback.label("Internal Error");
-        let message = `
-            Error in instructor feedback.
-            Please show the following to an instructor:
-            
-            <pre><strong>${error.tp$name}</strong>: ${Sk.ffi.remapToJs(error.args)}</pre>`;
 
-        if (error.traceback && error.traceback.length) {
-            let lastTraceback = error.traceback.slice(-1)[0];
-            if (lastTraceback.filename.slice(0, -3) === filenameExecuted) {
-                lastTraceback.lineno -= this.main.model.execution.reports.instructor.lineOffset;
-            }
-            let tracebackFormatted= error.traceback.map(frame =>
-                `File <span class="filename">"${frame.filename}"</span>, `+
-                `line <span class="lineno">${frame.lineno}</span>\n`).join("");
-            message += `<pre>${tracebackFormatted}</pre>`;
-        }
+        let message = "Error in instructor feedback. Please show the following to an instructor:<br>\n";
+        message += this.convertSkulptError(error, filenameExecuted);
         this.main.model.execution.feedback.message(message);
+
+        this.notifyFeedbackUpdate();
     }
 }

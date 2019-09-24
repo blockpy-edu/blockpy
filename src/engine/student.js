@@ -145,4 +145,11 @@ export class StudentConfiguration extends Configuration {
         };
         return true;
     }
+
+    showErrors() {
+        let report = this.main.model.execution.reports;
+        if (!report["student"].success) {
+            this.main.components.feedback.presentRunError(report.student.error);
+        }
+    }
 }
