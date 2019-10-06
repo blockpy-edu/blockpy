@@ -22,6 +22,16 @@ export class InstructorConfiguration extends Configuration {
         return this;
     }
 
+    openFile(filename) {
+        let instructorFiles = this.main.model.assignment.extraInstructorFiles();
+        for (let i=0; i < instructorFiles.length; i++) {
+            if (instructorFiles[i].filename() === "!"+filename) {
+                return instructorFiles[i].contents();
+            }
+        }
+        throw new Sk.builtin.OSError("File not found: "+filename);
+    }
+
     importFile(filename) {
         if (filename === "./answer.py") {
             return this.main.model.submission.code();

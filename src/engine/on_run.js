@@ -99,7 +99,8 @@ export class OnRunConfiguration extends InstructorConfiguration {
         let score = Sk.ffi.remapToJs(results.SCORE);
         score = Math.max(0, Math.min(100, score));
         let oldScore = this.main.model.submission.score();
-        this.main.model.submission.score(Math.max(oldScore, score));
+        score = Math.max(oldScore, score);
+        this.main.model.submission.score(score);
         // Hide status
         let hide = Sk.ffi.remapToJs(results.HIDE);
         // And fire the result!

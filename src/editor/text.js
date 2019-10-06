@@ -53,8 +53,8 @@ class TextEditorView extends AbstractEditor {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
-            this.codemirror.setValue(newContents);
-            this.mde.codemirror.refresh();
+            this.codeMirror.setValue(newContents);
+            this.codeMirror.refresh();
             this.dirty = false;
         }
     }
@@ -63,7 +63,7 @@ class TextEditorView extends AbstractEditor {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
-            this.file.handle(this.codeMirror.value());
+            this.file.handle(this.codeMirror.getValue());
             this.dirty = false;
         }
     }

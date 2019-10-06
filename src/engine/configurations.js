@@ -18,6 +18,8 @@ export class Configuration {
         Sk.console = this.main.components.console;
         Sk.queuedInput = [];
         Sk.configure(this.getSkulptOptions());
+        // Set openFile as mechanism to read files
+        Sk.inBrowser = this.openFile.bind(this);
         return this;
     }
 
@@ -27,13 +29,11 @@ export class Configuration {
             // import
             read: this.importFile.bind(this),
             // open
-            fileopen: this.openFile.bind(this),
+            //fileopen: this.openFile.bind(this),
             // file.write
             filewrite: this.writeFile.bind(this),
             // print
             output: this.print.bind(this),
-            // Prevents reading HTML elements as files
-            inBrowser: false,
             // input
             inputfun: this.input.bind(this),
             inputfunTakesPrompt: true,

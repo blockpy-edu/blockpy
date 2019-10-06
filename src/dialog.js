@@ -14,10 +14,11 @@ export let DIALOG_HTML = `
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class='modal-body' style='width:100%; height:400px; white-space:pre-wrap'>
+                <div class='modal-body' style='max-width:100%; max-height:400px'>
                 </div>
                 <div class='modal-footer'>
-                    <button type='button' class='btn btn-white' data-dismiss='modal'>Close</button>
+                    <button type='button' class='btn btn-white model-close' data-dismiss='modal'>Close</button>
+                    <button type='button' class='btn btn-success modal-okay' data-dismiss='modal'>Okay</button>
                 </div>    
             </div>
         </div>
@@ -41,6 +42,14 @@ export function BlockPyDialog(main, tag) {
 
     this.titleTag = tag.find(".modal-title");
     this.bodyTag = tag.find(".modal-body");
+    this.footerTag = tag.find(".modal-footer");
+    this.okayButton = tag.find(".modal-okay");
+
+    this.yes = () => {};
+    this.okayButton.click(() => {
+        this.yes();
+        this.tag.modal("hide");
+    });
 }
 
 /**
@@ -55,6 +64,7 @@ BlockPyDialog.prototype.show = function (title, body, onclose) {
     this.titleTag.html(title);
     this.bodyTag.html(body);
     this.tag.modal("show");
+    this.okayButton.hide();
     this.tag.draggable({
         "handle": ".modal-title"
     });
@@ -66,13 +76,18 @@ BlockPyDialog.prototype.show = function (title, body, onclose) {
     });
 };
 
-BlockPyDialog.prototype.confirm = function (title, body, yes, no) {
+BlockPyDialog.prototype.confirm = function (title, body, yes, no, yesText) {
+    if (yesText === undefined) {
+        yesText = "Okay";
+    }
     this.show(title, body, no);
+    this.yes = yes;
+    this.okayButton.show().html(yesText);
     // TODO: add okay button and cancel button
 };
 
 BlockPyDialog.prototype.ASSIGNMENT_VERSION_CHANGED = function () {
-    this.confirm("Assignment Changed", `Your instructor has made changes to this assignment. Would you like to reload? All your work has been saved.`,);
+    this.confirm("Assignment Changed", "Your instructor has made changes to this assignment. Would you like to reload? All your work has been saved.",);
 };
 
 BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function () {

@@ -15,6 +15,7 @@ const ASSIGNMENT_SETTINGS = [
     ["onlyInteractive", "only_interactive", false, "bool", "If checked, the editors are hidden, the program is automatically run, and then the console enters Eval mode (interactive)."],
     ["onlyUploads", "only_uploads", false, "bool", "If unchecked, then the students' file will not be directly editable (they will have to upload submissions)."],
     // What menus/feedback to show and hide
+    ["hideSubmission", "hide_submission", false, "bool", "If checked, then students will not be able to see their submission's code or history on Canvas."],
     ["hideFiles", "hide_files", true, "bool", "If checked, then students will not see the View Files toolbar."],
     ["hideQueuedInputs", "hide_queued_inputs", true, "bool", "INCOMPLETE: If unchecked, then the students can access the queued inputs box (makes repeated debugging easier for the input function)."],
     ["hideEditors", "hide_editors", false, "bool", "If checked, then all of the editors are hidden."],

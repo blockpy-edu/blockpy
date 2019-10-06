@@ -32,6 +32,17 @@ export let FILES_HTML = `
     ${makeTab("?mock_urls.blockpy", "URL Data", true)}
     ${makeTab("!sample_submissions.blockpy", "Sample Submissions", true)}
     ${makeTab("!tags.blockpy", "Tags", true)}
+    
+    <!-- ko foreach: assignment.extraInstructorFiles -->
+        <li class="nav-item">
+            <a class="nav-link" href="#"
+                data-toggle="tab"
+                data-bind="css: {active: $root.display.filename() === filename()},
+                            click: $root.display.filename.bind($data, filename()),
+                            text: filename">
+            </a>        
+        </li>
+    <!-- /ko -->
   
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
@@ -53,13 +64,45 @@ export let FILES_HTML = `
                            click: ui.files.add.bind($data, '!on_eval.py')">On Eval</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Starting File</a>
-            <a class="dropdown-item" href="#">Instructor File</a>
+            <a class="dropdown-item" href="#"
+                data-bind="click: ui.files.add.bind($data, 'instructor')">Instructor File</a>
             <a class="dropdown-item" href="#">Student File</a>
         </div>
     </li>
   
 </ul>
 </div>
+`;
+
+const NEW_INSTRUCTOR_FILE_DIALOG_HTML = `
+<form>
+<div class="form-group row">
+    <!-- Filename -->
+    <div class="col-sm-2 text-right">
+        <label for="blockpy-instructor-file-dialog-filename">Filename:</label>
+    </div>
+    <div class="col-sm-10">
+        <input type="text" class="form-control blockpy-instructor-file-dialog-filename"
+            id="blockpy-instructor-file-dialog-filename">    
+    </div>
+    <!-- Filetype -->
+    <div class="col-sm-2 text-right">
+        <label for="blockpy-instructor-file-dialog-filetype">Filetype: </label>
+    </div>
+    <div class="col-sm-10">
+        <span class="blockpy-instructor-file-dialog-filetype"
+            id="blockpy-instructor-file-dialog-filetype"></span>    
+    </div>
+    <!-- Inaccessible to student? -->
+    <div class="col-sm-2 text-right">
+        <label for="blockpy-instructor-file-dialog-filename">Inaccessible to student: </label>
+    </div>
+    <div class="col-sm-1">
+        <input type="checkbox" class="form-control blockpy-instructor-file-dialog-hidden"
+            id="blockpy-instructor-file-dialog-hidden" checked>
+    </div>
+</div>
+</form>
 `;
 
 /**
@@ -327,5 +370,26 @@ export class BlockPyFileSystem {
         if (file.filename in this.watches_) {
             this.watches_[file.filename].forEach(callback => callback.updated(file));
         }
+    }
+
+    newInstructorFile() {
+        let body = $(NEW_INSTRUCTOR_FILE_DIALOG_HTML);
+        let filename = body.find(".blockpy-instructor-file-dialog-filename");
+        let filetype = body.find(".blockpy-instructor-file-dialog-filetype");
+        let hidden = body.find(".blockpy-instructor-file-dialog-hidden");
+        let extensionRegex = /(?:\.([^.]+))?$/;
+        filename.on("input", () => {
+            let extension = extensionRegex.exec(filename.val())[1];
+            extension = extension === undefined ? "No extension" : extension;
+            filetype.text(extension);
+        });
+        let yes = () => {
+            hidden = hidden.is(":checked") ? "!" : "?";
+            if (filename.val()) {
+                filename = hidden+filename.val();
+                this.newFile(filename);
+            }
+        };
+        this.main.components.dialog.confirm("Make New File", body, yes, ()=>{}, "Add");
     }
 }

@@ -437,22 +437,34 @@ export class BlockPy {
                 canMarkSubmitted: ko.pureComputed(() =>
                     model.assignment.hidden() || model.assignment.reviewed()
                 ),
-                textMarkSubmitted: ko.pureComputed(() =>
-                    model.ui.menu.isSubmitted()
-                        ? "Reopen for editing"
-                        : model.display.dirtySubmission()
-                            ? "Run"
-                            : "Mark as submitted"
-                ),
-                clickMarkSubmitted: () =>
-                    model.ui.menu.isSubmitted()
-                        ? self.components.server.updateSubmissionStatus("inProgress")
-                        : model.display.dirtySubmission()
-                            ? self.components.engine.delayedRun()
-                            : self.components.server.updateSubmissionStatus("Submitted")
-                ,
+                textMarkSubmitted: ko.pureComputed(() => {
+                    if (model.ui.menu.isCompleted()) {
+                        return "Assignment closed";
+                    } else if (model.ui.menu.isSubmitted()) {
+                        return "Reopen for editing";
+                    } else if (model.display.dirtySubmission()) {
+                        return "Run";
+                    } else {
+                        return "Submit early";
+                    }
+                }),
+                clickMarkSubmitted: () => {
+                    if (model.ui.menu.isCompleted()) {
+                        alert("You cannot reopen closed assignments. Contact a grader!");
+                    } else if (model.ui.menu.isSubmitted()) {
+                        self.components.server.updateSubmissionStatus("inProgress");
+                    } else if (model.display.dirtySubmission()) {
+                        self.components.engine.delayedRun();
+                    } else {
+                        self.components.server.updateSubmissionStatus("Submitted");
+                    }
+                },
                 isSubmitted: ko.pureComputed(() =>
+                    model.assignment.reviewed() &&
                     model.submission.submissionStatus().toLowerCase() === "submitted"
+                ),
+                isCompleted: ko.pureComputed(()=>
+                    model.submission.submissionStatus().toLowerCase() === "completed"
                 )
             },
             secondRow: {
@@ -638,6 +650,9 @@ export class BlockPy {
                             model.assignment.onEval("");
                             self.components.fileSystem.newFile(path);
                             break;
+                        case "instructor":
+                            self.components.fileSystem.newInstructorFile();
+                            return;
                         default:
 
                     }
