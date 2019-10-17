@@ -122,9 +122,9 @@ BlockPyServer.prototype.createSubscriptions = function () {
     this.createFileSubscription(model.assignment.onChange, "!on_change.py");
     this.createFileSubscription(model.assignment.instructions, "!instructions.md");
     this.createFileSubscription(model.assignment.startingCode, "^starting_code.py");
-    this.createFileSubscription(model.ui.files.extraStudentFiles, "#extraStudentFiles.blockpy");
-    this.createFileSubscription(model.ui.files.extraStartingFiles, "#extraStartingFiles.blockpy");
-    this.createFileSubscription(model.ui.files.extraInstructorFiles, "#extraInstructorFiles.blockpy");
+    this.createFileSubscription(model.ui.files.extraStudentFiles, "#extra_student_files.blockpy");
+    this.createFileSubscription(model.ui.files.extraStartingFiles, "#extra_starting_files.blockpy");
+    this.createFileSubscription(model.ui.files.extraInstructorFiles, "#extra_instructor_files.blockpy");
 };
 
 /**

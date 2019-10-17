@@ -9,7 +9,7 @@ export class InstructorConfiguration extends Configuration {
         // Instructors have no limits
         Sk.execLimit = undefined;
         // Stepper! Executed after every statement.
-        Sk.afterSingleExecution = null;
+        Sk.afterSingleExecution = null; // 10 *1000
         // Mute everything
         this.main.model.display.mutePrinter(true);
         // Disable input box
@@ -39,6 +39,17 @@ export class InstructorConfiguration extends Configuration {
             return this.main.model.assignment.onRun();
         } else if (filename === "./_instructor/on_eval.py") {
             return this.main.model.assignment.onEval() || "";
+        } else if (filename === "./_instructor/__init__.js") {
+            return EMPTY_MODULE;
+        } else if (filename.startsWith("./_instructor/")) {
+            let innerName = filename.slice("./_instructor/".length);
+            let instructorFiles = this.main.model.assignment.extraInstructorFiles();
+            for (let i=0; i < instructorFiles.length; i++) {
+                if (instructorFiles[i].filename() === "!"+innerName) {
+                    return instructorFiles[i].contents();
+                }
+            }
+            throw new Sk.builtin.ImportError("File not found: '" + filename + "'");
         } else if (Sk.builtinFiles === undefined ||
             Sk.builtinFiles["files"][filename] === undefined) {
             throw "File not found: '" + filename + "'";

@@ -163,8 +163,16 @@ export function makeModelFile(filename, contents) {
 export function loadConcatenatedFile(concatenatedFile, modelFileList) {
     if (concatenatedFile) {
         let files = JSON.parse(concatenatedFile);
-        files = files.map(file => makeModelFile(file.filename, file.contents));
-        modelFileList(files);
+        let modelFiles = [];
+        for (let filename in files) {
+            if (files.hasOwnProperty(filename)) {
+                modelFiles.push(makeModelFile(filename, files[filename]));
+            }
+        }
+        //files = files.map(file => makeModelFile(file.filename, file.contents));
+        modelFileList(modelFiles);
+    } else {
+        modelFileList([]);
     }
 }
 

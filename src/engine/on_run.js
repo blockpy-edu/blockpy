@@ -26,7 +26,8 @@ student = MAIN_REPORT['sandbox']['run'] = Sandbox()
 #student.run(MAIN_REPORT['source']['code'], MAIN_REPORT['source']['filename'], report_exceptions=False)
 #debug(student)
 student.report_exceptions_mode = True
-compatibility.run_student(raise_exceptions=False)
+if not get_model_info('assignment.settings.disableInstructorRun'):
+    compatibility.run_student(raise_exceptions=False)
 #log(student.data)
 #student = get_student_data()
 #error, position = get_student_error()
