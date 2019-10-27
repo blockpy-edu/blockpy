@@ -155,6 +155,7 @@ export class BlockPy {
                 version: ko.observable(0),
                 submissionStatus: ko.observable("Started"),
                 gradingStatus: ko.observable("NotReady"),
+                ownerId: ko.observable(null)
             },
             display: {
                 /**
@@ -365,6 +366,7 @@ export class BlockPy {
         this.model.submission.version(submission.version);
         this.model.submission.gradingStatus(submission.grading_status);
         this.model.submission.submissionStatus(submission.submission_status);
+        this.model.submission.ownerId(submission.user_id);
         this.model.user.courseId(submission.course_id);
         loadConcatenatedFile(submission.extra_files, this.model.submission.extraFiles);
     }
@@ -651,7 +653,13 @@ export class BlockPy {
                             self.components.fileSystem.newFile(path);
                             break;
                         case "instructor":
-                            self.components.fileSystem.newInstructorFile();
+                            self.components.fileSystem.newFileDialog("instructor");
+                            return;
+                        case "student":
+                            self.components.fileSystem.newFileDialog("student");
+                            return;
+                        case "starting":
+                            self.components.fileSystem.newFileDialog("starting");
                             return;
                         default:
 

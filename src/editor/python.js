@@ -173,6 +173,8 @@ class PythonEditorView extends AbstractEditor {
         this.lineErrorSubscription = null;
         this.lineUncoveredSubscription = null;
         this.oldPythonMode = this.main.model.display.pythonMode();
+
+        this.makePerAssignmentSubscriptions();
     }
 
     configureExtraBlockly() {
@@ -292,6 +294,18 @@ class PythonEditorView extends AbstractEditor {
         this.bm.setMode(this.main.model.display.pythonMode());
         this.main.model.display.pythonMode.subscribe(mode => {
             this.bm.setMode(mode);
+        });
+    }
+
+    makePerAssignmentSubscriptions() {
+        console.log("TEST");
+        this.main.model.assignment.settings.onlyUploads.subscribe((changed) => {
+            console.log(changed);
+            if (!changed) {
+                this.setReadOnly(this.main.model.display.historyMode());
+            } else {
+                this.setReadOnly(changed);
+            }
         });
     }
 

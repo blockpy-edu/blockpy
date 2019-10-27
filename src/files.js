@@ -1,9 +1,13 @@
-const makeTab = function(filename, friendlyName, hideIfEmpty) {
+const makeTab = function(filename, friendlyName, hideIfEmpty, notInstructor) {
     if (friendlyName === undefined) {
         friendlyName = filename;
     }
+    let instructorFileClass = "";
+    if (!notInstructor) {
+        instructorFileClass = "blockpy-file-instructor";
+    }
     return `
-    <li class="nav-item">
+    <li class="nav-item ${instructorFileClass}">
         <a class="nav-link" href="#"
             data-toggle="tab"
             data-bind="css: {active: display.filename() === '${filename}'},
@@ -22,7 +26,7 @@ export let FILES_HTML = `
         <strong>View: </strong>
     </li>
 
-    ${makeTab("answer.py")}
+    ${makeTab("answer.py", undefined, undefined, true)}
     ${makeTab("!instructions.md", "Instructions")}
     ${makeTab("!assignment_settings.blockpy", "Settings")}
     ${makeTab("^starting_code.py", "Starting Code")}
@@ -34,6 +38,27 @@ export let FILES_HTML = `
     ${makeTab("!tags.blockpy", "Tags", true)}
     
     <!-- ko foreach: assignment.extraInstructorFiles -->
+        <li class="nav-item blockpy-file-instructor">
+            <a class="nav-link" href="#"
+                data-toggle="tab"
+                data-bind="css: {active: $root.display.filename() === filename()},
+                            click: $root.display.filename.bind($data, filename()),
+                            text: filename">
+            </a>        
+        </li>
+    <!-- /ko -->
+    <!-- ko foreach: assignment.extraStartingFiles -->
+        <li class="nav-item blockpy-file-instructor">
+            <a class="nav-link" href="#"
+                data-toggle="tab"
+                data-bind="css: {active: $root.display.filename() === filename()},
+                            click: $root.display.filename.bind($data, filename()),
+                            text: filename">
+            </a>        
+        </li>
+    <!-- /ko -->
+    
+    <!-- ko foreach: submission.extraFiles -->
         <li class="nav-item">
             <a class="nav-link" href="#"
                 data-toggle="tab"
@@ -48,25 +73,27 @@ export let FILES_HTML = `
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
          role="button" aria-haspopup="true" aria-expanded="false">Add New</a>
         <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?mock_urls.blockpy'),
                            click: ui.files.add.bind($data, '?mock_urls.blockpy')">URL Data</a>
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?tags.blockpy')">Tags</a>
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?sample_submissions.blockpy')">Sample Submissions</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: assignment.onChange,
                            click: ui.files.add.bind($data, '!on_change.py')">On Change</a>
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: assignment.onEval,
                            click: ui.files.add.bind($data, '!on_eval.py')">On Eval</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Starting File</a>
-            <a class="dropdown-item" href="#"
+            <a class="dropdown-item blockpy-file-instructor" href="#"
+                data-bind="click: ui.files.add.bind($data, 'starting')">Starting File</a>
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="click: ui.files.add.bind($data, 'instructor')">Instructor File</a>
-            <a class="dropdown-item" href="#">Student File</a>
+            <a class="dropdown-item" href="#"
+                data-bind="click: ui.files.add.bind($data, 'student')">Student File</a>
         </div>
     </li>
   
@@ -205,6 +232,10 @@ export class BlockPyFileSystem {
 
         this.watchModel();
         this.watches_ = {};
+
+        this.main.model.display.instructor.subscribe((visiblity)=> {
+            $(".blockpy-file-instructor").toggle(visiblity);
+        });
     }
 
     watchFile(filename, callback) {
@@ -380,7 +411,7 @@ export class BlockPyFileSystem {
         }
     }
 
-    newInstructorFile() {
+    newFileDialog(namespace) {
         let body = $(NEW_INSTRUCTOR_FILE_DIALOG_HTML);
         let filename = body.find(".blockpy-instructor-file-dialog-filename");
         let filetype = body.find(".blockpy-instructor-file-dialog-filetype");
@@ -392,12 +423,23 @@ export class BlockPyFileSystem {
             filetype.text(extension);
         });
         let yes = () => {
-            hidden = hidden.is(":checked") ? "!" : "?";
+            let prefix = "";
+            if (namespace === "instructor") {
+                prefix = hidden.is(":checked") ? "!" : "?";
+            } else if (namespace === "starting") {
+                prefix = "^";
+            }
+
             if (filename.val()) {
-                filename = hidden+filename.val();
+                filename = prefix+filename.val();
                 this.newFile(filename);
             }
         };
+        body.submit((e) => {
+            e.preventDefault();
+            yes();
+            this.main.components.dialog.close();
+        });
         this.main.components.dialog.confirm("Make New File", body, yes, ()=>{}, "Add");
     }
 }

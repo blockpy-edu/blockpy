@@ -29,6 +29,19 @@ export class InstructorConfiguration extends Configuration {
                 return instructorFiles[i].contents();
             }
         }
+        // TODO: Prevent students from editing files, instead of relying on startingFiles
+        instructorFiles = this.main.model.assignment.extraStartingFiles();
+        for (let i=0; i < instructorFiles.length; i++) {
+            if (instructorFiles[i].filename() === "^"+filename) {
+                return instructorFiles[i].contents();
+            }
+        }
+        let studentFiles = this.main.model.submission.extraFiles();
+        for (let i=0; i < studentFiles.length; i++) {
+            if (studentFiles[i].filename() === filename) {
+                return studentFiles[i].contents();
+            }
+        }
         throw new Sk.builtin.OSError("File not found: "+filename);
     }
 

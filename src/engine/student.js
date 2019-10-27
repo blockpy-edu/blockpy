@@ -23,6 +23,16 @@ export class StudentConfiguration extends Configuration {
         return this;
     }
 
+    openFile(filename) {
+        let studentFiles = this.main.model.submission.extraFiles();
+        for (let i=0; i < studentFiles.length; i++) {
+            if (studentFiles[i].filename() === filename) {
+                return studentFiles[i].contents();
+            }
+        }
+        throw new Sk.builtin.OSError("File not found: "+filename);
+    }
+
     importFile(filename) {
         if (this.isForbidden(filename)) {
             throw "File not accessible: '" + filename + "'";

@@ -52,6 +52,10 @@ export function BlockPyDialog(main, tag) {
     });
 }
 
+BlockPyDialog.prototype.close = function () {
+    this.tag.modal("hide");
+};
+
 /**
  * A simple externally available function for popping up a dialog
  * message. This menu will be draggable by its title.

@@ -247,6 +247,7 @@ export function makeAssignmentSettingsModel(configuration) {
             settings[clientName] = ko.observable(configuration["assignment.settings."+serverName]);
         }
     });
+
     return settings;
 }
 
