@@ -1,10 +1,14 @@
+import {firstDefinedValue} from "utilities.js";
+
 const makeTab = function(filename, friendlyName, hideIfEmpty, notInstructor) {
     if (friendlyName === undefined) {
         friendlyName = filename;
     }
     let instructorFileClass = "";
+    let hideIfNotInstructor = "true";
     if (!notInstructor) {
         instructorFileClass = "blockpy-file-instructor";
+        hideIfNotInstructor = "display.instructor()";
     }
     return `
     <li class="nav-item ${instructorFileClass}">
@@ -12,7 +16,7 @@ const makeTab = function(filename, friendlyName, hideIfEmpty, notInstructor) {
             data-toggle="tab"
             data-bind="css: {active: display.filename() === '${filename}'},
                 click: display.filename.bind($data, '${filename}'),
-                visible: !${hideIfEmpty} || ui.files.hasContents('${filename}')">
+                visible: (!${hideIfEmpty} || ui.files.hasContents('${filename}')) && ${hideIfNotInstructor}">
             ${friendlyName}</a>
     </li>`;
 };
@@ -38,17 +42,21 @@ export let FILES_HTML = `
     ${makeTab("!tags.blockpy", "Tags", true)}
     
     <!-- ko foreach: assignment.extraInstructorFiles -->
-        <li class="nav-item blockpy-file-instructor">
+        <li class="nav-item"
+            data-bind="css: {'blockpy-file-instructor': !filename().startsWith('&')},
+                       visible: filename().startsWith('&') || $root.display.instructor() ">
             <a class="nav-link" href="#"
                 data-toggle="tab"
-                data-bind="css: {active: $root.display.filename() === filename()},
+                data-bind="css: {active: $root.display.filename() === filename(),
+                                 uneditable: filename().startsWith('&')},
                             click: $root.display.filename.bind($data, filename()),
-                            text: filename">
+                            text: $root.ui.files.displayFilename(filename())">
             </a>        
         </li>
     <!-- /ko -->
     <!-- ko foreach: assignment.extraStartingFiles -->
-        <li class="nav-item blockpy-file-instructor">
+        <li class="nav-item blockpy-file-instructor"
+            data-bind="visible: $root.display.instructor()">
             <a class="nav-link" href="#"
                 data-toggle="tab"
                 data-bind="css: {active: $root.display.filename() === filename()},
@@ -64,7 +72,7 @@ export let FILES_HTML = `
                 data-toggle="tab"
                 data-bind="css: {active: $root.display.filename() === filename()},
                             click: $root.display.filename.bind($data, filename()),
-                            text: filename">
+                            text: $root.ui.files.displayFilename(filename())">
             </a>        
         </li>
     <!-- /ko -->
@@ -113,7 +121,7 @@ const NEW_INSTRUCTOR_FILE_DIALOG_HTML = `
             id="blockpy-instructor-file-dialog-filename">    
     </div>
     <!-- Filetype -->
-    <div class="col-sm-2 text-right">
+    <div class="col-sm-2 text-right mt-2">
         <label for="blockpy-instructor-file-dialog-filetype">Filetype: </label>
     </div>
     <div class="col-sm-10">
@@ -121,12 +129,16 @@ const NEW_INSTRUCTOR_FILE_DIALOG_HTML = `
             id="blockpy-instructor-file-dialog-filetype"></span>    
     </div>
     <!-- Inaccessible to student? -->
-    <div class="col-sm-2 text-right">
-        <label for="blockpy-instructor-file-dialog-filename">Inaccessible to student: </label>
+    <div class="col-sm-2 text-right mt-2">
+        <label for="blockpy-instructor-file-dialog-namespace">Namespace: </label>
     </div>
-    <div class="col-sm-1">
-        <input type="checkbox" class="form-control blockpy-instructor-file-dialog-hidden"
-            id="blockpy-instructor-file-dialog-hidden" checked>
+    <div class="col-sm-4">
+        <select class="form-control blockpy-instructor-file-dialog-namespace"
+            id="blockpy-instructor-file-dialog-namespace">
+            <option value="!">Completely inaccessible</option>
+            <option value="?">Hidden from student, accessible programatically</option>
+            <option value="&">Visible to student, but not editable</option>
+        </select>
     </div>
 </div>
 </form>
@@ -163,6 +175,15 @@ export const BASIC_NEW_FILES = [
     "!sample_submissions.blockpy"
 ];
 
+const INSTRUCTOR_DIRECTORY = "_instructor/";
+const STUDENT_DIRECTORY = "_student/";
+
+const SearchModes = {
+    EVERYWHERE: "EVERYWHERE",
+    START_WITH_INSTRUCTOR: "START_WITH_INSTRUCTOR",
+    ONLY_STUDENT_FILES: "ONLY_STUDENT_FILES"
+};
+
 const DELETABLE_SIMPLE_FILES = ["!on_change.py", "!on_eval.py"];
 
 export const UNDELETABLE_FILES = ["answer.py", "!instructions.md", "!assignment_settings.py",
@@ -185,6 +206,10 @@ class BlockPyFile {
 
 export function makeModelFile(filename, contents) {
     return {"filename": ko.observable(filename), contents: ko.observable(contents || "")};
+}
+
+function makeMockModelFile(filename, contents) {
+    return { filename: () => filename, contents: () => contents };
 }
 
 export function loadConcatenatedFile(concatenatedFile, modelFileList) {
@@ -310,7 +335,9 @@ export class BlockPyFileSystem {
             file.handle = this.main.model.display;
         } else if (file.filename.startsWith("^")) {
             this.observeInArray_(file, this.main.model.assignment.extraStartingFiles);
-        } else if (file.filename.startsWith("!") || file.filename.startsWith("?")) {
+        } else if (file.filename.startsWith("!") ||
+                   file.filename.startsWith("?") ||
+                   file.filename.startsWith("&")) {
             this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
         } else {
             this.observeInArray_(file, this.main.model.submission.extraFiles);
@@ -359,6 +386,9 @@ export class BlockPyFileSystem {
                 this.observeFile_(newFile);
             } else {
                 newFile.handle = modelFile;
+            }
+            if (contents !== undefined) {
+                newFile.handle(contents);
             }
             return newFile;
         }
@@ -411,22 +441,119 @@ export class BlockPyFileSystem {
         }
     }
 
-    newFileDialog(namespace) {
+    searchForFile(name, studentSearch) {
+        /*
+        files.*
+        _instructor/files.*
+        _student/files.*
+
+        If a student searches for a file, it checks the "?", "&", "*", "" namespaces
+            import helper => "./helper.py"
+            open("external.json") => "external.json"
+        If an instructor searches for a file, it checks "!", "^", "?", "&", "*", "" namespaces
+            To explicitly search instructor namespaces first
+                import _instructor.helper => "./instructor/helper.py"
+                open("_instructor/external.json") => "_instructor/external.json"
+            to allow student files to override:
+                import helper => "./helper.py"
+                open("external.json") => "external.json"
+            to only check student files, prepend with _student
+         */
+        // Chop off starting "./"
+        if (name.startsWith("./")) {
+            name = name.slice(2);
+        }
+        let searchMode = SearchModes.EVERYWHERE;
+        // Should the search be start with instructor side?
+        if (name.startsWith(INSTRUCTOR_DIRECTORY)) {
+            name = name.slice(INSTRUCTOR_DIRECTORY.length);
+            searchMode = SearchModes.START_WITH_INSTRUCTOR;
+        }
+        // Should the search be limited to the student mode?
+        if (name.startsWith(STUDENT_DIRECTORY)) {
+            name = name.slice(STUDENT_DIRECTORY.length);
+            searchMode = SearchModes.ONLY_STUDENT_FILES;
+        } else if (studentSearch) {
+            searchMode = SearchModes.ONLY_STUDENT_FILES;
+        }
+        // Shortcut for instructor versions
+        let extraStudentFiles = this.main.model.submission.extraFiles();
+        let extraInstructorFiles = this.main.model.assignment.extraInstructorFiles();
+        let extraStartingFiles = this.main.model.assignment.extraStartingFiles();
+        // Check special files (TODO: how would an instructor access "./_instructor/answer.py"?
+        let specialFile = this.searchForSpecialFiles_(name, searchMode);
+        if (specialFile !== undefined) {
+            return specialFile;
+        }
+        // Start looking through possible files
+        let studentVersion = this.searchForFileInList_(extraStudentFiles, name);
+        let generatedVersion = this.searchForFileInList_(extraStudentFiles, "*"+name);
+        let defaultVersion = this.searchForFileInList_(extraInstructorFiles, "&"+name);
+        if (searchMode === SearchModes.ONLY_STUDENT_FILES) {
+            return firstDefinedValue(defaultVersion, studentVersion, generatedVersion);
+        }
+        let instructorVersion = this.searchForFileInList_(extraInstructorFiles, "!"+name);
+        let hiddenVersion = this.searchForFileInList_(extraInstructorFiles, "?"+name);
+        let startingVersion = this.searchForFileInList_(extraStartingFiles, "^"+name);
+        if (searchMode === SearchModes.START_WITH_INSTRUCTOR) {
+            return firstDefinedValue(instructorVersion, hiddenVersion, startingVersion,
+                                     defaultVersion, studentVersion, generatedVersion);
+        } else if (searchMode === SearchModes.EVERYWHERE) {
+            return firstDefinedValue(defaultVersion, studentVersion, generatedVersion,
+                                     instructorVersion, hiddenVersion, startingVersion);
+        }
+    }
+
+    searchForFileInList_(modelList, filename) {
+        for (let i=0; i < modelList.length; i++) {
+            if (modelList[i].filename() === filename) {
+                return modelList[i];
+            }
+        }
+        return undefined;
+    }
+
+    searchForSpecialFiles_(filename, searchMode) {
+        if (searchMode === SearchModes.ONLY_STUDENT_FILES) {
+            if (filename === "answer.py") {
+                return makeMockModelFile("_instructor/answer.py", this.main.model.submission.code());
+            }
+            return undefined;
+        }
+        switch (filename) {
+            case "answer.py":
+                return makeMockModelFile("_instructor/answer.py", this.main.model.submission.code());
+            case "on_run.py":
+                return makeMockModelFile("_instructor/on_run.py", this.main.model.assignment.onRun());
+            case "on_change.py":
+                return makeMockModelFile("_instructor/on_change.py", this.main.model.assignment.onChange());
+            case "on_eval.py":
+                return makeMockModelFile("_instructor/on_eval.md", this.main.model.assignment.onEval());
+            case "instructions.md":
+                return makeMockModelFile("_instructor/instructions.md", this.main.model.assignment.instructions());
+            case "starting_code.py":
+                return makeMockModelFile("_instructor/starting_code.py", this.main.model.assignment.startingCode());
+        }
+        return undefined;
+    }
+
+    newFileDialog(kind) {
         let body = $(NEW_INSTRUCTOR_FILE_DIALOG_HTML);
         let filename = body.find(".blockpy-instructor-file-dialog-filename");
         let filetype = body.find(".blockpy-instructor-file-dialog-filetype");
-        let hidden = body.find(".blockpy-instructor-file-dialog-hidden");
+        let namespace = body.find(".blockpy-instructor-file-dialog-namespace");
         let extensionRegex = /(?:\.([^.]+))?$/;
         filename.on("input", () => {
             let extension = extensionRegex.exec(filename.val())[1];
             extension = extension === undefined ? "No extension" : extension;
+            //TODO: this.main.components.editors.getEditorFromExtension(extension);
             filetype.text(extension);
         });
         let yes = () => {
             let prefix = "";
-            if (namespace === "instructor") {
-                prefix = hidden.is(":checked") ? "!" : "?";
-            } else if (namespace === "starting") {
+            if (kind === "instructor") {
+                prefix = namespace.val();
+            } else if (kind === "starting") {
                 prefix = "^";
             }
 

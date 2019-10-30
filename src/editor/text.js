@@ -47,6 +47,8 @@ class TextEditorView extends AbstractEditor {
             // Delay so that everything is rendered
             setTimeout(this.codeMirror.refresh.bind(this.codeMirror), 1);
         }
+        // TODO: update dynamically when changing instructor status
+        this.codeMirror.setOption("readOnly", newFilename.startsWith("&") && !this.main.model.display.instructor());
     }
 
     updateEditor(newContents) {
@@ -72,6 +74,7 @@ class TextEditorView extends AbstractEditor {
         // Remove subscriber
         this.currentSubscription.dispose();
         this.codeMirror.off("change", this.currentListener);
+        this.codeMirror.setOption("readOnly", false);
         super.exit(newFilename, oldEditor);
     }
 }

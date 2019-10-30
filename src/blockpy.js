@@ -672,6 +672,13 @@ export class BlockPy {
                 extraStudentFiles: observeConcatenatedFile(model.submission.extraFiles),
                 extraInstructorFiles: observeConcatenatedFile(model.assignment.extraInstructorFiles),
                 extraStartingFiles: observeConcatenatedFile(model.assignment.extraStartingFiles),
+                displayFilename: function(path) {
+                    console.log(path);
+                    if (path.startsWith("&")) {
+                        return path.slice(1);
+                    }
+                    return path;
+                },
             },
             editors: {
                 current: ko.pureComputed( ()=>

@@ -240,11 +240,16 @@ export function loadAssignmentSettings(model, settings) {
 export function makeAssignmentSettingsModel(configuration) {
     let settings = {};
     ASSIGNMENT_SETTINGS.forEach(setting => {
-        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2];
+        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2],
+            fieldType = setting[3];
         if (configuration[serverName] === undefined) {
             settings[clientName] = ko.observable(defaultValue);
         } else {
-            settings[clientName] = ko.observable(configuration["assignment.settings."+serverName]);
+            let configValue = configuration["assignment.settings."+serverName];
+            if (fieldType === "bool") {
+                configValue = configValue.toLowerCase() === "true";
+            }
+            settings[clientName] = ko.observable(configValue);
         }
     });
 

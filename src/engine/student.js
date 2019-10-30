@@ -24,13 +24,13 @@ export class StudentConfiguration extends Configuration {
     }
 
     openFile(filename) {
-        let studentFiles = this.main.model.submission.extraFiles();
-        for (let i=0; i < studentFiles.length; i++) {
-            if (studentFiles[i].filename() === filename) {
-                return studentFiles[i].contents();
-            }
+        let found = this.main.components.fileSystem.searchForFile(filename, true);
+        console.log(filename, found);
+        if (found === undefined) {
+            throw new Sk.builtin.OSError("File not found: "+filename);
+        } else {
+            return found.contents();
         }
-        throw new Sk.builtin.OSError("File not found: "+filename);
     }
 
     importFile(filename) {
@@ -38,11 +38,18 @@ export class StudentConfiguration extends Configuration {
             throw "File not accessible: '" + filename + "'";
         } else if (filename === "./answer.py") {
             return this.main.model.submission.code();
-        } else if (Sk.builtinFiles === undefined ||
-            Sk.builtinFiles["files"][filename] === undefined) {
-            throw "File not found: '" + filename + "'";
+        } else if (Sk.builtinFiles === undefined) {
+            throw new Sk.builtin.OSError("Built-in modules not accessible.");
+        } else if (Sk.builtinFiles["files"][filename] !== undefined) {
+            return Sk.builtinFiles["files"][filename];
+        } else {
+            let found = this.main.components.fileSystem.searchForFile(filename, true);
+            if (found === undefined) {
+                throw new Sk.builtin.OSError("File not found: '"+filename + "'");
+            } else {
+                return found.contents();
+            }
         }
-        return Sk.builtinFiles["files"][filename];
     }
 
     input(promptMessage) {

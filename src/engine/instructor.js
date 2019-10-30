@@ -23,26 +23,12 @@ export class InstructorConfiguration extends Configuration {
     }
 
     openFile(filename) {
-        let instructorFiles = this.main.model.assignment.extraInstructorFiles();
-        for (let i=0; i < instructorFiles.length; i++) {
-            if (instructorFiles[i].filename() === "!"+filename) {
-                return instructorFiles[i].contents();
-            }
+        let found = this.main.components.fileSystem.searchForFile(filename, false)
+        if (found === undefined) {
+            throw new Sk.builtin.OSError("File not found: "+filename);
+        } else {
+            return found.contents();
         }
-        // TODO: Prevent students from editing files, instead of relying on startingFiles
-        instructorFiles = this.main.model.assignment.extraStartingFiles();
-        for (let i=0; i < instructorFiles.length; i++) {
-            if (instructorFiles[i].filename() === "^"+filename) {
-                return instructorFiles[i].contents();
-            }
-        }
-        let studentFiles = this.main.model.submission.extraFiles();
-        for (let i=0; i < studentFiles.length; i++) {
-            if (studentFiles[i].filename() === filename) {
-                return studentFiles[i].contents();
-            }
-        }
-        throw new Sk.builtin.OSError("File not found: "+filename);
     }
 
     importFile(filename) {
@@ -54,20 +40,18 @@ export class InstructorConfiguration extends Configuration {
             return this.main.model.assignment.onEval() || "";
         } else if (filename === "./_instructor/__init__.js") {
             return EMPTY_MODULE;
-        } else if (filename.startsWith("./_instructor/")) {
-            let innerName = filename.slice("./_instructor/".length);
-            let instructorFiles = this.main.model.assignment.extraInstructorFiles();
-            for (let i=0; i < instructorFiles.length; i++) {
-                if (instructorFiles[i].filename() === "!"+innerName) {
-                    return instructorFiles[i].contents();
-                }
+        } else if (Sk.builtinFiles === undefined) {
+            throw new Sk.builtin.OSError("Built-in modules not accessible.");
+        } else if (Sk.builtinFiles["files"][filename] !== undefined) {
+            return Sk.builtinFiles["files"][filename];
+        } else {
+            let found = this.main.components.fileSystem.searchForFile(filename, false);
+            if (found === undefined) {
+                throw new Sk.builtin.OSError("File not found: '"+filename + "'");
+            } else {
+                return found.contents();
             }
-            throw new Sk.builtin.ImportError("File not found: '" + filename + "'");
-        } else if (Sk.builtinFiles === undefined ||
-            Sk.builtinFiles["files"][filename] === undefined) {
-            throw "File not found: '" + filename + "'";
         }
-        return Sk.builtinFiles["files"][filename];
     };
 
     input(promptMessage) {

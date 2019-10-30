@@ -153,6 +153,16 @@ function moveElements(source, target, moveCheck) {
     } 
 }
 
+
+export function firstDefinedValue() {
+    for (var i = 0; i < arguments.length; i++) {
+        if (arguments[i] != null) {
+            return arguments[i];
+        }
+    }
+    return undefined;
+}
+
 /**
  * This function checks if the given object is one of the Sk.builtin objects
  * TODO: make this so we don't have to explicitly put out every option

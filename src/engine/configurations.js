@@ -57,6 +57,8 @@ export class Configuration {
         // TODO
     };
 
+
+
     openFile() {
         console.warn("Unimplemented method!");
         // TODO
