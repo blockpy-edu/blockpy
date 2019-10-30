@@ -23,7 +23,7 @@ export class InstructorConfiguration extends Configuration {
     }
 
     openFile(filename) {
-        let found = this.main.components.fileSystem.searchForFile(filename, false)
+        let found = this.main.components.fileSystem.searchForFile(filename, false);
         if (found === undefined) {
             throw new Sk.builtin.OSError("File not found: "+filename);
         } else {
