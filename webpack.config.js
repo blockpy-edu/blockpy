@@ -32,7 +32,10 @@ let config = {
         rules: [
             {
                 test: /(\.jsx|\.js)$/,
-                loader: "babel-loader",
+                /*loader: "babel-loader",*/
+                use: {
+                    loader: 'babel-loader'
+                },
                 exclude: /(node_modules|bower_components)/
             },
             {
