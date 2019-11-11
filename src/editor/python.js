@@ -39,9 +39,11 @@ export const PYTHON_EDITOR_HTML = `
          </div>
          
          <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+            <!-- ko if: $root.assignment.settings.enableBlocks() -->
             ${makeTab("Blocks", "th-large", DisplayModes.BLOCK)}
             ${makeTab("Split", "columns", DisplayModes.SPLIT)}
             ${makeTab("Text", "align-left", DisplayModes.TEXT)}
+            <!-- /ko -->
          </div>
 
          <div class="btn-group mr-2" role="group" aria-label="Reset Group">
@@ -294,6 +296,13 @@ class PythonEditorView extends AbstractEditor {
         this.bm.setMode(this.main.model.display.pythonMode());
         this.main.model.display.pythonMode.subscribe(mode => {
             this.bm.setMode(mode);
+        });
+        this.main.model.assignment.settings.enableBlocks.subscribe(enabled => {
+            if (!enabled) {
+                this.bm.setMode(DisplayModes.TEXT);
+            } else {
+                this.bm.setMode(this.main.model.display.pythonMode());
+            }
         });
     }
 

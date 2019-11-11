@@ -15,8 +15,6 @@ export class StudentConfiguration extends Configuration {
 
         // Function to call after each step
         // afterSingleExecution
-        // Proxy requests
-        Sk.requestsGet = (filename) => this.openURL(filename, "url");
 
         Sk.builtinFiles.files["src/lib/utility/__init__.js"] = EMPTY_MODULE;
 

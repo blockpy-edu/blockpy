@@ -13,7 +13,7 @@ const ASSIGNMENT_SETTINGS = [
     ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
     ["disableEdit", "can_edit", false, "bool", "If checked, then the students' file will not be editable at all."],
-    ["disableBlocks", "can_blocks", false, "bool", "If checked, then the student cannot edit the block interface (although it is visible)."],
+    ["enableBlocks", "can_blocks", true, "bool", "If checked, then the student cannot edit the block interface (although it is visible)."],
     ["onlyInteractive", "only_interactive", false, "bool", "If checked, the editors are hidden, the program is automatically run, and then the console enters Eval mode (interactive)."],
     ["onlyUploads", "only_uploads", false, "bool", "If unchecked, then the students' file will not be directly editable (they will have to upload submissions)."],
     // What menus/feedback to show and hide

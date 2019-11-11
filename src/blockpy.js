@@ -57,6 +57,7 @@ export class BlockPy {
         this.initInterface();
         this.applyModel();
         this.initComponents();
+        this.makeExtraSubscriptions();
         this.start();
     };
 
@@ -352,8 +353,15 @@ export class BlockPy {
         // Already a JSON list representing samples
     }
 
-    loadSubmission(submission) {
+    loadNoSubmission(assignment) {
+        this.model.submission.code(assignment.starting_code);
+        loadConcatenatedFile(assignment.extra_starting_files, this.model.submission.extraFiles);
+    }
+
+    loadSubmission(submission, assignment) {
         if (!submission) {
+            // TODO: Scarier "You are not logged in message"
+            this.loadNoSubmission(assignment);
             return false;
         }
         // TODO: What if submissions' assignment version and the assignments' version conflict?
@@ -374,6 +382,7 @@ export class BlockPy {
     loadAssignmentData_(data) {
         console.log(data);
         this.resetInterface();
+        this.components.fileSystem.dismountExtraFiles();
         let wasServerConnected = this.model.configuration.serverConnected();
         this.model.configuration.serverConnected(false);
         let assignment = data.assignment;
@@ -406,7 +415,7 @@ export class BlockPy {
         this.loadSampleSubmissions(assignment.sample_submissions);
         loadConcatenatedFile(assignment.extra_instructor_files, this.model.assignment.extraInstructorFiles);
         loadConcatenatedFile(assignment.extra_starting_files, this.model.assignment.extraStartingFiles);
-        this.loadSubmission(data.submission);
+        this.loadSubmission(data.submission, assignment);
         this.model.display.dirtySubmission(true);
         this.model.display.changedInstructions(null);
         this.model.configuration.serverConnected(wasServerConnected);
@@ -673,7 +682,9 @@ export class BlockPy {
                 extraInstructorFiles: observeConcatenatedFile(model.assignment.extraInstructorFiles),
                 extraStartingFiles: observeConcatenatedFile(model.assignment.extraStartingFiles),
                 displayFilename: function(path) {
-                    console.log(path);
+                    if (path === "?mock_urls.blockpy") {
+                        return "URL Data";
+                    }
                     if (path.startsWith("&")) {
                         return path.slice(1);
                     }
@@ -839,6 +850,13 @@ export class BlockPy {
         components.server = new BlockPyServer(main);
         components.corgis = new BlockPyCorgis(main);
         components.history = new BlockPyHistory(main, container.find(".blockpy-history-toolbar"));
+    }
+
+    makeExtraSubscriptions() {
+        this.model.display.changedInstructions.subscribe((changed) => {
+            this.components.server.logEvent("X-Instructions.Change", "", "",
+                                            changed, "instructions.md");
+        });
     }
 
     start() {

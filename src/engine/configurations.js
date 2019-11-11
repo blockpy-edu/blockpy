@@ -20,6 +20,8 @@ export class Configuration {
         Sk.configure(this.getSkulptOptions());
         // Set openFile as mechanism to read files
         Sk.inBrowser = this.openFile.bind(this);
+        // Proxy requests
+        Sk.requestsGet = (url, data, timeout) => this.openURL(url, data, timeout);
         return this;
     }
 
@@ -57,7 +59,27 @@ export class Configuration {
         // TODO
     };
 
-
+    openURL(url, data, timeout) {
+        //return new Promise((resolve, reject) => {
+        let mockUrlData = this.main.components.fileSystem.getFile("?mock_urls.blockpy");
+        if (mockUrlData == null) {
+            throw (new Sk.builtin.IOError("Cannot access url: URL Data was not made available for this assignment"));
+        }
+        mockUrlData = JSON.parse(mockUrlData.handle());
+        for (let filename in mockUrlData) {
+            if (mockUrlData.hasOwnProperty(filename)) {
+                for (let i=0; i < mockUrlData[filename].length; i+= 1) {
+                    if (mockUrlData[filename][i] === url) {
+                        let fileData = this.main.components.fileSystem.readFile(filename);
+                        return (fileData);
+                    }
+                }
+            }
+        }
+        //reject(new Sk.builtin.IOError("Cannot access url: "+url+" was not made available for this assignment"));
+        throw (new Sk.builtin.IOError("Cannot access url: "+url+" was not made available for this assignment"));
+        //});
+    }
 
     openFile() {
         console.warn("Unimplemented method!");

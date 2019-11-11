@@ -34,7 +34,7 @@ let config = {
                 test: /(\.jsx|\.js)$/,
                 /*loader: "babel-loader",*/
                 use: {
-                    loader: 'babel-loader'
+                    loader: "babel-loader"
                 },
                 exclude: /(node_modules|bower_components)/
             },

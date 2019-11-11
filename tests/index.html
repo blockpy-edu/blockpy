@@ -98,9 +98,12 @@ i.show()
             },
             "display.instructor": true,
             "assignment.on_run": `
-from pedal.questions import set_seed
-
-log(open('banana.txt').read())
+c=compile('''
+import requests
+requests.get('a')
+''', 'test.py', 'exec')
+d = {}
+exec(c, d)
 
 #set_seed(get_model_info("user.name")+get_model_info("assignment.name"))
 

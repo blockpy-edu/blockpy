@@ -16,7 +16,7 @@ export let FOOTER_HTML = `
         <span data-bind="text: ui.server.messages"></span>
     </div>
     <div>
-        <span>User: <span data-bind="text: user.id"></span> (<span data-bind="text: user.name"></span>)</span>, 
+        <span>User: <span data-bind="text: user.id"></span> (<span data-bind="text: user.name"></span>, <span data-bind="text: user.role"></span>)</span>, 
         <span>Course: <span data-bind="text: user.courseId"></span></span>,
         <span>Group: <span data-bind="text: user.groupId"></span></span>,
         <span>Assignment: <span data-bind="text: assignment.id"></span></span>,

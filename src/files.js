@@ -1,5 +1,7 @@
 import {firstDefinedValue} from "utilities.js";
 
+// ${makeTab("?mock_urls.blockpy", "URL Data", true)}
+
 const makeTab = function(filename, friendlyName, hideIfEmpty, notInstructor) {
     if (friendlyName === undefined) {
         friendlyName = filename;
@@ -37,7 +39,6 @@ export let FILES_HTML = `
     ${makeTab("!on_run.py", "On Run")}
     ${makeTab("!on_change.py", "On Change", true)}
     ${makeTab("!on_eval.py", "On Eval", true)}
-    ${makeTab("?mock_urls.blockpy", "URL Data", true)}
     ${makeTab("!sample_submissions.blockpy", "Sample Submissions", true)}
     ${makeTab("!tags.blockpy", "Tags", true)}
     
@@ -326,7 +327,7 @@ export class BlockPyFileSystem {
         } else if (file.filename === "^starting_code.py") {
             file.handle = this.main.model.assignment.startingCode;
         } else if (file.filename === "?mock_urls.blockpy") {
-            this.observeInArray_(file, this.main.model.assignment.extraFiles);
+            this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
         } else if (file.filename === "!tags.blockpy") {
             file.handle = this.main.model.assignment.tags;
         } else if (file.filename === "!assignment_settings.blockpy") {
@@ -365,6 +366,18 @@ export class BlockPyFileSystem {
         this.newFile("!on_run.py");
         this.newFile("!instructions.md");
         this.newFile("!assignment_settings.blockpy");
+    }
+
+    dismountExtraFiles() {
+        for (let name in this.files_) {
+            if (this.files_.hasOwnProperty(name)) {
+                if (UNDELETABLE_FILES.indexOf(name) === -1) {
+                    delete this.files_[name];
+                    delete this.watches_[name];
+                }
+            }
+        }
+        // TODO: Shouldn't we notify the UI that the file was deleted?
     }
 
     newFile(filename, contents, modelFile) {
