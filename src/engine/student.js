@@ -6,7 +6,7 @@ export class StudentConfiguration extends Configuration {
         // Limit execution to 5 seconds
         let settings = this.main.model.settings;
         Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 10000;
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 3000;
         Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = this.step.bind(this);

@@ -23,6 +23,9 @@ export let FEEDBACK_HTML = `
         <span class='badge blockpy-feedback-category feedback-badge'
             data-bind="css: ui.feedback.badge,
                        text: ui.feedback.category">Feedback Kind</span>
+        <small data-bind="text: submission.score()+'%',
+                          visible: display.instructor() && execution.feedback.label()"
+            class="text-muted"></small>
     </div>
     <div>
         <strong class="blockpy-feedback-label"

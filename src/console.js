@@ -198,7 +198,9 @@ class ConsoleLineInput extends ConsoleLine {
             resolveOnClick = resolve;
         });
         let submitForm = () => {
-            resolveOnClick(input.val());
+            let userInputtedValue = input.val();
+            Sk.queuedInput.push(userInputtedValue);
+            resolveOnClick(userInputtedValue);
             input.prop("disabled", true);
             button.prop("disabled", true);
             this.html.tooltip();

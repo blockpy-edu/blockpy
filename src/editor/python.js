@@ -167,6 +167,7 @@ class PythonEditorView extends AbstractEditor {
             "run": main.components.engine.run.bind(main.components.engine),
             "skipSkulpt": true,
             "blocklyMediaPath": main.model.configuration.blocklyPath,
+            "toolbox": main.model.assignment.settings.toolbox()
             //'height': '2000px'
         });
         this.dirty = false;
@@ -303,6 +304,10 @@ class PythonEditorView extends AbstractEditor {
             } else {
                 this.bm.setMode(this.main.model.display.pythonMode());
             }
+        });
+        this.main.model.assignment.settings.toolbox.subscribe(toolbox => {
+            this.bm.configuration.toolbox = toolbox;
+            this.bm.blockEditor.remakeToolbox();
         });
     }
 

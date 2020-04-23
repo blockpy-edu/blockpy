@@ -393,7 +393,7 @@ BlockPyServer.prototype.saveAssignment = function () {
                                console.error(e, textStatus, errorThrown);
                            });
     } else {
-        this.setStatus("Offline", "Server is not connected! (Save Assignment)");
+        this.setStatus("saveAssignment", StatusState.OFFLINE, "Server is not connected! (Save Assignment)");
     }
 };
 
@@ -474,7 +474,7 @@ BlockPyServer.prototype.loadFile = function (filename, type, callback, errorCall
                                    callback(response.data);
                                } else {
                                    errorCallback(response.message);
-                                   server.setStatus("Failure", response.message);
+                                   server.setStatus("loadFile", StatusState.FAILED, response.message);
                                }
                            },
                            function (e, textStatus, errorThrown) {
@@ -483,7 +483,7 @@ BlockPyServer.prototype.loadFile = function (filename, type, callback, errorCall
                            });
     } else {
         errorCallback("No file server available.");
-        this.setStatus("Offline", "Server is not connected! (Load File)");
+        this.setStatus("loadFile", StatusState.OFFLINE, "Server is not connected! (Load File)");
     }
 };
 

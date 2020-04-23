@@ -230,6 +230,11 @@ export class BlockPy {
                  * the text).
                  */
                 dirtySubmission: ko.observable(true),
+                /**
+                 *  Whether or not to make the BlockPy element in FULL SCREEN mode. Sadly, not fullscreen
+                 *  within the window, but FULL SCREEN. Very aggressive.
+                 */
+                fullscreen: ko.observable(false),
             },
             status: {
                 // @type {ServerStatus}
@@ -445,6 +450,12 @@ export class BlockPy {
                     model.display.changedInstructions(null)
             },
             menu: {
+                textFullscreen: ko.pureComputed(() =>
+                    (model.display.fullscreen()) ? "fa-compress-arrows-alt" : "fa-expand-arrows-alt"
+                ),
+                clickFullscreen: () =>{
+                    model.display.fullscreen(!model.display.fullscreen());
+                },
                 canMarkSubmitted: ko.pureComputed(() =>
                     model.assignment.hidden() || model.assignment.reviewed()
                 ),

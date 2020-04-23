@@ -2,7 +2,8 @@ import {AbstractEditor} from "./abstract_editor";
 import {DisplayModes} from "./python";
 
 const ASSIGNMENT_SETTINGS = [
-    ["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
+    ["toolbox", "toolbox", "normal", "toolbox", "Which version of the toolbox to present to the user."],
+    //["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
     ["startView", "start_view", DisplayModes.SPLIT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
     ["datasets", "datasets", "", "string", "The current list of datasets available on load as a comma-separated string."],
     ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
@@ -154,7 +155,7 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
             </div>            
             <div class="col-sm-9">
                 <small class="form-text text-muted">
-                    If reviewed, the assignment can be commented upon and regraded by the staff afterwards.
+                    If reviewed, the assignment need to be commented upon and regraded by the staff after submission.
                 </small>
             </div>
         </div>
@@ -202,6 +203,22 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
             </div>
         </div>
         
+        <div class="form-group row">
+            <label for="blockpy-settings-toolbox" class="col-sm-2 col-form-label text-right">Block Toolbox:</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="blockpy-settings-toolbox"
+                       data-bind="value: assignment.settings.toolbox">
+                   <option value="normal">Normal Toolbox</option>
+                   <option value="ct">CT@VT Toolbox</option>
+                   <option value="minimal">Minimal Set</option>
+                   <option value="full">All Blocks</option>
+                </select>
+                <small class="form-text text-muted">
+                    ${getDocumentation("toolbox")}
+                </small>
+            </div>
+        </div>
+        
         ${ASSIGNMENT_SETTINGS_BOOLEAN_COMPONENTS_HTML}
     </form>
     
@@ -228,6 +245,8 @@ export function loadAssignmentSettings(model, settings) {
             let clientName = setting[0], serverName = setting[1];
             if (serverName in settings) {
                 model.assignment.settings[clientName](settings[serverName]);
+            } else {
+                model.assignment.settings[clientName](setting[2]);
             }
         });
 

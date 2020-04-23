@@ -14,6 +14,8 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
         tifaAnalysis = "from pedal.tifa import tifa_analysis\ntifa_analysis(False)";
     }
 
+    // TODO: Add in Sk.queuedInput to be passed in
+
     return `
 from pedal.report import *
 from pedal.source import set_source

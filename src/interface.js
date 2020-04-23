@@ -27,6 +27,29 @@ export function makeExtraInterfaceSubscriptions(self, model) {
             });
         }, 400);
     });
+    model.display.fullscreen.subscribe((isFullscreen) => {
+        self.components.server.logEvent("X-Display.Fullscreen.Request", "", "",
+                                        isFullscreen.toString(), "");
+        if (isFullscreen) {
+            // NOTE: navigationUI could allow us to force controls to show
+            model.configuration.container[0].requestFullscreen().catch(err => {
+                let message = `Error attempting to enable full-screen mode: ${err.message} (${err.name})`;
+                self.components.server.logEvent("X-Display.Fullscreen.Error", "", "",
+                                                message,  "");
+                alert(message);
+            }).then(() => {
+                self.components.server.logEvent("X-Display.Fullscreen.Success", "", "",
+                                                "", "");
+                model.display.fullscreen(true);
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                self.components.server.logEvent("X-Display.Fullscreen.Exit", "", "",
+                                                isFullscreen.toString(), "");
+                model.display.fullscreen(false);
+            });
+        }
+    });
 }
 
 // TODO: Get shareable link button
@@ -90,6 +113,11 @@ export function makeInterface(main) {
                     View as instructor
                 </label>
             </div>
+            <button class="btn btn-outline-secondary btn-sm"
+                data-bind="click: ui.menu.clickFullscreen"
+            ><span class='fas',
+                           data-bind="class: ui.menu.textFullscreen"
+            ></span></button>
         </div>
          
     </div>

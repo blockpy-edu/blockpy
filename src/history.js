@@ -165,6 +165,9 @@ function prettyPrintDateTime(timeString) {
         minutes = timeString.slice(11, 13),
         seconds = timeString.slice(13, 15);*/
     // TODO: Handle timezones correctly
+    if (timeString === undefined) {
+        return "Undefined Time";
+    }
     let now = new Date();
     let past = new Date(parseInt(timeString, 10));
     if (isSameDay(now, past)) {
