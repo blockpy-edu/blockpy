@@ -53,7 +53,7 @@ js_in = ["src/front.js",
          "src/feedback.js",
          "src/toolbar.js",
          "src/engine.js",
-         "src/main.js"]
+         "src/main_v4.js"]
 css_in = ['src/blockpy.css']
 
 #js_out = 'kennel_dist/blockpy.js'

@@ -1,0 +1,73 @@
+/**
+ * Override bad accessibility in Bootstrap
+ */
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.blockpy-content * {
+    font-size: 14px;
+}
+
+.blockpy-content .btn-sm, .blockpy-content .btn-sm span {
+    font-size: 12px;
+}
+
+.blockpy-content a {
+    text-decoration: underline;
+}
+
+.blockpy-content {
+    background-color: #fcf8e3;
+    border: 1px solid #faebcc;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.blockpy-content .btn {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.blockpy-content .btn-outline-secondary {
+    background-color: white;
+    color: #333;
+}
+
+.blockpy-content .btn-outline-secondary:focus {
+    color: #333;
+    border-color: #8c8c8c;
+    background-color: #e6e6e6;
+}
+
+.blockpy-content .btn-outline-secondary:hover {
+    color: #333;
+    border-color: #adadad;
+    background-color: #e6e6e6;
+}
+
+.blockpy-content .text-muted-less {
+    color: #444;
+}
+
+.blockpy-content .label-default {
+    background-color: #666;
+}
+
+.row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.blockpy-content .alert {
+    color: black;
+}
+
+.blockpy-content table {
+    background-color: white;
+}
+
+.blockpy-content p, .blockpy-content pre {
+    /*margin-bottom: 4px;*/
+}

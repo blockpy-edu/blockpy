@@ -20,8 +20,7 @@ function arrayUnique(array) {
     var a = array.concat();
     for(var i=0; i<a.length; ++i) {
         for(var j=i+1; j<a.length; ++j) {
-            if(a[i] === a[j])
-                a.splice(j--, 1);
+            if(a[i] === a[j]) {a.splice(j--, 1);}
         }
     }
 
@@ -73,8 +72,17 @@ function cloneNode(node) {
  * @param {String} str - The string to be manipulated.
  * @returns {String} The string with four spaces added at the start of every new line.
  */
-function indent(str) {
-  return str.replace(/^(?=.)/gm, '    ');
+export function indent(str) {
+    return str.replace(/^(?=.)/gm, "    ");
+}
+
+/**
+ * Turns spaces into underscores in the string, makes it lowercase.
+ * @param {String} str - the string to be manipulated
+ * @returns {string}
+ */
+export function slug(str) {
+    return str.replace(/\s/g, "_").toLowerCase();
 }
 
 /**
@@ -95,12 +103,12 @@ function randomInteger(min,max) {
  * @param {string} str - The text to be converted.
  * @return {string} The HTML-safe text.
  */
-function encodeHTML(str) {
-    return str.replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&apos;');
+export function encodeHTML(str) {
+    return str.replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
 }
 
 /**
@@ -127,7 +135,7 @@ if (typeof Blockly !== "undefined") {
                          -properties.y+y);
             y = y + randomInteger(5, maximal_increase);
         }
-    }
+    };
 }
 
 /**
@@ -143,6 +151,16 @@ function moveElements(source, target, moveCheck) {
             i--;
         }
     } 
+}
+
+
+export function firstDefinedValue() {
+    for (var i = 0; i < arguments.length; i++) {
+        if (arguments[i] != null) {
+            return arguments[i];
+        }
+    }
+    return undefined;
 }
 
 /**
@@ -197,7 +215,7 @@ function mixedRemapToPy(obj){
             if(!isSkBuiltin(subval)){
                 arr.push(mixedRemapToPy(subval));
             }else{
-                arr.push(subval)
+                arr.push(subval);
             }
         }
         return new Sk.builtin.list(arr);

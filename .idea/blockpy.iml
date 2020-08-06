@@ -5,8 +5,13 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.8 (blockpy)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Knockout" level="project" />
+    <orderEntry type="library" name="jquery" level="project" />
+    <orderEntry type="library" name="BlockMirror" level="project" />
+    <orderEntry type="library" name="Skulpt" level="project" />
   </component>
 </module>
