@@ -1,7 +1,7 @@
 {
   "name": "blockpy",
   "version": "1.0.0",
-  "description": "corgis-blockly ==============",
+  "description": "corgis-blockly",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -27,10 +27,7 @@
     "@babel/cli": "^7.5.0",
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
-    "@webpack-contrib/defaults": "^5.0.2",
-    "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-eslint": "^10.0.2",
-    "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "css-loader": "^3.0.0",
@@ -39,14 +36,15 @@
     "eslint-config-prettier": "^6.0.0",
     "eslint-loader": "^2.2.1",
     "eslint-plugin-import": "^2.18.0",
+    "eslint-webpack-plugin": "^2.1.0",
     "expose-loader": "^0.7.5",
     "file-loader": "^4.0.0",
+    "jquery": "latest",
+    "knockout": "^3.5.0",
     "mini-css-extract-plugin": "^0.8.0",
     "webpack": "^4.35.3",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
-    "yargs": "latest",
-    "jquery": "latest",
-    "knockout": "^3.5.0"
+    "yargs": "latest"
   }
 }
