@@ -3,6 +3,7 @@ import {DisplayModes} from "./python";
 
 const ASSIGNMENT_SETTINGS = [
     ["toolbox", "toolbox", "normal", "toolbox", "Which version of the toolbox to present to the user."],
+    ["passcode", "passcode", "", "string", "A string that the user must enter to access the problem. If blank, then no passcode is prompted."],
     //["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
     ["startView", "start_view", DisplayModes.SPLIT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
     ["datasets", "datasets", "", "string", "The current list of datasets available on load as a comma-separated string."],
@@ -14,7 +15,9 @@ const ASSIGNMENT_SETTINGS = [
     ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
     ["disableEdit", "can_edit", false, "bool", "If checked, then the students' file will not be editable at all."],
+    ["enableImages", "can_image", false, "bool", "If checked, then users can copy/paste images directly into the text editor."],
     ["enableBlocks", "can_blocks", true, "bool", "If checked, then the student cannot edit the block interface (although it is visible)."],
+    ["canClose", "can_close", false, "bool", "If checked, then the student should mark their submission closed when they are done. There is no way to force a student to do so. Unlike Reviewed, this still submits the correctness."],
     ["onlyInteractive", "only_interactive", false, "bool", "If checked, the editors are hidden, the program is automatically run, and then the console enters Eval mode (interactive)."],
     ["onlyUploads", "only_uploads", false, "bool", "If unchecked, then the students' file will not be directly editable (they will have to upload submissions)."],
     // What menus/feedback to show and hide
@@ -193,6 +196,17 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
         </div>
         
         <div class="form-group row">
+            <label for="blockpy-settings-passcode" class="col-sm-2 col-form-label text-right">Passcode:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-passcode"
+                data-bind="value: assignment.settings.passcode">
+                <small class="form-text text-muted">
+                    ${getDocumentation("passcode")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
             <label for="blockpy-settings-datasets" class="col-sm-2 col-form-label text-right">Preloaded Datasets:</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="blockpy-settings-datasets"
@@ -210,6 +224,7 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
                        data-bind="value: assignment.settings.toolbox">
                    <option value="normal">Normal Toolbox</option>
                    <option value="ct">CT@VT Toolbox</option>
+                   <option value="ct2">CT@VT Toolbox V2</option>
                    <option value="minimal">Minimal Set</option>
                    <option value="full">All Blocks</option>
                 </select>
@@ -261,7 +276,7 @@ export function makeAssignmentSettingsModel(configuration) {
     ASSIGNMENT_SETTINGS.forEach(setting => {
         let clientName = setting[0], serverName = setting[1], defaultValue = setting[2],
             fieldType = setting[3];
-        if (configuration[serverName] === undefined) {
+        if (configuration["assignment.settings."+serverName] === undefined) {
             settings[clientName] = ko.observable(defaultValue);
         } else {
             let configValue = configuration["assignment.settings."+serverName];
