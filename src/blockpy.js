@@ -1,6 +1,7 @@
 import "./css/blockpy.css";
 import "./css/bootstrap_retheme.css";
 import $ from "jquery";
+import {$builtinmodule} from "skulpt_modules/image";
 import {LocalStorageWrapper} from "storage.js";
 import {EditorsEnum} from "editors.js";
 import {DisplayModes} from "editor/python.js";
@@ -235,6 +236,14 @@ export class BlockPy {
                  *  within the window, but FULL SCREEN. Very aggressive.
                  */
                 fullscreen: ko.observable(false),
+                /**
+                 * User-supplied passcode to compare on the server against the current passcode.
+                 */
+                passcode: ko.observable(""),
+                /**
+                 * Whether or not to clear out inputs after a run/on_run cycle
+                 */
+                clearInputs: ko.observable(true)
             },
             status: {
                 // @type {ServerStatus}
@@ -275,6 +284,9 @@ export class BlockPy {
                 reports: {},
                 // list of Output objects
                 output: ko.observableArray([]),
+                // List of inputted strings
+                input: ko.observableArray([]),
+                inputIndex: ko.observable(0),
                 // Information related to a student run
                 student: {
                     // str: the filename that was last executed and is associated with these results
@@ -296,6 +308,7 @@ export class BlockPy {
                 },
                 instructor: {
                     globals: null,
+                    sysmodules: undefined
                 },
                 // Information related to feedback from the instructor run
                 feedback: {
@@ -425,6 +438,7 @@ export class BlockPy {
         this.model.display.changedInstructions(null);
         this.model.configuration.serverConnected(wasServerConnected);
         this.components.corgis.loadDatasets(true);
+        this.components.pythonEditor.bm.refresh();
 
         this.components.server.setStatus("saveFile", StatusState.READY);
     }
@@ -456,18 +470,26 @@ export class BlockPy {
                 clickFullscreen: () =>{
                     model.display.fullscreen(!model.display.fullscreen());
                 },
+                editInputs: () => {
+                    this.components.dialog.EDIT_INPUTS();
+                },
                 canMarkSubmitted: ko.pureComputed(() =>
-                    model.assignment.hidden() || model.assignment.reviewed()
+                    model.assignment.hidden() || model.assignment.reviewed() ||
+                    model.assignment.settings.canClose()
                 ),
                 textMarkSubmitted: ko.pureComputed(() => {
                     if (model.ui.menu.isCompleted()) {
-                        return "Assignment closed";
+                        return model.user.groupId() ? "Problem closed" : "Assignment closed";
                     } else if (model.ui.menu.isSubmitted()) {
                         return "Reopen for editing";
                     } else if (model.display.dirtySubmission()) {
                         return "Run";
                     } else {
-                        return "Submit early";
+                        if (!model.assignment.hidden() && model.submission.correct()) {
+                            return "Submit";
+                        } else {
+                            return "Submit early";
+                        }
                     }
                 }),
                 clickMarkSubmitted: () => {
@@ -482,7 +504,7 @@ export class BlockPy {
                     }
                 },
                 isSubmitted: ko.pureComputed(() =>
-                    model.assignment.reviewed() &&
+                    (model.assignment.reviewed() || model.assignment.settings.canClose()) &&
                     model.submission.submissionStatus().toLowerCase() === "submitted"
                 ),
                 isCompleted: ko.pureComputed(()=>
@@ -827,6 +849,7 @@ export class BlockPy {
 
     turnOnHacks() {
         //console.log("TODO");
+        Sk.builtinFiles.files["src/lib/image.js"] = $builtinmodule.toString();
     }
 
     /**
@@ -876,6 +899,11 @@ export class BlockPy {
 
     resetInterface() {
         this.components.engine.reset();
+    }
+
+    requestPasscode() {
+        let userSuppliedPasscode = prompt("Please enter the passcode.");
+        this.model.display.passcode(userSuppliedPasscode);
     }
 
 }

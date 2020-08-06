@@ -377,7 +377,7 @@ export class BlockPyFileSystem {
                 }
             }
         }
-        // TODO: Shouldn't we notify the UI that the file was deleted?
+        // submission.codeTODO: Shouldn't we notify the UI that the file was deleted?
     }
 
     newFile(filename, contents, modelFile) {

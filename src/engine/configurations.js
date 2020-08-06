@@ -9,6 +9,7 @@ export class Configuration {
         this.main = main;
         this.filename = null;
         this.code = null;
+        this.sysmodules = undefined;
     }
 
     use(engine) {
@@ -100,6 +101,13 @@ export class Configuration {
         // TODO
     }
 
+    clearInput() {
+        if (this.main.model.display.clearInputs()) {
+            this.main.model.execution.input([]);
+        }
+        this.main.model.execution.inputIndex(0);
+    }
+
     static inputMockFunction() {
         if (Sk.queuedInput.length) {
             return Sk.queuedInput.pop();
@@ -108,8 +116,9 @@ export class Configuration {
         }
     };
 
-    getImageProxy() {
+    getImageProxy(url) {
         // TODO
+        return url;
     }
 
     step() {

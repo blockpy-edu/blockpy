@@ -49,7 +49,7 @@ export let $sk_mod_instructor = function() {
         if (Sk.executionReports["student"].success) {
             let output = Sk.executionReports["student"]["output"]();
             output = output.map(function(item) { return item.toSkulpt(); });
-            return Sk.builtin.list(output);
+            return new Sk.builtin.list(output);
         } else {
             return new Sk.builtin.list([]);
         }
@@ -199,8 +199,8 @@ export let $sk_mod_instructor = function() {
     mod.StudentData = Sk.misceval.buildClass(mod, function($gbl, $loc) {
         $loc.__init__ = new Sk.builtin.func(function(self) {
             //self.data = Sk.builtin.dict();
-            let newDict = Sk.builtin.dict();
-            Sk.abstr.sattr(self, Sk.builtin.str("data"), newDict, true);
+            let newDict = new Sk.builtin.dict();
+            Sk.abstr.sattr(self, new Sk.builtin.str("data"), newDict, true);
             self.module = Sk.executionReports["student"].results;
             if (self.module !== undefined) {
                 self.module = self.module.$d;
@@ -213,6 +213,7 @@ export let $sk_mod_instructor = function() {
             } else {
                 self.module = {};
             }
+            return Sk.builtin.none.none$;
         });
         var call_f = function(kwa) {
             Sk.builtin.pyCheckArgsLen("call", arguments.length, 1, Infinity, true, true);
@@ -269,7 +270,7 @@ export let $sk_mod_instructor = function() {
                     }
                 }
             }
-            return Sk.builtin.list(result);
+            return new Sk.builtin.list(result);
         });
     
         $loc.get_values_by_type = new Sk.builtin.func(function(self, type, exclude_builtins) {
@@ -291,7 +292,7 @@ export let $sk_mod_instructor = function() {
                     }
                 }
             }
-            return Sk.builtin.list(result);
+            return new Sk.builtin.list(result);
         });
     }, "StudentData");
     mod.student = Sk.misceval.callsimOrSuspend(mod.StudentData);

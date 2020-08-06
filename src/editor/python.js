@@ -31,7 +31,7 @@ export const PYTHON_EDITOR_HTML = `
          role="toolbar" aria-label="Python Toolbar">
 
          <div class="btn-group mr-2" role="group" aria-label="Run Group">         
-            <button type="button" class="btn blockpy-run"
+            <button type="button" class="btn blockpy-run notransition"
                 data-bind="click: ui.execute.run,
                             css: {'blockpy-run-running': ui.execute.isRunning}">
                 <span class="fas fa-play"></span> Run
@@ -162,12 +162,14 @@ function convertIpynbToPython(code) {
 class PythonEditorView extends AbstractEditor {
     constructor(main, tag) {
         super(main, tag.find(".blockpy-python-blockmirror"));
+        Blockly.setParentContainer(main.model.configuration.container[0]);
         this.bm = new BlockMirror({
             "container": this.tag[0],
             "run": main.components.engine.run.bind(main.components.engine),
             "skipSkulpt": true,
             "blocklyMediaPath": main.model.configuration.blocklyPath,
-            "toolbox": main.model.assignment.settings.toolbox()
+            "toolbox": main.model.assignment.settings.toolbox(),
+            "imageMode": true,
             //'height': '2000px'
         });
         this.dirty = false;
@@ -309,10 +311,12 @@ class PythonEditorView extends AbstractEditor {
             this.bm.configuration.toolbox = toolbox;
             this.bm.blockEditor.remakeToolbox();
         });
+        this.main.model.assignment.settings.enableImages.subscribe(imageMode => {
+            this.bm.setImageMode(imageMode);
+        });
     }
 
     makePerAssignmentSubscriptions() {
-        console.log("TEST");
         this.main.model.assignment.settings.onlyUploads.subscribe((changed) => {
             console.log(changed);
             if (!changed) {

@@ -21,12 +21,18 @@ export class RunConfiguration extends StudentConfiguration {
 
         Sk.retainGlobals = false;
 
+        this.clearInput();
+
         return this;
     }
 
     success(module) {
         console.log("Run success");
-        this.main.components.server.logEvent("Run.Program", "", "", "", "answer.py");
+        let message = {
+            "inputs": this.main.model.execution.input().join("\n"),
+            "outputs": this.main.model.execution.output().join("\n"),
+        };
+        this.main.components.server.logEvent("Run.Program", "", "", JSON.stringify(message), "answer.py");
         this.main.model.display.dirtySubmission(false);
         this.main.components.console.finishTurtles();
         this.main.model.status.onExecution(StatusState.READY);
@@ -46,7 +52,8 @@ export class RunConfiguration extends StudentConfiguration {
                 "trace": this.engine.executionBuffer.trace,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
                 "results": module,
-                "output": this.main.model.execution.output
+                "output": this.main.model.execution.output,
+                "input": this.main.model.execution.input
             };
             resolve();
         });

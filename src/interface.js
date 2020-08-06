@@ -32,7 +32,7 @@ export function makeExtraInterfaceSubscriptions(self, model) {
                                         isFullscreen.toString(), "");
         if (isFullscreen) {
             // NOTE: navigationUI could allow us to force controls to show
-            model.configuration.container[0].requestFullscreen().catch(err => {
+            model.configuration.container.parent()[0].requestFullscreen().catch(err => {
                 let message = `Error attempting to enable full-screen mode: ${err.message} (${err.name})`;
                 self.components.server.logEvent("X-Display.Fullscreen.Error", "", "",
                                                 message,  "");
@@ -41,6 +41,7 @@ export function makeExtraInterfaceSubscriptions(self, model) {
                 self.components.server.logEvent("X-Display.Fullscreen.Success", "", "",
                                                 "", "");
                 model.display.fullscreen(true);
+                model.configuration.container.css("overflow-y", "auto");
             });
         } else {
             document.exitFullscreen().then(() => {
@@ -115,9 +116,13 @@ export function makeInterface(main) {
             </div>
             <button class="btn btn-outline-secondary btn-sm"
                 data-bind="click: ui.menu.clickFullscreen"
+                title="Full Screen"
             ><span class='fas',
                            data-bind="class: ui.menu.textFullscreen"
             ></span></button>
+            <button class="btn btn-outline-secondary btn-sm"
+                data-bind="click: ui.menu.editInputs" title="Edit Inputs"
+            ><span class='fas fa-list-alt'></span></button>
         </div>
          
     </div>

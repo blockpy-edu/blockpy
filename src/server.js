@@ -127,6 +127,17 @@ BlockPyServer.prototype.createSubscriptions = function () {
     this.createFileSubscription(model.ui.files.extraInstructorFiles, "#extra_instructor_files.blockpy");
 };
 
+BlockPyServer.prototype.createEventLogs = function() {
+    window.onblur = () => {
+        this.logEvent("Session.End", undefined, undefined, undefined);
+    };
+    window.onfocus = () => {
+        this.logEvent("Session.Start", undefined, undefined, undefined);
+    };
+
+    // TODO: Add in beacon?
+};
+
 /**
  *
  * Some subscriptions have to happen after other things have been loaded.
@@ -148,6 +159,7 @@ BlockPyServer.prototype.createServerData = function () {
     let assignment = this.main.model.assignment;
     let user = this.main.model.user;
     let submission = this.main.model.submission;
+    let display = this.main.model.display;
     let now = new Date();
     let microseconds = now.getTime();
     return {
@@ -158,7 +170,8 @@ BlockPyServer.prototype.createServerData = function () {
         "user_id": user.id(),
         "version": assignment.version(),
         "timestamp": microseconds,
-        "timezone": now.getTimezoneOffset()
+        "timezone": now.getTimezoneOffset(),
+        "passcode": display.passcode()
     };
 };
 
@@ -364,10 +377,11 @@ BlockPyServer.prototype.loadAssignment = function (assignment_id) {
                                    this.main.loadAssignmentData_(response);
                                } else {
                                    this.setStatus("loadAssignment", StatusState.FAILED, response.message);
+                                   this.main.components.dialog.ERROR_LOADING_ASSIGNMNENT(response.message);
                                }
                            },
                            (e, textStatus, errorThrown) => {
-                               this.main.components.dialog.ERROR_LOADING_ASSIGNMNENT();
+                               this.main.components.dialog.ERROR_LOADING_ASSIGNMNENT(textStatus);
                                console.error(e, textStatus, errorThrown);
                            });
     } else {

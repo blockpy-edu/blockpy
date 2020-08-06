@@ -13,46 +13,52 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
     if (!quick) {
         tifaAnalysis = "from pedal.tifa import tifa_analysis\ntifa_analysis(False)";
     }
+    let skip_tifa = quick ? "True": "False";
 
     // TODO: Add in Sk.queuedInput to be passed in
 
     return `
-from pedal.report import *
-from pedal.source import set_source
-set_source(${safeCode}, "answer.py")
-${tifaAnalysis}
-from pedal.sandbox.sandbox import Sandbox
-from pedal.sandbox import compatibility
-from utility import *
-student = MAIN_REPORT['sandbox']['run'] = Sandbox()
-#student.run(MAIN_REPORT['source']['code'], MAIN_REPORT['source']['filename'], report_exceptions=False)
-#debug(student)
-student.report_exceptions_mode = True
-if not get_model_info('assignment.settings.disableInstructorRun'):
-    compatibility.run_student(raise_exceptions=False)
-#log(student.data)
-#student = get_student_data()
-#error, position = get_student_error()
-#compatibility.raise_exception(error, position)
-run_student = compatibility.run_student
-reset_output = compatibility.reset_output
-queue_input = compatibility.queue_input
-get_output = compatibility.get_output
-get_plots = compatibility.get_plots
-compatibility.trace_lines = trace_lines
-from pedal import questions
-questions.show_question = set_instructions
-# TODO: Remove the need for this hack!
-def capture_output(func, *args):
-   reset_output()
-   student.call(func.__name__, *args)
-   return get_output()
-compatibility.capture_output = capture_output
+# Support our sysmodules hack by clearing out any lingering old data
+from pedal.core.report import MAIN_REPORT
+MAIN_REPORT.clear()
 
+from utility import *
+
+# Load in some commonly used tools
 from pedal.cait.cait_api import parse_program
+from pedal.sandbox.commands import *
+from pedal.core.commands import *
+
+from pedal.environments.blockpy import setup_pedal
+pedal = setup_pedal(skip_tifa=${skip_tifa},
+                    main_file='answer.py',
+                    main_code=${safeCode})
+
+# Execute students' code
+if not get_model_info('assignment.settings.disableInstructorRun'):
+    set_input(get_model_info('execution.input'))
+    student = run()
+else:
+    student = get_sandbox()
+
+# TODO: Refactor resolver to return instructions
+# Monkey-patch questions
+#from pedal import questions
+#questions.show_question = set_instructions
+
+# Run the actual instructor code
 ${instructorCode}
-from pedal.resolvers import simple
-SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()
+
+# Resolve everything
+from pedal.resolvers.simple import resolve
+final = resolve()
+SUCCESS = final.success
+SCORE = final.score
+CATEGORY = final.category
+LABEL = final.title
+MESSAGE = final.message
+DATA = final.data
+HIDE = final.hide_correctness
 `;
 };
 
@@ -80,6 +86,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
             //'complete': false // Actually, let's use undefined for now.
         };
 
+        console.log(instructorCode);
         this.code = instructorCode;
 
         Sk.retainGlobals = false;
@@ -92,6 +99,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         console.log("OnRun success");
         // TODO: Actually parse results
         this.main.model.execution.instructor.globals = Sk.globals;
+        this.main.model.execution.instructor.sysmodules = Sk.sysmodules;
         Sk.globals = {};
         let results = module.$d.on_run.$d;
         this.main.components.feedback.presentFeedback(results);
@@ -141,3 +149,55 @@ export class OnRunConfiguration extends InstructorConfiguration {
         //TODO: after(error);
     }
 }
+
+
+/*
+# The following is the old instructor code, leaving it here for now.
+
+from pedal.core.report import MAIN_REPORT
+# Support our sysmodules hack by clearing out any lingering old data
+MAIN_REPORT.clear()
+from pedal.core.commands import contextualize_report
+contextualize_report(${safeCode}, "answer.py")
+${tifaAnalysis}
+from pedal.sandbox.sandbox import Sandbox
+from pedal.sandbox import compatibility
+from utility import *
+student = MAIN_REPORT['sandbox']['run'] = Sandbox()
+student.report_exceptions_mode = True
+log(get_model_info('execution.input'))
+student.set_input(get_model_info('execution.input'))
+if not get_model_info('assignment.settings.disableInstructorRun'):
+    compatibility.run_student(raise_exceptions=False)
+#log(student.data)
+#student = get_student_data()
+#error, position = get_student_error()
+#compatibility.raise_exception(error, position)
+run_student = compatibility.run_student
+reset_output = compatibility.reset_output
+queue_input = compatibility.queue_input
+get_output = compatibility.get_output
+get_plots = compatibility.get_plots
+compatibility.trace_lines = trace_lines
+from pedal import questions
+questions.show_question = set_instructions
+# TODO: Remove the need for this hack!
+def capture_output(func, *args):
+   reset_output()
+   student.call(func.__name__, *args)
+   return get_output()
+compatibility.capture_output = capture_output
+
+from pedal.cait.cait_api import parse_program
+${instructorCode}
+from pedal.resolvers import simple
+final = simple.resolve()
+SUCCESS = final.success
+SCORE = final.score
+CATEGORY = final.category
+LABEL = final.title
+MESSAGE = final.message
+DATA = final.data
+HIDE = final.hide_correctness
+
+ */

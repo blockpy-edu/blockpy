@@ -197,9 +197,12 @@ class ConsoleLineInput extends ConsoleLine {
         let submittedPromise = new Promise((resolve) => {
             resolveOnClick = resolve;
         });
+        let inputIndex = this.main.model.execution.inputIndex();
         let submitForm = () => {
             let userInputtedValue = input.val();
             Sk.queuedInput.push(userInputtedValue);
+            this.main.model.execution.inputIndex(inputIndex+1);
+            this.main.model.execution.input().push(userInputtedValue);
             resolveOnClick(userInputtedValue);
             input.prop("disabled", true);
             button.prop("disabled", true);
@@ -212,6 +215,17 @@ class ConsoleLineInput extends ConsoleLine {
             }
         });
         input.focus();
+        if (inputIndex < this.main.model.execution.input().length) {
+            let userInputtedValue = this.main.model.execution.input()[inputIndex];
+            input.val(userInputtedValue);
+            this.main.model.execution.inputIndex(inputIndex+1);
+            return new Promise((resolve) => {
+                input.prop("disabled", true);
+                button.prop("disabled", true);
+                this.html.tooltip();
+                resolve(userInputtedValue);
+            });
+        }
         return submittedPromise;
     }
 }
@@ -258,6 +272,7 @@ export class BlockPyConsole {
         this.main.model.display.previousConsoleHeight(this.DEFAULT_HEIGHT);
 
         this.output = this.main.model.execution.output;
+        //this.input = this.main.model.execution.input;
         this.settings = {};
         this.clear();
 
@@ -392,6 +407,7 @@ export class BlockPyConsole {
     }
 
     printPILImage(imageData) {
+        console.log("TEST", imageData.image);
         this.imageBuffer = new ConsoleLineImage(this.main, imageData.image);
         this.imageBuffer.render(this.printerTag);
         return this.imageBuffer;

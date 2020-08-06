@@ -94,7 +94,10 @@ export class BlockPyEngine {
     }
 
     delayedRun() {
-        setTimeout(this.run.bind(this), 1);
+        //this.main.model.status.onExecution(StatusState.ACTIVE);
+        //$(".blockpy-run").addClass("blockpy-run-running");
+        this.run();
+        //setTimeout(this.run.bind(this), 1);
     }
 
     run() {
@@ -152,7 +155,8 @@ export class BlockPyEngine {
         this.main.model.status.onExecution(StatusState.ACTIVE);
         return Sk.misceval.asyncToPromise(() =>
             Sk.importMainWithBody(this.configuration.filename, false,
-                                  this.configuration.code, true)
+                                  this.configuration.code, true,
+                                  this.configuration.sysmodules)
         );
     }
 

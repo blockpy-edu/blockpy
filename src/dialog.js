@@ -17,7 +17,7 @@ export let DIALOG_HTML = `
                 <div class='modal-body' style='max-width:100%; max-height:400px'>
                 </div>
                 <div class='modal-footer'>
-                    <button type='button' class='btn btn-white model-close' data-dismiss='modal'>Close</button>
+                    <button type='button' class='btn btn-white modal-close' data-dismiss='modal'>Close</button>
                     <button type='button' class='btn btn-success modal-okay' data-dismiss='modal'>Okay</button>
                 </div>    
             </div>
@@ -44,11 +44,17 @@ export function BlockPyDialog(main, tag) {
     this.bodyTag = tag.find(".modal-body");
     this.footerTag = tag.find(".modal-footer");
     this.okayButton = tag.find(".modal-okay");
+    this.closeButton = tag.find(".modal-close");
 
     this.yes = () => {};
+    this.no = () => {};
     this.okayButton.click(() => {
         this.yes();
         this.tag.modal("hide");
+    });
+    this.closeButton.click(() => {
+        this.no();
+        //this.tag.modal("hide");
     });
 }
 
@@ -86,6 +92,7 @@ BlockPyDialog.prototype.confirm = function (title, body, yes, no, yesText) {
     }
     this.show(title, body, no);
     this.yes = yes;
+    this.no = no;
     this.okayButton.show().html(yesText);
     // TODO: add okay button and cancel button
 };
@@ -94,9 +101,9 @@ BlockPyDialog.prototype.ASSIGNMENT_VERSION_CHANGED = function () {
     this.confirm("Assignment Changed", "Your instructor has made changes to this assignment. Would you like to reload? All your work has been saved.",);
 };
 
-BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function () {
+BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function (reason) {
     this.show("Error Loading Assignment", `BlockPy encountered an error while loading the assignment.<br>
-Please reload the page and try again.`,);
+Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
 };
 
 BlockPyDialog.prototype.SCREENSHOT_BLOCKS = function () {
@@ -111,4 +118,30 @@ Please reload the page and try again.`);
 BlockPyDialog.prototype.ERROR_LOADING_HISTORY = function () {
     this.show("Error Loading History", `BlockPy encountered an error while loading your history.<br>
 Please reload the page and try again.`);
+};
+
+BlockPyDialog.prototype.EDIT_INPUTS = function () {
+    let inputText = this.main.model.execution.input().join("\n");
+    let clearInputs = this.main.model.display.clearInputs() ? "" : "checked";
+    let yes = () => {
+        let checked = this.tag.find(".blockpy-remember-inputs").prop("checked");
+        let inputs = this.tag.find(".blockpy-input-list").val().split("\n");
+        this.main.model.display.clearInputs(!checked);
+        this.main.model.execution.input(inputs);
+    };
+    this.confirm("Edit Remembered Inputs", `
+
+<div class="form-check">
+<input type="checkbox" class="blockpy-remember-inputs form-check-input"
+        name="blockpy-remember-inputs" ${clearInputs}>
+<label class="form-check-label" for="blockpy-remember-inputs">Reuse inputs for next execution</label>
+</div>
+
+<textarea class="blockpy-input-list form-control" rows="4">${inputText}</textarea><br>
+Edit the inputs above to store and reuse them across multiple executions.
+Each input should be put on its own line.
+You do not need quotes; the text will be entered literally.
+ 
+`, yes, this.no, "Save");
+    // TODO: Allow user to specify the infinite string to keep giving when the others run out
 };

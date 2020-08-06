@@ -59,7 +59,9 @@
     <script src="../../skulpt/dist/skulpt-stdlib.js" type="text/javascript"></script>
 
     <!-- Pedal -->
-    <script src="../../../pedal/dist/skulpt-pedal.js" type="text/javascript"></script>
+    <script src="../../../pedal-edu/pedal/dist-js/skulpt-pedal.js" type="text/javascript"></script>
+    <script src="../../../pedal-edu/curriculum-ctvt/dist-js/skulpt-curriculum-ctvt.js" type="text/javascript"></script>
+    <script src="../../../pedal-edu/curriculum-sneks/dist-js/skulpt-curriculum-sneks.js" type="text/javascript"></script>
 
     <!-- BlockMirror -->
     <link rel="stylesheet" href="../../BlockMirror/dist/block_mirror.css">
@@ -101,36 +103,24 @@ i.show()
             },
             "display.instructor": true,
             "assignment.on_run": `
-from pedal.questions import check_pool_exam
-
-#################################################################
-# A question that tests their knowledge of conditionals
-check_pool_exam("Question 1: If Statements", [
-#################################################################
-    # Version 1
-    {'instructions': "Define a function named \`add5\` that consumes a ",
-    'functions': [{'name': "add5", "arity": 1, "cases": [
-        {"arguments": [10], "returns": 5},
-    ]}]},
-    # Version 2
-    # Version 3
-#################################################################
-], get_model_info("assignment.name"))
-
-#set_seed(get_model_info("user.name")+get_model_info("assignment.name"))
-
-#from pedal.questions import show_question
-
-#show_question("test")
-#log(1+result)
+debug(student.output)
+log(student.output)
 `.trim(),
             "submission.code": `
-1+""
+a = 0
+print(a)
 `.trim()
         });
+/*
+from image import Image
+dog = Image("http://localhost:8000/images/swimming.gif")
+dog.flip().show()
+ */
         blockmirror = editor.components.editors.registered_[1].bm;
     });
 </script>
+
+
 
 </div>
 

@@ -148,6 +148,11 @@ export class BlockPyFeedback {
         this.feedbackModel.message(message);
         this.feedbackModel.category(category);
         this.feedbackModel.label(label);
+        //let highlightTimeout = setTimeout(() => {
+        this.message.find("pre code").map( (i, block) => {
+            window.hljs.highlightBlock(block);
+        });
+        //}, 400);
         // TODO: Instead of tracking student file, let's track the instructor file
         this.main.components.server.logEvent("Intervention", category, label, message, "answer.py");
 
