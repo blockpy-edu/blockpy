@@ -132,13 +132,17 @@
     cursor: pointer;
 }
 
+.blockpy-console-image-output img {
+    max-height: 100px;
+}
+
 .blockpy-console-input input {
     width: 75%;
 }
 
 .blockpy-btn-eval {
     position: absolute;
-    bottom: 10px;
+    bottom: 20px;
     left: 20px;
 }
 
@@ -488,4 +492,31 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 
 .blockpy-content .badge.server-status-offline {
     background-color: #333;
+}
+
+.notransition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+}
+
+.blockpy-content .blockpy-feedback-message p {
+    margin-bottom: 0;
+}
+
+.blockpy-content .blockpy-feedback-message p+p {
+    margin-top: .5rem;
+}
+
+.blockpy-content .blockpy-feedback-message pre {
+    margin: 0;
+}
+
+.blockpy-content .blockpy-feedback-message pre+p {
+    margin-top: .5rem;
+}
+
+.blockpy-content .blockpy-feedback-message code {
+    padding: 0;
 }
