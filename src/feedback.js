@@ -101,12 +101,20 @@ export class BlockPyFeedback {
     };
 
     static findFirstErrorLine(feedbackData) {
-        for (let i = feedbackData.length-1; i >= 0; i-= 1) {
+        let location = feedbackData.quick$lookup(new Sk.builtin.str("location"));
+        if (location) {
+            let line = location.tp$getattr(new Sk.builtin.str("line"));
+            if (line) {
+                return Sk.ffi.remapToJs(line);
+            }
+        }
+        return null;
+        /*for (let i = feedbackData.length-1; i >= 0; i-= 1) {
             if ("position" in feedbackData[i]) {
                 return feedbackData[i].position.line;
             }
         }
-        return null;
+        return null;*/
     };
 
     updateRegularFeedback() {
@@ -123,7 +131,7 @@ export class BlockPyFeedback {
         let category = Sk.ffi.remapToJs(executionResults.CATEGORY);
         let label = Sk.ffi.remapToJs(executionResults.LABEL);
         let hide = Sk.ffi.remapToJs(executionResults.HIDE);
-        let data = Sk.ffi.remapToJs(executionResults.DATA);
+        let data = executionResults.DATA;
 
         // Override based on assignments' settings
         let hideScore = this.main.model.assignment.hidden();
@@ -160,6 +168,7 @@ export class BlockPyFeedback {
         this.main.components.pythonEditor.bm.clearHighlightedLines();
 
         // Find the first error on a line and report that
+        console.log(data);
         let line = BlockPyFeedback.findFirstErrorLine(data);
         this.feedbackModel.linesError.removeAll();
         if (line !== null && line !== undefined) {
