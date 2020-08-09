@@ -86,6 +86,18 @@ export function slug(str) {
 }
 
 /**
+ * Capitalize the first letter of a string.
+ * @param {String} s - The string to be capitalized.
+ * @returns {string}
+ */
+export function capitalize(s) {
+    if (typeof s !== "string") {
+        return "";
+    }
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
  * Return a random integer between [`min`, `max`].
  * 
  * @param {number} min - The lowest possible integer.

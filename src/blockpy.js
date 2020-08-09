@@ -26,6 +26,7 @@ import {BlockPyDialog} from "./dialog";
 import {loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";
 import {BlockPyCorgis, _IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS} from "./corgis";
 import {BlockPyHistory} from "./history";
+import {capitalize} from "./utilities";
 
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
 
@@ -732,7 +733,7 @@ export class BlockPy {
                     self.components.editors.getEditor(model.display.filename())
                 ),
                 view: ko.pureComputed(() =>
-                    model.assignment.settings.hideEditors() ? "None" :
+                    (!model.display.instructor() && model.assignment.settings.hideEditors()) ? "None" :
                     model.display.filename() ? model.ui.editors.current() : "None"
                 ),
                 reset: function() {
@@ -825,16 +826,16 @@ export class BlockPy {
                     model.configuration.urls !== undefined &&
                     model.configuration.urls[endpoint] !== undefined,
                 messages: ko.pureComputed(() =>
-                    model.status.loadAssignmentMessage() ||
-                    model.status.saveAssignmentMessage() ||
-                    model.status.loadHistoryMessage() ||
-                    model.status.loadFileMessage() ||
-                    model.status.saveFileMessage() ||
-                    model.status.loadDatasetMessage() ||
-                    model.status.logEventMessage() ||
-                    model.status.saveImage() ||
-                    model.status.updateSubmissionMessage() ||
-                    model.status.updateSubmissionStatusMessage() || ""
+                    capitalize(model.status.loadAssignmentMessage() ||
+                        model.status.saveAssignmentMessage() ||
+                        model.status.loadHistoryMessage() ||
+                        model.status.loadFileMessage() ||
+                        model.status.saveFileMessage() ||
+                        model.status.loadDatasetMessage() ||
+                        model.status.logEventMessage() ||
+                        model.status.saveImage() ||
+                        model.status.updateSubmissionMessage() ||
+                        model.status.updateSubmissionStatusMessage() || "")
                 ),
                 force: {
                     updateSubmission: (data, event) => {
