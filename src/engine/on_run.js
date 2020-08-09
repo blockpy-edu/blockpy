@@ -29,17 +29,17 @@ from pedal.cait.cait_api import parse_program
 from pedal.sandbox.commands import *
 from pedal.core.commands import *
 
-from pedal.environments.blockpy import setup_pedal
-pedal = setup_pedal(skip_tifa=${skip_tifa},
-                    main_file='answer.py',
-                    main_code=${safeCode})
-
-# Execute students' code
-if not get_model_info('assignment.settings.disableInstructorRun'):
+from pedal.environments.blockpy import setup_environment
+# Do we execute student's code?
+skip_run = get_model_info('assignment.settings.disableInstructorRun')
+if not skip_run:
     set_input(get_model_info('execution.input'))
-    student = run()
-else:
-    student = get_sandbox()
+# Initialize the BlockPy environment
+pedal = setup_environment(skip_tifa=${skip_tifa},
+                          skip_run=skip_run,
+                          main_file='answer.py',
+                          main_code=${safeCode})
+student = pedal.fields['student']
 
 # TODO: Refactor resolver to return instructions
 # Monkey-patch questions
