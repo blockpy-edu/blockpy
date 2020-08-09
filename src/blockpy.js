@@ -509,6 +509,9 @@ export class BlockPy {
                 ),
                 isCompleted: ko.pureComputed(()=>
                     model.submission.submissionStatus().toLowerCase() === "completed"
+                ),
+                showQueuedInputs: ko.pureComputed(() =>
+                    !model.assignment.settings.hideQueuedInputs()
                 )
             },
             secondRow: {

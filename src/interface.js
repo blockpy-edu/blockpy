@@ -121,7 +121,7 @@ export function makeInterface(main) {
                            data-bind="class: ui.menu.textFullscreen"
             ></span></button>
             <button class="btn btn-outline-secondary btn-sm"
-                data-bind="click: ui.menu.editInputs" title="Edit Inputs"
+                data-bind="click: ui.menu.editInputs, visible: ui.menu.showQueuedInputs" title="Edit Inputs"
             ><span class='fas fa-list-alt'></span></button>
         </div>
          
