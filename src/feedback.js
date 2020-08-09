@@ -101,11 +101,13 @@ export class BlockPyFeedback {
     };
 
     static findFirstErrorLine(feedbackData) {
-        let location = feedbackData.quick$lookup(new Sk.builtin.str("location"));
-        if (location) {
-            let line = location.tp$getattr(new Sk.builtin.str("line"));
-            if (line) {
-                return Sk.ffi.remapToJs(line);
+        if (feedbackData.quick$lookup) {
+            let location = feedbackData.quick$lookup(new Sk.builtin.str("location"));
+            if (location) {
+                let line = location.tp$getattr(new Sk.builtin.str("line"));
+                if (line) {
+                    return Sk.ffi.remapToJs(line);
+                }
             }
         }
         return null;
