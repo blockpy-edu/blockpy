@@ -317,14 +317,19 @@ class PythonEditorView extends AbstractEditor {
     }
 
     makePerAssignmentSubscriptions() {
-        this.main.model.assignment.settings.onlyUploads.subscribe((changed) => {
-            console.log(changed);
-            if (!changed) {
-                this.setReadOnly(this.main.model.display.historyMode());
-            } else {
-                this.setReadOnly(changed);
-            }
+        this.main.model.display.instructor.subscribe((changed) => {
+            this.setReadOnly(this.decideIfNotEditable());
         });
+        this.main.model.assignment.settings.onlyUploads.subscribe((changed) => {
+            this.setReadOnly(this.decideIfNotEditable());
+        });
+    }
+
+    decideIfNotEditable() {
+        let model = this.main.model;
+        return model.display.historyMode() || (
+            model.assignment.settings.onlyUploads() && !model.display.instructor()
+        );
     }
 
     setReadOnly(isReadOnly) {
