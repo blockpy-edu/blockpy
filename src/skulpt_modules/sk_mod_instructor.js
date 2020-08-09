@@ -27,7 +27,7 @@ export let $sk_mod_instructor = function() {
     /**
      * Logs feedback to javascript console
      */
-    mod.log = new Sk.builtin.func(function(message) {
+    mod.log_console = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
         console.log(Sk.ffi.remapToJs(message));
     });
@@ -35,7 +35,7 @@ export let $sk_mod_instructor = function() {
     /**
      * Logs debug to javascript console
      */
-    mod.debug = new Sk.builtin.func(function(message) {
+    mod.debug_console = new Sk.builtin.func(function(message) {
         Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
         console.log(message);
     });
