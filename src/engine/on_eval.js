@@ -11,37 +11,42 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
     let indentedCode = indent(indent(isSafe ? studentCode : "None"));
 
     return `
-from pedal.report import *
-from pedal.source import set_source
-set_source(${safeCode})
-def run_student():
-    # limit_execution_time()
-    try:
-${indentedCode}
-    except Exception as error:
-        # unlimit_execution_time()
-        return error
-    # unlimit_execution_time()
-    return None
-from pedal.sandbox import compatibility
 from utility import *
-student = get_student_data()
-compatibility.set_sandbox(student)
-error, position = get_student_error()
-compatibility.raise_exception(error, position)
-compatibility.run_student = run_student
-compatibility.get_plots = get_plots
-compatibility.get_output = get_output
-compatibility.reset_output = reset_output
-compatibility.trace_lines = trace_lines
-def capture_output(func, *args):
-   reset_output()
-   func(*args)
-   return get_output()
-compatibility.capture_output = capture_output
+
+# Load in some commonly used tools
+from pedal.cait.cait_api import parse_program
+from pedal.sandbox.commands import *
+from pedal.core.commands import *
+
+# Backup the feedback
+on_run_feedback = []
+for feedback in MAIN_REPORT.feedback:
+    on_run_feedback.append(feedback)
+MAIN_REPORT.feedback.clear()
+
+from pedal.environments.blockpy import setup_environment
+# TODO: What about new inputs since we last ran/evaled?
+MAIN_REPORT.submission.files['evaluation'] = ${safeCode}
+evaluate(${safeCode})
+
+# TODO: Refactor resolver to return instructions
+# Monkey-patch questions
+#from pedal import questions
+#questions.show_question = set_instructions
+
+# Run the actual instructor code
 ${instructorCode}
-from pedal.resolvers import simple
-SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE = simple.resolve()
+
+# Resolve everything
+from pedal.resolvers.simple import resolve
+final = resolve()
+SUCCESS = final.success
+SCORE = final.score
+CATEGORY = final.category
+LABEL = final.title
+MESSAGE = final.message
+DATA = final.data
+HIDE = final.hide_correctness
 `;
 };
 
@@ -69,6 +74,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
             //'complete': false // Actually, let's use undefined for now.
         };
         this.code = instructorCode;
+        console.log(this.code);
 
         super.use(engine);
 
@@ -82,6 +88,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         console.log("OnEval success");
         // TODO: Actually parse results
         this.main.model.execution.instructor.globals = Sk.globals;
+        console.log(module);
         let results = module.$d.on_eval.$d;
         console.log(module.$d);
         this.main.components.feedback.presentFeedback(results);

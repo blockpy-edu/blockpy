@@ -24,8 +24,12 @@ export class InstructorConfiguration extends Configuration {
         Sk.builtinFiles.files["./_instructor/__init__.js"] = EMPTY_MODULE;
         // Reuse any existing sysmodules that we previously found;
         this.sysmodules = this.main.model.execution.instructor.sysmodules;
+        // Remove any existing __main__ modules
+        let $main = new Sk.builtin.str("__main__");
         if (this.sysmodules !== undefined) {
-            this.sysmodules.del$item(new Sk.builtin.str("__main__"));
+            if (this.sysmodules.quick$lookup($main)) {
+                this.sysmodules.del$item($main);
+            }
         }
         return this;
     }

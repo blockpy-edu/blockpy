@@ -55,7 +55,7 @@ export class EvalConfiguration extends StudentConfiguration {
             report["student"] = {
                 "success": false,
                 "error": error,
-                "evaluation": false
+                "evaluation": this.code
             };
             console.error(error);
             resolve();
