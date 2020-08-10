@@ -27,17 +27,15 @@ export let $sk_mod_instructor = function() {
     /**
      * Logs feedback to javascript console
      */
-    mod.log_console = new Sk.builtin.func(function(message) {
-        Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
-        console.log(Sk.ffi.remapToJs(message));
+    mod.console_log = new Sk.builtin.func(function() {
+        console.log(([...arguments]).map(Sk.ffi.remapToJs));
     });
     
     /**
      * Logs debug to javascript console
      */
-    mod.debug_console = new Sk.builtin.func(function(message) {
-        Sk.builtin.pyCheckArgs("log", arguments, 1, 1);
-        console.log(message);
+    mod.console_debug = new Sk.builtin.func(function() {
+        console.log(arguments);
     });
 
     /**
@@ -67,7 +65,7 @@ export let $sk_mod_instructor = function() {
         return Sk.builtin.none.none$;
     });
     
-    mod.queue_input = new Sk.builtin.func(function() {
+    /*mod.queue_input = new Sk.builtin.func(function() {
         Sk.builtin.pyCheckArgs("queue_input", arguments, 1, Infinity);
         let args = arguments;
         for (let i = args.length-1; i >= 0; i--) {
@@ -75,7 +73,7 @@ export let $sk_mod_instructor = function() {
             Sk.builtin.pyCheckType("input", "string", Sk.builtin.checkString(input));
             Sk.queuedInput.push(Sk.ffi.remapToJs(input));
         }
-    });
+    });*/
     
     /**
      * This function is called by instructors to get the students' code as a string.

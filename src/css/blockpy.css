@@ -520,3 +520,13 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 .blockpy-content .blockpy-feedback-message code {
     padding: 0;
 }
+
+.blockpy-content .blockpy-feedback-positive {
+    right: 10px;
+    position: absolute;
+    bottom: 0;
+}
+
+.blockpy-content .blockpy-feedback-positive .blockpy-feedback-positive-icon {
+    font-size: 16px;
+}

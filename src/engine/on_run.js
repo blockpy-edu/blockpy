@@ -32,11 +32,12 @@ from pedal.core.commands import *
 from pedal.environments.blockpy import setup_environment
 # Do we execute student's code?
 skip_run = get_model_info('assignment.settings.disableInstructorRun')
-if not skip_run:
-    set_input(get_model_info('execution.input'))
+inputs = None if skip_run else get_model_info('execution.input')
+
 # Initialize the BlockPy environment
 pedal = setup_environment(skip_tifa=${skip_tifa},
                           skip_run=skip_run,
+                          inputs=inputs,
                           main_file='answer.py',
                           main_code=${safeCode})
 student = pedal.fields['student']
@@ -59,6 +60,25 @@ LABEL = final.title
 MESSAGE = final.message
 DATA = final.data
 HIDE = final.hide_correctness
+
+# Handle questions
+if final.instructions:
+    set_instructions(final.instructions[-1].message)
+    
+POSITIVE = []
+for positive in final.positives:
+    POSITIVE.append({
+        "title": positive.title,
+        "label": positive.label,
+        "message": positive.message
+    })
+    
+for system in final.systems:
+    if system.label == 'log':
+        console_log(system.title, system.message);
+    if system.label == 'debug':
+        console_debug(system.title, system.message);
+
 `;
 };
 
@@ -86,7 +106,6 @@ export class OnRunConfiguration extends InstructorConfiguration {
             //'complete': false // Actually, let's use undefined for now.
         };
 
-        console.log(instructorCode);
         this.code = instructorCode;
 
         Sk.retainGlobals = false;
@@ -96,7 +115,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
 
     success(module) {
         // TODO Logging!!!!
-        console.log("OnRun success");
+        //console.log("OnRun success");
         // TODO: Actually parse results
         this.main.model.execution.instructor.globals = Sk.globals;
         this.main.model.execution.instructor.sysmodules = Sk.sysmodules;

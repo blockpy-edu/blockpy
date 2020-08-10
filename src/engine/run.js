@@ -72,6 +72,8 @@ export class RunConfiguration extends StudentConfiguration {
             report["student"] = {
                 "success": false,
                 "error": error,
+                "lines": this.engine.executionBuffer.trace.map(x => x.line),
+                "input": this.main.model.execution.input
             };
             console.error(error);
             resolve();

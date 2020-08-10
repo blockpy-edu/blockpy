@@ -16,6 +16,12 @@ export let FEEDBACK_HTML = `
         <span class='fas fa-eye'></span>
         <span data-bind="text: ui.secondRow.switchLabel"></span>
     </button>
+    
+    <!-- Positive Feedback Region -->
+    <div class="blockpy-feedback-positive float-right">
+        
+    
+    </div>
 
     <!-- Actual Feedback Region -->    
     <div>
@@ -56,6 +62,7 @@ export class BlockPyFeedback {
         this.category = this.tag.find(".blockpy-feedback-category");
         this.label = this.tag.find(".blockpy-feedback-label");
         this.message = this.tag.find(".blockpy-feedback-message");
+        this.positive = this.tag.find(".blockpy-feedback-positive");
 
         // TODO: If they change the student extra files, also update the dirty flag
         this.main.model.submission.code.subscribe(() => this.main.model.display.dirtySubmission(true));
@@ -134,6 +141,7 @@ export class BlockPyFeedback {
         let label = Sk.ffi.remapToJs(executionResults.LABEL);
         let hide = Sk.ffi.remapToJs(executionResults.HIDE);
         let data = executionResults.DATA;
+        let positives = Sk.ffi.remapToJs(executionResults.POSITIVE);
 
         // Override based on assignments' settings
         let hideScore = this.main.model.assignment.hidden();
@@ -170,7 +178,6 @@ export class BlockPyFeedback {
         this.main.components.pythonEditor.bm.clearHighlightedLines();
 
         // Find the first error on a line and report that
-        console.log(data);
         let line = BlockPyFeedback.findFirstErrorLine(data);
         this.feedbackModel.linesError.removeAll();
         if (line !== null && line !== undefined) {
@@ -189,6 +196,17 @@ export class BlockPyFeedback {
             });
             this.feedbackModel.linesUncovered(uncoveredLines);
         }
+
+        this.positive.empty();
+        for (let i=0; i<positives.length; i+=1) {
+            let positiveData = positives[i];
+            let positive = $("<span></span>");
+            positive.addClass("blockpy-feedback-positive-icon fas fa-star");
+            positive.css("color", "green");
+            positive.attr("title", positiveData.message);
+            this.positive.append(positive);
+            positive.tooltip({"trigger": "hover"});
+        }
     }
 
     /**
@@ -204,7 +222,6 @@ export class BlockPyFeedback {
     };
 
     notifyFeedbackUpdate() {
-        console.log(this.isFeedbackVisible());
         if (!this.isFeedbackVisible()) {
             this.tag.find(".blockpy-floating-feedback").show().fadeOut(7000);
             this.scrollIntoView();

@@ -47,6 +47,10 @@ LABEL = final.title
 MESSAGE = final.message
 DATA = final.data
 HIDE = final.hide_correctness
+
+# Handle questions
+if final.instructions:
+    set_instructions(final.instructions[-1].message)
 `;
 };
 
