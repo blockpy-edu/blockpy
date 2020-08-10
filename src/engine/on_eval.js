@@ -51,6 +51,23 @@ HIDE = final.hide_correctness
 # Handle questions
 if final.instructions:
     set_instructions(final.instructions[-1].message)
+    
+# Handle positive feedback
+POSITIVE = []
+for positive in final.positives:
+    POSITIVE.append({
+        "title": positive.title,
+        "label": positive.label,
+        "message": positive.message
+    })
+    
+# Handle system messages
+for system in final.systems:
+    if system.label == 'log':
+        console_log(system.title, system.message);
+    if system.label == 'debug':
+        console_debug(system.title, system.message);
+
 `;
 };
 

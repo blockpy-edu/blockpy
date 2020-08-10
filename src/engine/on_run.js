@@ -65,6 +65,7 @@ HIDE = final.hide_correctness
 if final.instructions:
     set_instructions(final.instructions[-1].message)
     
+# Handle positive feedback
 POSITIVE = []
 for positive in final.positives:
     POSITIVE.append({
@@ -73,6 +74,7 @@ for positive in final.positives:
         "message": positive.message
     })
     
+# Handle system messages
 for system in final.systems:
     if system.label == 'log':
         console_log(system.title, system.message);
