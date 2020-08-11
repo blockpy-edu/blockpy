@@ -3,10 +3,10 @@ import {Configuration, EMPTY_MODULE} from "./configurations";
 export class StudentConfiguration extends Configuration {
     use(engine) {
         super.use(engine);
-        // Limit execution to 5 seconds
+        // Limit execution to 4 seconds
         let settings = this.main.model.settings;
         Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 3000;
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 4000;
         Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = this.step.bind(this);

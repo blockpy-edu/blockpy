@@ -83,7 +83,10 @@ class ConsoleLineTurtle extends ConsoleLine {
     render(where) {
         if (this.visible) {
             where.prepend(this.html);
-            this.html[0].scrollIntoView({ behavior: "smooth" });
+            //this.html[0].scrollIntoView({ behavior: "smooth" });
+            var top = this.html.position().top;
+            //$('html').scrollTop(top);
+            $('html').scrollTop(0);
             //this.html.tooltip();
         }
     }

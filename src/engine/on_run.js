@@ -99,7 +99,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
-        lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
+        lineOffset = 0; //instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
         report["instructor"] = {
             "compliments": [],
             "filename": "./_instructor/on_run.py",

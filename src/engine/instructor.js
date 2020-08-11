@@ -8,8 +8,10 @@ const COVERAGE_MODULE_CODE = $sk_mod_coverage;
 export class InstructorConfiguration extends Configuration {
     use(engine) {
         super.use(engine);
-        // Instructors have no limits
-        Sk.execLimit = undefined;
+        // Instructors get 4 seconds
+        Sk.execLimitFunction = () =>
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 4000;
+        Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = null; // 10 *1000
         // Mute everything

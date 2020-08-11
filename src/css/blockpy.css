@@ -196,7 +196,7 @@
 .blockpy-feedback {
     padding: 10px;
     overflow-y: auto;
-    max-height: 230px;
+    /*max-height: 230px;*/
 }
 
 .blockpy-feedback-traces table {
