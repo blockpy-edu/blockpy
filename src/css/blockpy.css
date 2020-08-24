@@ -536,3 +536,10 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     padding: 10px;
     border: 1px solid lightgray;
 }
+
+.blockpy-quick-menu .blockpy-student-error {
+    font-size: 16px;
+    cursor: pointer;
+    color: pink;
+    display: none;
+}

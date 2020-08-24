@@ -206,6 +206,7 @@ export class BlockPyFeedback {
 
     clearPositiveFeedback() {
         this.positive.empty();
+        this.main.model.configuration.container.find(".blockpy-student-error").hide();
     }
 
     addPositiveFeedback(text, icon, color, onclick, toEnd) {
@@ -248,36 +249,9 @@ export class BlockPyFeedback {
             just_return = false;
         }
         let message, label, category, lineno;
-        if (error.tp$name === "SyntaxError") {
-            category = "syntax";
-            let lineno = Sk.ffi.remapToJs(error.lineno);
-            let label = Sk.ffi.remapToJs(error.msg);
-            let source, message = "";
-            try {
-                source = error.args.v[3][2];
-                if (source === undefined) {
-                    source = "";
-                } else {
-                    source = `<pre>${source}</pre>`;
-                }
-            } catch (e) {
-                source = "";
-            }
-            if (label === "bad input") {
-                label = "Bad Input";
-                message = `Bad input on line ${lineno}.<br>${source}`;
-            } else if (label === "EOF in multi-line statement") {
-                label = "EOF in multi-line statement";
-                message = `Unexpected end-of-file in multi-line statement on line ${lineno}.<br>${source}`;
-            } else {
-                label = "Syntax Error";
-                message = label + "<br>" + source;
-            }
-        } else {
-            label = error.tp$name;
-            category = "runtime";
-            message = this.convertSkulptError(error);
-        }
+        label = error.tp$name;
+        category = "runtime";
+        message = this.convertSkulptError(error);
 
         if (just_return) {
             return message;

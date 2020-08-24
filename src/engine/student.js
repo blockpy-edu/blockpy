@@ -172,8 +172,12 @@ export class StudentConfiguration extends Configuration {
         let report = this.main.model.execution.reports;
         let feedback = this.main.components.feedback;
         if (!report["student"].success) {
+            let errorButton = this.main.model.configuration.container.find(".blockpy-student-error");
             let message = feedback.presentRunError(report.student.error, true);
-            feedback.addPositiveFeedback("Click to see Original Error", "bug", "pink", () => this.main.components.dialog.ERROR_SHOW_STUDENT_ERROR(message), true);
+            errorButton.attr("title", "Click to see Original Error");
+            errorButton.tooltip({"trigger": "hover"});
+            errorButton.click(() => this.main.components.dialog.ERROR_SHOW_STUDENT_ERROR(message));
+            errorButton.show();
         }
     }
 }
