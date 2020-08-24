@@ -106,6 +106,14 @@ BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function (reason) {
 Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
 };
 
+BlockPyDialog.prototype.ERROR_SHOW_STUDENT_ERROR = function (error) {
+    this.show("Original Error", `When I ran your code, I encountered an error:\n\n<div class="blockpy-dialog-student-error-message">${error}</div>`);
+};
+
+BlockPyDialog.prototype.POSITIVE_FEEDBACK_FULL = function (title, message) {
+    this.show(title, message);
+};
+
 BlockPyDialog.prototype.SCREENSHOT_BLOCKS = function () {
     // TODO
 };

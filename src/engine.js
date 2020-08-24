@@ -107,7 +107,10 @@ export class BlockPyEngine {
             this.configuration.failure.bind(this.configuration)
         );
         if (!this.main.model.assignment.settings.disableFeedback()) {
-            execution.then(this.onRun.bind(this));
+            execution.then(() => {
+                this.configuration.provideSecretError();
+                return this.onRun();
+            });
         } else {
             execution.then(this.configuration.showErrors.bind(this.configuration));
         }

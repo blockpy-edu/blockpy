@@ -6,7 +6,7 @@ export class StudentConfiguration extends Configuration {
         // Limit execution to 4 seconds
         let settings = this.main.model.settings;
         Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 4000;
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 5000;
         Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = this.step.bind(this);
@@ -165,6 +165,15 @@ export class StudentConfiguration extends Configuration {
         let report = this.main.model.execution.reports;
         if (!report["student"].success) {
             this.main.components.feedback.presentRunError(report.student.error);
+        }
+    }
+
+    provideSecretError() {
+        let report = this.main.model.execution.reports;
+        let feedback = this.main.components.feedback;
+        if (!report["student"].success) {
+            let message = feedback.presentRunError(report.student.error, true);
+            feedback.addPositiveFeedback("Click to see Original Error", "bug", "pink", () => this.main.components.dialog.ERROR_SHOW_STUDENT_ERROR(message), true);
         }
     }
 }

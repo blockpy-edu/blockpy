@@ -105,6 +105,7 @@ export class BlockPyFeedback {
         this.feedbackModel.hidden(false);
         this.feedbackModel.linesError.removeAll();
         this.feedbackModel.linesUncovered.removeAll();
+        this.clearPositiveFeedback();
     };
 
     static findFirstErrorLine(feedbackData) {
@@ -197,15 +198,29 @@ export class BlockPyFeedback {
             this.feedbackModel.linesUncovered(uncoveredLines);
         }
 
-        this.positive.empty();
         for (let i=0; i<positives.length; i+=1) {
             let positiveData = positives[i];
-            let positive = $("<span></span>");
-            positive.addClass("blockpy-feedback-positive-icon fas fa-star");
-            positive.css("color", "green");
-            positive.attr("title", positiveData.message);
+            this.addPositiveFeedback(positiveData.message, "star", "green", () => this.main.components.dialog.POSITIVE_FEEDBACK_FULL(positiveData.title, positiveData.message));
+        }
+    }
+
+    clearPositiveFeedback() {
+        this.positive.empty();
+    }
+
+    addPositiveFeedback(text, icon, color, onclick, toEnd) {
+        let positive = $("<span></span>");
+        positive.addClass("blockpy-feedback-positive-icon fas fa-"+icon);
+        positive.css("color", color);
+        positive.attr("title", text);
+        if (toEnd) {
             this.positive.append(positive);
-            positive.tooltip({"trigger": "hover"});
+        } else {
+            this.positive.prepend(positive);
+        }
+        positive.tooltip({"trigger": "hover"});
+        if (onclick !== undefined) {
+            positive.click(onclick);
         }
     }
 
@@ -228,7 +243,10 @@ export class BlockPyFeedback {
         }
     };
 
-    presentRunError(error) {
+    presentRunError(error, just_return) {
+        if (just_return === undefined) {
+            just_return = false;
+        }
         let message, label, category, lineno;
         if (error.tp$name === "SyntaxError") {
             category = "syntax";
@@ -259,6 +277,10 @@ export class BlockPyFeedback {
             label = error.tp$name;
             category = "runtime";
             message = this.convertSkulptError(error);
+        }
+
+        if (just_return) {
+            return message;
         }
         this.feedbackModel.message(message);
         this.feedbackModel.category(category);
