@@ -103,17 +103,14 @@ i.show()
             },
             "display.instructor": true,
             "assignment.on_run": `
-debug(student.output)
-log(student.output)
-compliment("Correct output!")
+from pedal import *
+assert_output(student, 'dog')
+#debug(student.output)
+#log(student.output)
+#compliment("Correct output!")
 `.trim(),
             "submission.code": `
-import turtle
-
-for i in range(20):
-    turtle.forward(10)
-    turtle.right(20)
-turtle.mainloop()
+print('cat')
 `.trim()
         });
 /*
