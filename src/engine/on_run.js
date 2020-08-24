@@ -129,7 +129,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.main.model.submission.correct(success || this.main.model.submission.correct());
         // Cannot exceed 1 point, cannot go below 0 points
         let score = Sk.ffi.remapToJs(results.SCORE);
-        score = Math.max(0, Math.min(100, score));
+        score = Math.max(0, Math.min(1, score));
         let oldScore = this.main.model.submission.score();
         score = Math.max(oldScore, score);
         this.main.model.submission.score(score);
