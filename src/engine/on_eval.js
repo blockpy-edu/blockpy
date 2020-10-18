@@ -25,6 +25,8 @@ for feedback in MAIN_REPORT.feedback:
 MAIN_REPORT.feedback.clear()
 
 from pedal.environments.blockpy import setup_environment
+# Add in evaluated stuff from last time
+student = get_sandbox()
 # TODO: What about new inputs since we last ran/evaled?
 MAIN_REPORT.submission.files['evaluation'] = ${safeCode}
 evaluate(${safeCode})
@@ -55,10 +57,13 @@ if final.instructions:
 # Handle positive feedback
 POSITIVE = []
 for positive in final.positives:
+    message = positive.message
+    if not positive:
+        message = positive.else_message
     POSITIVE.append({
         "title": positive.title,
         "label": positive.label,
-        "message": positive.message
+        "message": message
     })
     
 # Handle system messages
@@ -95,7 +100,6 @@ export class OnEvalConfiguration extends InstructorConfiguration {
             //'complete': false // Actually, let's use undefined for now.
         };
         this.code = instructorCode;
-        console.log(this.code);
 
         super.use(engine);
 
@@ -109,6 +113,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         console.log("OnEval success");
         // TODO: Actually parse results
         this.main.model.execution.instructor.globals = Sk.globals;
+        this.main.model.execution.instructor.sysmodules = Sk.sysmodules;
         console.log(module);
         let results = module.$d.on_eval.$d;
         console.log(module.$d);

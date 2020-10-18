@@ -22,6 +22,9 @@ export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick
 from pedal.core.report import MAIN_REPORT
 MAIN_REPORT.clear()
 
+from cisc108 import student_tests
+student_tests.reset()
+
 from utility import *
 
 # Load in some commonly used tools
@@ -68,10 +71,13 @@ if final.instructions:
 # Handle positive feedback
 POSITIVE = []
 for positive in final.positives:
+    message = positive.message
+    if not positive:
+        message = positive.else_message
     POSITIVE.append({
         "title": positive.title,
         "label": positive.label,
-        "message": positive.message
+        "message": message
     })
     
 # Handle system messages
