@@ -134,10 +134,12 @@ export class BlockPyEngine {
                 this.configuration.success.bind(this.configuration),
                 this.configuration.failure.bind(this.configuration)
             );
-            if (!this.main.model.assignment.settings.disableFeedback()) {
+            if (!this.main.model.assignment.settings.disableFeedback() &&
+                this.main.model.assignment.onEval()) {
                 execution.then(this.onEval.bind(this));
             } else {
-                execution.then(this.configuration.showErrors.bind(this.configuration));
+                execution.then(this.configuration.showErrors.bind(this.configuration))
+                    .then(this.evaluate.bind(this));
             }
         });
     }
