@@ -29,7 +29,7 @@ export let FEEDBACK_HTML = `
         <span class='badge blockpy-feedback-category feedback-badge'
             data-bind="css: ui.feedback.badge,
                        text: ui.feedback.category">Feedback Kind</span>
-        <small data-bind="text: submission.score()+'%',
+        <small data-bind="text: (100*submission.score())+'%',
                           visible: display.instructor() && execution.feedback.label()"
             class="text-muted"></small>
     </div>
@@ -223,6 +223,9 @@ export class BlockPyFeedback {
         if (onclick !== undefined) {
             positive.click(onclick);
         }
+        positive.hover(() => {
+            this.main.components.server.logEvent("X-Feedback", "positive", "hover", text, "");
+        });
     }
 
     /**
