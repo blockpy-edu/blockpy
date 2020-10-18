@@ -38,6 +38,7 @@ export class EvalConfiguration extends StudentConfiguration {
                 "success": true,
                 "trace": this.engine.executionBuffer.trace,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
+                "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "results": module,
                 "output": this.main.model.execution.output,
                 "evaluation": this.code

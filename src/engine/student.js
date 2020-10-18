@@ -23,7 +23,7 @@ export class StudentConfiguration extends Configuration {
 
     openFile(filename) {
         let found = this.main.components.fileSystem.searchForFile(filename, true);
-        console.log(filename, found);
+        //console.log(filename, found);
         if (found === undefined) {
             throw new Sk.builtin.OSError("File not found: "+filename);
         } else {
@@ -64,16 +64,18 @@ export class StudentConfiguration extends Configuration {
      * "Steps" the execution of the code, meant to be used as a callback to the Skulpt
      * environment.
      *
-     * @param {Object} variables - Hash that maps the names of variables (Strings) to their Skulpt representation.
+     * @param {Object} globals - Hash that maps the names of global variables (Strings) to their Skulpt representation.
+     * @param {Object} locals - Hash that maps the names of local variables (Strings) to their Skulpt representation.
      * @param {Number} lineNumber - The corresponding line number in the source code that is being executed.
      * @param {Number} columnNumber - The corresponding column number in the source code that is being executed.
      *                                Think of it as the "X" position to the lineNumber's "Y" position.
      * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
+     * @param {Boolean} isDocstring - Whether or not this is an actual line or a docstring.
      */
-    step(variables, locals, lineNumber, columnNumber, filename) {
+    step(globals, locals, lineNumber, columnNumber, filename, isDocstring) {
         if (filename === "answer.py") {
             let currentStep = this.engine.executionBuffer.step;
-            let globals = this.main.components.trace.parseGlobals(variables);
+            let globals = this.main.components.trace.parseGlobals(globals);
             // TODO: Trace local variables properly
             //console.log(globals, locals);
             //let locals = this.main.components.trace.parseGlobals(locals);
@@ -85,7 +87,8 @@ export class StudentConfiguration extends Configuration {
                 "line": lineNumber,
                 "column": columnNumber,
                 "properties": globals.properties,
-                "modules": globals.modules
+                "modules": globals.modules,
+                "isDocstring": isDocstring
             });
             this.engine.executionBuffer.step = currentStep + 1;
             this.engine.executionBuffer.line = lineNumber;
@@ -163,7 +166,9 @@ export class StudentConfiguration extends Configuration {
 
     showErrors() {
         let report = this.main.model.execution.reports;
-        if (!report["student"].success) {
+        if (report["student"].success) {
+            this.main.components.feedback.clear();
+        } else {
             this.main.components.feedback.presentRunError(report.student.error);
         }
     }

@@ -30,7 +30,7 @@ export class RunConfiguration extends StudentConfiguration {
         console.log("Run success");
         let message = {
             "inputs": this.main.model.execution.input().join("\n"),
-            "outputs": this.main.model.execution.output().join("\n"),
+            "outputs": this.main.model.execution.output().map(line => line.content).join("\n"),
         };
         this.main.components.server.logEvent("Run.Program", "", "", JSON.stringify(message), "answer.py");
         this.main.model.display.dirtySubmission(false);
@@ -51,6 +51,7 @@ export class RunConfiguration extends StudentConfiguration {
                 "success": true,
                 "trace": this.engine.executionBuffer.trace,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
+                "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "results": module,
                 "output": this.main.model.execution.output,
                 "input": this.main.model.execution.input
@@ -73,6 +74,7 @@ export class RunConfiguration extends StudentConfiguration {
                 "success": false,
                 "error": error,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
+                "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "input": this.main.model.execution.input
             };
             console.error(error);

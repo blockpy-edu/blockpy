@@ -20,9 +20,10 @@ class Coverage:
     def save(self):
         pass
 
-    def _analyze(filename: str):
+    def _analyze(self, filename: str):
         lines = set(utility.trace_lines())
-        return Analysis(set(), lines, None)
+        # lines will be the lines that were actually executed
+        return Analysis(None, len(lines), None, set(), lines)
 
 
 class Numbers:
