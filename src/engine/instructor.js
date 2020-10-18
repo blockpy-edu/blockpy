@@ -10,7 +10,7 @@ export class InstructorConfiguration extends Configuration {
         super.use(engine);
         // Instructors get 4 seconds
         Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 5000;
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 7000;
         Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = null; // 10 *1000
