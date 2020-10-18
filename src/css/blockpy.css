@@ -204,10 +204,18 @@
     width: 100%;
 }
 
-table.blockpy-feedback-unit {
+table.pedal-table {
     background: white;
     width: 100%;
     padding-top: 4px;
+}
+
+table.pedal-table tr.pedal-row {
+    border-top: 1px solid lightgray;
+}
+
+table.pedal-table pre.pedal-python-code {
+    display: inline-block;
 }
 
 .blockpy-feedback pre {
@@ -542,4 +550,14 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     cursor: pointer;
     color: pink;
     display: none;
+}
+
+.blockpy-content sup {
+    font-size: 12px;
+}
+
+.pedal-positive-mark {
+    color: green;
+    font-size: 16px;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 }
