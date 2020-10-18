@@ -95,6 +95,24 @@ i.show()
 -->
 
 <script>
+    let LOCAL_FILES = {
+        LOCAL_ON_RUN_CODE: "",
+        LOCAL_ON_EVAL_CODE: "",
+        LOCAL_ANSWER_CODE: ""
+    }
+    try {
+        if (localStorage) {
+            for (let key in LOCAL_FILES) {
+                let LOCAL = localStorage.getItem(key);
+                if (LOCAL) {
+                    LOCAL_FILES[key] = LOCAL;
+                }
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
     $(document).ready(function() {
         editor = new blockpy.BlockPy({
             'attachment.point': '#main-editor',
@@ -102,16 +120,10 @@ i.show()
                 "importDatasets": "https://corgis-edu.github.io/corgis/datasets/"
             },
             "display.instructor": true,
-            "assignment.on_run": `
-from pedal import *
-assert_output(student, 'dog')
-#debug(student.output)
-#log(student.output)
-#compliment("Correct output!")
-`.trim(),
-            "submission.code": `
-print('cat')
-`.trim()
+            //"assignment.on_eval": "console_log(ABC)",
+            "assignment.on_run": LOCAL_FILES.LOCAL_ON_RUN_CODE,
+            //"assignment.on_eval": LOCAL_FILES.LOCAL_ON_EVAL_CODE,
+            "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE
         });
 /*
 from image import Image
@@ -119,9 +131,46 @@ dog = Image("http://localhost:8000/images/swimming.gif")
 dog.flip().show()
  */
         blockmirror = editor.components.editors.registered_[1].bm;
+
+        updateClient();
     });
+
+    function saveNewClient() {
+        LOCAL_FILES.LOCAL_ANSWER_CODE = editor.model.submission.code();
+        LOCAL_FILES.LOCAL_ON_RUN_CODE = editor.model.assignment.onRun();
+        LOCAL_FILES.LOCAL_ON_EVAL_CODE = editor.model.assignment.onEval();
+        localStorage.setItem("LOCAL_ANSWER_CODE", LOCAL_FILES.LOCAL_ANSWER_CODE);
+        localStorage.setItem("LOCAL_ON_RUN_CODE", LOCAL_FILES.LOCAL_ON_RUN_CODE);
+        localStorage.setItem("LOCAL_ON_EVAL_CODE", LOCAL_FILES.LOCAL_ON_EVAL_CODE);
+        updateClient();
+    }
+
+    function updateClient() {
+        $("#old-answer-code").text(LOCAL_FILES.LOCAL_ANSWER_CODE);
+        $("#old-on-run-code").text(LOCAL_FILES.LOCAL_ON_RUN_CODE);
+        $("#old-on-eval-code").text(LOCAL_FILES.LOCAL_ON_EVAL_CODE);
+    }
+
+    function deleteOldClient() {
+        localStorage.removeItem("LOCAL_ANSWER_CODE");
+        localStorage.removeItem("LOCAL_ON_RUN_CODE");
+        localStorage.removeItem("LOCAL_ON_EVAL_CODE");
+        LOCAL_FILES.LOCAL_ANSWER_CODE = "";
+        LOCAL_FILES.LOCAL_ON_RUN_CODE = "";
+        LOCAL_FILES.LOCAL_ON_EVAL_CODE = "";
+        updateClient();
+    }
 </script>
 
+    <button onclick="deleteOldClient()">Reset old client</button>
+    <button onclick="saveNewClient()">Save code now</button>
+    <table>
+        <tr>
+            <td><pre id="old-answer-code"></pre></td>
+            <td><pre id="old-on-run-code"></pre></td>
+            <td><pre id="old-on-eval-code"></pre></td>
+        </tr>
+    </table>
 
 
 </div>
