@@ -131,6 +131,9 @@ class ConsoleLineText extends ConsoleLine {
     render(where) {
         if (this.visible) {
             let encodedText = encodeHTML(this.content);
+            if (!encodedText || encodedText.trim().length <= 0) {
+                encodedText = "\n";
+            }
             let lineData = $("<samp></samp>", { "html": encodedText });
             this.html.append(lineData);
             where.append(this.html);
