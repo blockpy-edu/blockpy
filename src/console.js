@@ -55,6 +55,7 @@ class ConsoleLine {
         };
         this.html = $("<div></div>", {
             "class":  "blockpy-printer-output",
+            "data-container": main.model.configuration.attachmentPoint,
             "data-toggle": "tooltip",
             "data-placement": "auto",
             "data-step": this.origin.step,

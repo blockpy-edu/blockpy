@@ -219,7 +219,7 @@ export class BlockPyFeedback {
         } else {
             this.positive.prepend(positive);
         }
-        positive.tooltip({"trigger": "hover"});
+        positive.tooltip({"trigger": "hover", "container": this.main.model.configuration.attachmentPoint});
         if (onclick !== undefined) {
             positive.click(onclick);
         }

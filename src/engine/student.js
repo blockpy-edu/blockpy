@@ -180,7 +180,7 @@ export class StudentConfiguration extends Configuration {
             let errorButton = this.main.model.configuration.container.find(".blockpy-student-error");
             let message = feedback.presentRunError(report.student.error, true);
             errorButton.attr("title", "Click to see Original Error");
-            errorButton.tooltip({"trigger": "hover"});
+            errorButton.tooltip({"trigger": "hover", "container": this.main.model.configuration.attachmentPoint});
             errorButton.click(() => this.main.components.dialog.ERROR_SHOW_STUDENT_ERROR(message));
             errorButton.show();
         }
