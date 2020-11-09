@@ -24,15 +24,15 @@
   },
   "homepage": "https://github.com/RealTimeWeb/blockpy#readme",
   "devDependencies": {
-    "webpack": "latest",
-    "path": "latest",
-    "yargs": "latest",
-    "mini-css-extract-plugin": "latest",
-    "eslint-loader": "latest",
-    "jquery": "latest",
-    "knockout": "latest",
-    "babel-loader": "latest",
-    "@babel/preset-env": "latest",
-    "css-loader": "latest"
+    "webpack": "4.44.1",
+    "path": "0.12.7",
+    "yargs": "15.4.1",
+    "mini-css-extract-plugin": "0.9.0",
+    "eslint-loader": "4.0.2",
+    "jquery": "3.5.1",
+    "knockout": "3.5.1",
+    "babel-loader": "8.1.0",
+    "@babel/preset-env": "7.11.0",
+    "css-loader": "4.2.0"
   }
 }
