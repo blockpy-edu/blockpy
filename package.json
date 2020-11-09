@@ -33,6 +33,8 @@
     "knockout": "3.5.1",
     "babel-loader": "8.1.0",
     "@babel/preset-env": "7.11.0",
-    "css-loader": "4.2.0"
+    "css-loader": "4.2.0",
+    "babel-core": "6.26.3",
+    "eslint": "5.0.0"
   }
 }
