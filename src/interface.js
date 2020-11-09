@@ -129,6 +129,7 @@ export function makeInterface(main) {
     </div>
     
     <!-- Row 2: Console and Feedback -->
+    <!-- ko if: ui.secondRow.isAllVisible -->
     <div class='row'>
     
         <!-- Console -->
@@ -145,6 +146,7 @@ export function makeInterface(main) {
         <!-- /ko -->
          
     </div>
+    <!-- /ko -->
     
     <!-- Row 3: File Navigation -->
     <!-- ko if: ui.files.visible -->

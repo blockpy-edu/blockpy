@@ -516,6 +516,9 @@ export class BlockPy {
                 )
             },
             secondRow: {
+                isAllVisible: ko.pureComputed(() =>
+                    !model.assignment.settings.hideMiddlePanel()
+                ),
                 isFeedbackVisible: ko.pureComputed(() =>
                     model.display.secondRowSecondPanel() === SecondRowSecondPanelOptions.FEEDBACK
                 ),
