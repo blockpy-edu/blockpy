@@ -27,6 +27,7 @@ function makeTab(name, icon, mode) {
 }
 
 export const PYTHON_EDITOR_HTML = `
+
     <div class="blockpy-python-toolbar col-md-12 btn-toolbar"
          role="toolbar" aria-label="Python Toolbar">
 
@@ -53,12 +54,14 @@ export const PYTHON_EDITOR_HTML = `
               </button>
          </div>
          
+         <!-- ko if: !assignment.settings.hideImportDatasetsButton() -->
          <div class="btn-group mr-2" role="group" aria-label="Import Group">
             <button type="button" class="btn btn-outline-secondary"
                 data-bind="click: ui.editors.importDataset">
                 <span class="fas fa-cloud-download-alt"></span> Import datasets
              </button>
          </div>
+         <!-- /ko -->
          
          <div class="btn-group mr-2">
                 <label class="btn btn-outline-secondary">
@@ -170,8 +173,18 @@ class PythonEditorView extends AbstractEditor {
             "blocklyMediaPath": main.model.configuration.blocklyPath,
             "toolbox": main.model.assignment.settings.toolbox(),
             "imageMode": true,
+            imageDownloadHOok: (oldUrl) => {
+                return oldUrl;
+            },
+            imageUploadHook: (blob) => {
+                return Promise.resolve("Image("+JSON.stringify(URL.createObjectURL(blob))+")");
+            },
+            imageLiteralHook: (oldUrl) => {
+                return `Image("${oldUrl}")`;
+            },
             //'height': '2000px'
         });
+
         this.dirty = false;
         this.readOnly = false;
         this.makeSubscriptions();
