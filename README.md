@@ -22,13 +22,57 @@ By combining these two technologies, we end up with a powerful system for writin
 Installation
 ------------
 
-Briefly, you will need to do the following:
+First, you're going to need all of our special dependencies. The final structure looks like this:
 
 ```
+blockpy-edu/
+  skulpt/
+  blockly/
+  BlockMirror/
+  blockpy/
+pedal-edu/
+  pedal/
+  curriculum-ctvt
+  curriculum-sneks
+```
+
+1. So you can start by making the two top-level directories:
+
+```shell
+$> mkdir blockpy-edu
+$> mkdir pedal-edu
+```
+
+2. Skulpt is probably the hardest dependency, since you will probably want to modify it.
+
+```shell
+$> cd blockpy-edu
+$> git clone https://github.com/blockpy-edu/skulpt skulpt
+$> cd skulpt
+$> npm install
+```
+
+3. For many of the remainders, you actually only need the final compiled files (per [this file](https://github.com/blockpy-edu/blockpy/blob/master/tests/index.html#L51-L68)).
+But if you want to install each from source, here are the github links:
+
+```shell
+$> cd blockpy-edu
+$> git clone https://github.com/blockpy-edu/BlockMirror BlockMirror
+$> git clone https://github.com/google/blockly blockly
+$> cd ../pedal-edu
+$> git clone https://github.com/pedal-edu/pedal pedal
+$> git clone https://github.com/pedal-edu/curriculum-ctvt curriculum-ctvt
+$> git clone https://github.com/pedal-edu/curriculum-sneks curriculum-sneks
+```
+
+4. To actually install the BlockPy client, you can do the following:
+
+```
+$> cd ../blockpy-edu
+$> git clone https://github.com/blockpy-edu/blockpy blockpy
+$> cd blockpy
 $> npm install
 $> npm run dev
 ```
 
 That should rebuild the files into `dist`. You can then open `tests/index.html` and explore.
-
-You'll need to make sure that our fork of Skulpt, BlockMirror, Pedal library, and Pedal extensions are all appropriately adjacent as needed.
