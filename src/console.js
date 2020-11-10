@@ -1,10 +1,24 @@
 import {encodeHTML} from "./utilities";
 
+/**
+ * Evaluate button HTML template
+ * @type {string}
+ */
 const START_EVAL_HTML = `
 <button type="button" class="btn btn-sm btn-outline float-right blockpy-btn-eval">
     Evaluate
 </button>`;
 
+/**
+ * HTML template for a new line in the console.
+ * @type {string}
+ */
+const NEW_CONSOLE_LINE_HTML = "<div></div>";
+
+/**
+ * HTML template for the entire console area
+ * @type {string}
+ */
 export const CONSOLE_HTML = `
     <div class='col-md-6 blockpy-panel blockpy-console'
           role="region" aria-label="Console"
@@ -24,10 +38,8 @@ export const CONSOLE_HTML = `
         
      </div>`;
 
-const NEW_CONSOLE_LINE_HTML = "<div></div>";
-
 /**
- *
+ * All the possible types for a line in the console.
  * @enum
  */
 export let ConsoleLineType = {
@@ -43,16 +55,42 @@ export let ConsoleLineType = {
     TEST_CASE: "test_case"
 };
 
+/**
+ * Abstract version of a line in the console. All other console lines
+ * should extend this class. Critically, they need to implement a render function.
+ */
 class ConsoleLine {
     constructor(main, type, content) {
+        /**
+         * Reference back to the main BlockPy instance.
+         * @const
+         * @type {BlockPy}
+         */
         this.main = main;
+        /**
+         * Categorizes what kind of line this is (text/html/plot/etc.)
+         * @type {ConsoleLineType}
+         */
         this.type = type;
+        /**
+         * The actual data stored on this line.
+         * @type {string}
+         */
         this.content = content;
+        /**
+         * Metadata about where the line originated from in the code.
+         * @type {{filename: string, line: number, step: number}}
+         */
         this.origin = {
             filename: Sk.currFilename,
             step: main.components.engine.executionBuffer.step,
             line: main.components.engine.executionBuffer.line
         };
+        /**
+         * The HTML content stored on this line, meant to be rendered
+         * to the user.
+         * @type {*|jQuery.fn.init|jQuery|HTMLElement}
+         */
         this.html = $("<div></div>", {
             "class":  "blockpy-printer-output",
             "data-container": main.model.configuration.attachmentPoint,
@@ -61,14 +99,29 @@ class ConsoleLine {
             "data-step": this.origin.step,
             "title": "Step " + this.origin.step + ", Line " + this.origin.line
         });
+        /**
+         * Whether or not this line should be visible
+         * @type {boolean}
+         */
         this.visible = !main.model.display.mutePrinter();
+        /**
+         *
+         * @type {number}
+         */
         this.index = 0;
     }
 
+    /**
+     * Create a Skulpt representation of this console line's content.
+     * @returns {*}
+     */
     toSkulpt() {
         return Sk.ffi.remapToPy(this.content);
     }
 
+    /**
+     * Remove this console line by deleting its HTML representation.
+     */
     delete() {
         this.html.remove();
     }

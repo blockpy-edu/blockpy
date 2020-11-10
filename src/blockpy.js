@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Starting point of the BlockPy application, containing the main
+ * BlockPy class.
+ */
 import "./css/blockpy.css";
 import "./css/bootstrap_retheme.css";
 import $ from "jquery";
@@ -31,7 +35,13 @@ import {capitalize} from "./utilities";
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
 
 /**
- * Major entry point for creating a BlockPy instance
+ * Major entry point for creating a BlockPy instance.
+ * Two most important fields are `model` and `components`.
+ * The `model` holds all the data about the interface.
+ * The `components` are references to the disparate parts of BlockPy.
+ *
+ * Most of this classes definition is just initializing the model and updating
+ * it on an assignment switch.
  */
 export class BlockPy {
     /**
@@ -887,6 +897,7 @@ export class BlockPy {
         components.engine = new BlockPyEngine(main);
         components.fileSystem = new BlockPyFileSystem(main);
         components.editors = new Editors(main, container.find(".blockpy-editor"));
+        // Convenient shortcut directly to PythonEditor
         components.pythonEditor = this.components.editors.byName("python");
         components.server = new BlockPyServer(main);
         components.corgis = new BlockPyCorgis(main);

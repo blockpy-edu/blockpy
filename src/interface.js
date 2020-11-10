@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Contains main HTML of BlockPy interface, and helper functions.
+ * Combines a lot of HTML from components.
+ *
+ * Here's the layout:
+ *  Row 1: Header and Quick Menu
+ *  Row 2: Console and Feedback
+ *  Row 3: File Navigation
+ *  Row 4: View Row
+ *  Row 5: Footer Row
+ */
+
 import {TRACE_HTML} from "trace.js";
 import {DIALOG_HTML} from "dialog.js";
 import {FEEDBACK_HTML} from "feedback.js";
@@ -7,7 +19,8 @@ import {EDITORS_HTML} from "editors.js";
 import {CONSOLE_HTML} from "console.js";
 
 /**
- * @enum {str}
+ * The different layout options of the panes in the second row of the layout.
+ * @enum {String}
  */
 export let SecondRowSecondPanelOptions = {
     FEEDBACK: "feedback",
@@ -15,7 +28,13 @@ export let SecondRowSecondPanelOptions = {
     NONE: "none"
 };
 
+/**
+ * Setup any additional Knockout subscriptions to fire on interface changes.
+ * @param self
+ * @param model
+ */
 export function makeExtraInterfaceSubscriptions(self, model) {
+    // Highlight Markdown when instructions update
     let highlightTimeout = null;
     model.ui.instructions.current.subscribe(() => {
         if (highlightTimeout !== null) {
@@ -27,6 +46,7 @@ export function makeExtraInterfaceSubscriptions(self, model) {
             });
         }, 400);
     });
+    // Provide Fullscreen support
     model.display.fullscreen.subscribe((isFullscreen) => {
         self.components.server.logEvent("X-Display.Fullscreen.Request", "", "",
                                         isFullscreen.toString(), "");
@@ -155,16 +175,16 @@ export function makeInterface(main) {
     </div>
     <!-- /ko -->
     
-    <!-- View Row -->
+    <!-- Row 4: View Row -->
     <div class="row">
         ${EDITORS_HTML}
     </div>
 
-    <!-- Footer Row -->    
+    <!-- Row 5: Footer Row -->    
     <div class="row">
         ${FOOTER_HTML}
     </div>
     
 </div>
     `;
-};
+}

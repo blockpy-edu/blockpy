@@ -2,6 +2,7 @@ export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }";
 
 /**
  * A container for holding settings of a particular run configuration.
+ * This is the root class for all other configurations.
  */
 export class Configuration {
 
