@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --progress --colors --watch --env dev",
+    "dev": "webpack --progress --color --watch --env dev",
     "build": "webpack --env dev && webpack --env build"
   },
   "repository": {
@@ -24,17 +24,18 @@
   },
   "homepage": "https://github.com/RealTimeWeb/blockpy#readme",
   "devDependencies": {
-    "webpack": "4.44.1",
-    "path": "0.12.7",
-    "yargs": "15.4.1",
-    "mini-css-extract-plugin": "0.9.0",
+    "@babel/core": "7.0.0",
+    "@babel/preset-env": "7.11.0",
+    "babel-loader": "8.1.0",
+    "css-loader": "4.2.0",
+    "eslint": "5.0.0",
     "eslint-loader": "4.0.2",
     "jquery": "3.5.1",
     "knockout": "3.5.1",
-    "babel-loader": "8.1.0",
-    "@babel/preset-env": "7.11.0",
-    "css-loader": "4.2.0",
-    "babel-core": "6.26.3",
-    "eslint": "5.0.0"
+    "mini-css-extract-plugin": "0.9.0",
+    "path": "0.12.7",
+    "webpack": "4.44.1",
+    "webpack-cli": "^4.2.0",
+    "yargs": "15.4.1"
   }
 }
