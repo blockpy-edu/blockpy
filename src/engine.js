@@ -114,6 +114,7 @@ export class BlockPyEngine {
         } else {
             execution.then(this.configuration.showErrors.bind(this.configuration));
         }
+        execution.then(this.configuration.finally.bind(this.configuration));
     }
 
     onRun() {
@@ -121,7 +122,9 @@ export class BlockPyEngine {
         this.execute().then(
             this.configuration.success.bind(this.configuration),
             this.configuration.failure.bind(this.configuration)
-        ).then(this.executionEnd_.bind(this));
+        )
+            .then(this.configuration.finally.bind(this.configuration))
+            .then(this.executionEnd_.bind(this));
     }
 
     evaluate() {
@@ -141,6 +144,7 @@ export class BlockPyEngine {
                 execution.then(this.configuration.showErrors.bind(this.configuration))
                     .then(this.evaluate.bind(this));
             }
+            execution.then(this.configuration.finally.bind(this.configuration));
         });
     }
 
@@ -149,7 +153,9 @@ export class BlockPyEngine {
         this.execute().then(
             this.configuration.success.bind(this.configuration),
             this.configuration.failure.bind(this.configuration)
-        ).then(this.evaluate.bind(this));
+        )
+            .then(this.evaluate.bind(this))
+            .then(this.configuration.finally.bind(this.configuration));
     }
 
     onChange() {

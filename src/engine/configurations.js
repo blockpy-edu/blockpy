@@ -142,6 +142,13 @@ export class Configuration {
         throw new Error("Abstract failure execution");
     }
 
+    finally(result) {
+        // Force Pygame to stop trapping keyboard events
+        if (this.main.components.console.pygameLine) {
+            this.main.components.console.pygameLine.cleanup();
+        }
+    }
+
     dummyOutSandbox() {
         //Sk.builtinFiles.files["src/lib/pedal/sandbox/sandbox.py"] = "class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n";
     }

@@ -47,6 +47,7 @@ export let ConsoleLineType = {
     HTML: "html",
     PLOT: "plot",
     IMAGE: "image",
+    PYGAME: "pygame",
     TURTLE: "turtle",
     EVAL: "eval",
     START_EVAL: "start_eval",
@@ -144,6 +145,38 @@ class ConsoleLineTurtle extends ConsoleLine {
             //this.html.tooltip();
         }
     }
+}
+
+class ConsoleLinePygame extends ConsoleLine {
+    constructor(main, size, fullscreen, pygameObj) {
+        super(main, ConsoleLineType.PYGAME);
+        this.html.addClass("blockpy-console-pygame-output");
+        this.size = size;
+        this.fullscreen = fullscreen;
+        this.pygameObj = pygameObj;
+        this.initialized = false;
+        this.canvas = document.createElement("canvas");
+        //Sk.main_canvas = document.getElementById("myCanvas");
+    }
+
+    render(where) {
+        if (this.visible) {
+            this.html.append(this.canvas);
+            where.prepend(this.html);
+            var top = this.html.position().top;
+            $("html").scrollTop(0);
+        }
+    }
+
+    cleanup(self) {
+        // Starts off as a no-op
+    }
+
+    finalize(cleanupFunction) {
+        this.initialized = true;
+        this.cleanup = () => cleanupFunction(this.pygameObj);
+    }
+
 }
 
 class ConsoleLineImage extends ConsoleLine {
@@ -362,6 +395,8 @@ export class BlockPyConsole {
             height: this.getHeight(),
             assets: this.loadAsset.bind(this)
         };
+
+        this.pygameLine = null;
     };
 
     loadAsset(name) {
@@ -464,6 +499,14 @@ export class BlockPyConsole {
         this.plotBuffer = new ConsoleLinePlot(this.main, plots);
         this.plotBuffer.render(this.printerTag);
         return this.plotBuffer;
+    }
+
+    pygame(size, fullscreen, pygameObj) {
+        if (this.pygameLine === null) {
+            this.pygameLine = new ConsoleLinePygame(this.main, size, fullscreen, pygameObj);
+            this.pygameLine.render(this.printerTag);
+        }
+        return this.pygameLine;
     }
 
     printPILImage(imageData) {
