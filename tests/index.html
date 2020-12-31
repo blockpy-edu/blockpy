@@ -58,6 +58,9 @@
     <script src="../../skulpt/dist/skulpt.js" type="text/javascript"></script>
     <script src="../../skulpt/dist/skulpt-stdlib.js" type="text/javascript"></script>
 
+    <!-- PygameSkulpt -->
+    <script src="../../pygame4skulpt/dist/pygameskulpt.js" type="text/javascript"></script>
+
     <!-- Pedal -->
     <script src="../../../pedal-edu/pedal/dist-js/skulpt-pedal.js" type="text/javascript"></script>
     <script src="../../../pedal-edu/curriculum-ctvt/dist-js/skulpt-curriculum-ctvt.js" type="text/javascript"></script>
@@ -123,7 +126,11 @@ i.show()
             //"assignment.on_eval": "console_log(ABC)",
             "assignment.on_run": LOCAL_FILES.LOCAL_ON_RUN_CODE,
             //"assignment.on_eval": LOCAL_FILES.LOCAL_ON_EVAL_CODE,
-            "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE
+            "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE,
+            // Pygame tests
+            "display.python.mode": "text",
+            //"assignment.settings.disable_timeout": true,
+            //"assignment.settings.disable_instructor_run": "true"
         });
 /*
 from image import Image

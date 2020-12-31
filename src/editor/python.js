@@ -320,13 +320,35 @@ class PythonEditorView extends AbstractEditor {
                 this.bm.setMode(this.main.model.display.pythonMode());
             }
         });
-        this.main.model.assignment.settings.toolbox.subscribe(toolbox => {
-            this.bm.configuration.toolbox = toolbox;
-            this.bm.blockEditor.remakeToolbox();
-        });
+        this.main.model.assignment.settings.toolbox.subscribe(this.reloadToolbox.bind(this));
         this.main.model.assignment.settings.enableImages.subscribe(imageMode => {
             this.bm.setImageMode(imageMode);
         });
+    }
+
+    reloadToolbox(toolbox) {
+        if (toolbox === "custom") {
+            let customToolbox = this.main.components.fileSystem.getFile("?toolbox.blockpy");
+            if (customToolbox == null) {
+                toolbox = "empty";
+            } else {
+                try {
+                    toolbox = JSON.parse(customToolbox.handle());
+                } catch (e) {
+                    console.error(e); // TODO: Improve error message for instructor
+                    toolbox = "minimal";
+                }
+            }
+        }
+        this.bm.configuration.toolbox = toolbox;
+        // TODO: Handle invalid toolbox better
+        try {
+            this.bm.blockEditor.remakeToolbox();
+        } catch (e) {
+            console.error(e);
+            this.bm.configuration.toolbox = "empty";
+            this.bm.blockEditor.remakeToolbox();
+        }
     }
 
     makePerAssignmentSubscriptions() {

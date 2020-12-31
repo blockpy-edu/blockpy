@@ -2,7 +2,14 @@
 export let FOOTER_HTML = `
 <div class="col-md-12 blockpy-panel blockpy-status">
     <div>
-        <span class="badge" data-bind="class: ui.server.status('loadAssignment')">Load Assignment</span>, 
+        <label class="badge" data-bind="class: ui.server.status('loadAssignment')">Load Assignment
+            <!-- ko if: display.instructor -->
+            <input type="file"
+            class="blockpy-force-load-assignment-file blockpy-hidden-file"
+            accept="application/JSON"
+            data-bind="event: {change: ui.server.force.loadAssignment}">
+            <!-- /ko -->
+        </label>, 
         <span class="badge" data-bind="class: ui.server.status('saveAssignment')">Save Assignment</span>, 
         <span class="badge" data-bind="class: ui.server.status('loadFile')">Load File</span>, 
         <span class="badge" data-bind="class: ui.server.status('saveFile')">Save File</span>, 
@@ -21,8 +28,14 @@ export let FOOTER_HTML = `
         <span>Group: <span data-bind="text: user.groupId"></span></span>,
         <span>Assignment: <span data-bind="text: assignment.id"></span></span>,
         <span>Assignment Version: <span data-bind="text: assignment.version"></span></span>,
-        <span>Submission: <span data-bind="text: submission.id"></span></span>, 
-        <span>Submission Version: <span data-bind="text: submission.version"></span></span>
+        <span>Submission: 
+            <span data-bind="text: submission.id"></span>
+            <span data-bind="if: submission.ownerId() != user.id()">
+                (Owner ID: <span data-bind="text: submission.ownerId()"></span>)
+            </span>
+        </span>, 
+        <span>Submission Version: <span data-bind="text: submission.version"></span></span>,
+        <span>Editor Version: <span data-bind="text: display.editorVersion"></span></span>
     </div>
 </div>
 `;

@@ -86,9 +86,14 @@ export let FILES_HTML = `
                 data-bind="hidden: ui.files.hasContents('?mock_urls.blockpy'),
                            click: ui.files.add.bind($data, '?mock_urls.blockpy')">URL Data</a>
             <a class="dropdown-item blockpy-file-instructor" href="#"
-                data-bind="hidden: ui.files.hasContents('?tags.blockpy')">Tags</a>
+                data-bind="hidden: ui.files.hasContents('?toolbox.blockpy'),
+                           click: ui.files.add.bind($data, '?toolbox.blockpy')">Toolbox</a>
+            
             <a class="dropdown-item blockpy-file-instructor" href="#"
-                data-bind="hidden: ui.files.hasContents('?sample_submissions.blockpy')">Sample Submissions</a>
+                data-bind="hidden: ui.files.hasContents('!tags.blockpy')">Tags</a>
+            <a class="dropdown-item blockpy-file-instructor" href="#"
+                data-bind="hidden: ui.files.hasContents('!sample_submissions.blockpy'),
+                           click: ui.files.add.bind($data, '!sample_submissions.blockpy')">Sample Submissions</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: assignment.onChange,
@@ -172,6 +177,7 @@ export const BASIC_NEW_FILES = [
     "!on_change.py",
     "!on_eval.py",
     "?mock_urls.blockpy",
+    "?toolbox.blockpy",
     "!tags.blockpy",
     "!sample_submissions.blockpy"
 ];
@@ -192,7 +198,8 @@ export const UNDELETABLE_FILES = ["answer.py", "!instructions.md", "!assignment_
 
 export const UNRENAMABLE_FILES = ["answer.py", "!instructions.md", "!assignment_settings.py",
                                   "^starting_code.py", "!on_run.py", "$settings.blockpy",
-                                  "!on_change.py", "!on_eval.py", "?mock_urls.blockpy",
+                                  "!on_change.py", "!on_eval.py",
+                                  "?mock_urls.blockpy", "?toolbox.blockpy",
                                   "!tags.blockpy", "!sample_submissions.blockpy"];
 
 class BlockPyFile {
@@ -328,10 +335,14 @@ export class BlockPyFileSystem {
             file.handle = this.main.model.assignment.startingCode;
         } else if (file.filename === "?mock_urls.blockpy") {
             this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
+        } else if (file.filename === "?toolbox.blockpy") {
+            this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
         } else if (file.filename === "!tags.blockpy") {
             file.handle = this.main.model.assignment.tags;
         } else if (file.filename === "!assignment_settings.blockpy") {
             file.handle = this.main.model.assignment.settings;
+        } else if (file.filename === "!sample_submissions.blockpy") {
+            file.handle = this.main.model.assignment.sampleSubmissions;
         } else if (file.filename === "$settings.blockpy") {
             file.handle = this.main.model.display;
         } else if (file.filename.startsWith("^")) {
@@ -456,6 +467,9 @@ export class BlockPyFileSystem {
 
     searchForFile(name, studentSearch) {
         /*
+        TODO: This is called quite a bit by the Import mechanism, might need
+              to optimize it some more. Do timing tests.
+
         files.*
         _instructor/files.*
         _student/files.*

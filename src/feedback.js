@@ -303,5 +303,7 @@ export class BlockPyFeedback {
         this.main.model.execution.feedback.message(message);
 
         this.notifyFeedbackUpdate();
+
+        this.main.components.server.logEvent("X-System.Error", "internal", "Internal Error", message, filenameExecuted);
     }
 }

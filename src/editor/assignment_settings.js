@@ -228,6 +228,7 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
                    <option value="ct2">CT@VT Toolbox V2</option>
                    <option value="minimal">Minimal Set</option>
                    <option value="full">All Blocks</option>
+                   <option value="custom">Custom</option>
                 </select>
                 <small class="form-text text-muted">
                     ${getDocumentation("toolbox")}
@@ -299,7 +300,6 @@ class AssignmentSettingsView extends AbstractEditor {
 
     enter(newFilename, oldEditor) {
         super.enter(newFilename, oldEditor);
-        console.log(this.file);
         this.dirty = false;
         //TODO: this.updateEditor(this.file.handle());
         // Subscribe to the relevant File

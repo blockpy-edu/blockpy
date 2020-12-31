@@ -473,7 +473,7 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 
 /** Footer Row **/
 
-.blockpy-content .blockpy-status span {
+.blockpy-content .blockpy-status span,.blockpy-content .blockpy-status label {
     font-size: 12px;
 }
 
@@ -500,6 +500,10 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 
 .blockpy-content .badge.server-status-offline {
     background-color: #333;
+}
+
+.blockpy-content .blockpy-hidden-file {
+    display: none;
 }
 
 .notransition {
@@ -560,4 +564,49 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     color: green;
     font-size: 16px;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+}
+
+.blockpy-console-pygame-output {
+    z-index: 9;
+    cursor: pointer;
+    /*position: absolute;*/
+}
+
+.pygame-title-bar {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /*line-height: 24px;*/
+    /*height: 24px;*/
+    border: 1px solid darkgray;
+    border-bottom: none;
+    position: relative;
+    padding-left: 2px;
+    background-color: #F0F0F0;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+}
+
+.pygame-title-exit {
+    position: absolute;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    line-height: 0;
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid rgb(200, 33, 49);
+    background-color: rgb(220, 53, 69);
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.pygame-title-exit:hover {
+    background-color: rgb(240, 73, 89);
+}
+
+.pygame-title-exit:active {
+    background-color: rgb(255, 150, 150);
 }

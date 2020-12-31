@@ -75,9 +75,8 @@ export class StudentConfiguration extends Configuration {
     step(globals, locals, lineNumber, columnNumber, filename, isDocstring) {
         if (filename === "answer.py") {
             let currentStep = this.engine.executionBuffer.step;
-            let globals = this.main.components.trace.parseGlobals(globals);
+            globals = this.main.components.trace.parseGlobals(globals);
             // TODO: Trace local variables properly
-            //console.log(globals, locals);
             //let locals = this.main.components.trace.parseGlobals(locals);
             //Object.assign(globals, locals);
             this.engine.executionBuffer.trace.push({

@@ -24,6 +24,8 @@ function BlockPyToolbar(main, tag) {
 
 /**
  * Register click events for more complex toolbar actions.
+ *
+ * Note: Pretty sure these are all deprecated!
  */
 BlockPyToolbar.prototype.activateToolbar = function() {
     var main = this.main;
@@ -34,13 +36,13 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         $(this).removeClass("btn-success").addClass("btn-warning")
         //.html("Running")
         ;
-        setTimeout(function() {
-            main.components.engine.on_run();
-            $(backup)
-                //.html('<span class="glyphicon glyphicon-play"></span> Run')
-                .removeClass("btn-warning")
-                .addClass("btn-success");
-        }, 20);
+        //setTimeout(function() {
+        main.components.engine.on_run();
+        $(backup)
+            //.html('<span class="glyphicon glyphicon-play"></span> Run')
+            .removeClass("btn-warning")
+            .addClass("btn-success");
+        //}, 20);
     });
     this.tags.mode_set_text.click(function() {
         main.components.server.logEvent("editor", "text");
@@ -96,6 +98,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         main.components.english.openDialog();
         main.components.server.logEvent("editor", "english");
     });
+    /*
     var uploadButton = this.tag.find(".blockpy-toolbar-upload");
     uploadButton.change(function() {
         var fr = new FileReader();
@@ -131,8 +134,9 @@ BlockPyToolbar.prototype.activateToolbar = function() {
         fr.fileName = files[0].name;
         fr.readAsText(files[0]);
         uploadButton.val("");
-    });
-    
+    });*/
+
+    /*
     var downloadButton = this.tag.find(".blockpy-toolbar-download");
     downloadButton.click(function() {
         var data = main.model.programs["__main__"]();
@@ -152,7 +156,7 @@ BlockPyToolbar.prototype.activateToolbar = function() {
             document.body.removeChild(elem);
         }
         main.components.server.logEvent("editor", "download");
-    });
+    });*/
     
     this.tag.find(".blockpy-toolbar-filename-picker label").click(function() {
         main.model.settings.filename($(this).data("filename"));

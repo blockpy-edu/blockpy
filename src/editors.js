@@ -17,6 +17,9 @@ import {TextEditor} from "./editor/text";
 import {AssignmentSettings} from "./editor/assignment_settings";
 import {TagsEditor} from "./editor/tags";
 import {MarkdownEditor} from "./editor/markdown";
+import {SampleSubmissions} from "./editor/sample_submissions";
+import {JsonEditor} from "./editor/json";
+import {ToolboxEditor} from "./editor/toolbox";
 
 /**
  * The different possible editors available
@@ -37,14 +40,15 @@ export let EditorsEnum = {
 const SPECIAL_NAMESPACES = ["!", "^", "?", "$"];
 
 const AVAILABLE_EDITORS = [
-    TextEditor, PythonEditor, AssignmentSettings, TagsEditor, MarkdownEditor
+    TextEditor, PythonEditor, AssignmentSettings, TagsEditor, MarkdownEditor,
+    SampleSubmissions, JsonEditor, ToolboxEditor
 ];
 
-export const EDITORS_HTML = AVAILABLE_EDITORS.map(editor =>
-    `
-<div class="col-md-12 blockpy-panel blockpy-editor">
-    <div data-bind="visible: ui.editors.view().name === '${editor.name}'">
-    ${editor.template}    
+export const EDITORS_HTML = AVAILABLE_EDITORS.map(editor => `
+<div class="col-md-12 blockpy-panel blockpy-editor" 
+     data-bind="visible: ui.editors.view().name === '${editor.name}'">
+    <div>
+    ${editor.template}
     </div>
 </div>
 `

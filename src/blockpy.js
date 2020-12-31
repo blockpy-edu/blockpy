@@ -31,8 +31,11 @@ import {loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assi
 import {BlockPyCorgis, _IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS} from "./corgis";
 import {BlockPyHistory} from "./history";
 import {capitalize} from "./utilities";
+import {SampleSubmission} from "./editor/sample_submissions";
 
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
+
+const EDITOR_VERSION = "5.1.1";
 
 /**
  * Major entry point for creating a BlockPy instance.
@@ -254,7 +257,9 @@ export class BlockPy {
                 /**
                  * Whether or not to clear out inputs after a run/on_run cycle
                  */
-                clearInputs: ko.observable(true)
+                clearInputs: ko.observable(true),
+                editorVersion: EDITOR_VERSION,
+                readOnly: ko.observable(this.getSetting("display.read_only", "false").toString()==="true"),
             },
             status: {
                 // @type {ServerStatus}
@@ -691,6 +696,8 @@ export class BlockPy {
                         case "!on_eval.py": return model.assignment.onEval() !== null;
                         case "?mock_urls.blockpy": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "?mock_urls.blockpy");
+                        case "?toolbox.blockpy": return model.assignment.extraInstructorFiles().some(file =>
+                            file.filename() === "?toolbox.blockpy");
                         case "!tags.blockpy": return model.assignment.tags().length;
                         case "!sample_submissions.blockpy": return model.assignment.sampleSubmissions().length;
                         default: return false;
@@ -702,6 +709,15 @@ export class BlockPy {
                         case "?tags.blockpy":
                         case "?settings.blockpy":
                             self.components.fileSystem.newFile(path); break;
+                        case "?toolbox.blockpy":
+                            let normalToolbox = self.components.pythonEditor.bm.blockEditor.TOOLBOXES["normal"];
+                            normalToolbox = JSON.stringify(normalToolbox, null, 2);
+                            self.components.fileSystem.newFile(path, normalToolbox); break;
+                            break;
+                        case "!sample_submissions.blockpy":
+                            model.assignment.sampleSubmissions([SampleSubmission.Blank()]);
+                            self.components.fileSystem.newFile(path);
+                            break;
                         case "!on_change.py":
                             model.assignment.onChange("");
                             self.components.fileSystem.newFile(path);
@@ -734,6 +750,9 @@ export class BlockPy {
                 displayFilename: function(path) {
                     if (path === "?mock_urls.blockpy") {
                         return "URL Data";
+                    }
+                    if (path === "?toolbox.blockpy") {
+                        return "Toolbox";
                     }
                     if (path.startsWith("&")) {
                         return path.slice(1);
@@ -819,7 +838,13 @@ export class BlockPy {
                 },
                 settings: {
                     save: () => self.components.server.saveAssignment()
-                }
+                },
+                sampleSubmissions: {
+                    buildEditor: (newDOM, index, newElement) => {
+                        let editor = self.components.editors.byName("Sample Submissions");
+                        editor.buildEditor(newDOM, index, newElement);
+                    }
+                },
             },
             execute: {
                 isRunning: ko.pureComputed(() =>
@@ -851,6 +876,22 @@ export class BlockPy {
                         model.status.updateSubmissionStatusMessage() || "")
                 ),
                 force: {
+                    loadAssignment: (data, event) => {
+                        //let fileHandler = $(".blockpy-force-load-assignment-file");
+                        let assignmentForceLoadButton = $(event.target);
+                        //fileHandler.click();
+                        $(event.target).parent().fadeOut(100).fadeIn(100);
+                        // Allow user to upload a file containing an assignment submission
+                        var fr = new FileReader();
+                        var files = assignmentForceLoadButton[0].files;
+                        fr.onload = function(e) {
+                            let assignmentSubmission = JSON.parse(e.target.result);
+                            self.loadAssignmentData_(assignmentSubmission);
+                        };
+                        fr.fileName = files[0].name;
+                        fr.readAsText(files[0]);
+                        assignmentForceLoadButton.val("");
+                    },
                     updateSubmission: (data, event) => {
                         console.log(event);
                         self.components.server.updateSubmission(self.model.submission.score(),

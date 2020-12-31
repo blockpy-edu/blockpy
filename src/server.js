@@ -424,6 +424,10 @@ BlockPyServer.prototype.loadHistory = function (callback) {
 };
 
 BlockPyServer.prototype.logEvent = function (event_type, category, label, message, file_path) {
+    if (this.main.model.display.readOnly()) {
+        this.setStatus("logEvent", StatusState.OFFLINE);
+        return;
+    }
     if (this.main.model.ui.server.isEndpointConnected("logEvent")) {
         let data = this.createServerData();
         data["event_type"] = event_type;
@@ -441,6 +445,10 @@ BlockPyServer.prototype.logEvent = function (event_type, category, label, messag
 };
 
 BlockPyServer.prototype.saveImage = function (directory, image) {
+    if (this.main.model.display.readOnly()) {
+        this.setStatus("saveImage", StatusState.OFFLINE);
+        return;
+    }
     if (this.main.model.ui.server.isEndpointConnected("saveImage")) {
         let data = this.createServerData();
         data["directory"] = directory;
@@ -454,6 +462,10 @@ BlockPyServer.prototype.saveImage = function (directory, image) {
 };
 
 BlockPyServer.prototype.updateSubmissionStatus = function(newStatus) {
+    if (this.main.model.display.readOnly()) {
+        this.setStatus("updateSubmissionStatus", StatusState.OFFLINE);
+        return;
+    }
     if (this.main.model.ui.server.isEndpointConnected("updateSubmissionStatus")) {
         let data = this.createServerData();
         data["status"] = newStatus;
@@ -506,6 +518,10 @@ BlockPyServer.prototype.saveFile = function (filename, contents, delay) {
         delay = this.TIMER_DELAY;
     }
     let model = this.main.model;
+    if (model.display.readOnly()) {
+        this.setStatus("saveFile", StatusState.OFFLINE);
+        return;
+    }
     if (model.ui.server.isEndpointConnected("saveFile")) {
         let data = this.createServerData();
         data["filename"] = filename;
@@ -518,6 +534,10 @@ BlockPyServer.prototype.saveFile = function (filename, contents, delay) {
 };
 
 BlockPyServer.prototype.updateSubmission = function (score, correct, hiddenOverride, forceUpdate) {
+    if (this.main.model.display.readOnly()) {
+        this.setStatus("updateSubmission", StatusState.OFFLINE);
+        return;
+    }
     let callback = this.main.model.configuration.callbacks.success;
     if (this.main.model.ui.server.isEndpointConnected("updateSubmission")) {
         let data = this.createServerData();

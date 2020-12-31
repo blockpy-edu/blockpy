@@ -134,6 +134,19 @@ export function makeInterface(main) {
                     View as instructor
                 </label>
             </div>
+            <!-- Readonly mode for spying -->
+            <div data-bind="if: submission.ownerId() != user.id()">
+                Owner: <span data-bind="text: submission.ownerId"></span>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="blockpy-read-only"
+                        data-bind="checked: display.readOnly">
+                    <label class="form-check-label" for="blockpy-read-only">
+                        Readonly?
+                    </label>
+                </div>
+            </div>
+            
+            
             <button class="btn btn-outline-secondary btn-sm"
                 data-bind="click: ui.menu.clickFullscreen"
                 title="Full Screen"

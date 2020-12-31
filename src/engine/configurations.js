@@ -24,7 +24,30 @@ export class Configuration {
         Sk.inBrowser = this.openFile.bind(this);
         // Proxy requests
         Sk.requestsGet = (url, data, timeout) => this.openURL(url, data, timeout);
+        // Configure a "do you want to wait? prompt"
+        Sk.timeoutHandler = (timePassed, execLimit) => {
+            if (this.main.model.assignment.settings.disableTimeout()) {
+                return null;
+            }
+            let promptMessage = this.getTimeoutPrompt(timePassed/1000 > 30);
+            let delay = prompt(promptMessage, Sk.execLimit/1000);
+            if (delay !== null || delay==0) {
+                delay = Sk.execLimit + parseInt(delay, 10) * 1000;
+                Sk.execLimit = delay;
+                Sk.execLimitFunction = () =>
+                    this.main.model.assignment.settings.disableTimeout() ? Infinity : delay;
+            }
+            return delay;
+        };
         return this;
+    }
+
+    getTimeoutPrompt(longTimeout) {
+        if (longTimeout) {
+            return "The program has taken a REALLY long time to run (30 or more seconds). You might want to cancel and check your code. Or, you can add more seconds to wait below.";
+        } else {
+            return "The program is taking a while to run. How many more seconds would you like to wait?";
+        }
     }
 
     getSkulptOptions() {
@@ -146,6 +169,7 @@ export class Configuration {
         // Force Pygame to stop trapping keyboard events
         if (this.main.components.console.pygameLine) {
             this.main.components.console.pygameLine.cleanup();
+            this.main.components.console.pygameLine.stop();
         }
     }
 

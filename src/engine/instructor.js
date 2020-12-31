@@ -36,6 +36,14 @@ export class InstructorConfiguration extends Configuration {
         return this;
     }
 
+    getTimeoutPrompt(longTimeout) {
+        if (longTimeout) {
+            return "The instructor code has taken a REALLY long time to check your code (30 or more seconds). You might want to cancel and check your code (or get help from an instructor). Or, you can add more seconds to wait below.";
+        } else {
+            return "The instructor code is taking a little while to check your code; it might just need a little more time. How many more seconds would you like to wait?";
+        }
+    }
+
     openFile(filename) {
         let found = this.main.components.fileSystem.searchForFile(filename, false);
         if (found === undefined) {

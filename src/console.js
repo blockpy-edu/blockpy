@@ -168,13 +168,17 @@ class ConsoleLinePygame extends ConsoleLine {
         }
     }
 
-    cleanup(self) {
+    cleanup() {
         // Starts off as a no-op
     }
 
-    finalize(cleanupFunction) {
+    stop() {
+        this.cleanup = () => {};
+    }
+
+    finalize(cleanupFunction, listeners) {
         this.initialized = true;
-        this.cleanup = () => cleanupFunction(this.pygameObj);
+        this.cleanup = () => cleanupFunction(this.pygameObj, listeners);
     }
 
 }
