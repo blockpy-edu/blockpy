@@ -5,10 +5,14 @@ export class RunConfiguration extends StudentConfiguration {
     use(engine) {
         this.main.model.execution.feedback.message("Running...");
         this.filename = "answer";
-        this.code = this.main.model.submission.code();
-        this.main.components.server.saveFile("answer.py", this.code, null);
+        this.code = this.main.model.ui.files.getStudentCode();
+        if (this.main.model.assignment.settings.disableStudentRun()) {
+            this.code = "";
+        }
+        //this.code = this.main.model.submission.code();
+        this.main.components.server.saveFile("answer.py", this.main.model.submission.code(), null);
         this.main.components.server.logEvent("Compile", "", "", "", "answer.py");
-
+        //console.log(this.code);
         super.use(engine);
 
         engine.reset();
@@ -54,14 +58,16 @@ export class RunConfiguration extends StudentConfiguration {
                 "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "results": module,
                 "output": this.main.model.execution.output,
-                "input": this.main.model.execution.input
+                "input": this.main.model.execution.input,
+                "calls": this.main.model.execution.student.calls,
+                "tracing": []
             };
             resolve();
         });
     }
 
     failure(error) {
-        console.log("Run failure");
+        console.error("Run failure", error);
         this.main.model.status.onExecution(StatusState.FAILED);
         let report = this.main.model.execution.reports;
         if (report.parser.success && report.verifier.success) {
@@ -75,9 +81,10 @@ export class RunConfiguration extends StudentConfiguration {
                 "error": error,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
                 "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
-                "input": this.main.model.execution.input
+                "input": this.main.model.execution.input,
+                "calls": this.main.model.execution.student.calls,
+                "tracing": []
             };
-            console.error(error);
             resolve();
         });
     }

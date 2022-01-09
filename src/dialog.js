@@ -106,6 +106,21 @@ BlockPyDialog.prototype.ERROR_LOADING_ASSIGNMNENT = function (reason) {
 Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
 };
 
+BlockPyDialog.prototype.ERROR_LISTING_UPLOADED_FILES = function (reason) {
+    this.show("Error Listing Uploaded Files", `BlockPy encountered an error while listing the uploaded files.<br>
+Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
+BlockPyDialog.prototype.ERROR_UPLOADING_FILE = function (reason) {
+    this.show("Error Uploaded File", `BlockPy encountered an error while uploading the file.<br>
+Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
+BlockPyDialog.prototype.ERROR_SAVING_ASSIGNMNENT = function (reason) {
+    this.show("Error Saving Assignment", `BlockPy encountered an error while saving the assignment.<br>
+Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
 BlockPyDialog.prototype.ERROR_SHOW_STUDENT_ERROR = function (error) {
     this.show("Original Error", `When I ran your code, I encountered an error:\n\n<div class="blockpy-dialog-student-error-message">${error}</div>`);
 };
@@ -126,6 +141,37 @@ Please reload the page and try again.`);
 BlockPyDialog.prototype.ERROR_LOADING_HISTORY = function () {
     this.show("Error Loading History", `BlockPy encountered an error while loading your history.<br>
 Please reload the page and try again.`);
+};
+
+BlockPyDialog.prototype.OFFER_FORK = function () {
+    let setupUrl = this.main.model.configuration.urls.instructionsAssignmentSetup;
+    setupUrl = setupUrl ? ` (<a href="${setupUrl}" target="_blank">How do I do that?</a>)` : "";
+    this.show("Assignment Not Owned; Fork?", `
+    <div class="mb-4">
+        It looks like you want to edit this assignment, but you are not an instructor
+    or designer in the course that owns it ("Course Name"). Would you like to fork
+    this assignment (or its entire group) so that you can save your modifications?
+    </div>
+    
+    <div class="mb-4">
+        Remember to update the Launch URL in the assignments' settings on Canvas!${setupUrl}
+    </div>
+    
+    <div><button type='button' class='btn btn-white'>Fork entire assignment group</button></div>
+    <div><button type='button' class='btn btn-white'>Fork just this assignment</button></div>
+    <div><button type='button' class='btn btn-danger'>Reset my local changes</button></div>
+    
+    <div class="form-check">
+        <input type="checkbox" class="form-check-input"
+                name="blockpy-transfer-submissions">
+        <label class="form-check-label" for="blockpy-transfer-submissions">Transfer Student Submissions for this course</label>
+    </div>
+    
+    <div class="form-check">
+    <label class="form-text" for="blockpy-course-id">New owning course id: </label>
+        <input type="text" name="blockpy-course-id" value="${this.main.model.user.courseId()}">
+    </div>
+    `);
 };
 
 BlockPyDialog.prototype.EDIT_INPUTS = function () {

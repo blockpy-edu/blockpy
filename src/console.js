@@ -422,13 +422,26 @@ export class BlockPyConsole {
         return this.turtleLine.html[0];
     }
 
+    handlePygameResize(newWidth, newHeight) {
+        // If the user hasn't changed the console size, and the newHeight is bigger than default, we'll change it
+        if (this.main.model.display.previousConsoleHeight() === this.printerTag.height() &&
+            newHeight > this.DEFAULT_HEIGHT) {
+            this.printerTag.height(30+newHeight);
+            this.main.model.display.previousConsoleHeight(this.printerTag.height());
+        }
+    }
+
     finishTurtles() {
         if (this.main.model.assignment.settings.saveTurtleOutput()) {
-            let canvas = this.turtleLine.html.find("canvas").last()[0];
-            let ctx = canvas.getContext("2d");
-            let img = new Image();
-            let dataUrl = canvas.toDataURL("image/png");
-            this.main.components.server.saveImage("turtle_output", dataUrl);
+            if (this.turtleLine) {
+                let canvas = this.turtleLine.html.find("canvas").last()[0];
+                let ctx = canvas.getContext("2d");
+                let img = new Image();
+                let dataUrl = canvas.toDataURL("image/png");
+                this.main.components.server.saveImage("turtle_output", dataUrl);
+            } else {
+                // TODO: What if there are no turtles to save?
+            }
         }
     }
 

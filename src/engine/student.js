@@ -10,6 +10,7 @@ export class StudentConfiguration extends Configuration {
         Sk.execLimit = Sk.execLimitFunction();
         // Stepper! Executed after every statement.
         Sk.afterSingleExecution = this.step.bind(this);
+
         // Unmute everything
         this.main.model.display.mutePrinter(false);
 
@@ -25,7 +26,11 @@ export class StudentConfiguration extends Configuration {
         let found = this.main.components.fileSystem.searchForFile(filename, true);
         //console.log(filename, found);
         if (found === undefined) {
-            throw new Sk.builtin.OSError("File not found: "+filename);
+            if (Sk.builtinFiles && Sk.builtinFiles["files"][filename] !== undefined) {
+                return Sk.builtinFiles["files"][filename];
+            } else {
+                throw new Sk.builtin.OSError("File not found: " + filename);
+            }
         } else {
             return found.contents();
         }
@@ -93,6 +98,8 @@ export class StudentConfiguration extends Configuration {
             this.engine.executionBuffer.line = lineNumber;
         }
     };
+
+
 
     /**
      * Called at the end of the Skulpt execution to terminate the executionBuffer

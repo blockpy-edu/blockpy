@@ -268,38 +268,62 @@ export class BlockPyFeedback {
         }
     }
 
-    convertSkulptError(error, filenameExecuted) {
+    buildTraceback(error, filenameExecuted) {
+        return error.traceback.map(frame => {
+            let lineno = frame.lineno;
+            if (frame.filename.slice(0, -3) === filenameExecuted) {
+                lineno -= this.main.model.execution.reports.instructor.lineOffset;
+            }
+            let file = `File <code class="filename">"${frame.filename}"</code>, `;
+            let line = `on line <code class="lineno">${lineno}</code>, `;
+            let scope = (frame.scope !== "<module>" &&
+            frame.scope !== undefined) ? `in scope ${frame.scope}` : "";
+            let source = "";
+            if (frame.source !== undefined) {
+                source = `\n<pre><code>${frame.source}</code></pre>`;
+            }
+            return file + line + scope + source;
+        });
+    }
+
+    convertSkulptError(error, filenameExecuted, isInstructor) {
         let name = error.tp$name;
         let args = Sk.ffi.remapToJs(error.args);
         let top = `${name}: ${args[0]}\n<br>\n<br>`;
         let traceback = "";
-        if (error.traceback && error.traceback.length) {
-            traceback = "Traceback:<br>\n" + error.traceback.map(frame => {
-                let lineno = frame.lineno;
-                if (frame.filename.slice(0, -3) === filenameExecuted) {
-                    lineno -= this.main.model.execution.reports.instructor.lineOffset;
+        if (name === "TimeoutError") {
+            if (error.err && error.err.traceback && error.err.traceback.length) {
+                const allFrames = this.buildTraceback(error.err, filenameExecuted);
+                const result = ["Traceback:"];
+                if (allFrames.length > 5) {
+                    result.push(...allFrames.slice(0, 3),
+                                `... Hiding ${allFrames.length - 3} other stack frames ...,`,
+                                ...allFrames.slice(-3, -2));
+                } else {
+                    result.push(...allFrames);
                 }
-                let file = `File <code class="filename">"${frame.filename}"</code>, `;
-                let line = `on line <code class="lineno">${lineno}</code>, `;
-                let scope = (frame.scope !== "<module>" &&
-                frame.scope !== undefined) ? `in scope ${frame.scope}` : "";
-                let source = "";
-                if (frame.source !== undefined) {
-                    source = `\n<pre><code>${frame.source}</code></pre>`;
-                }
-                return file + line + scope + source;
-            }).join("\n<br>");
-            traceback = `${traceback}`;
+                traceback = result.join("\n<br>");
+            }
+        } else {
+            if (isInstructor) {
+                top = "Error in instructor feedback. Please show the following to an instructor:<br>\n"+top;
+            }
+            if (error.traceback && error.traceback.length) {
+                traceback = "Traceback:<br>\n" + this.buildTraceback(error, filenameExecuted).join("\n<br>");
+            }
         }
         return top+"\n"+traceback;
     }
 
     presentInternalError(error, filenameExecuted) {
-        this.main.model.execution.feedback.category("internal");
-        this.main.model.execution.feedback.label("Internal Error");
-
-        let message = "Error in instructor feedback. Please show the following to an instructor:<br>\n";
-        message += this.convertSkulptError(error, filenameExecuted);
+        if (error.tp$name === "TimeoutError") {
+            this.main.model.execution.feedback.category("runtime");
+            this.main.model.execution.feedback.label("Timeout Error");
+        } else {
+            this.main.model.execution.feedback.category("internal");
+            this.main.model.execution.feedback.label("Internal Error");
+        }
+        let message = this.convertSkulptError(error, filenameExecuted, true);
         this.main.model.execution.feedback.message(message);
 
         this.notifyFeedbackUpdate();

@@ -1,6 +1,8 @@
 import {AbstractEditor} from "./abstract_editor";
+import {default_header} from "./default_header";
 
 export const MARKDOWN_EDITOR_HTML = `
+    ${default_header}
     <textarea class="blockpy-editor-markdown"></textarea>    
 `;
 
@@ -12,7 +14,8 @@ class MarkdownEditorView extends AbstractEditor {
             element: tag.find(".blockpy-editor-markdown")[0],
             autoDownloadFontAwesome: false,
             forceSync: true,
-            minHeight: "500px",
+            minHeight: "300px",
+            //scrollbarStyle: "native",
             // TODO: imageUploadFunction
             renderingConfig: {
                 codeSyntaxHighlighting: true,

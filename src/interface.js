@@ -89,7 +89,7 @@ export function makeInterface(main) {
     <div class='row'>
          
          <!-- Description -->
-         <div class='col-md-10 blockpy-panel blockpy-header'
+         <div class='col-md-9 blockpy-panel blockpy-header'
                role='heading' aria-label='Assignment Description'>
          
             <!-- Assignment Name -->
@@ -114,7 +114,7 @@ export function makeInterface(main) {
             </div>
         </div>
         
-        <div class='col-md-2 blockpy-panel blockpy-quick-menu'
+        <div class='col-md-3 blockpy-panel blockpy-quick-menu'
              role='menubar' aria-label='Quick Menu' title="Quick Menu">
             <!-- Get Shareable Link -->
             <!--<button class="btn btn-outline-secondary btn-sm">
@@ -147,15 +147,24 @@ export function makeInterface(main) {
             </div>
             
             
+            <!-- Fullscreen button -->
             <button class="btn btn-outline-secondary btn-sm"
                 data-bind="click: ui.menu.clickFullscreen"
-                title="Full Screen"
-            ><span class='fas',
-                           data-bind="class: ui.menu.textFullscreen"
-            ></span></button>
+                title="Full Screen">
+                <span class='fas' data-bind="class: ui.menu.textFullscreen"></span>
+            </button>
+            <!-- Edit Queued Inputs -->
             <button class="btn btn-outline-secondary btn-sm"
-                data-bind="click: ui.menu.editInputs, visible: ui.menu.showQueuedInputs" title="Edit Inputs"
-            ><span class='fas fa-list-alt'></span></button>
+                data-bind="click: ui.menu.editInputs, visible: ui.menu.showQueuedInputs" title="Edit Inputs">
+                <span class='fas fa-list-alt'></span>
+            </button>
+            <!-- Toggle Image Rendering -->
+            <button class="btn btn-outline-secondary btn-sm"
+                data-toggle="button"
+                data-bind="click: ui.menu.toggleImages" title="Toggle Images">
+                <span class="fas fa-images"></span>
+            </button>
+            <!-- Pink Bug for actual errors -->
             <span class="blockpy-student-error fas fa-bug"></span>
         </div>
          

@@ -9,6 +9,7 @@ export class EvalConfiguration extends StudentConfiguration {
         this.filename = "answer";
         this.code = "_ = " + code;
         Sk.afterSingleExecution = null;
+        Sk.beforeCall = null;
 
         super.use(engine);
 
@@ -41,14 +42,16 @@ export class EvalConfiguration extends StudentConfiguration {
                 "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "results": module,
                 "output": this.main.model.execution.output,
-                "evaluation": this.code
+                "evaluation": this.code,
+                "calls": this.main.model.execution.student.calls,
+                "tracing": []
             };
             resolve();
         });
     }
 
     failure(error) {
-        console.log("Eval failure");
+        console.log("Eval failure", error);
         this.main.model.status.onExecution(StatusState.FAILED);
         let report = this.main.model.execution.reports;
         this.main.components.server.logEvent("Compile.Error", "", "", error.toString(), "evaluations");
@@ -56,9 +59,9 @@ export class EvalConfiguration extends StudentConfiguration {
             report["student"] = {
                 "success": false,
                 "error": error,
-                "evaluation": this.code
+                "evaluation": this.code,
+                "tracing": []
             };
-            console.error(error);
             resolve();
         });
     }

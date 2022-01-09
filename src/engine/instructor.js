@@ -1,6 +1,8 @@
 import {Configuration, EMPTY_MODULE} from "./configurations.js";
 import {$sk_mod_instructor} from "../skulpt_modules/sk_mod_instructor";
 import {$sk_mod_coverage} from "../skulpt_modules/coverage";
+import {$pedal_tracer} from "../skulpt_modules/pedal_tracer";
+import {chompSpecialFile} from "../files";
 
 const UTILITY_MODULE_CODE = "var $builtinmodule = " + $sk_mod_instructor.toString();
 const COVERAGE_MODULE_CODE = $sk_mod_coverage;
@@ -18,22 +20,74 @@ export class InstructorConfiguration extends Configuration {
         this.main.model.display.mutePrinter(true);
         // Disable input box
         Sk.queuedInput = [];
+        // Put the input index back to the front, so we can replay inputs
+        this.main.model.execution.inputIndex(1);
         // TODO Sk.inputfun = BlockPyEngine.inputMockFunction;
         // TODO: Allow input function to disable the timer, somehow
+        // Disable the beforeCall checker unless specifically requested
+        Sk.beforeCallBackup = Sk.beforeCall;
+        Sk.beforeCall = null;
         // Enable utility mode
         Sk.builtinFiles.files["src/lib/utility/__init__.js"] = UTILITY_MODULE_CODE;
         Sk.builtinFiles.files["src/lib/coverage.py"] = COVERAGE_MODULE_CODE;
+        // TODO: Check if this needs to be optimized
+        //const PEDAL_TRACER_MODULE_CODE = Sk.compile($pedal_tracer, "tracer.py", "exec", true, false);
+        Sk.builtinFiles.files["src/lib/pedal/sandbox/tracer.py"] = $pedal_tracer;
+        delete Sk.builtinFiles.files["src/lib/pedal/sandbox/tracer.js"];
+        // TODO: Mock Pedal's tracer module with the appropriate version
         Sk.builtinFiles.files["./_instructor/__init__.js"] = EMPTY_MODULE;
-        // Reuse any existing sysmodules that we previously found;
-        this.sysmodules = this.main.model.execution.instructor.sysmodules;
+        // Reuse any existing sysmodules that we previously found, but not __main__ modules
+        this.sysmodules = this.clearExistingStudentImports();
+        // Horrific hack, to prevent Tifa from caching a bad version of the students' import
+        Sk.clearExistingStudentImports = this.clearExistingStudentImports;
+        return this;
+    }
+
+    clearExistingStudentImports() {
+        let sysmodules = this.main.model.execution.instructor.sysmodules;
         // Remove any existing __main__ modules
-        let $main = new Sk.builtin.str("__main__");
-        if (this.sysmodules !== undefined) {
-            if (this.sysmodules.quick$lookup($main)) {
-                this.sysmodules.del$item($main);
+        if (sysmodules !== undefined) {
+            for (let filename of this.getAllFilenames()) {
+                let skFilename = new Sk.builtin.str(filename);
+                if (sysmodules.quick$lookup(skFilename)) {
+                    sysmodules.del$item(skFilename);
+                }
             }
         }
-        return this;
+        return sysmodules;
+    }
+
+    getAllStudentFiles() {
+        const files = {
+            "answer.py": this.main.model.ui.files.getStudentCode()
+        };
+        // Skip special instructor files
+        this.main.model.assignment.extraInstructorFiles().forEach(file => {
+            if (!("!^$#".includes(file.filename()[0]))) {
+                files[file.filename()] = chompSpecialFile(file.contents());
+            }
+        });
+        // Include normal student extra files
+        this.main.model.submission.extraFiles().forEach(file => {
+            files[file.filename()] = file.contents();
+        });
+        return files;
+    }
+
+    getAllFilenames() {
+        function clean(filename) {
+            filename = chompSpecialFile(filename);
+            if (filename.endsWith(".py")) {
+                filename = filename.slice(0, -3);
+            }
+            return filename;
+        }
+        return [
+            "__main__",
+            "_instructor",
+            ...this.main.model.assignment.extraInstructorFiles().map(file => "_instructor." + clean(file.filename())),
+            ...this.main.model.submission.extraFiles().map(file => clean(file.filename())),
+        ];
     }
 
     getTimeoutPrompt(longTimeout) {
@@ -78,6 +132,7 @@ export class InstructorConfiguration extends Configuration {
 
     input(promptMessage) {
         //return "ApplePie";
+        console.log(">>>", this.main.model.execution.input(), this.main.model.execution.inputIndex());
         if (this.main.model.execution.inputIndex() < this.main.model.execution.input().length) {
             let inputIndex = this.main.model.execution.inputIndex();
             let nextInput = this.main.model.execution.input()[inputIndex];
@@ -89,6 +144,14 @@ export class InstructorConfiguration extends Configuration {
         /*return new Promise((resolve) => {
             resolve(Sk.queuedInput.pop());
         });*/
+    }
+
+    beforeCall(functionName, posargs, kwargs) {
+        let studentModel = this.main.model.execution.reports.student;
+        //console.log("HEY INSTRUCTOR CALL", functionName, studentModel.tracing);
+        if (studentModel.tracing && studentModel.tracing.length) {
+            super.beforeCall(functionName, posargs, kwargs);
+        }
     }
 
 }

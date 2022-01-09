@@ -142,7 +142,7 @@
 
 .blockpy-btn-eval {
     position: absolute;
-    bottom: 20px;
+    bottom: 2px;
     left: 20px;
 }
 
@@ -588,12 +588,11 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 }
 
 .pygame-title-exit {
-    position: absolute;
-    right: 0;
     width: 20px;
     height: 20px;
     line-height: 0;
     padding: 0;
+    margin-right: 4px;
     vertical-align: middle;
     text-align: center;
     border: 1px solid rgb(200, 33, 49);

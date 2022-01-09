@@ -14,12 +14,14 @@
 
 import {PythonEditor} from "./editor/python";
 import {TextEditor} from "./editor/text";
-import {AssignmentSettings} from "./editor/assignment_settings";
+import {AssigmentType as AssignmentType, AssignmentSettings} from "./editor/assignment_settings";
 import {TagsEditor} from "./editor/tags";
 import {MarkdownEditor} from "./editor/markdown";
 import {SampleSubmissions} from "./editor/sample_submissions";
 import {JsonEditor} from "./editor/json";
 import {ToolboxEditor} from "./editor/toolbox";
+import {QuizEditor} from "./editor/quiz";
+import {ImageEditor} from "./editor/images";
 
 /**
  * The different possible editors available
@@ -41,7 +43,7 @@ const SPECIAL_NAMESPACES = ["!", "^", "?", "$"];
 
 const AVAILABLE_EDITORS = [
     TextEditor, PythonEditor, AssignmentSettings, TagsEditor, MarkdownEditor,
-    SampleSubmissions, JsonEditor, ToolboxEditor
+    SampleSubmissions, JsonEditor, ToolboxEditor, QuizEditor, ImageEditor
 ];
 
 export const EDITORS_HTML = AVAILABLE_EDITORS.map(editor => `
@@ -112,11 +114,24 @@ export class Editors {
         let {space, name, type} = Editors.parseFilename(path);
         if (type === ".blockpy" && path in this.extensions_) {
             return this.extensions_[path];
-        } else if (type in this.extensions_) {
+        }
+        let assignmentType = this.main.model.assignment.type();
+        if (assignmentType !== AssignmentType.BLOCKPY) {
+            if (name === "answer" && type === ".py") {
+                if ("."+assignmentType in this.extensions_) {
+                    return this.extensions_["."+assignmentType];
+                } else {
+                    console.error("No editor registered for assignment type:", assignmentType);
+                    return this.registered_[0];
+                }
+            }
+        }
+        if (type in this.extensions_) {
             return this.extensions_[type];
         } else {
             return this.registered_[0];
         }
+        //console.log(this.main.model.assignment.type(), space, name, type);
     }
 
 }

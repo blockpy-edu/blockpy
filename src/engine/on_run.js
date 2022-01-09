@@ -2,17 +2,20 @@ import {indent} from "../utilities";
 import {StatusState} from "../server";
 import {InstructorConfiguration} from "./instructor";
 
-export const NEW_LINE_REGEX = /\r\n|\r|\n/;
+export function findActualInstructorOffset(instructorCode) {
+    const index = instructorCode.indexOf(INSTRUCTOR_MARKER);
+    const before = instructorCode.slice(0, index);
+    const match = before.match(NEW_LINE_REGEX);
+    return match ? (1+match.length) : 0;
+}
+
+export const INSTRUCTOR_MARKER = "###Run the actual instructor code###";
+export const NEW_LINE_REGEX = /\n/g;
 /**
  * @return {string}
  */
-export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
-    let safeCode = JSON.stringify(studentCode);
-    let indentedCode = indent(indent(isSafe ? studentCode : "pass"));
-    let tifaAnalysis = "";
-    if (!quick) {
-        tifaAnalysis = "from pedal.tifa import tifa_analysis\ntifa_analysis(False)";
-    }
+export const WRAP_INSTRUCTOR_CODE = function (studentFiles, instructorCode, quick, isSafe) {
+    let safeCode = JSON.stringify(studentFiles);
     let skip_tifa = quick ? "True": "False";
 
     // TODO: Add in Sk.queuedInput to be passed in
@@ -37,12 +40,16 @@ from pedal.environments.blockpy import setup_environment
 skip_run = get_model_info('assignment.settings.disableInstructorRun')
 inputs = None if skip_run else get_model_info('execution.input')
 
+# Set the seed to the submission ID by default?
+from pedal.questions import set_seed
+set_seed(str(get_model_info("submission.id")))
+
 # Initialize the BlockPy environment
 pedal = setup_environment(skip_tifa=${skip_tifa},
                           skip_run=skip_run,
                           inputs=inputs,
                           main_file='answer.py',
-                          main_code=${safeCode})
+                          files=${safeCode})
 student = pedal.fields['student']
 
 # TODO: Refactor resolver to return instructions
@@ -50,7 +57,7 @@ student = pedal.fields['student']
 #from pedal import questions
 #questions.show_question = set_instructions
 
-# Run the actual instructor code
+${INSTRUCTOR_MARKER}
 ${instructorCode}
 
 # Resolve everything
@@ -99,13 +106,14 @@ export class OnRunConfiguration extends InstructorConfiguration {
         let disableTifa = this.main.model.assignment.settings.disableTifa();
 
         let report = this.main.model.execution.reports;
-        let studentCodeSafe = this.main.model.submission.code();
+        //let studentCodeSafe = this.main.model.submission.code();
+        let studentFiles = this.getAllStudentFiles();
         this.dummyOutSandbox();
         let instructorCode = this.code;
-        let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         let isSafe = !report["parser"].empty && report["verifier"].success;
-        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
-        lineOffset = 0; //instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
+        instructorCode = WRAP_INSTRUCTOR_CODE(studentFiles, instructorCode, disableTifa, isSafe);
+        let lineOffset = findActualInstructorOffset(instructorCode); //instructorCode.split(NEW_LINE_REGEX).length;
+        //lineOffset = 0; //instructorCode.split(NEW_LINE_REGEX).length - lineOffset - 4;
         report["instructor"] = {
             "compliments": [],
             "filename": "./_instructor/on_run.py",
@@ -159,7 +167,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
     }
 
     failure(error) {
-        console.log("OnRun failure");
+        console.error("OnRun failure", error);
         let report = this.main.model.execution.reports;
         if (error.tp$name === "GracefulExit") {
             report["instructor"]["success"] = true;
@@ -167,7 +175,6 @@ export class OnRunConfiguration extends InstructorConfiguration {
         } else {
             this.main.model.status.onExecution(StatusState.FAILED);
             //console.log(report["instructor"]["code"]);
-            console.error(error);
             this.main.components.feedback.presentInternalError(error, this.filename);
             //report["instructor"]["success"] = false;
             //report["instructor"]["error"] = error;

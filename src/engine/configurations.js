@@ -39,6 +39,8 @@ export class Configuration {
             }
             return delay;
         };
+        // Attach beforeCall
+        Sk.beforeCall = this.beforeCall.bind(this);
         return this;
     }
 
@@ -66,6 +68,8 @@ export class Configuration {
             inputfunTakesPrompt: true,
             // Media Image Proxy URL
             imageProxy: this.getImageProxy.bind(this),
+            // TODO: Make this set by the system so we can use our own servers in practice
+            emojiProxy: (part) => `https://twemoji.maxcdn.com/v/13.1.0/svg/${part.toLowerCase()}.svg`,
             // Whether or not to keep the globals
             retainGlobals: true
         };
@@ -175,6 +179,31 @@ export class Configuration {
 
     dummyOutSandbox() {
         //Sk.builtinFiles.files["src/lib/pedal/sandbox/sandbox.py"] = "class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n";
+    }
+
+    beforeCall(functionName, posargs, kwargs) {
+        //console.log("TRACKING CALL", functionName, posargs, kwargs);
+        // TODO: Handle fastcall too? Check how that works in Skulpt side
+        let studentModel = this.main.model.execution.reports.student;
+        if (!("calls" in studentModel)) {
+            studentModel.calls = {};
+        }
+        if (!(functionName in studentModel.calls)) {
+            studentModel.calls[functionName] = [];
+        }
+        let args = {};
+        // Get actual parameter names!!
+        for (let i=0; i < posargs.length; i+= 1) {
+            args["__ARG"+i] = posargs[i];
+        }
+        if (kwargs && kwargs[0] != null) {
+            args["__ARGS"] = kwargs[0];
+        }
+        if (kwargs && kwargs[1] != null) {
+            args["__KWARGS"] = kwargs[1];
+        }
+        //console.log(args);
+        studentModel.calls[functionName].push(args);
     }
 }
 

@@ -86,6 +86,9 @@ export let FILES_HTML = `
                 data-bind="hidden: ui.files.hasContents('?mock_urls.blockpy'),
                            click: ui.files.add.bind($data, '?mock_urls.blockpy')">URL Data</a>
             <a class="dropdown-item blockpy-file-instructor" href="#"
+                data-bind="hidden: ui.files.hasContents('?images.blockpy'),
+                           click: ui.files.add.bind($data, '?images.blockpy')">Images</a>
+            <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?toolbox.blockpy'),
                            click: ui.files.add.bind($data, '?toolbox.blockpy')">Toolbox</a>
             
@@ -101,6 +104,13 @@ export let FILES_HTML = `
             <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: assignment.onEval,
                            click: ui.files.add.bind($data, '!on_eval.py')">On Eval</a>
+            <div class="dropdown-divider"></div>
+           <a class="dropdown-item blockpy-file-instructor" href="#"
+                data-bind="hidden: ui.files.hasContents('!answer_prefix.py'),
+                           click: ui.files.add.bind($data, '!answer_prefix.py')">Answer Prefix</a>
+           <a class="dropdown-item blockpy-file-instructor" href="#"
+                data-bind="hidden: ui.files.hasContents('!answer_suffix.py'),
+                           click: ui.files.add.bind($data, '!answer_suffix.py')">Answer Suffix</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="click: ui.files.add.bind($data, 'starting')">Starting File</a>
@@ -179,8 +189,18 @@ export const BASIC_NEW_FILES = [
     "?mock_urls.blockpy",
     "?toolbox.blockpy",
     "!tags.blockpy",
-    "!sample_submissions.blockpy"
+    "!sample_submissions.blockpy",
+    "!answer_prefix.py",
+    "!answer_suffix.py"
 ];
+
+export function chompSpecialFile(filename) {
+    if ("!^?&$*#".includes(filename[0])) {
+        return filename.slice(1);
+    } else {
+        return filename;
+    }
+}
 
 const INSTRUCTOR_DIRECTORY = "_instructor/";
 const STUDENT_DIRECTORY = "_student/";
@@ -200,7 +220,8 @@ export const UNRENAMABLE_FILES = ["answer.py", "!instructions.md", "!assignment_
                                   "^starting_code.py", "!on_run.py", "$settings.blockpy",
                                   "!on_change.py", "!on_eval.py",
                                   "?mock_urls.blockpy", "?toolbox.blockpy",
-                                  "!tags.blockpy", "!sample_submissions.blockpy"];
+                                  "!tags.blockpy", "!sample_submissions.blockpy",
+                                  "!answer_prefix.py", "!answer_suffix.py"];
 
 class BlockPyFile {
     constructor(main, filename, contents) {
@@ -230,9 +251,17 @@ export function loadConcatenatedFile(concatenatedFile, modelFileList) {
             }
         }
         //files = files.map(file => makeModelFile(file.filename, file.contents));
-        modelFileList(modelFiles);
+        if (modelFileList) {
+            modelFileList(modelFiles);
+        } else {
+            return modelFiles;
+        }
     } else {
-        modelFileList([]);
+        if (modelFileList) {
+            modelFileList([]);
+        } else {
+            return [];
+        }
     }
 }
 
@@ -288,17 +317,21 @@ export class BlockPyFileSystem {
          this.main.model.assignment.extraStartingFiles,
          this.main.model.assignment.extraInstructorFiles].forEach(fileArray =>
             fileArray.subscribe(function(changes) {
-                changes.forEach(function (change) {
-                    let modelFile = change.value;
-                    if (change.status === "added") {
-                        // Track new file
-                        let file = filesystem.newFile(modelFile.filename(), modelFile.contents(), modelFile.contents);
-                        filesystem.notifyWatches(file);
-                    } else if (change.status === "deleted") {
-                        // Delete file
-                        filesystem.deleteFileLocally_(modelFile.filename);
-                    }
-                });
+                changes.sort((first, second) => second.status.localeCompare(first.status))
+                    .forEach(function (change) {
+                        let modelFile = change.value;
+                        if (change.status === "added") {
+                            // Track new file
+                            let file = filesystem.newFile(modelFile.filename(), modelFile.contents(), modelFile.contents);
+                            filesystem.notifyWatches(file);
+                        } else if (change.status === "deleted") {
+                            // Delete file
+                            let file = filesystem.deleteFileLocally_(modelFile.filename());
+                            if (filesystem.main.model.display.filename() === modelFile.filename()) {
+                                filesystem.main.model.display.filename("answer.py");
+                            }
+                        }
+                    });
             }, this, "arrayChange")
         );
     }
@@ -336,6 +369,10 @@ export class BlockPyFileSystem {
         } else if (file.filename === "?mock_urls.blockpy") {
             this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
         } else if (file.filename === "?toolbox.blockpy") {
+            this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
+        } else if (file.filename === "!answer_prefix.py") {
+            this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
+        } else if (file.filename === "!answer_suffix.py") {
             this.observeInArray_(file, this.main.model.assignment.extraInstructorFiles);
         } else if (file.filename === "!tags.blockpy") {
             file.handle = this.main.model.assignment.tags;
@@ -445,7 +482,7 @@ export class BlockPyFileSystem {
             return false;
         } else {
             // Triggers a callback to eventually call deleteFileLocally_
-            let found = this.files_[filename].owner.remove(modelFile => modelFile.filename === filename);
+            let found = this.files_[filename].owner.remove(modelFile => modelFile.filename() === filename);
             return found || false;
         }
     }
@@ -457,6 +494,18 @@ export class BlockPyFileSystem {
             this.watches_[filename].forEach(callback => callback.deleted());
         }
         return file;
+    }
+
+    renameFile(source, destination) {
+        if (UNRENAMABLE_FILES.indexOf(source) !== -1) {
+            return false;
+        } else if (this.files_[filename].owner === null) {
+            return false;
+        } else {
+            // Triggers a callback to eventually call deleteFileLocally_
+            let found = this.files_[filename].owner.remove(modelFile => modelFile.filename() === filename);
+            return found || false;
+        }
     }
 
     notifyWatches(file) {
@@ -516,11 +565,11 @@ export class BlockPyFileSystem {
         let studentVersion = this.searchForFileInList_(extraStudentFiles, name);
         let generatedVersion = this.searchForFileInList_(extraStudentFiles, "*"+name);
         let defaultVersion = this.searchForFileInList_(extraInstructorFiles, "&"+name);
+        let hiddenVersion = this.searchForFileInList_(extraInstructorFiles, "?"+name);
         if (searchMode === SearchModes.ONLY_STUDENT_FILES) {
-            return firstDefinedValue(defaultVersion, studentVersion, generatedVersion);
+            return firstDefinedValue(hiddenVersion, defaultVersion, studentVersion, generatedVersion);
         }
         let instructorVersion = this.searchForFileInList_(extraInstructorFiles, "!"+name);
-        let hiddenVersion = this.searchForFileInList_(extraInstructorFiles, "?"+name);
         let startingVersion = this.searchForFileInList_(extraStartingFiles, "^"+name);
         if (searchMode === SearchModes.START_WITH_INSTRUCTOR) {
             return firstDefinedValue(instructorVersion, hiddenVersion, startingVersion,

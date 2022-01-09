@@ -51,6 +51,8 @@ export function BlockPyServer(main) {
     this.cachedFilenames = [];
     this.createSubscriptions();
     this.checkCaches();
+
+    this.altLogEntry = null;
 }
 
 /**
@@ -66,7 +68,11 @@ BlockPyServer.prototype.checkIP = function (response) {
                     "old": oldIP,
                     "new": response.ip
                 });
-                this.logEvent("X-IP.Change", undefined, undefined, message);
+                if (this.altLogEntry) {
+                    this.altLogEntry("X-IP.Change", undefined, undefined, message);
+                } else {
+                    this.logEvent("X-IP.Change", undefined, undefined, message);
+                }
                 this.storage.set("IP", response.ip);
             }
         } else {
@@ -293,7 +299,7 @@ BlockPyServer.prototype._postRetry = function (data, endpoint, delay, callback) 
  * @param {Integer} delay - The current number of milliseconds to wait before
  trying the request again.
  */
-BlockPyServer.prototype._postLatestRetry = function (data, filename, endpoint, delay) {
+BlockPyServer.prototype._postLatestRetry = function (data, filename, endpoint, delay, failureFunction, doneFunction) {
     let cache = endpoint + filename;
     let request = () => {
         // Make a backup of the current post
@@ -319,6 +325,9 @@ BlockPyServer.prototype._postLatestRetry = function (data, filename, endpoint, d
                         if (time >= cachedTime) {
                             this.storage.remove(cache);
                         }
+                        if (failureFunction) {
+                            failureFunction(response);
+                        }
                     }
                 }
             })
@@ -329,19 +338,25 @@ BlockPyServer.prototype._postLatestRetry = function (data, filename, endpoint, d
                 if (time >= cachedTime) {
                     this._postLatestRetry(data, filename, endpoint, delay + this.FAIL_DELAY);
                 }
-            });
+            })
+            .done(doneFunction);
     };
     clearTimeout(this.timers[cache]);
     if (delay === null) {
-        request();
+        return request();
     } else {
         this.timers[cache] = setTimeout(request, delay);
     }
 };
 
-BlockPyServer.prototype._postBlocking = function (endpoint, data, attempts, success, failure) {
+BlockPyServer.prototype._postBlocking = function (endpoint, data, attempts, success, failure, extraSettings={}) {
     this.showOverlay(attempts);
-    $.post(this.urls[endpoint], data)
+    return $.ajax({
+        type: "POST",
+        url: this.urls[endpoint],
+        data: data,
+        ...extraSettings
+    })
         .done((response) => {
             this.hideOverlay();
             this.setStatus(endpoint, StatusState.READY);
@@ -397,13 +412,15 @@ BlockPyServer.prototype.saveAssignment = function () {
         data["reviewed"] = model.assignment.reviewed();
         data["public"] = model.assignment.public();
         data["url"] = model.assignment.url();
+        data["points"] = model.assignment.points();
         data["ip_ranges"] = model.assignment.ipRanges();
         data["name"] = model.assignment.name();
         data["settings"] = saveAssignmentSettings(model);
 
-        this._postBlocking("saveAssignment", data, 3, () => 0,
+        this._postBlocking("saveAssignment", data, 3,
+                           this.startPossibleFork.bind(this),
                            (e, textStatus, errorThrown) => {
-                               this.main.components.dialog.ERROR_SAVING_ASSIGNMNENT();
+                               this.main.components.dialog.ERROR_SAVING_ASSIGNMNENT(textStatus);
                                console.error(e, textStatus, errorThrown);
                            });
     } else {
@@ -420,6 +437,38 @@ BlockPyServer.prototype.loadHistory = function (callback) {
                                this.main.components.dialog.ERROR_LOADING_HISTORY();
                                console.error(e, textStatus, errorThrown);
                            });
+    }
+};
+
+BlockPyServer.prototype.listUploadedFiles = function (callback) {
+    if (this.main.model.ui.server.isEndpointConnected("listUploadedFiles")) {
+        let model = this.main.model;
+        let data = this.createServerData();
+        this._postBlocking("listUploadedFiles", data, 2, callback,
+                           (e, textStatus, errorThrown) => {
+                               this.main.components.dialog.ERROR_LISTING_UPLOADED_FILES(textStatus);
+                               console.error(e, textStatus, errorThrown);
+                           });
+    }
+};
+
+BlockPyServer.prototype.uploadFile = function (placement, directory, filename, contents, callback) {
+    let model = this.main.model;
+    if (model.ui.server.isEndpointConnected("uploadFile")) {
+        let data = this.createServerData();
+        data["placement"] = placement;
+        data["directory"] = directory;
+        data["filename"] = filename;
+        data["contents"] = contents;
+        let fd = Object.entries(data).reduce((d,e) => (d.append(...e), d), new FormData());
+        return this._postBlocking("uploadFile", fd, 3,
+                                  callback,
+                                  (e, textStatus, errorThrown) => {
+                                      this.main.components.dialog.ERROR_UPLOADING_FILE(textStatus);
+                                      console.error(e, textStatus, errorThrown);
+                                  }, {processData: false, contentType: false});
+    } else {
+        this.setStatus("uploadFile", StatusState.OFFLINE, "Server is not connected! (Upload File)");
     }
 };
 
@@ -527,9 +576,15 @@ BlockPyServer.prototype.saveFile = function (filename, contents, delay) {
         data["filename"] = filename;
         data["code"] = contents;
         this.setStatus("saveFile", StatusState.ACTIVE);
-        this._postLatestRetry(data, filename, "saveFile", delay);
+        return this._postLatestRetry(data, filename, "saveFile", delay, this.startPossibleFork.bind(this));
     } else {
-        this.setStatus("saveFile", StatusState.OFFLINE);
+        return this.setStatus("saveFile", StatusState.OFFLINE);
+    }
+};
+
+BlockPyServer.prototype.startPossibleFork = function (response) {
+    if (!response.success && response.forkable) {
+        this.main.components.dialog.OFFER_FORK();
     }
 };
 

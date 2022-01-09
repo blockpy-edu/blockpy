@@ -1,6 +1,6 @@
 import {InstructorConfiguration} from "./instructor";
 import {StatusState} from "../server";
-import {NEW_LINE_REGEX} from "./on_run";
+import {findActualInstructorOffset, INSTRUCTOR_MARKER, NEW_LINE_REGEX} from "./on_run";
 import {indent} from "../utilities";
 
 /**
@@ -8,7 +8,6 @@ import {indent} from "../utilities";
  */
 export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
     let safeCode = JSON.stringify(studentCode);
-    let indentedCode = indent(indent(isSafe ? studentCode : "None"));
 
     return `
 from utility import *
@@ -36,7 +35,7 @@ evaluate(${safeCode})
 #from pedal import questions
 #questions.show_question = set_instructions
 
-# Run the actual instructor code
+${INSTRUCTOR_MARKER}
 ${instructorCode}
 
 # Resolve everything
@@ -88,10 +87,9 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         let studentCodeSafe = this.main.model.execution.reports.student.evaluation || "None";
         this.dummyOutSandbox();
         let instructorCode = this.code;
-        let lineOffset = instructorCode.split(NEW_LINE_REGEX).length;
         let isSafe = !report["parser"].empty && report["verifier"].success;
         instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
-        lineOffset = instructorCode.split(NEW_LINE_REGEX).length - lineOffset;
+        let lineOffset = findActualInstructorOffset(instructorCode); //instructorCode.split(NEW_LINE_REGEX).length;
         report["instructor"] = {
             "compliments": [],
             "filename": "./_instructor/on_eval.py",
@@ -146,7 +144,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
     }
 
     failure(error) {
-        console.log("OnEval failure");
+        console.log("OnEval failure", error);
         let report = this.main.model.execution.reports;
         if (error.tp$name === "GracefulExit") {
             report["instructor"]["success"] = true;
@@ -154,7 +152,6 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         } else {
             this.main.model.status.onExecution(StatusState.FAILED);
             //console.log(report["instructor"]["code"]);
-            console.error(error);
             this.main.components.feedback.presentInternalError(error, this.filename);
             //report["instructor"]["success"] = false;
             //report["instructor"]["error"] = error;

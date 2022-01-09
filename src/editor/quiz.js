@@ -1,24 +1,21 @@
 import {AbstractEditor} from "./abstract_editor";
-import {default_header} from "./default_header";
 
-export const JSON_EDITOR_HTML = `
-    ${default_header}
-     <div>
-        <textarea class="blockpy-editor-json"></textarea>
+export const QUIZ_EDITOR_HTML = `
+    <div>
+    <textarea class="blockpy-editor-quiz"></textarea>
     </div>
 `;
 
-class JsonEditorView extends AbstractEditor {
+class QuizEditorView extends AbstractEditor {
     constructor(main, tag) {
         super(main, tag);
-        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-json")[0], {
+        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-text")[0], {
             showCursorWhenSelecting: true,
             lineNumbers: true,
             firstLineNumber: 1,
             indentUnit: 4,
             tabSize: 4,
             indentWithTabs: false,
-            mode: "json",
             extraKeys: {
                 "Tab": "indentMore",
                 "Shift-Tab": "indentLess",
@@ -52,7 +49,6 @@ class JsonEditorView extends AbstractEditor {
         }
         // TODO: update dynamically when changing instructor status
         this.codeMirror.setOption("readOnly", newFilename.startsWith("&") && !this.main.model.display.instructor());
-
     }
 
     updateEditor(newContents) {
@@ -83,9 +79,9 @@ class JsonEditorView extends AbstractEditor {
     }
 }
 
-export const JsonEditor = {
-    name: "JSON",
-    extensions: [".json"],
-    constructor: JsonEditorView,
-    template: JSON_EDITOR_HTML
+export const QuizEditor = {
+    name: "Quiz",
+    extensions: [".quiz"],
+    constructor: QuizEditorView,
+    template: QUIZ_EDITOR_HTML
 };

@@ -60,12 +60,14 @@ export class BlockPyEngine {
 
     resetStudentModel() {
         let student = this.executionModel.student;
+        student.calls = {};
         student.currentStep(null);
         student.currentTraceStep(0);
         student.lastStep(0);
         student.currentLine(null);
         student.currentTraceData.removeAll();
         student.results = null;
+        student.tracing = [];
     }
 
     resetExecutionBuffer() {

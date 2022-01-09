@@ -99,6 +99,34 @@ export let $sk_mod_instructor = function() {
             return new Sk.builtin.list([]);
         }
     });
+
+    mod.trace_calls = new Sk.builtin.func(function() {
+        //console.log("--", Sk.executionReports["student"]);
+        //console.log("CHECKING CALLS", Sk.executionReports['student'].success);
+        if (Sk.executionReports["student"].success) {
+            let calls = Sk.executionReports["student"].calls;
+            return Sk.ffi.remapToPy(calls);
+        }
+        return new Sk.builtin.dict([]);
+    });
+
+    mod.start_trace = new Sk.builtin.func(function() {
+        //console.log("START/BEGIN", Sk.beforeCall, Sk.executionReports.student.tracing);
+        if (Sk.beforeCall === null) {
+            Sk.beforeCall = Sk.beforeCallBackup;
+        }
+        Sk.executionReports["student"].tracing.push(true);
+        //console.log("START/END", Sk.beforeCall, Sk.executionReports.student.tracing);
+    });
+
+    mod.stop_trace = new Sk.builtin.func(function() {
+        //console.log("STOP/BEGIN", Sk.beforeCall, Sk.executionReports.student.tracing);
+        Sk.executionReports["student"].tracing.pop();
+        if (Sk.executionReports["student"].tracing.length === 0) {
+            Sk.beforeCall = null;
+        }
+        //console.log("STOP/END", Sk.beforeCall, Sk.executionReports.student.tracing);
+    });
     
     /**
      *
@@ -314,6 +342,11 @@ export let $sk_mod_instructor = function() {
             model = model[keys[i]];
         }
         return Sk.ffi.remapToPy(model());
+    });
+
+    mod.clear_existing_student_imports = new Sk.builtin.func(function() {
+        Sk.builtin.pyCheckArgs("get_student_data", arguments, 0, 0);
+        Sk.clearExistingStudentImports();
     });
     
     return mod;

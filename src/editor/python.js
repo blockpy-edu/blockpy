@@ -121,12 +121,12 @@ export const PYTHON_EDITOR_HTML = `
              </button>
          </div>
          
-         <div class="btn-group mr-2" role="group" aria-label="Rename Group"
+         <!--<div class="btn-group mr-2" role="group" aria-label="Rename Group"
             data-bind="visible: ui.editors.canRename">
              <button type="button" class="btn btn-outline-secondary">
                 <span class="fas fa-file-signature"></span> Rename
              </button>
-         </div>
+         </div>-->
          
     </div>
     
@@ -173,14 +173,24 @@ class PythonEditorView extends AbstractEditor {
             "blocklyMediaPath": main.model.configuration.blocklyPath,
             "toolbox": main.model.assignment.settings.toolbox(),
             "imageMode": true,
-            imageDownloadHOok: (oldUrl) => {
+            imageDownloadHook: (oldUrl) => {
                 return oldUrl;
             },
             imageUploadHook: (blob) => {
-                return Promise.resolve("Image("+JSON.stringify(URL.createObjectURL(blob))+")");
+                //const uuid = window.URL.createObjectURL(new Blob([])).substring(31);
+                return new Promise((resolve, reject) => {
+                    const submissionId = main.model.submission.id();
+                    main.components.server.uploadFile("submission", submissionId, blob.name, blob, (response) => {
+                        resolve(JSON.stringify(response.endpoint));
+                        //resolve(JSON.stringify(main.model.configuration.urls["downloadFile"] + `?placement=submission&directory=${submissionId}&filename=${blob.name}`));
+                    });
+                    //return Promise.resolve("Image("+JSON.stringify(URL.createObjectURL(blob))+")");
+                    //return Promise.resolve(JSON.stringify(URL.createObjectURL(blob)));
+                });
             },
             imageLiteralHook: (oldUrl) => {
-                return `Image("${oldUrl}")`;
+                //return `Image("${oldUrl}")`;
+                return `"${oldUrl}"`;
             },
             //'height': '2000px'
         });

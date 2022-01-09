@@ -1,6 +1,8 @@
 import {AbstractEditor} from "./abstract_editor";
+import {default_header} from "./default_header";
 
 export const TEXT_EDITOR_HTML = `
+    ${default_header}
     <div>
     <textarea class="blockpy-editor-text"></textarea>
     </div>

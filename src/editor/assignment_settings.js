@@ -3,6 +3,7 @@ import {DisplayModes} from "./python";
 
 const ASSIGNMENT_SETTINGS = [
     ["toolbox", "toolbox", "normal", "toolbox", "Which version of the toolbox to present to the user."],
+    ["type", "type", "blockpy", "type", "The type of question; BlockPy programming problems are the default, but we also support static readings, quiz questions, and a Maze game."],
     ["passcode", "passcode", "", "string", "A string that the user must enter to access the problem. If blank, then no passcode is prompted."],
     //["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
     ["startView", "start_view", DisplayModes.SPLIT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
@@ -10,7 +11,7 @@ const ASSIGNMENT_SETTINGS = [
     ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
     ["isParsons", "is_parsons", false, "bool", "If checked, then this is a parson's style question (jumbled)."],
     ["disableFeedback", "disable_feedback", false, "bool", "If checked, then no instructor scripts are run (e.g., on_run and on_eval)."],
-    ["disableInstructorRun", "disable_instructor_run", false, "bool", "If checked, then the instructor on_run will not automatically run the students' code. This still runs the students' code."],
+    ["disableInstructorRun", "disable_instructor_run", false, "bool", "If checked, then the instructor on_run will not automatically run the students' code. This still runs the students' code once beforehand, but the output/data will not be available to the instructor's on_run.py script."],
     ["disableStudentRun", "disable_student_run", false, "bool", "If checked, then the run button no longer run the students' code. This still runs the instructor's feedback on_run script."],
     ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
@@ -34,6 +35,13 @@ const ASSIGNMENT_SETTINGS = [
     ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."],
     ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle output is saved whenever the program uses it."],
 ];
+
+export let AssigmentType = {
+    BLOCKPY: "blockpy",
+    MAZE: "maze",
+    QUIZ: "quiz",
+    READING: "reading"
+};
 
 function getDocumentation(name) {
     for (let i=0; i < ASSIGNMENT_SETTINGS.length; i++) {
@@ -165,6 +173,17 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
         </div>
         
         <div class="form-group row">
+            <label for="blockpy-settings-points" class="col-sm-2 col-form-label text-right">Points:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control" id="blockpy-settings-points"
+                data-bind="value: assignment.points">
+                <small class="form-text text-muted">
+                    The number of points this assignment is worth; defaults to 1 point. 
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
             <div class="col-sm-2 text-right">
                 <label class="form-check-label" for="blockpy-settings-reviewed">Starting View:</label>
             </div>
@@ -232,6 +251,22 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
                 </select>
                 <small class="form-text text-muted">
                     ${getDocumentation("toolbox")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-type" class="col-sm-2 col-form-label text-right">Problem Type:</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="blockpy-settings-type"
+                       data-bind="value: assignment.type">
+                   <option value="blockpy">BlockPy</option>
+                   <option value="maze">Maze</option>
+                   <option value="quiz">Quiz Question</option>
+                   <option value="reading">Reading</option>
+                </select>
+                <small class="form-text text-muted">
+                    ${getDocumentation("type")}
                 </small>
             </div>
         </div>

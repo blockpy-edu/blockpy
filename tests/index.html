@@ -5,7 +5,7 @@
     <title>BlockPy Example</title>
 
     <!-- D3 -->
-    <script src="../libs/d3/d3.min.js"></script>
+    <script src="../libs/d3/d3.6.3.1.min.js"></script>
 
     <!-- FontAwesome 5 -->
     <link rel="stylesheet" href="../libs/fontawesome/all.min.css">
@@ -60,6 +60,10 @@
 
     <!-- PygameSkulpt -->
     <script src="../../pygame4skulpt/dist/pygameskulpt.js" type="text/javascript"></script>
+    
+    <!-- Designer -->
+    <script src="../../../gamedev/designer/dist-js/skulpt-designer.js" type="text/javascript"></script>
+    <script src="../../../gamedev/designer/dist-js/skulpt-designer-files.js" type="text/javascript"></script>
 
     <!-- Pedal -->
     <script src="../../../pedal-edu/pedal/dist-js/skulpt-pedal.js" type="text/javascript"></script>
@@ -101,7 +105,8 @@ i.show()
     let LOCAL_FILES = {
         LOCAL_ON_RUN_CODE: "",
         LOCAL_ON_EVAL_CODE: "",
-        LOCAL_ANSWER_CODE: ""
+        LOCAL_ANSWER_CODE: "",
+        //LOCAL_INSTRUCTOR_EXTRA_FILES: ""
     }
     try {
         if (localStorage) {
@@ -120,13 +125,15 @@ i.show()
         editor = new blockpy.BlockPy({
             'attachment.point': '#main-editor',
             "urls": {
-                "importDatasets": "https://corgis-edu.github.io/corgis/datasets/"
+                "importDatasets": "https://corgis-edu.github.io/corgis/datasets/",
+                "instructionsAssignmentSetup": "https://localhost:5000"
             },
             "display.instructor": true,
             //"assignment.on_eval": "console_log(ABC)",
             "assignment.on_run": LOCAL_FILES.LOCAL_ON_RUN_CODE,
             //"assignment.on_eval": LOCAL_FILES.LOCAL_ON_EVAL_CODE,
             "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE,
+            "assignment.extra_instructor_files": LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES,
             // Pygame tests
             "display.python.mode": "text",
             //"assignment.settings.disable_timeout": true,
@@ -139,6 +146,9 @@ dog.flip().show()
  */
         blockmirror = editor.components.editors.registered_[1].bm;
 
+        // TODO: HACK, need to make this cleaner
+        Sk.emojiProxy = (part) => `https://twemoji.maxcdn.com/v/13.1.0/svg/${part.toLowerCase()}.svg`;
+
         updateClient();
     });
 
@@ -146,9 +156,13 @@ dog.flip().show()
         LOCAL_FILES.LOCAL_ANSWER_CODE = editor.model.submission.code();
         LOCAL_FILES.LOCAL_ON_RUN_CODE = editor.model.assignment.onRun();
         LOCAL_FILES.LOCAL_ON_EVAL_CODE = editor.model.assignment.onEval();
+        LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES = JSON.stringify(Object.fromEntries(editor.model.assignment.extraInstructorFiles().map(file => {
+            return [file.filename(), file.contents()];
+        })));
         localStorage.setItem("LOCAL_ANSWER_CODE", LOCAL_FILES.LOCAL_ANSWER_CODE);
         localStorage.setItem("LOCAL_ON_RUN_CODE", LOCAL_FILES.LOCAL_ON_RUN_CODE);
         localStorage.setItem("LOCAL_ON_EVAL_CODE", LOCAL_FILES.LOCAL_ON_EVAL_CODE);
+        localStorage.setItem("LOCAL_INSTRUCTOR_EXTRA_FILES", LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES);
         updateClient();
     }
 
@@ -156,15 +170,18 @@ dog.flip().show()
         $("#old-answer-code").text(LOCAL_FILES.LOCAL_ANSWER_CODE);
         $("#old-on-run-code").text(LOCAL_FILES.LOCAL_ON_RUN_CODE);
         $("#old-on-eval-code").text(LOCAL_FILES.LOCAL_ON_EVAL_CODE);
+        $("#old-extra-instructor-files").text(LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES);
     }
 
     function deleteOldClient() {
         localStorage.removeItem("LOCAL_ANSWER_CODE");
         localStorage.removeItem("LOCAL_ON_RUN_CODE");
         localStorage.removeItem("LOCAL_ON_EVAL_CODE");
+        localStorage.removeItem("LOCAL_INSTRUCTOR_EXTRA_FILES");
         LOCAL_FILES.LOCAL_ANSWER_CODE = "";
         LOCAL_FILES.LOCAL_ON_RUN_CODE = "";
         LOCAL_FILES.LOCAL_ON_EVAL_CODE = "";
+        LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES = "";
         updateClient();
     }
 </script>
@@ -176,6 +193,7 @@ dog.flip().show()
             <td><pre id="old-answer-code"></pre></td>
             <td><pre id="old-on-run-code"></pre></td>
             <td><pre id="old-on-eval-code"></pre></td>
+            <td><pre id="old-extra-instructor-files"></pre></td>
         </tr>
     </table>
 

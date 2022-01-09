@@ -5,7 +5,9 @@
 import "./css/blockpy.css";
 import "./css/bootstrap_retheme.css";
 import $ from "jquery";
-import {$builtinmodule} from "skulpt_modules/image";
+import {$builtinmodule as imageModule} from "skulpt_modules/image";
+import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
+//import {$builtinmodule as matplotlibModule} from "skulpt_modules/matplotlib2";
 import {LocalStorageWrapper} from "storage.js";
 import {EditorsEnum} from "editors.js";
 import {DisplayModes} from "editor/python.js";
@@ -27,7 +29,7 @@ import {BlockPyConsole} from "./console";
 import {BlockPyFeedback} from "feedback.js";
 import {BlockPyServer} from "./server";
 import {BlockPyDialog} from "./dialog";
-import {loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";
+import {AssigmentType, loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";
 import {BlockPyCorgis, _IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS} from "./corgis";
 import {BlockPyHistory} from "./history";
 import {capitalize} from "./utilities";
@@ -35,7 +37,7 @@ import {SampleSubmission} from "./editor/sample_submissions";
 
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
 
-const EDITOR_VERSION = "5.1.1";
+const EDITOR_VERSION = "5.1.2";
 
 /**
  * Major entry point for creating a BlockPy instance.
@@ -136,12 +138,13 @@ export class BlockPy {
                  */
                 url: ko.observable(""),
                 // TODO: warning message if maze
-                type: ko.observable(""),
+                type: ko.observable(AssigmentType.BLOCKPY),
+                points: ko.observable(null),
                 startingCode: ko.observable(configuration["assignment.starting_code"] || ""),
                 onRun: ko.observable(configuration["assignment.on_run"] || ""),
                 onChange: ko.observable(configuration["assignment.on_change"] || null),
                 onEval: ko.observable(configuration["assignment.on_eval"] || null),
-                extraInstructorFiles: ko.observableArray([]),
+                extraInstructorFiles: ko.observableArray(loadConcatenatedFile(configuration["assignment.extra_instructor_files"]) || []),
                 extraStartingFiles: ko.observableArray([]),
                 forkedId: ko.observable(null),
                 forkedVersion: ko.observable(null),
@@ -183,7 +186,7 @@ export class BlockPy {
                  * Whether or not to be presented with the instructor settings and files
                  * @type {bool}
                  */
-                instructor: ko.observable(this.getSetting("display.instructor", "false").toString()==="true"),
+                instructor: ko.observable(""+this.getSetting("display.instructor", "false")==="true"),
                 /**
                  * Whether or not to prevent the printer from showing things
                  */
@@ -258,8 +261,16 @@ export class BlockPy {
                  * Whether or not to clear out inputs after a run/on_run cycle
                  */
                 clearInputs: ko.observable(true),
+                /**
+                 * Whether or not images should be rendered (true), or just stay as text code (false).
+                 */
+                renderImages: ko.observable(true),
                 editorVersion: EDITOR_VERSION,
                 readOnly: ko.observable(this.getSetting("display.read_only", "false").toString()==="true"),
+                /**
+                 * Uploaded files are ones that have been listed by the remote
+                 */
+                uploadedFiles: ko.observable(null)
             },
             status: {
                 // @type {ServerStatus}
@@ -293,6 +304,15 @@ export class BlockPy {
                 updateSubmissionStatus: ko.observable(StatusState.READY),
                 updateSubmissionStatusMessage: ko.observable(""),
                 // @type {ServerStatus}
+                listUploadedFiles: ko.observable(StatusState.READY),
+                listUploadedFilesMessage: ko.observable(""),
+                // @type {ServerStatus}
+                downloadFile: ko.observable(StatusState.READY),
+                downloadFileMessage: ko.observable(""),
+                // @type {ServerStatus}
+                uploadFile: ko.observable(StatusState.READY),
+                uploadFileMessage: ko.observable(""),
+                // @type {ServerStatus}
                 onExecution: ko.observable(StatusState.READY),
             },
             execution: {
@@ -320,7 +340,8 @@ export class BlockPy {
                     currentTraceStep: ko.observable(0),
                     // Actual execution results
                     results: null,
-                    globals: ko.observable(null)
+                    globals: ko.observable(null),
+                    calls: {}
                 },
                 instructor: {
                     globals: null,
@@ -430,6 +451,7 @@ export class BlockPy {
         this.model.assignment.public(assignment.public);
         this.model.assignment.type(assignment.type);
         this.model.assignment.url(assignment.url);
+        this.model.assignment.points(assignment.points);
         this.model.assignment.ipRanges(assignment.ip_ranges);
         this.model.assignment.instructions(assignment.instructions);
         this.model.assignment.name(assignment.name);
@@ -444,11 +466,11 @@ export class BlockPy {
         this.model.assignment.onRun(assignment.on_run);
         this.model.assignment.startingCode(assignment.starting_code);
         this.model.assignment.ownerId(assignment.owner_id);
-        loadAssignmentSettings(this.model, assignment.settings);
         this.loadTags(assignment.tags);
         this.loadSampleSubmissions(assignment.sample_submissions);
         loadConcatenatedFile(assignment.extra_instructor_files, this.model.assignment.extraInstructorFiles);
         loadConcatenatedFile(assignment.extra_starting_files, this.model.assignment.extraStartingFiles);
+        loadAssignmentSettings(this.model, assignment.settings);
         this.loadSubmission(data.submission, assignment);
         this.model.display.dirtySubmission(true);
         this.model.display.changedInstructions(null);
@@ -488,6 +510,14 @@ export class BlockPy {
                 },
                 editInputs: () => {
                     this.components.dialog.EDIT_INPUTS();
+                },
+                toggleImages: () => {
+                    if (model.display.renderImages()) {
+                        self.components.pythonEditor.bm.textEditor.disableImages();
+                    } else {
+                        self.components.pythonEditor.bm.textEditor.enableImages();
+                    }
+                    model.display.renderImages(!model.display.renderImages());
                 },
                 canMarkSubmitted: ko.pureComputed(() =>
                     model.assignment.hidden() || model.assignment.reviewed() ||
@@ -696,6 +726,12 @@ export class BlockPy {
                         case "!on_eval.py": return model.assignment.onEval() !== null;
                         case "?mock_urls.blockpy": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "?mock_urls.blockpy");
+                        case "?images.blockpy": return model.assignment.extraInstructorFiles().some(file =>
+                            file.filename() === "?images.blockpy");
+                        case "!answer_prefix.py": return model.assignment.extraInstructorFiles().some(file =>
+                            file.filename() === "!answer_prefix.py");
+                        case "!answer_suffix.py": return model.assignment.extraInstructorFiles().some(file =>
+                            file.filename() === "!answer_suffix.py");
                         case "?toolbox.blockpy": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "?toolbox.blockpy");
                         case "!tags.blockpy": return model.assignment.tags().length;
@@ -706,13 +742,19 @@ export class BlockPy {
                 add: function(path) {
                     switch (path) {
                         case "?mock_urls.blockpy":
+                        case "!answer_prefix.py":
+                        case "!answer_suffix.py":
                         case "?tags.blockpy":
                         case "?settings.blockpy":
-                            self.components.fileSystem.newFile(path); break;
+                            self.components.fileSystem.newFile(path);
+                            break;
+                        case "?images.blockpy":
+                            self.components.fileSystem.newFile(path, "{}");
+                            break;
                         case "?toolbox.blockpy":
                             let normalToolbox = self.components.pythonEditor.bm.blockEditor.TOOLBOXES["normal"];
                             normalToolbox = JSON.stringify(normalToolbox, null, 2);
-                            self.components.fileSystem.newFile(path, normalToolbox); break;
+                            self.components.fileSystem.newFile(path, normalToolbox);
                             break;
                         case "!sample_submissions.blockpy":
                             model.assignment.sampleSubmissions([SampleSubmission.Blank()]);
@@ -744,12 +786,36 @@ export class BlockPy {
                 delete: function() {
                     return self.components.fileSystem.deleteFile(model.display.filename());
                 },
+                rename: (newName) => {
+                    return self.components.fileSystem.renameFile(model.display.filename(), newName);
+                },
+                getStudentCode: function() {
+                    let prefixPy = self.components.fileSystem.getFile("!answer_prefix.py");
+                    let suffixPy = self.components.fileSystem.getFile("!answer_suffix.py");
+                    let code = self.model.submission.code();
+                    if (prefixPy && prefixPy.handle && prefixPy.handle()) {
+                        code = prefixPy.handle() + code;
+                    }
+                    if (suffixPy && suffixPy.handle && suffixPy.handle()) {
+                        code = code + suffixPy.handle();
+                    }
+                    return code;
+                },
                 extraStudentFiles: observeConcatenatedFile(model.submission.extraFiles),
                 extraInstructorFiles: observeConcatenatedFile(model.assignment.extraInstructorFiles),
                 extraStartingFiles: observeConcatenatedFile(model.assignment.extraStartingFiles),
                 displayFilename: function(path) {
                     if (path === "?mock_urls.blockpy") {
                         return "URL Data";
+                    }
+                    if (path === "?images.blockpy") {
+                        return "Images";
+                    }
+                    if (path === "!answer_prefix.py") {
+                        return "Answer Prefix";
+                    }
+                    if (path === "!answer_suffix.py") {
+                        return "Answer Suffix";
                     }
                     if (path === "?toolbox.blockpy") {
                         return "Toolbox";
@@ -836,6 +902,9 @@ export class BlockPy {
                         use: ()=>{ self.components.history.use(); }
                     }
                 },
+                images: {
+                    reloadImages: () => self.components.editors.byName("image").reloadImages()
+                },
                 settings: {
                     save: () => self.components.server.saveAssignment()
                 },
@@ -907,7 +976,9 @@ export class BlockPy {
 
     turnOnHacks() {
         //console.log("TODO");
-        Sk.builtinFiles.files["src/lib/image.js"] = $builtinmodule.toString();
+        Sk.builtinFiles.files["src/lib/image.js"] = imageModule.toString();
+        //Sk.builtinFiles.files["src/lib/weakref.js"] = weakrefModule.toString();
+        //Sk.builtinFiles.files["src/lib/matplotlib/pyplot/__init__.js"] = matplotlibModule.toString();
     }
 
     /**
@@ -915,7 +986,7 @@ export class BlockPy {
      * HTML.
      */
     applyModel() {
-        ko.applyBindings(this.model);
+        ko.applyBindings(this.model, this.model.configuration.container[0]);
     }
 
     initUtilities() {
@@ -945,6 +1016,14 @@ export class BlockPy {
         components.history = new BlockPyHistory(main, container.find(".blockpy-history-toolbar"));
     }
 
+    show() {
+        this.model.configuration.container.show();
+    }
+
+    hide() {
+        this.model.configuration.container.hide();
+    }
+
     makeExtraSubscriptions() {
         this.model.display.changedInstructions.subscribe((changed) => {
             this.components.server.logEvent("X-Instructions.Change", "", "",
@@ -958,6 +1037,8 @@ export class BlockPy {
 
     resetInterface() {
         this.components.engine.reset();
+        // Disable any alternative logEntry functions we have been given
+        this.components.server.altLogEntry = null;
     }
 
     requestPasscode() {
