@@ -13,5 +13,7 @@
     <orderEntry type="library" name="jquery" level="project" />
     <orderEntry type="library" name="BlockMirror" level="project" />
     <orderEntry type="library" name="Skulpt" level="project" />
+    <orderEntry type="library" name="Skulpt" level="project" />
+    <orderEntry type="library" name="D3" level="project" />
   </component>
 </module>
