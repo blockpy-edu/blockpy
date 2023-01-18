@@ -50,6 +50,7 @@ $> cd blockpy-edu
 $> git clone https://github.com/blockpy-edu/skulpt skulpt
 $> cd skulpt
 $> npm install
+$> npm run devbuild
 ```
 
 3. For many of the remainders, you actually only need the final compiled files (per [this file](https://github.com/blockpy-edu/blockpy/blob/master/tests/index.html#L51-L68)).
