@@ -6,10 +6,12 @@ const ASSIGNMENT_SETTINGS = [
     ["type", "type", "blockpy", "type", "The type of question; BlockPy programming problems are the default, but we also support static readings, quiz questions, and a Maze game."],
     ["passcode", "passcode", "", "string", "A string that the user must enter to access the problem. If blank, then no passcode is prompted."],
     //["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
-    ["startView", "start_view", DisplayModes.SPLIT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
+    ["startView", "start_view", DisplayModes.TEXT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
     ["datasets", "datasets", "", "string", "The current list of datasets available on load as a comma-separated string."],
     ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
+    ["partId", "part_id", "", "string", "The Part ID of an Assignment that this editor is responsible for. Assignments can have regions (\"Parts\") that behave independently to the user but all correspond to the same assignment on the backend. Blank corresponds to the full document. Note that most assignment settings will apply UNIVERSALLY across all parts, including the on_run.py and the other settings on this page."],
     ["isParsons", "is_parsons", false, "bool", "If checked, then this is a parson's style question (jumbled)."],
+    ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle (and pygame) output is saved whenever the program uses it."],
     ["disableFeedback", "disable_feedback", false, "bool", "If checked, then no instructor scripts are run (e.g., on_run and on_eval)."],
     ["disableInstructorRun", "disable_instructor_run", false, "bool", "If checked, then the instructor on_run will not automatically run the students' code. This still runs the students' code once beforehand, but the output/data will not be available to the instructor's on_run.py script."],
     ["disableStudentRun", "disable_student_run", false, "bool", "If checked, then the run button no longer run the students' code. This still runs the instructor's feedback on_run script."],
@@ -33,7 +35,10 @@ const ASSIGNMENT_SETTINGS = [
     // TODO: Fix this one to be settable
     ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
     ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."],
-    ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle output is saved whenever the program uses it."],
+    ["hideTraceButton", "hide_trace_button", false, "bool", "If checked, then the Trace button is not shown."],
+    ["smallLayout", "small_layout", false, "bool", "If checked, then the interface fits into a smaller region."],
+    ["hasClock", "has_clock", false, "bool", "If checked, then a clock is shown in the top right corner."],
+    ["preloadFiles", "preload_files", "", "string", "A JSON structure representing the files that should be loaded on start from the remote, as if they were local."]
 ];
 
 export let AssigmentType = {
@@ -238,6 +243,17 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
         </div>
         
         <div class="form-group row">
+            <label for="blockpy-settings-preload-files" class="col-sm-2 col-form-label text-right">Preloaded Files:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-preload-files"
+                data-bind="value: assignment.settings.preloadFiles">
+                <small class="form-text text-muted">
+                    ${getDocumentation("preloadFiles")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
             <label for="blockpy-settings-toolbox" class="col-sm-2 col-form-label text-right">Block Toolbox:</label>
             <div class="col-sm-10">
                 <select class="form-control" id="blockpy-settings-toolbox"
@@ -267,6 +283,17 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
                 </select>
                 <small class="form-text text-muted">
                     ${getDocumentation("type")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-part-id" class="col-sm-2 col-form-label text-right">Part ID:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-part-id"
+                data-bind="value: configuration.partId">
+                <small class="form-text text-muted">
+                    ${getDocumentation("partId")}
                 </small>
             </div>
         </div>

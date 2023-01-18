@@ -609,3 +609,25 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 .pygame-title-exit:active {
     background-color: rgb(255, 150, 150);
 }
+
+.feedback-shrunk {
+    max-height: 4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.feedback-expand-on-click {
+    cursor: pointer;
+    border: 1px solid lightgray;
+}
+
+.feedback-shrunk.feedback-expand-on-click::before {
+    content: "+";
+    float: right;
+}
+
+.feedback-expand-on-click:not(.feedback-shrunk)::before {
+    content: "-";
+    float: right;
+}

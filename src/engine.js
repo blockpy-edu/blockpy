@@ -95,20 +95,24 @@ export class BlockPyEngine {
         this.main.components.feedback.clear();
     }
 
-    delayedRun() {
+    delayedRun(disableFeedback=false) {
         //this.main.model.status.onExecution(StatusState.ACTIVE);
         //$(".blockpy-run").addClass("blockpy-run-running");
-        this.run();
+        this.run(disableFeedback);
         //setTimeout(this.run.bind(this), 1);
     }
 
-    run() {
+    stop() {
+
+    }
+
+    run(disableFeedback=false) {
         this.configuration = this.configurations.run.use(this);
         let execution = this.execute().then(
             this.configuration.success.bind(this.configuration),
             this.configuration.failure.bind(this.configuration)
         );
-        if (!this.main.model.assignment.settings.disableFeedback()) {
+        if (!this.main.model.assignment.settings.disableFeedback() && !disableFeedback) {
             execution.then(() => {
                 this.configuration.provideSecretError();
                 return this.onRun();
@@ -141,6 +145,7 @@ export class BlockPyEngine {
             );
             if (!this.main.model.assignment.settings.disableFeedback() &&
                 this.main.model.assignment.onEval()) {
+                this.configuration.provideSecretError();
                 execution.then(this.onEval.bind(this));
             } else {
                 execution.then(this.configuration.showErrors.bind(this.configuration))

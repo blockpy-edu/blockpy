@@ -44,9 +44,9 @@ export const TRACE_HTML = `
             </span>
         </div>
     </div>
-    
+    <p data-bind="text: ui.trace.ast"></p>
+    <p>Variables after this step:</p>
     <table class='table table-sm table-striped table-bordered table-hover'>
-        <caption>Current variables at this step</caption>
         <thead>
             <tr><th>Name</th><th>Type</th><th>Value</th></tr>
         </thead>
@@ -70,6 +70,108 @@ export const TRACE_HTML = `
 </div>
 `;
 
+export const AST_DESCRIPTIONS = {
+    "Add": "An addition operator",
+    "And": "A boolean AND operator",
+    "AnnAssign": "An annotated assignment",
+    "Assert": "An assert statement",
+    "Assign": "An assignment statement",
+    "AsyncFor": "An asychronous for loop",
+    "AsyncFunctionDef": "An asychronous function definition",
+    "AsyncWith": "An asychronous with statement",
+    "Attribute": "An attribute lookup (access a field)",
+    "AugAssign": "An augmented assignment",
+    "AugLoad": "An augmented load",
+    "AugStore": "An augmented store",
+    "Await": "An await statement",
+    "BinOp": "A binary operator",
+    "BitAnd": "A bitwise AND operator",
+    "BitOr": "A bitwise OR operator",
+    "BitXor": "A bitwise XOR operator",
+    "BoolOp": "A boolean operator",
+    "Break": "A break statement",
+    "Bytes": "A literal bytes string",
+    "Call": "A function call",
+    "ClassDef": "A class definition",
+    "Compare": "A boolean comparison",
+    "Constant": "A literal value",
+    "Continue": "A continue statement",
+    "Del": "A delete statement",
+    "Delete": "A deletion",
+    "Dict": "A dictionary literal",
+    "DictComp": "A dictionary comprehension",
+    "Div": "A division operator",
+    "Ellipsis": "An ellipsis",
+    "Eq": "An equality comparison operator",
+    "ExceptHandler": "An except handler",
+    "Expr": "An expression used as a statement",
+    "Expression": "An evaluated expression",
+    "ExtSlice": "A multi-dimensional slice",
+    "FloorDiv": "An integer division operator",
+    "For": "A FOR loop",
+    "FormattedValue": "A formatted value in an f-string",
+    "FunctionDef": "A function definition",
+    "GeneratorExp": "A generator expression",
+    "Global": "A global statement",
+    "Gt": "A greater than comparison operator",
+    "GtE": "A greater than or equal to comparison operator",
+    "If": "An IF statement",
+    "IfExp": "An IF expression",
+    "Import": "An import statement",
+    "ImportFrom": "An import/from statement",
+    "In": "An IN operator",
+    "Index": "An index",
+    "Interactive": "An interactive expression",
+    "Invert": "An invert operator",
+    "Is": "An IS operator",
+    "IsNot": "An IS NOT operator",
+    "JoinedStr": "An f-string",
+    "LShift": "A left shift operator",
+    "Lambda": "A lambda expression",
+    "List": "A list literal",
+    "ListComp": "A list comprehension",
+    "Load": "A load",
+    "Lt": "A less than comparison operator",
+    "LtE": "A less than or equal to comparison operator",
+    "MatMult": "A matrix multiplication operator",
+    "Mod": "A modulo operator",
+    "Module": "A module",
+    "Mult": "A multiplication operator",
+    "Name": "A name",
+    "NameConstant": "A name constant",
+    "Nonlocal": "A nonlocal statement",
+    "Not": "A not operator",
+    "NotEq": "A not equal to comparison operator",
+    "NotIn": "A NOT IN operator",
+    "Num": "A numeric literal",
+    "Or": "A boolean OR operator",
+    "Param": "A parameter",
+    "Pass": "A pass statement",
+    "Pow": "A power operator",
+    "RShift": "A right shift operator",
+    "Raise": "A raise statement",
+    "Return": "A return statement",
+    "Set": "A set literal",
+    "SetComp": "A set comprehension",
+    "Slice": "A slice",
+    "Starred": "A starred argument",
+    "Store": "A store",
+    "Str": "A string literal",
+    "Sub": "A subtraction operator",
+    "Subscript": "A subscript",
+    "Suite": "A suite",
+    "Try": "A try statement",
+    "Tuple": "A tuple literal",
+    "TypeIgnore": " a type ignore",
+    "UAdd": "A unary addition operator",
+    "USub": "A unary subtraction operator",
+    "UnaryOp": "A unary operator",
+    "While": "A while loop",
+    "With": "A with statement",
+    "Yield": "A yield statement",
+    "YieldFrom": "A yield/from statement"
+};
+
 export class BlockPyTrace {
 
     constructor(main, tag) {
@@ -77,7 +179,7 @@ export class BlockPyTrace {
         this.tag = tag;
 
         this.IGNORED_GLOBALS = ["__name__", "__doc__", "__package__",
-                                "classmethod", "property", "staticmethod"];
+                                "classmethod", "property", "staticmethod", "$free", "$cell"];
 
         // this.trace.click(this.buildTraceTable.bind(this));
     }
@@ -91,10 +193,17 @@ export class BlockPyTrace {
     parseGlobals(variables) {
         let result = [];
         let modules = [];
+        //console.log(variables);
         if (!this.main.model.display.traceExecution()) {
+            /*if ("$cell" in variables) {
+                variables = {...variables, ...variables.$cell};
+            }*/
+            /*if ("$free" in variables) {
+                variables = {...variables, ...variables.$free};
+            }*/
             for (let property in variables) {
                 let value = variables[property];
-                if (this.IGNORED_GLOBALS.indexOf(property) === -1) {
+                if (this.IGNORED_GLOBALS.indexOf(property) === -1 && value !== undefined) {
                     property = property.replace("_$rw$", "")
                         .replace("_$rn$", "");
                     let parsed;
@@ -127,14 +236,22 @@ export class BlockPyTrace {
                 "value": "Undefined"
             };
         }
+        switch (property) {
+            case "dataclass":
+                return {
+                    name: property,
+                    type: "Decorator",
+                    value: "<dataclass decorator>"
+                };
+        }
         switch (value.constructor) {
             case Sk.builtin.func:
                 return {"name": property,
                     "type": "Function",
                     "value":
                         (value.func_code.co_varnames !== undefined ?
-                            " Arguments: "+value.func_code.co_varnames.join(", ") :
-                            " No arguments")
+                            " Parameters: "+value.func_code.co_varnames.join(", ") :
+                            " No parameters")
                 };
             case Sk.builtin.module: return null;
             case Sk.builtin.str:
@@ -220,6 +337,8 @@ export class BlockPyTrace {
                 };
         }
     };
+
+
 }
 
 // TODO: viewExactValue

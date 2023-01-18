@@ -25,7 +25,7 @@ export const WRAP_INSTRUCTOR_CODE = function (studentFiles, instructorCode, quic
 from pedal.core.report import MAIN_REPORT
 MAIN_REPORT.clear()
 
-from cisc108 import student_tests
+from bakery import student_tests
 student_tests.reset()
 
 from utility import *
@@ -104,6 +104,8 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.code = this.main.model.assignment.onRun();
 
         let disableTifa = this.main.model.assignment.settings.disableTifa();
+        // Put the input index back to the front, so we can replay inputs
+        this.main.model.execution.inputIndex(1);
 
         let report = this.main.model.execution.reports;
         //let studentCodeSafe = this.main.model.submission.code();
@@ -121,6 +123,13 @@ export class OnRunConfiguration extends InstructorConfiguration {
             "lineOffset": lineOffset
             //'complete': false // Actually, let's use undefined for now.
         };
+        /*
+        TODO: Interesting situation. If you have an instructor-file (not a student-file),
+        then it gets imported into sysmodules as `_instructor.MODULE_NAME`. But the instructor
+        script will attempt to import it as `MODULE_NAME`, and fail. UNLESS the *student* has
+        previously imported that module successfully. So there's a common case here where the
+        students' code fails to import the module THEREBY breaking the instructor code.
+         */
 
         this.code = instructorCode;
 

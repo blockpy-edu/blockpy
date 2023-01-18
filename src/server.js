@@ -166,6 +166,7 @@ BlockPyServer.prototype.createServerData = function () {
     let user = this.main.model.user;
     let submission = this.main.model.submission;
     let display = this.main.model.display;
+    const configuration = this.main.model.configuration;
     let now = new Date();
     let microseconds = now.getTime();
     return {
@@ -177,7 +178,8 @@ BlockPyServer.prototype.createServerData = function () {
         "version": assignment.version(),
         "timestamp": microseconds,
         "timezone": now.getTimezoneOffset(),
-        "passcode": display.passcode()
+        "passcode": display.passcode(),
+        "part_id": configuration.partId()
     };
 };
 
@@ -467,6 +469,25 @@ BlockPyServer.prototype.uploadFile = function (placement, directory, filename, c
                                       this.main.components.dialog.ERROR_UPLOADING_FILE(textStatus);
                                       console.error(e, textStatus, errorThrown);
                                   }, {processData: false, contentType: false});
+    } else {
+        this.setStatus("uploadFile", StatusState.OFFLINE, "Server is not connected! (Upload File)");
+    }
+};
+
+BlockPyServer.prototype.downloadFile = function (placement, directory, filename, callback) {
+    let model = this.main.model;
+    if (model.ui.server.isEndpointConnected("downloadFile")) {
+        let data = this.createServerData();
+        data["placement"] = placement;
+        data["directory"] = directory;
+        data["filename"] = filename;
+        let fd = Object.entries(data).reduce((d,e) => (d.append(...e), d), new FormData());
+        return this._postBlocking("downloadFile", fd, 3,
+                                  callback,
+                                  (e, textStatus, errorThrown) => {
+                                      this.main.components.dialog.ERROR_DOWNLOADING_FILE(textStatus);
+                                      console.error(e, textStatus, errorThrown);
+                                  }, {processData: false, contentType: false, dataType: "text"});
     } else {
         this.setStatus("uploadFile", StatusState.OFFLINE, "Server is not connected! (Upload File)");
     }

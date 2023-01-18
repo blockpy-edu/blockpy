@@ -24,8 +24,8 @@ const makeTab = function(filename, friendlyName, hideIfEmpty, notInstructor) {
 };
 
 export let FILES_HTML = `
-<div class="col-md-12 blockpy-panel blockpy-files"
-    data-bind="visible: ui.files.visible">
+<div class="blockpy-panel blockpy-files"
+    data-bind="visible: ui.files.visible, class: ui.files.width">
 <ul class="nav nav-tabs" role="tablist">
 
     <li class="nav-item">
@@ -81,6 +81,7 @@ export let FILES_HTML = `
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
          role="button" aria-haspopup="true" aria-expanded="false">Add New</a>
+        <!-- ko if: $root.display.instructor() -->
         <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?mock_urls.blockpy'),
@@ -119,6 +120,13 @@ export let FILES_HTML = `
             <a class="dropdown-item" href="#"
                 data-bind="click: ui.files.add.bind($data, 'student')">Student File</a>
         </div>
+        <!-- /ko -->
+        <!-- ko ifnot: $root.display.instructor() -->
+        <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="#"
+                data-bind="click: ui.files.add.bind($data, 'student')">Student File</a>
+        </div>
+        <!-- /ko -->
     </li>
   
 </ul>
@@ -295,9 +303,12 @@ export class BlockPyFileSystem {
         this.watchModel();
         this.watches_ = {};
 
+        this.remoteFiles_ = {};
+
+        /*main.model.configuration.container.find(".blockpy-file-instructor").toggle(this.main.model.display.instructor());
         this.main.model.display.instructor.subscribe((visiblity)=> {
-            $(".blockpy-file-instructor").toggle(visiblity);
-        });
+            main.model.configuration.container.find(".blockpy-file-instructor").toggle(visiblity);
+        });*/
     }
 
     watchFile(filename, callback) {
@@ -566,17 +577,18 @@ export class BlockPyFileSystem {
         let generatedVersion = this.searchForFileInList_(extraStudentFiles, "*"+name);
         let defaultVersion = this.searchForFileInList_(extraInstructorFiles, "&"+name);
         let hiddenVersion = this.searchForFileInList_(extraInstructorFiles, "?"+name);
+        let remoteVersion = this.remoteFiles_[name];
         if (searchMode === SearchModes.ONLY_STUDENT_FILES) {
-            return firstDefinedValue(hiddenVersion, defaultVersion, studentVersion, generatedVersion);
+            return firstDefinedValue(hiddenVersion, defaultVersion, studentVersion, generatedVersion, remoteVersion);
         }
         let instructorVersion = this.searchForFileInList_(extraInstructorFiles, "!"+name);
         let startingVersion = this.searchForFileInList_(extraStartingFiles, "^"+name);
         if (searchMode === SearchModes.START_WITH_INSTRUCTOR) {
             return firstDefinedValue(instructorVersion, hiddenVersion, startingVersion,
-                                     defaultVersion, studentVersion, generatedVersion);
+                                     defaultVersion, studentVersion, generatedVersion, remoteVersion);
         } else if (searchMode === SearchModes.EVERYWHERE) {
             return firstDefinedValue(defaultVersion, studentVersion, generatedVersion,
-                                     instructorVersion, hiddenVersion, startingVersion);
+                                     instructorVersion, hiddenVersion, startingVersion, remoteVersion);
         }
     }
 
@@ -644,5 +656,39 @@ export class BlockPyFileSystem {
             this.main.components.dialog.close();
         });
         this.main.components.dialog.confirm("Make New File", body, yes, ()=>{}, "Add");
+    }
+
+    loadRemoteFiles() {
+        // Clear existing remote files (?)
+        /*
+        Object.getOwnPropertyNames(this.remoteFiles_).forEach(function (prop) {
+            delete this.remoteFiles_[prop];
+        });*/
+        let model = this.main.model;
+        const preloadFiles = model.assignment.settings.preloadFiles();
+        if (!preloadFiles) {
+            return null;
+        }
+        let files;
+        try {
+            files = JSON.parse(preloadFiles);
+        } catch (e) {
+            console.error("Failed to preload files, invalid structure: ", e);
+            return null;
+        }
+        Object.entries(files).forEach(([placement, placementData]) => {
+            Object.entries(placementData).forEach(([directory, directoryData]) => {
+                Object.entries(directoryData).forEach(([filename, renamedFile]) => {
+                    if (renamedFile === true) {
+                        renamedFile = filename;
+                    }
+                    if (!(renamedFile in this.remoteFiles_)) {
+                        this.main.components.server.downloadFile(placement, directory, filename, (data) => {
+                            this.remoteFiles_[renamedFile] = makeMockModelFile(renamedFile, data);
+                        });
+                    }
+                });
+            });
+        });
     }
 }

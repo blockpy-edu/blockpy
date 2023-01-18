@@ -20,8 +20,6 @@ export class InstructorConfiguration extends Configuration {
         this.main.model.display.mutePrinter(true);
         // Disable input box
         Sk.queuedInput = [];
-        // Put the input index back to the front, so we can replay inputs
-        this.main.model.execution.inputIndex(1);
         // TODO Sk.inputfun = BlockPyEngine.inputMockFunction;
         // TODO: Allow input function to disable the timer, somehow
         // Disable the beforeCall checker unless specifically requested
@@ -43,15 +41,21 @@ export class InstructorConfiguration extends Configuration {
         return this;
     }
 
+    print(value) {
+        super.print(value);
+        console.info("Printed:", value);
+    }
+
     clearExistingStudentImports() {
         let sysmodules = this.main.model.execution.instructor.sysmodules;
         // Remove any existing __main__ modules
         if (sysmodules !== undefined) {
             for (let filename of this.getAllFilenames()) {
                 let skFilename = new Sk.builtin.str(filename);
-                if (sysmodules.quick$lookup(skFilename)) {
-                    sysmodules.del$item(skFilename);
-                }
+                /*if (sysmodules.quick$lookup(skFilename)) {
+                    sysmodules.pop$item(skFilename);
+                }*/
+                sysmodules.pop$item(skFilename);
             }
         }
         return sysmodules;
@@ -64,7 +68,7 @@ export class InstructorConfiguration extends Configuration {
         // Skip special instructor files
         this.main.model.assignment.extraInstructorFiles().forEach(file => {
             if (!("!^$#".includes(file.filename()[0]))) {
-                files[file.filename()] = chompSpecialFile(file.contents());
+                files[chompSpecialFile(file.filename())] = file.contents();
             }
         });
         // Include normal student extra files

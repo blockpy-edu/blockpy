@@ -47,8 +47,8 @@ const AVAILABLE_EDITORS = [
 ];
 
 export const EDITORS_HTML = AVAILABLE_EDITORS.map(editor => `
-<div class="col-md-12 blockpy-panel blockpy-editor" 
-     data-bind="visible: ui.editors.view().name === '${editor.name}'">
+<div class="blockpy-panel blockpy-editor" 
+     data-bind="visible: ui.editors.view().name === '${editor.name}', class: ui.editors.width">
     <div>
     ${editor.template}
     </div>

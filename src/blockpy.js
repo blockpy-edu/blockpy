@@ -24,7 +24,7 @@ import {
 } from "./files";
 import {uploadFile, downloadFile} from "./editor/abstract_editor";
 import {BlockPyEngine} from "engine.js";
-import {BlockPyTrace} from "./trace";
+import {AST_DESCRIPTIONS, BlockPyTrace} from "./trace";
 import {BlockPyConsole} from "./console";
 import {BlockPyFeedback} from "feedback.js";
 import {BlockPyServer} from "./server";
@@ -32,8 +32,8 @@ import {BlockPyDialog} from "./dialog";
 import {AssigmentType, loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";
 import {BlockPyCorgis, _IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS} from "./corgis";
 import {BlockPyHistory} from "./history";
-import {capitalize} from "./utilities";
-import {SampleSubmission} from "./editor/sample_submissions";
+import {capitalize, extractPart, getCurrentTime} from "./utilities";
+import {SampleSubmission, SubmissionStatuses} from "./editor/sample_submissions";
 
 export {_IMPORTED_COMPLETE_DATASETS, _IMPORTED_DATASETS};
 
@@ -109,6 +109,7 @@ export class BlockPy {
         // Connect to local storage
         this.localSettings_ = new LocalStorageWrapper("localSettings");
         this.initialConfiguration_ = configuration;
+        //console.log(configuration, configuration["submission.code"], configuration["partId"], extractPart(configuration["submission.code"] || "", configuration["partId"]));
 
         this.model = {
             user: {
@@ -161,7 +162,7 @@ export class BlockPy {
             },
             submission: {
                 id: ko.observable(null),
-                code: ko.observable(configuration["submission.code"] || ""),
+                code: ko.observable(extractPart(configuration["submission.code"] || "", configuration["partId"]) || ""),
                 extraFiles: ko.observableArray([]),
                 url: ko.observable(""),
                 endpoint: ko.observable(""),
@@ -195,7 +196,7 @@ export class BlockPy {
                  * (Python Views) The current editor mode.
                  * @type {DisplayModes}
                  */
-                pythonMode: ko.observable(this.getSetting("display.python.mode", DisplayModes.SPLIT)),
+                pythonMode: ko.observable(this.getSetting("display.python.mode", DisplayModes.TEXT)),
                 /**
                  * Whether or not History mode is engaged.
                  * @type {bool}
@@ -224,6 +225,7 @@ export class BlockPy {
                  * @type {SecondRowSecondPanelOptions}
                  */
                 secondRowSecondPanel: ko.observable(SecondRowSecondPanelOptions.FEEDBACK),
+                previousSecondRowSecondPanel: ko.observable(null),
                 /**
                  * Whether or not to be tracing the code right now
                  */
@@ -270,7 +272,13 @@ export class BlockPy {
                 /**
                  * Uploaded files are ones that have been listed by the remote
                  */
-                uploadedFiles: ko.observable(null)
+                uploadedFiles: ko.observable(null),
+                /**
+                 * Backup copy of the latest known full code for the Submission. This is relevant if there was a
+                 * PartID specified, in which case the submission.code in the model is only showing what we know
+                 * locally.
+                 */
+                backupSubmissionCode: ko.observable(configuration["submission.code"] || "")
             },
             status: {
                 // @type {ServerStatus}
@@ -382,7 +390,13 @@ export class BlockPy {
                 // JQuery object
                 container: null,
                 // Maps codes ('log_event', 'save_code') to URLs
-                urls: this.initialConfiguration_["urls"] || {}
+                urls: this.initialConfiguration_["urls"] || {},
+                /**
+                 * Unique Part ID that can distinguish this editor instance's region of the assignment.
+                 * It's possible that other editors may be attached to a different Part of the same assignmnet, on the
+                 * same page.
+                 * **/
+                partId: ko.observable(configuration["partId"] || "")
             }
         };
     };
@@ -421,21 +435,22 @@ export class BlockPy {
         }
         // TODO: What if submissions' assignment version and the assignments' version conflict?
         this.model.submission.id(submission.id);
-        this.model.submission.code(submission.code);
+        this.model.display.backupSubmissionCode(submission.code);
+        this.model.submission.code(extractPart(submission.code, this.model.configuration.partId()) || "");
         this.model.submission.correct(submission.correct);
         this.model.submission.score(submission.score);
         this.model.submission.endpoint(submission.endpoint);
         this.model.submission.url(submission.url);
         this.model.submission.version(submission.version);
-        this.model.submission.gradingStatus(submission.grading_status);
-        this.model.submission.submissionStatus(submission.submission_status);
+        this.model.submission.gradingStatus(submission.grading_status || SubmissionStatuses.UNKNOWN);
+        this.model.submission.submissionStatus(submission.submission_status || SubmissionStatuses.UNKNOWN);
         this.model.submission.ownerId(submission.user_id);
         this.model.user.courseId(submission.course_id);
         loadConcatenatedFile(submission.extra_files, this.model.submission.extraFiles);
     }
 
     loadAssignmentData_(data) {
-        console.log(data);
+        console.debug(data);
         this.resetInterface();
         this.components.fileSystem.dismountExtraFiles();
         let wasServerConnected = this.model.configuration.serverConnected();
@@ -477,6 +492,7 @@ export class BlockPy {
         this.model.configuration.serverConnected(wasServerConnected);
         this.components.corgis.loadDatasets(true);
         this.components.pythonEditor.bm.refresh();
+        this.components.fileSystem.loadRemoteFiles();
 
         this.components.server.setStatus("saveFile", StatusState.READY);
     }
@@ -485,6 +501,8 @@ export class BlockPy {
         let self = this;
         let model = this.model;
         model.ui = {
+            smallLayout: ko.pureComputed(()=>
+                !model.display.instructor() && model.assignment.settings.smallLayout()),
             role: {
                 isGrader: ko.pureComputed(()=>
                     model.user.role() === "owner" || model.user.role() === "grader")
@@ -502,6 +520,10 @@ export class BlockPy {
                     model.display.changedInstructions(null)
             },
             menu: {
+                visible: ko.pureComputed(
+                    () =>
+                        model.display.instructor() || !model.assignment.settings.onlyInteractive()
+                ),
                 textFullscreen: ko.pureComputed(() =>
                     (model.display.fullscreen()) ? "fa-compress-arrows-alt" : "fa-expand-arrows-alt"
                 ),
@@ -558,9 +580,19 @@ export class BlockPy {
                 ),
                 showQueuedInputs: ko.pureComputed(() =>
                     !model.assignment.settings.hideQueuedInputs()
+                ),
+                showClock: ko.pureComputed(() =>
+                    !model.assignment.settings.hasClock()
                 )
             },
             secondRow: {
+                width: ko.pureComputed(()=>
+                    model.display.instructor() || !model.assignment.settings.smallLayout() ?
+                        "col-md-12" : "col-md-5"
+                ),
+                hideTraceButton: ko.pureComputed(()=>
+                    !model.display.instructor() && model.assignment.settings.hideTraceButton()
+                ),
                 isAllVisible: ko.pureComputed(() =>
                     !model.assignment.settings.hideMiddlePanel()
                 ),
@@ -589,10 +621,23 @@ export class BlockPy {
                         currentPanel(SecondRowSecondPanelOptions.NONE);
                     }
                 },
+                makeWide: function () {
+                    const currentPanel = model.display.secondRowSecondPanel;
+                    model.display.previousSecondRowSecondPanel(currentPanel());
+                    currentPanel(SecondRowSecondPanelOptions.NONE);
+                },
+                restorePanel: function() {
+                    const oldPanel = model.display.previousSecondRowSecondPanel;
+                    if (oldPanel() !== null) {
+                        model.display.secondRowSecondPanel(oldPanel());
+                        oldPanel(null);
+                    }
+                }
             },
             console: {
                 size: ko.pureComputed(() =>
-                    model.display.secondRowSecondPanel() === SecondRowSecondPanelOptions.NONE ?
+                    (!model.display.instructor() && model.assignment.settings.smallLayout()) ||
+                    (model.display.secondRowSecondPanel() === SecondRowSecondPanelOptions.NONE) ?
                         "col-md-12" :
                         "col-md-6"
                 ),
@@ -661,12 +706,32 @@ export class BlockPy {
                         case "no errors":
                             return "No errors";
                     }
-                })
+                }),
+                resetScore: () => {
+                    model.submission.score(0);
+                    model.submission.correct(false);
+                    self.components.server.updateSubmission(model.submission.score(), model.submission.correct(), true, true);
+                }
             },
             trace: {
                 has: ko.pureComputed(() =>
                     model.execution.student.currentTraceData() !== null
                 ),
+                highlightedLine: ko.pureComputed(() => {
+                    if (model.display.secondRowSecondPanel() !== SecondRowSecondPanelOptions.TRACE) {
+                        return [];
+                    }
+                    let step = model.execution.student.currentTraceStep();
+                    let lastStep = model.execution.student.lastStep();
+                    let traceData = model.execution.student.currentTraceData();
+                    if (!traceData || step === null) {
+                        return [];
+                    } else if (step === 0) {
+                        return [];
+                    } else {
+                        return [traceData[step-1].line];
+                    }
+                }),
                 line: ko.pureComputed(function () {
                     let step = model.execution.student.currentTraceStep();
                     let lastStep = model.execution.student.lastStep();
@@ -680,7 +745,26 @@ export class BlockPy {
                         return "Finished run";
                     } else {
                         // TODO: why are these numbers wonky?
-                        return "Line "+(traceData[step].line-1);
+                        return "Line "+(traceData[step-1].line);
+                    }
+                }),
+                ast: ko.pureComputed(function () {
+                    let step = model.execution.student.currentTraceStep();
+                    let lastStep = model.execution.student.lastStep();
+                    let traceData = model.execution.student.currentTraceData();
+                    if (!traceData) {
+                        return "Nothing traced.";
+                    }
+                    switch (step) {
+                        case 0:
+                            return "Starting execution";
+                        case lastStep:
+                            if (!model.execution.reports.student.success) {
+                                return "Execution halted (error)";
+                            }
+                            return "Finished execution";
+                        default:
+                            return "Current step: " + AST_DESCRIPTIONS[traceData[step-1].ast];
                     }
                 }),
                 first: function () {
@@ -717,6 +801,10 @@ export class BlockPy {
             files: {
                 visible: ko.pureComputed(() =>
                     model.display.instructor() || !model.assignment.settings.hideFiles()
+                ),
+                width: ko.pureComputed(()=>
+                    model.display.instructor() || !model.assignment.settings.smallLayout() ?
+                        "col-md-12" : "col-md-6"
                 ),
                 hasContents: function(path) {
                     switch (path) {
@@ -830,8 +918,14 @@ export class BlockPy {
                 current: ko.pureComputed( ()=>
                     self.components.editors.getEditor(model.display.filename())
                 ),
+                width: ko.pureComputed(()=>
+                    model.display.instructor() || !model.assignment.settings.smallLayout() ?
+                        "col-md-12" : "col-md-7"
+                ),
                 view: ko.pureComputed(() =>
-                    (!model.display.instructor() && model.assignment.settings.hideEditors()) ? "None" :
+                    (!model.display.instructor() && (
+                        model.assignment.settings.hideEditors() ||
+                        model.assignment.settings.onlyInteractive())) ? "None" :
                     model.display.filename() ? model.ui.editors.current() : "None"
                 ),
                 reset: function() {
@@ -919,8 +1013,32 @@ export class BlockPy {
                 isRunning: ko.pureComputed(() =>
                     model.status.onExecution() === StatusState.ACTIVE
                 ),
-                run: () =>
-                    self.components.engine.delayedRun(),
+                runLabel: ko.pureComputed(() =>
+                    model.status.onExecution() === StatusState.ACTIVE ? "Stop" : "Run"
+                ),
+                run: () => {
+                    if (model.status.onExecution() === StatusState.ACTIVE) {
+                        if (typeof PygameLib !== "undefined" && PygameLib.running) {
+                            PygameLib.StopPygame();
+                        }
+                        model.status.onExecution(StatusState.READY);
+                    } else {
+                        self.components.engine.delayedRun();
+                    }
+                },
+                runQuietlyLabel: ko.pureComputed(()=>
+                    model.status.onExecution() === StatusState.ACTIVE ? "Stop" : "Run without feedback"
+                ),
+                runQuietly: () => {
+                    if (model.status.onExecution() === StatusState.ACTIVE) {
+                        if (typeof PygameLib !== "undefined" && PygameLib.running) {
+                            PygameLib.StopPygame();
+                        }
+                        model.status.onExecution(StatusState.READY);
+                    } else {
+                        self.components.engine.delayedRun(true);
+                    }
+                },
                 evaluate: () =>
                     self.components.engine.evaluate()
             },
@@ -970,6 +1088,12 @@ export class BlockPy {
                     }
                 }
             },
+            footer: {
+                visible: ko.pureComputed(
+                    () =>
+                        model.display.instructor() || !model.ui.smallLayout()
+                ),
+            }
         };
         makeExtraInterfaceSubscriptions(self, model);
     }
@@ -1018,6 +1142,7 @@ export class BlockPy {
 
     show() {
         this.model.configuration.container.show();
+        //this.model.configuration.container.find(".blockpy-file-instructor").toggle(this.model.display.instructor());
     }
 
     hide() {
@@ -1028,6 +1153,25 @@ export class BlockPy {
         this.model.display.changedInstructions.subscribe((changed) => {
             this.components.server.logEvent("X-Instructions.Change", "", "",
                                             changed, "instructions.md");
+        });
+        this.clock = null;
+        const container = this.model.configuration.container;
+        const updateClock = () => container.find(".blockpy-menu-clock").text(getCurrentTime());
+        if (this.model.ui.menu.showClock()) {
+            this.clock = setInterval(updateClock, 1000);
+        }
+
+        this.model.ui.menu.showClock.subscribe((changed) => {
+            if (this.model.ui.menu.showClock()) {
+                if (this.clock) {
+                    clearInterval(this.clock);
+                    this.clock = null;
+                }
+            } else {
+                if (!this.clock) {
+                    this.clock = setInterval(updateClock, 1000);
+                }
+            }
         });
     }
 
@@ -1044,6 +1188,10 @@ export class BlockPy {
     requestPasscode() {
         let userSuppliedPasscode = prompt("Please enter the passcode.");
         this.model.display.passcode(userSuppliedPasscode);
+    }
+
+    destroy() {
+
     }
 
 }

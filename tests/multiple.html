@@ -83,8 +83,11 @@
 
 <div style="width:900px;  margin:0 auto;">
 
-<div id="main-editor"></div>
-
+<div id="first-editor"></div>
+    <hr style="margin-top: 20px; margin-bottom: 20px">
+<div id="second-editor"></div>
+    <hr style="margin-top: 20px; margin-bottom: 20px">
+<div id="third-editor"></div>
     <!-- Debugging code
 import turtle
 turtle.bgpic("https://i.imgur.com/A8eQsll.jpg")
@@ -122,31 +125,33 @@ i.show()
     }
 
     $(document).ready(function() {
-        editor = new blockpy.BlockPy({
-            'attachment.point': '#main-editor',
-            "urls": {
-                "importDatasets": "https://corgis-edu.github.io/corgis/datasets/",
-                "instructionsAssignmentSetup": "https://localhost:5000"
-            },
-            "display.instructor": true,
-            //"assignment.on_eval": "console_log(ABC)",
-            "assignment.on_run": LOCAL_FILES.LOCAL_ON_RUN_CODE,
-            //"assignment.on_eval": LOCAL_FILES.LOCAL_ON_EVAL_CODE,
-            "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE,
-            "assignment.extra_instructor_files": LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES,
-            // Pygame tests
-            "display.python.mode": "text",
-            //"assignment.settings.disable_timeout": true,
-            //"assignment.settings.disable_instructor_run": "true"
-            //"assignment.settings.small_layout": "true",
-            //"assignment.settings.hide_files": "false"
-        });
+        editors = ["#first-editor", "#second-editor", "#third-editor"].map((id) => (
+            new blockpy.BlockPy({
+                'attachment.point': id,
+                'partId': id,
+                "urls": {
+                    "importDatasets": "https://corgis-edu.github.io/corgis/datasets/",
+                    "instructionsAssignmentSetup": "https://localhost:5000"
+                },
+                "display.instructor": false,
+                //"assignment.on_eval": "console_log(ABC)",
+                "assignment.on_run": LOCAL_FILES.LOCAL_ON_RUN_CODE,
+                //"assignment.on_eval": LOCAL_FILES.LOCAL_ON_EVAL_CODE,
+                "submission.code": LOCAL_FILES.LOCAL_ANSWER_CODE,
+                "assignment.extra_instructor_files": LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES,
+                // Pygame tests
+                "display.python.mode": "text",
+                //"assignment.settings.disable_timeout": true,
+                //"assignment.settings.disable_instructor_run": "true"
+                "assignment.settings.small_layout": "true"
+            })
+        ));
 /*
 from image import Image
 dog = Image("http://localhost:8000/images/swimming.gif")
 dog.flip().show()
  */
-        blockmirror = editor.components.editors.registered_[1].bm;
+        blockmirrors = editors.map(editor => editor.components.editors.registered_[1].bm);
 
         // TODO: HACK, need to make this cleaner
         Sk.emojiProxy = (part) => `https://twemoji.maxcdn.com/v/13.1.0/svg/${part.toLowerCase()}.svg`;
@@ -155,10 +160,10 @@ dog.flip().show()
     });
 
     function saveNewClient() {
-        LOCAL_FILES.LOCAL_ANSWER_CODE = editor.model.submission.code();
-        LOCAL_FILES.LOCAL_ON_RUN_CODE = editor.model.assignment.onRun();
-        LOCAL_FILES.LOCAL_ON_EVAL_CODE = editor.model.assignment.onEval();
-        LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES = JSON.stringify(Object.fromEntries(editor.model.assignment.extraInstructorFiles().map(file => {
+        LOCAL_FILES.LOCAL_ANSWER_CODE = editors[0].model.submission.code();
+        LOCAL_FILES.LOCAL_ON_RUN_CODE = editors[0].model.assignment.onRun();
+        LOCAL_FILES.LOCAL_ON_EVAL_CODE = editors[0].model.assignment.onEval();
+        LOCAL_FILES.LOCAL_INSTRUCTOR_EXTRA_FILES = JSON.stringify(Object.fromEntries(editors[0].model.assignment.extraInstructorFiles().map(file => {
             return [file.filename(), file.contents()];
         })));
         localStorage.setItem("LOCAL_ANSWER_CODE", LOCAL_FILES.LOCAL_ANSWER_CODE);

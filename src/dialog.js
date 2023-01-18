@@ -116,6 +116,11 @@ BlockPyDialog.prototype.ERROR_UPLOADING_FILE = function (reason) {
 Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
 };
 
+BlockPyDialog.prototype.ERROR_DOWNLOADING_FILE = function (reason) {
+    this.show("Error Downloading File", `BlockPy encountered an error while downloading a file.<br>
+Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
 BlockPyDialog.prototype.ERROR_SAVING_ASSIGNMNENT = function (reason) {
     this.show("Error Saving Assignment", `BlockPy encountered an error while saving the assignment.<br>
 Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);

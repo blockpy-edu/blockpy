@@ -27,8 +27,8 @@ from pedal.environments.blockpy import setup_environment
 # Add in evaluated stuff from last time
 student = get_sandbox()
 # TODO: What about new inputs since we last ran/evaled?
-MAIN_REPORT.submission.files['evaluation'] = ${safeCode}
-evaluate(${safeCode})
+# MAIN_REPORT.submission.files['evaluation'] = ${safeCode}
+evaluate(${safeCode}['evaluation'])
 
 # TODO: Refactor resolver to return instructions
 # Monkey-patch questions
@@ -84,11 +84,14 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         let disableTifa = this.main.model.assignment.settings.disableTifa();
 
         let report = this.main.model.execution.reports;
-        let studentCodeSafe = this.main.model.execution.reports.student.evaluation || "None";
+        //let studentCodeSafe = this.main.model.execution.reports.student.evaluation || "None";
+        let studentFiles = this.getAllStudentFiles();
+        studentFiles["evaluation"] = this.main.model.execution.reports.student.evaluation || "None";
         this.dummyOutSandbox();
         let instructorCode = this.code;
         let isSafe = !report["parser"].empty && report["verifier"].success;
-        instructorCode = WRAP_INSTRUCTOR_CODE(studentCodeSafe, instructorCode, disableTifa, isSafe);
+        instructorCode = WRAP_INSTRUCTOR_CODE(studentFiles, instructorCode, disableTifa, isSafe);
+        console.log(">>>", instructorCode);
         let lineOffset = findActualInstructorOffset(instructorCode); //instructorCode.split(NEW_LINE_REGEX).length;
         report["instructor"] = {
             "compliments": [],

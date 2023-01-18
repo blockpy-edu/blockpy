@@ -10,6 +10,7 @@
  */
 import {AbstractEditor, sluggify} from "./abstract_editor";
 import {HISTORY_TOOLBAR_HTML} from "../history";
+import {SecondRowSecondPanelOptions} from "../interface";
 
 export let DisplayModes = {
     BLOCK: "block",
@@ -35,7 +36,7 @@ export const PYTHON_EDITOR_HTML = `
             <button type="button" class="btn blockpy-run notransition"
                 data-bind="click: ui.execute.run,
                             css: {'blockpy-run-running': ui.execute.isRunning}">
-                <span class="fas fa-play"></span> Run
+                <span class="fas fa-play"></span> <span data-bind="text: ui.execute.runLabel"></span>
              </button>
          </div>
          
@@ -54,7 +55,7 @@ export const PYTHON_EDITOR_HTML = `
               </button>
          </div>
          
-         <!-- ko if: !assignment.settings.hideImportDatasetsButton() -->
+         <!-- ko if: !assignment.settings.hideImportDatasetsButton() && !ui.smallLayout()-->
          <div class="btn-group mr-2" role="group" aria-label="Import Group">
             <button type="button" class="btn btn-outline-secondary"
                 data-bind="click: ui.editors.importDataset">
@@ -63,7 +64,7 @@ export const PYTHON_EDITOR_HTML = `
          </div>
          <!-- /ko -->
          
-         <div class="btn-group mr-2">
+         <div class="btn-group mr-2" data-bind="hidden: ui.smallLayout">
                 <label class="btn btn-outline-secondary">
                     <span class="fas fa-file-upload"></span> Upload
                     <input class="blockpy-toolbar-upload" type="file"
@@ -85,7 +86,7 @@ export const PYTHON_EDITOR_HTML = `
                 </div>
             </div>
          
-         <div class="btn-group mr-2" role="group" aria-label="History Group">
+         <div class="btn-group mr-2" role="group" aria-label="History Group" data-bind="hidden: ui.smallLayout">
             <button type="button" class="btn btn-outline-secondary"
                 aria-pressed="false"
                 data-bind="click: ui.editors.python.toggleHistoryMode,
@@ -120,6 +121,23 @@ export const PYTHON_EDITOR_HTML = `
                 <span class="fas fa-trash"></span> Delete
              </button>
          </div>
+         
+         <div class="btn-group mr-2">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="fas fa-ellipsis-v"></span>
+                    <span class="sr-only">Toggle Extra Features</span>
+                </button>
+                
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class='dropdown-item blockpy-toolbar-run-quietly notransition' role="button"
+                        href=""
+                        data-bind="click: ui.execute.runQuietly,
+                                    css: {'blockpy-run-running': ui.execute.isRunning}">
+                        <span class="fas fa-comment-slash"></span> <span data-bind="text: ui.execute.runQuietlyLabel"></span>
+                    </a>
+                </div>
+            </div>
          
          <!--<div class="btn-group mr-2" role="group" aria-label="Rename Group"
             data-bind="visible: ui.editors.canRename">
@@ -200,6 +218,7 @@ class PythonEditorView extends AbstractEditor {
         this.makeSubscriptions();
         this.lineErrorSubscription = null;
         this.lineUncoveredSubscription = null;
+        this.lineTraceSubscription = null;
         this.oldPythonMode = this.main.model.display.pythonMode();
 
         this.makePerAssignmentSubscriptions();
@@ -249,6 +268,11 @@ class PythonEditorView extends AbstractEditor {
             this.lineUncoveredSubscription = this.main.model.execution.feedback.linesUncovered.subscribe((lines) =>
                 this.bm.setHighlightedLines(lines, "editor-uncovered-line")
             );
+
+            this.lineTraceSubscription = this.main.model.ui.trace.highlightedLine.subscribe((lines) => {
+                this.bm.clearHighlightedLines("editor-traced-line");
+                this.bm.setHighlightedLines(lines, "editor-traced-line");
+            });
         }
 
 
@@ -316,6 +340,10 @@ class PythonEditorView extends AbstractEditor {
             this.lineUncoveredSubscription.dispose();
             this.lineUncoveredSubscription = null;
         }
+        if (this.lineTraceSubscription) {
+            this.lineTraceSubscription.dispose();
+            this.lineTraceSubscription = null;
+        }
     }
 
     makeSubscriptions() {
@@ -334,6 +362,28 @@ class PythonEditorView extends AbstractEditor {
         this.main.model.assignment.settings.enableImages.subscribe(imageMode => {
             this.bm.setImageMode(imageMode);
         });
+
+        // Small Layout Stuff
+        this.oldHeight = null;
+        if (this.main.model.ui.smallLayout()) {
+            this.useSmallLayout();
+        }
+        this.main.model.ui.smallLayout.subscribe(useSmallLayout => {
+            if (useSmallLayout) {
+                this.useSmallLayout();
+            } else if (this.oldHeight !== null) {
+                this.bm.configuration.height = this.oldHeight;
+                this.bm.textEditor.resizeResponsively();
+                this.oldHeight = null;
+            }
+        });
+    }
+
+    useSmallLayout() {
+        this.bm.textEditor.updateGutter({indentSidebar: false});
+        this.oldHeight = this.bm.configuration.height;
+        this.bm.configuration.height = 300; // TODO: Parameterize this
+        this.bm.textEditor.resizeResponsively();
     }
 
     reloadToolbox(toolbox) {
@@ -367,6 +417,9 @@ class PythonEditorView extends AbstractEditor {
         });
         this.main.model.assignment.settings.onlyUploads.subscribe((changed) => {
             this.setReadOnly(this.decideIfNotEditable());
+        });
+        this.main.model.configuration.partId.subscribe((changed) => {
+            // TODO: Handle part id changing after everything is loaded
         });
     }
 
@@ -408,7 +461,7 @@ class PythonEditorView extends AbstractEditor {
 
 export const PythonEditor = {
     name: "Python",
-    extensions: [".py"],
+    extensions: [".py", ".reading"],
     constructor: PythonEditorView,
     template: PYTHON_EDITOR_HTML
 };

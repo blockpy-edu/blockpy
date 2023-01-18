@@ -9,7 +9,7 @@ export const QUIZ_EDITOR_HTML = `
 class QuizEditorView extends AbstractEditor {
     constructor(main, tag) {
         super(main, tag);
-        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-text")[0], {
+        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-quiz")[0], {
             showCursorWhenSelecting: true,
             lineNumbers: true,
             firstLineNumber: 1,

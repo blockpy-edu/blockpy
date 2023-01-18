@@ -77,10 +77,13 @@ export class StudentConfiguration extends Configuration {
      * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
      * @param {Boolean} isDocstring - Whether or not this is an actual line or a docstring.
      */
-    step(globals, locals, lineNumber, columnNumber, filename, isDocstring) {
+    step(globals, locals, lineNumber, columnNumber, filename, isDocstring, astName) {
         if (filename === "answer.py") {
+            /*if (execStack) {
+                console.log(execStack.map(([n, o]) => [n, {...o}]));
+            }*/
             let currentStep = this.engine.executionBuffer.step;
-            globals = this.main.components.trace.parseGlobals(globals);
+            globals = this.main.components.trace.parseGlobals({...globals, ...locals});
             // TODO: Trace local variables properly
             //let locals = this.main.components.trace.parseGlobals(locals);
             //Object.assign(globals, locals);
@@ -92,7 +95,8 @@ export class StudentConfiguration extends Configuration {
                 "column": columnNumber,
                 "properties": globals.properties,
                 "modules": globals.modules,
-                "isDocstring": isDocstring
+                "isDocstring": isDocstring,
+                "ast": astName
             });
             this.engine.executionBuffer.step = currentStep + 1;
             this.engine.executionBuffer.line = lineNumber;
@@ -173,7 +177,7 @@ export class StudentConfiguration extends Configuration {
     showErrors() {
         let report = this.main.model.execution.reports;
         if (report["student"].success) {
-            this.main.components.feedback.clear();
+            this.main.components.feedback.clear("Execution finished. No errors to report.");
         } else {
             this.main.components.feedback.presentRunError(report.student.error);
         }

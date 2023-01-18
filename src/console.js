@@ -20,7 +20,7 @@ const NEW_CONSOLE_LINE_HTML = "<div></div>";
  * @type {string}
  */
 export const CONSOLE_HTML = `
-    <div class='col-md-6 blockpy-panel blockpy-console'
+    <div class='blockpy-panel blockpy-console'
           role="region" aria-label="Console"
           data-bind="class: ui.console.size">
           
@@ -139,9 +139,9 @@ class ConsoleLineTurtle extends ConsoleLine {
         if (this.visible) {
             where.prepend(this.html);
             //this.html[0].scrollIntoView({ behavior: "smooth" });
-            var top = this.html.position().top;
+            var top = this.html.offset().top;
             //$('html').scrollTop(top);
-            $("html").scrollTop(0);
+            $("html").scrollTop(top);
             //this.html.tooltip();
         }
     }
@@ -163,8 +163,8 @@ class ConsoleLinePygame extends ConsoleLine {
         if (this.visible) {
             this.html.append(this.canvas);
             where.prepend(this.html);
-            var top = this.html.position().top;
-            $("html").scrollTop(0);
+            var top = this.html.offset().top;
+            $("html").scrollTop(top);
         }
     }
 
@@ -174,6 +174,7 @@ class ConsoleLinePygame extends ConsoleLine {
 
     stop() {
         this.cleanup = () => {};
+        this.main.model.ui.secondRow.restorePanel();
     }
 
     finalize(cleanupFunction, listeners) {
@@ -312,6 +313,7 @@ class ConsoleLineInput extends ConsoleLine {
             }
         });
         input.focus();
+        console.log(inputIndex, this.main.model.execution.input().length);
         if (inputIndex < this.main.model.execution.input().length) {
             let userInputtedValue = this.main.model.execution.input()[inputIndex];
             input.val(userInputtedValue);
@@ -429,14 +431,20 @@ export class BlockPyConsole {
             this.printerTag.height(30+newHeight);
             this.main.model.display.previousConsoleHeight(this.printerTag.height());
         }
+        // If the pygame window is wider than the console, we'll expand temporarily.
+        if (newWidth > this.printerTag.width()) {
+            this.main.model.ui.secondRow.makeWide();
+        }
     }
 
     finishTurtles() {
         if (this.main.model.assignment.settings.saveTurtleOutput()) {
             if (this.turtleLine) {
                 let canvas = this.turtleLine.html.find("canvas").last()[0];
-                let ctx = canvas.getContext("2d");
-                let img = new Image();
+                let dataUrl = canvas.toDataURL("image/png");
+                this.main.components.server.saveImage("turtle_output", dataUrl);
+            } else if (this.pygameLine) {
+                let canvas = this.pygameLine.canvas;
                 let dataUrl = canvas.toDataURL("image/png");
                 this.main.components.server.saveImage("turtle_output", dataUrl);
             } else {

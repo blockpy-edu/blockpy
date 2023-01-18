@@ -1,4 +1,29 @@
 /**
+ * Move an element from index in an array to a new index.
+ * O(n)
+ * Courtesy:
+ * https://stackoverflow.com/a/73877680/1718155
+ * @param arr
+ * @param oldIndex
+ * @param newIndex
+ * @returns {*}
+ */
+export function arrayMove(arr, oldIndex, newIndex) {
+    const length = arr.length;
+    const itemToMove = arr[oldIndex];
+
+    if (oldIndex === newIndex || oldIndex > length || newIndex > length) {
+        return arr;
+    }
+
+    return arr.reduce((acc, item, index) => {
+        if (index === oldIndex) {return acc;}
+        if (index === newIndex) {return oldIndex < newIndex ? [...acc, item, itemToMove] : [...acc, itemToMove, item];}
+        return [...acc, item];
+    }, []);
+}
+
+/**
  * Determines if the element is in the list.
  * @param {anything} needle - The element to look for.
  * @param {Array} haystack - The list to search.
@@ -202,6 +227,40 @@ function isAstNode(obj){
     return obj instanceof Object && "_astname" in obj;
 }
 
+const DEFAULT_SECTION_PATTERN = /^(##### Part (.+))$/gm;
+
+/**
+ * Finds the given Part ID using the pattern `#### Part whatever` (on its own separate line). If the pattern
+ * is not found, then null is returned. If no pattern is given (empty string or null), then the original text
+ * is returned without modifications.
+ * @param text
+ * @param partId
+ * @returns {null|*}
+ */
+export function extractPart(text, partId) {
+    if (partId === "" || partId == null) {
+        return text;
+    }
+    const parts = text.split(DEFAULT_SECTION_PATTERN);
+    for (let i=2; i < parts.length; i+=3) {
+        /* // Unnecessary assertion, but not bad to think about
+        if (!parts[i-1].startsWith("#### Part ")) {
+            throw "Error: part format is broken!";
+        }*/
+        if (parts[i] === partId) {
+            let body = parts[i+1];
+            if (body && body[0] === "\n") {
+                body = body.slice(1);
+            }
+            if (i !== parts.length - 3 && body && body.slice(-1) === "\n") {
+                body = body.slice(0, -1);
+            }
+            return body;
+        }
+    }
+    return null;
+}
+
 /**
  * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
  * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
@@ -258,3 +317,31 @@ function mixedRemapToPy(obj){
         return new Sk.builtin.str(obj.name);
     }
 }
+
+
+export function getCurrentTime() {
+    const today = new Date();
+    let h = Math.floor(today.getHours()%12);
+    let m = today.getMinutes();
+    //let s = today.getSeconds();
+    if (m < 10) {m = "0" + m;}
+    //if (s < 10) {s = "0" + s;}
+    let p = "am";
+    if (today.getHours()>=12) {
+        p = "pm";
+    }
+    return `${h}:${m}${p}`;
+}
+
+export const pyInt = Sk.builtin.int_;
+export const pyNone = Sk.builtin.none.none$;
+export const pyStr = Sk.builtin.str;
+export const pyTuple = Sk.builtin.tuple;
+export const pyCallOrSuspend = Sk.misceval.callsimOrSuspendArray;
+
+export const { isTrue, richCompareBool, chain } = Sk.misceval;
+export const { typeName, setUpModuleMethods, buildNativeClass } = Sk.abstr;
+export const { TypeError, ValueError, KeyError, IndexError, checkString, asnum$ } = Sk.builtin;
+export const { remapToPy, remapToJs } = Sk.ffi;
+export const { getAttr, setAttr } = Sk.generic;
+export const chainOrSuspend = chain;

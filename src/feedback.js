@@ -1,3 +1,5 @@
+import {arrayMove, capitalize, pyStr} from "./utilities";
+
 export let FEEDBACK_HTML = `
 
 <span class='blockpy-floating-feedback text-muted-less pull-right position-sticky sticky-top'
@@ -5,17 +7,20 @@ export let FEEDBACK_HTML = `
     New feedback &uarr;
 </span>
 
-<div class='blockpy-feedback col-md-6 blockpy-panel'
+<div class='blockpy-feedback blockpy-panel'
             role="region" aria-label="Feedback"
-            aria-live="polite">
+            aria-live="polite"
+            data-bind="class: ui.console.size">
 
     <!-- Feedback/Trace Visibility Control -->
+    <!-- ko ifnot: ui.secondRow.hideTraceButton -->
     <button type='button'
             class='btn btn-sm btn-outline-secondary float-right'
             data-bind="click: ui.secondRow.advanceState">
         <span class='fas fa-eye'></span>
         <span data-bind="text: ui.secondRow.switchLabel"></span>
     </button>
+    <!-- /ko -->
     
     <!-- Positive Feedback Region -->
     <div class="blockpy-feedback-positive float-right">
@@ -32,6 +37,9 @@ export let FEEDBACK_HTML = `
         <small data-bind="text: (100*submission.score())+'%',
                           visible: display.instructor() && execution.feedback.label()"
             class="text-muted"></small>
+        <small data-bind="click: ui.feedback.resetScore,
+                          visible: display.instructor() && execution.feedback.label() && submission.score() > 0"
+            class="text-muted" style="cursor: pointer"><u>(reset)</u></small>
     </div>
     <div>
         <strong class="blockpy-feedback-label"
@@ -74,7 +82,7 @@ export class BlockPyFeedback {
     scrollIntoView() {
         $("html, body").animate({
             scrollTop: this.tag.offset().top
-        }, 1000);
+        }, 700);
     };
 
     /**
@@ -98,14 +106,15 @@ export class BlockPyFeedback {
      * Clears any output currently in the feedback area. Also resets the printer and
      * any highlighted lines in the editor.
      */
-    clear() {
-        this.feedbackModel.message("*Ready*");
+    clear(message="Ready") {
+        this.feedbackModel.message(message);
         this.feedbackModel.category(null);
         this.feedbackModel.label(null);
         this.feedbackModel.hidden(false);
         this.feedbackModel.linesError.removeAll();
         this.feedbackModel.linesUncovered.removeAll();
         this.clearPositiveFeedback();
+        this.category.off("click");
     };
 
     static findFirstErrorLine(feedbackData) {
@@ -234,18 +243,103 @@ export class BlockPyFeedback {
     presentFeedback(executionResults) {
         this.updateFeedback(executionResults);
 
+        this.category.off("click");
+        if (this.main.model.display.instructor()) {
+            this.updateFullFeedback(executionResults);
+        }
+
         // TODO: Logging
         //this.main.components.server.logEvent("feedback", category+"|"+label, message);
 
         this.notifyFeedbackUpdate();
     };
 
+    processSingleFeedback(element) {
+        const title = element.tp$getattr(new pyStr("title")).toString();
+        const category = capitalize(element.tp$getattr(new pyStr("category")).toString());
+        const kind = element.tp$getattr(new pyStr("kind")).toString();
+        const active = Sk.misceval.isTrue(element);
+        let message = element.tp$getattr(new pyStr("message")).toString();
+        const unused_message = element.tp$getattr(new pyStr("unused_message")).toString();
+        message = message === "None" ? unused_message : message;
+        const justification = element.tp$getattr(new pyStr("justification")).toString();
+        const parent = element.tp$getattr(new pyStr("parent"));
+        const hasParent = !Sk.builtin.checkNone(parent);
+        let score = element.tp$getattr(new pyStr("resolved_score"));
+        score = score === Sk.builtin.none.none$ ? ""
+            : score.tp$name === "float"
+                ? "+" + Math.round(score.v*100).toString() + "%"
+                : score.toString();
+        return [element, parent, `
+        <div class="list-group-item flex-column align-items-start" ${hasParent ? "style='margin-left: 50px;'" : ""}>
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <span><strong class="mb-1" style="${active ? "" : "text-decoration: line-through;"}">${title}</strong> (${category} - ${kind})</span>
+                <span class="badge badge-info badge-pill">${score}</span>
+            </div>
+            ${active ? "" : "<div>(Muted - Not shown to student)</div>"}
+            <div class="mb-1 p-1 feedback-expand-on-click feedback-shrunk">
+                ${message}
+            </div>
+            <small style="white-space: pre">${justification}</small>
+        </div>
+        `];
+    }
+
+    updateFullFeedback(executionResults) {
+        console.log(executionResults);
+        if (!("MAIN_REPORT" in executionResults)) {
+            return;
+        }
+        let mainReport = executionResults.MAIN_REPORT;
+        const feedback = mainReport.tp$getattr(new pyStr("feedback"));
+        if (!feedback) {
+            return;
+        }
+        let feedbacks = [];
+        Sk.misceval.iterFor(feedback.tp$iter(), (element) => {
+            feedbacks.push(this.processSingleFeedback(element));
+        });
+        Sk.misceval.iterFor(mainReport.tp$getattr(new pyStr("ignored_feedback")).tp$iter(), (element) => {
+            feedbacks.push(this.processSingleFeedback(element));
+        });
+        const parents = new Map();
+        for (let i = 0; i < feedbacks.length; i += 1) {
+            const [element, parent, text] = feedbacks[i];
+            const hasParent = !Sk.builtin.checkNone(parent);
+            if (hasParent) {
+                if (!parents.has(parent)) {
+                    parents.set(parent, []);
+                }
+                parents.get(parent).push(text);
+            } else {
+                if (!parents.has(element)) {
+                    parents.set(element, []);
+                }
+                parents.get(element).unshift(text);
+            }
+        }
+        feedbacks = [...parents.values()].flat();
+        this.category.on("click", () => {
+            this.main.components.dialog.show("Full Feedback Information", '<div class="list-group">'+
+                feedbacks.join("\n") + "</div>");
+            $(".feedback-expand-on-click").on("click", (event) => {
+                $(event.target).toggleClass("feedback-shrunk");
+            });
+        });
+    }
+
     notifyFeedbackUpdate() {
         if (!this.isFeedbackVisible()) {
             this.tag.find(".blockpy-floating-feedback").show().fadeOut(7000);
-            this.scrollIntoView();
+            if (this.shouldScrollIntoView()) {
+                this.scrollIntoView();
+            }
         }
     };
+
+    shouldScrollIntoView() {
+        return !this.main.model.ui.smallLayout();
+    }
 
     presentRunError(error, just_return) {
         if (just_return === undefined) {
@@ -270,6 +364,9 @@ export class BlockPyFeedback {
 
     buildTraceback(error, filenameExecuted) {
         return error.traceback.map(frame => {
+            if (!frame) {
+                return "??";
+            }
             let lineno = frame.lineno;
             if (frame.filename.slice(0, -3) === filenameExecuted) {
                 lineno -= this.main.model.execution.reports.instructor.lineOffset;

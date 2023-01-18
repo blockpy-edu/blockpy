@@ -23,6 +23,15 @@ export class RunConfiguration extends StudentConfiguration {
             "code": this.code
         };
 
+        if (typeof Sk.environ == "undefined") {
+            Sk.environ = new Sk.builtin.dict();
+        }
+        const printerTag = this.main.components.console.printerTag,
+            width = printerTag.width()-50,
+            height = Math.max(300, printerTag.height()-50);
+        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_WIDTH"), new Sk.builtin.int_(width));
+        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_HEIGHT"), new Sk.builtin.int_(height));
+
         Sk.retainGlobals = false;
 
         this.clearInput();
@@ -75,10 +84,12 @@ export class RunConfiguration extends StudentConfiguration {
         } else {
             this.main.components.server.logEvent("Run.Program", "ProgramErrorOutput", "", error.toString(), "answer.py");
         }
+        this.lastStep();
         return new Promise((resolve, reject) => {
             report["student"] = {
                 "success": false,
                 "error": error,
+                "trace": this.engine.executionBuffer.trace,
                 "lines": this.engine.executionBuffer.trace.map(x => x.line),
                 "realLines": this.engine.executionBuffer.trace.filter(x => !x.isDocstring).map(x => x.line),
                 "input": this.main.model.execution.input,

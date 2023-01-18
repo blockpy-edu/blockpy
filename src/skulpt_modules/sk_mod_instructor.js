@@ -345,8 +345,39 @@ export let $sk_mod_instructor = function() {
     });
 
     mod.clear_existing_student_imports = new Sk.builtin.func(function() {
-        Sk.builtin.pyCheckArgs("get_student_data", arguments, 0, 0);
+        Sk.builtin.pyCheckArgs("clear_existing_student_imports", arguments, 0, 0);
         Sk.clearExistingStudentImports();
+    });
+
+    mod.download_file = new Sk.builtin.func(function(placement, directory, filename) {
+        Sk.builtin.pyCheckArgs("download_file", arguments, 3, 3);
+        const downloadFileUrl = Sk.executionReports["model"].configuration.urls["downloadFile"];
+        const combiner = downloadFileUrl.includes("?") ? "&" : "?";
+        const url = `${downloadFileUrl}${combiner}placement=${placement}&directory=${directory}&filename=${filename}`;
+        const prom = new Promise(function (resolve, reject) {
+            const xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.addEventListener("loadend", function (e) {
+                resolve(Sk.ffi.remapToPy(xmlhttp.responseText));
+            });
+
+            xmlhttp.open("GET", url);
+            xmlhttp.send(null);
+        });
+        const susp = new Sk.misceval.Suspension();
+        let resolution = null;
+        susp.resume = ()=>resolution;
+        susp.data = {
+            type: "Sk.promise",
+            promise: prom.then((value) => {
+                resolution = value;
+                return value;
+            }, (err) => {
+                resolution ="";
+                return err;
+            })
+        };
+        return susp;
     });
     
     return mod;

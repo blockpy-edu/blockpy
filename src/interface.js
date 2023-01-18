@@ -86,7 +86,7 @@ export function makeInterface(main) {
     <canvas id='capture-canvas' class='d-none' role="presentation" aria-hidden="true"></canvas>
     
     <!-- Row 1: Header and Quick Menu -->
-    <div class='row'>
+    <div class='row' data-bind="hidden: ui.smallLayout()">
          
          <!-- Description -->
          <div class='col-md-9 blockpy-panel blockpy-header'
@@ -166,46 +166,62 @@ export function makeInterface(main) {
             </button>
             <!-- Pink Bug for actual errors -->
             <span class="blockpy-student-error fas fa-bug"></span>
+            <span data-bind="hidden: ui.menu.showClock" class="blockpy-menu-clock"></span>
         </div>
          
     </div>
     
+    <!-- ko if: ui.smallLayout() -->
+    <!-- Small layout View as instructor -->
+    <div class="form-check"
+         data-bind="visible: ui.role.isGrader">
+        <input class="form-check-input" type="checkbox" value="" id="blockpy-as-instructor"
+            data-bind="checked: display.instructor">
+        <label class="form-check-label" for="blockpy-as-instructor">
+            View as instructor
+        </label>
+    </div>
+    <!-- ko if: ui.files.visible() -->
+    ${FILES_HTML}
+    <!-- /ko -->
+    <!-- /ko -->
+    
+    <div class='row'>
     <!-- Row 2: Console and Feedback -->
     <!-- ko if: ui.secondRow.isAllVisible -->
+    <div data-bind="class: ui.secondRow.width">
     <div class='row'>
-    
         <!-- Console -->
         ${CONSOLE_HTML}
-         
         <!-- Feedback -->
         <!-- ko if: ui.secondRow.isFeedbackVisible -->
         ${FEEDBACK_HTML}
         <!-- /ko -->
-        
         <!-- Trace -->
         <!-- ko if: ui.secondRow.isTraceVisible -->
         ${TRACE_HTML}
         <!-- /ko -->
-         
+    </div>
     </div>
     <!-- /ko -->
     
     <!-- Row 3: File Navigation -->
-    <!-- ko if: ui.files.visible -->
-    <div class='row'>
-        ${FILES_HTML}
-    </div>
+    <!-- ko if: ui.files.visible() && !ui.smallLayout() -->
+    ${FILES_HTML}
     <!-- /ko -->
     
     <!-- Row 4: View Row -->
-    <div class="row">
-        ${EDITORS_HTML}
+    ${EDITORS_HTML}
+    
     </div>
-
+    
+    
     <!-- Row 5: Footer Row -->    
+    <!-- ko if: ui.footer.visible -->
     <div class="row">
         ${FOOTER_HTML}
     </div>
+    <!-- /ko -->
     
 </div>
     `;
