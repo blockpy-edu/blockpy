@@ -52,8 +52,7 @@ cd ../../..
 
 
 : BlockPy
-cd blockpy-edu && git clone https://github.com/JAromando/blockpy-kennel blockpy && cd blockpy
-git checkout feat/update-deps-for-modern-node
+cd blockpy-edu && git clone https://github.com/THRALLab/blockpy-kennel blockpy && cd blockpy
 call npm install
 call npm run build
 
