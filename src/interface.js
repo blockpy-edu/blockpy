@@ -164,6 +164,12 @@ export function makeInterface(main) {
                 data-bind="click: ui.menu.toggleImages" title="Toggle Images">
                 <span class="fas fa-images"></span>
             </button>
+            <!-- Get Shareable Link Dialog -->
+            <button class="btn btn-outline-secondary btn-sm"
+                data-bind="click: ()=>ui.menu.startShare(false), visible: ui.menu.canShare"
+                title="Get Shareable Link for Instructors or TAs">
+                <span class="fas fa-link"></span>
+            </button>
             <!-- Pink Bug for actual errors -->
             <span class="blockpy-student-error fas fa-bug"></span>
             <span data-bind="hidden: ui.menu.showClock" class="blockpy-menu-clock"></span>

@@ -278,7 +278,15 @@ export class BlockPy {
                  * PartID specified, in which case the submission.code in the model is only showing what we know
                  * locally.
                  */
-                backupSubmissionCode: ko.observable(configuration["submission.code"] || "")
+                backupSubmissionCode: ko.observable(configuration["submission.code"] || ""),
+                /**
+                 * Controls the rating system
+                 */
+                showRating: ko.observable(this.getSetting("display.showRating", "true").toString()==="true"),
+                /**
+                 * Whether the student has rated this current feedback
+                 */
+                hasRated: ko.observable(false),
             },
             status: {
                 // @type {ServerStatus}
@@ -320,6 +328,12 @@ export class BlockPy {
                 // @type {ServerStatus}
                 uploadFile: ko.observable(StatusState.READY),
                 uploadFileMessage: ko.observable(""),
+                // @type {ServerStatus}
+                renameFile: ko.observable(StatusState.READY),
+                renameFileMessage: ko.observable(""),
+                // @type {ServerStatus}
+                externalAPI: ko.observable(StatusState.READY),
+                externalAPIMessage: ko.observable(""),
                 // @type {ServerStatus}
                 onExecution: ko.observable(StatusState.READY),
             },
@@ -396,7 +410,8 @@ export class BlockPy {
                  * It's possible that other editors may be attached to a different Part of the same assignmnet, on the
                  * same page.
                  * **/
-                partId: ko.observable(configuration["partId"] || "")
+                partId: ko.observable(configuration["partId"] || ""),
+                accessToken: ko.observable(configuration["access_token"] || undefined),
             }
         };
     };
@@ -583,7 +598,33 @@ export class BlockPy {
                 ),
                 showClock: ko.pureComputed(() =>
                     !model.assignment.settings.hasClock()
-                )
+                ),
+                canShare: ko.pureComputed(() =>
+                    model.configuration.urls["shareUrl"] !== undefined
+                ),
+                getShareUrl: (wasPrompted) => {
+                    const parts = ["group", model.user.courseId(), model.user.groupId(), model.assignment.id(), model.user.id()];
+                    /*const interestingDetails = {
+                        "when": new Date().toISOString(),
+                        // "feedback": model.execution.feedback.category() + "|" + model.execution.feedback.label(),
+                        // "wasPrompted": wasPrompted
+                    };
+                    parts.push(btoa(JSON.stringify(interestingDetails)));
+                    console.log(interestingDetails);*/
+                    parts.push(new Date().toISOString());
+
+                    // Base64 encode the parts
+                    const encoded = btoa(parts.join("_"));
+                    // Construct the target URL using model.configuration.urls["shareUrl"]
+                    const baseUrl = model.configuration.urls["shareUrl"];
+                    return baseUrl + (baseUrl.endsWith("/") ? "" : "/") + encoded;
+                },
+                startShare: (wasPrompted) => {
+                    this.components.dialog.START_SHARE(
+                        model.ui.menu.getShareUrl(wasPrompted),
+                        wasPrompted
+                    );
+                },
             },
             secondRow: {
                 width: ko.pureComputed(()=>
@@ -711,6 +752,40 @@ export class BlockPy {
                     model.submission.score(0);
                     model.submission.correct(false);
                     self.components.server.updateSubmission(model.submission.score(), model.submission.correct(), true, true);
+                },
+                provideRatings: ko.pureComputed(() =>
+                    !model.assignment.hidden()
+                ),
+                flipRating: () => {
+                    const newState = !model.display.showRating();
+                    model.display.showRating(newState);
+                    self.localSettings_.set("display.showRating", newState.toString());
+                },
+                rate: (rating, suggestShare=false) => {
+                    self.components.server.logEvent("X-Rating",
+                                                    model.execution.feedback.category(),
+                                                    model.execution.feedback.label(),
+                                                    rating);
+                    model.configuration.container.find(".blockpy-rating").fadeOut(500, function() {
+                        $(this).fadeIn(500);
+                        model.display.hasRated(true);
+                    });
+                    const thankYou = model.configuration.container.find(".blockpy-feedback-thank-you");
+                    thankYou.addClass("show");
+                    setTimeout(() => {
+                        thankYou.removeClass("show");
+                        if (model.display.hasRated()) {
+                            model.ui.menu.startShare(true);
+                        }
+                    }, 1000);
+                },
+                hasRatedClass: ko.pureComputed(() =>
+                    model.display.hasRated() ? "far" : "fas"
+                ),
+                addPositiveFeedback: (text, icon, color, onclick, toEnd, instructorOnly) => {
+                    if (!instructorOnly || model.display.instructor()) {
+                        self.components.feedback.addPositiveFeedback(text, icon, color, onclick, toEnd);
+                    }
                 }
             },
             trace: {
@@ -800,6 +875,9 @@ export class BlockPy {
             },
             files: {
                 visible: ko.pureComputed(() =>
+                    model.display.instructor() || !model.assignment.settings.hideFiles() || model.assignment.settings.preloadAllFiles()
+                ),
+                addIsVisible: ko.pureComputed(() =>
                     model.display.instructor() || !model.assignment.settings.hideFiles()
                 ),
                 width: ko.pureComputed(()=>
@@ -814,8 +892,8 @@ export class BlockPy {
                         case "!on_eval.py": return model.assignment.onEval() !== null;
                         case "?mock_urls.blockpy": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "?mock_urls.blockpy");
-                        case "?images.blockpy": return model.assignment.extraInstructorFiles().some(file =>
-                            file.filename() === "?images.blockpy");
+                        case "images.blockpy": return model.assignment.extraInstructorFiles().some(file =>
+                            file.filename() === "images.blockpy");
                         case "!answer_prefix.py": return model.assignment.extraInstructorFiles().some(file =>
                             file.filename() === "!answer_prefix.py");
                         case "!answer_suffix.py": return model.assignment.extraInstructorFiles().some(file =>
@@ -836,7 +914,7 @@ export class BlockPy {
                         case "?settings.blockpy":
                             self.components.fileSystem.newFile(path);
                             break;
-                        case "?images.blockpy":
+                        case "images.blockpy":
                             self.components.fileSystem.newFile(path, "{}");
                             break;
                         case "?toolbox.blockpy":
@@ -896,7 +974,7 @@ export class BlockPy {
                     if (path === "?mock_urls.blockpy") {
                         return "URL Data";
                     }
-                    if (path === "?images.blockpy") {
+                    if (path === "images.blockpy") {
                         return "Images";
                     }
                     if (path === "!answer_prefix.py") {
@@ -997,7 +1075,12 @@ export class BlockPy {
                     }
                 },
                 images: {
-                    reloadImages: () => self.components.editors.byName("image").reloadImages()
+                    uploadFile: () => self.components.editors.byName("image").uploadFile(),
+                    deleteFile: (fileInfo) => self.components.editors.byName("image").deleteFile(fileInfo),
+                    renameFile: (fileInfo) => self.components.editors.byName("image").renameFile(fileInfo),
+                    reloadImages: () => self.components.editors.byName("image").reloadImages(),
+                    canChoosePlacement: ko.pureComputed(() => model.display.instructor()),
+                    canModify: (placement) => model.display.instructor() || placement === "submission" || placement === "user",
                 },
                 settings: {
                     save: () => self.components.server.saveAssignment()
@@ -1060,6 +1143,7 @@ export class BlockPy {
                         model.status.logEventMessage() ||
                         model.status.saveImage() ||
                         model.status.updateSubmissionMessage() ||
+                        model.status.externalAPI() ||
                         model.status.updateSubmissionStatusMessage() || "")
                 ),
                 force: {

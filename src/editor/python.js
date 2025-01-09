@@ -212,6 +212,7 @@ class PythonEditorView extends AbstractEditor {
             },
             //'height': '2000px'
         });
+        // TODO: Prevent INS and OVR mode (... this.bm.textEditor.codeMirror.
 
         this.dirty = false;
         this.readOnly = false;

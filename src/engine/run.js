@@ -29,8 +29,8 @@ export class RunConfiguration extends StudentConfiguration {
         const printerTag = this.main.components.console.printerTag,
             width = printerTag.width()-50,
             height = Math.max(300, printerTag.height()-50);
-        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_WIDTH"), new Sk.builtin.int_(width));
-        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_HEIGHT"), new Sk.builtin.int_(height));
+        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_WIDTH"), new Sk.builtin.int_(Math.round(width)));
+        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_HEIGHT"), new Sk.builtin.int_(Math.round(height)));
 
         Sk.retainGlobals = false;
 

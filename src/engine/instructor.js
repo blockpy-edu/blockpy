@@ -111,6 +111,15 @@ export class InstructorConfiguration extends Configuration {
         }
     }
 
+    openURL(url, data, timeout) {
+        // TODO: Figure out why parameters are misaligned..?
+        if (data.v === "OPENAI") {
+            return this.main.components.server.openaiProxy(timeout.v);
+        } else {
+            return super.openURL(url, data, timeout);
+        }
+    }
+
     importFile(filename) {
         if (filename === "./answer.py") {
             return this.main.model.submission.code();

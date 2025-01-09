@@ -12,6 +12,7 @@ export let FEEDBACK_HTML = `
             aria-live="polite"
             data-bind="class: ui.console.size">
 
+    <div>
     <!-- Feedback/Trace Visibility Control -->
     <!-- ko ifnot: ui.secondRow.hideTraceButton -->
     <button type='button'
@@ -21,12 +22,6 @@ export let FEEDBACK_HTML = `
         <span data-bind="text: ui.secondRow.switchLabel"></span>
     </button>
     <!-- /ko -->
-    
-    <!-- Positive Feedback Region -->
-    <div class="blockpy-feedback-positive float-right">
-        
-    
-    </div>
 
     <!-- Actual Feedback Region -->    
     <div>
@@ -47,6 +42,35 @@ export let FEEDBACK_HTML = `
         <div class="blockpy-feedback-message"
             data-bind="html: execution.feedback.message"></div>
     </div>
+    </div>
+    <div style="position: relative;">
+        <!-- The thank you message will appear above the span -->
+        <span class="blockpy-feedback-thank-you">Thank you!</span>
+    </div>
+    <small class="blockpy-feedback-response-full" style="text-align: right"
+        data-bind="visible: ui.feedback.provideRatings() && execution.feedback.label() && display.showRating()">
+        <span style="cursor: pointer;" class="far fa-minus-square"
+            data-bind="click: ui.feedback.flipRating"></span>
+        Rate this Feedback:
+        <span style="cursor: pointer; font-size: 20px" class="blockpy-rating fa-thumbs-up"
+            data-bind="click: ()=>ui.feedback.rate('thumbs-up'),
+                        css: ui.feedback.hasRatedClass"></span>
+<!--        <span style="cursor: pointer; font-size: 20px" class="blockpy-rating fa-meh"-->
+<!--            data-bind="click: ()=>ui.feedback.rate('meh'),-->
+<!--                        css: ui.feedback.hasRatedClass"></span>-->
+        <span style="cursor: pointer; font-size: 20px" class="blockpy-rating fa-thumbs-down"
+            data-bind="click: ()=>ui.feedback.rate('thumbs-down', true),
+                        css: ui.feedback.hasRatedClass"></span>
+    </small>
+    <!-- Positive Feedback Region -->
+    <div class="blockpy-feedback-positive" style="text-align: right">
+    </div>
+    <small class="blockpy-feedback-response-collapsed" 
+        style="position: absolute; right: 0; bottom: 0"
+        data-bind="visible: execution.feedback.label() && !display.showRating()">
+        <span style="cursor: pointer; vertical-align: middle" class="far fa-plus-square"
+            data-bind="click: ui.feedback.flipRating"></span> Rate
+    </small>
 </div>            
 `;
 
@@ -115,6 +139,7 @@ export class BlockPyFeedback {
         this.feedbackModel.linesUncovered.removeAll();
         this.clearPositiveFeedback();
         this.category.off("click");
+        this.main.model.display.hasRated(false);
     };
 
     static findFirstErrorLine(feedbackData) {
@@ -427,4 +452,7 @@ export class BlockPyFeedback {
 
         this.main.components.server.logEvent("X-System.Error", "internal", "Internal Error", message, filenameExecuted);
     }
+
+
+
 }

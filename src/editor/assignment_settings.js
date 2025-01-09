@@ -18,6 +18,7 @@ const ASSIGNMENT_SETTINGS = [
     ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
     ["disableEdit", "disable_edit", false, "bool", "If checked, then the students' file will not be editable."],
+    ["preloadAllFiles", "preload_all_files", false, "bool", "If checked, then the students can upload and use images and other files. This preloads all available files and images. You can filter them using the Preloaded Files setting."],
     ["enableImages", "can_image", false, "bool", "If checked, then users can copy/paste images directly into the text editor."],
     ["enableBlocks", "can_blocks", true, "bool", "If checked, then the student can edit the block interface (if not, then it is visible but not editable)."],
     ["canClose", "can_close", false, "bool", "If checked, then the student should mark their submission closed when they are done. There is no way to force a student to do so. Unlike Reviewed, this still submits the correctness."],

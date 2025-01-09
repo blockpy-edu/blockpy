@@ -48,6 +48,18 @@
     <script src="../libs/codemirror/shell.js"></script>
     <script src="../libs/codemirror/yaml-frontmatter.js"></script>
 
+    <!-- Filepond -->
+    <link rel="stylesheet" href="../libs/filepond/filepond.min.css">
+    <link rel="stylesheet" href="../libs/filepond/filepond-plugin-image-preview.css">
+    <link rel="stylesheet" href="../libs/filepond/filepond-plugin-file-poster.css">
+    <script src="../libs/filepond/filepond-plugin-image-preview.js"></script>
+    <script src="../libs/filepond/filepond-plugin-file-poster.js"></script>
+    <script src="../libs/filepond/filepond.min.js"></script>
+    <script>
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.registerPlugin(FilePondPluginFilePoster);
+    </script>
+
     <!-- Blockly -->
     <script src="../../blockly/blockly_compressed.js" type="text/javascript"></script>
     <script src="../../blockly/blocks_compressed.js" type="text/javascript"></script>
@@ -69,6 +81,9 @@
     <script src="../../../pedal-edu/pedal/dist-js/skulpt-pedal.js" type="text/javascript"></script>
     <script src="../../../pedal-edu/curriculum-ctvt/dist-js/skulpt-curriculum-ctvt.js" type="text/javascript"></script>
     <script src="../../../pedal-edu/curriculum-sneks/dist-js/skulpt-curriculum-sneks.js" type="text/javascript"></script>
+
+    <!-- Drafter -->
+    <script src="../../../drafter-edu/drafter/dist-js/skulpt-drafter.js" type="text/javascript"></script>
 
     <!-- BlockMirror -->
     <link rel="stylesheet" href="../../BlockMirror/dist/block_mirror.css">
@@ -126,7 +141,12 @@ i.show()
             'attachment.point': '#main-editor',
             "urls": {
                 "importDatasets": "https://corgis-edu.github.io/corgis/datasets/",
-                "instructionsAssignmentSetup": "https://localhost:5000"
+                "openai_proxy": "https://localhost:5000/blockpy/openai",
+                "instructionsAssignmentSetup": "https://localhost:5000",
+                "listUploadedFiles": "https://localhost:5000/blockpy/list_files",
+                "uploadFile": "https://localhost:5000/blockpy/upload_file",
+                "downloadFile": "https://localhost:5000/blockpy/download_file",
+                "shareUrl": "https://localhost:5000/blockpy/share",
             },
             "display.instructor": true,
             //"assignment.on_eval": "console_log(ABC)",

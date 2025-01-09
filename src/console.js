@@ -48,6 +48,7 @@ export let ConsoleLineType = {
     PLOT: "plot",
     IMAGE: "image",
     PYGAME: "pygame",
+    DRAFTER: "drafter",
     TURTLE: "turtle",
     EVAL: "eval",
     START_EVAL: "start_eval",
@@ -144,6 +145,31 @@ class ConsoleLineTurtle extends ConsoleLine {
             $("html").scrollTop(top);
             //this.html.tooltip();
         }
+    }
+}
+
+class ConsoleLineDrafter extends ConsoleLine {
+    constructor(main, size, fullscreen) {
+        super(main, ConsoleLineType.DRAFTER);
+        this.html.addClass("blockpy-console-drafter-output");
+        this.size = size;
+        this.fullscreen = fullscreen;
+    }
+
+    render(where) {
+        if (this.visible) {
+            where.prepend(this.html);
+            var top = this.html.offset().top;
+            $("html").scrollTop(top);
+        }
+    }
+
+    cleanup() {
+        // Starts off as a no-op
+    }
+
+    stop() {
+        this.main.model.ui.secondRow.restorePanel();
     }
 }
 
@@ -403,6 +429,7 @@ export class BlockPyConsole {
         };
 
         this.pygameLine = null;
+        this.drafterLine = null;
     };
 
     loadAsset(name) {
@@ -532,6 +559,14 @@ export class BlockPyConsole {
             this.pygameLine.render(this.printerTag);
         }
         return this.pygameLine;
+    }
+
+    drafter(size, fullscreen) {
+        if (this.drafterLine === null) {
+            this.drafterLine = new ConsoleLineDrafter(this.main, size, fullscreen);
+            this.drafterLine.render(this.printerTag);
+        }
+        return this.drafterLine;
     }
 
     printPILImage(imageData) {

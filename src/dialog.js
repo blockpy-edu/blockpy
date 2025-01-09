@@ -121,6 +121,16 @@ BlockPyDialog.prototype.ERROR_DOWNLOADING_FILE = function (reason) {
 Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
 };
 
+BlockPyDialog.prototype.ERROR_RENAMING_FILE = function (reason) {
+    this.show("Error Renaming File", `BlockPy encountered an error while renaming a file.<br>
+Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
+BlockPyDialog.prototype.ERROR_DELETING_FILE = function (reason) {
+    this.show("Error Deleting File", `BlockPy encountered an error while deleting a file.<br>
+Please try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
+};
+
 BlockPyDialog.prototype.ERROR_SAVING_ASSIGNMNENT = function (reason) {
     this.show("Error Saving Assignment", `BlockPy encountered an error while saving the assignment.<br>
 Please reload the page and try again.<br>Response from server was:<br><pre>${reason}</pre>`,);
@@ -203,4 +213,32 @@ You do not need quotes; the text will be entered literally.
  
 `, yes, this.no, "Save");
     // TODO: Allow user to specify the infinite string to keep giving when the others run out
+};
+
+BlockPyDialog.prototype.START_SHARE = function (url, wasPrompted) {
+    const initialMessage = wasPrompted ? `
+    It looks like you are having some trouble with this problem, your code, or this feedback.
+    If you plan to reach out for help from the course staff, then we recommend you include this link
+    in your message. It will make it much easier for them to help you quickly. 
+    ` : "You can quickly share your code with instructors and TAs by providing them with this link:";
+    this.show("Share Your Code", `
+    <div class="mb-4">
+        ${initialMessage}
+    </div>
+    <div class="mb-4">
+        <pre class="blockpy-copy-share-link-area">${url}</pre>
+        <button type='button' class='btn btn-white blockpy-copy-share-link'>Copy Link</button>
+    </div>
+    <div class="mb-4">
+        Note that you CANNOT share this link with other students, or access it yourself.
+        This is strictly for sharing with the course staff when something goes wrong or you need help with your code.
+    </div>
+    `);
+
+    this.tag.find(".blockpy-copy-share-link").on("click", () => {
+        // Copy the URL to the clipboard
+        navigator.clipboard.writeText(url).then(() => {
+            this.tag.find(".blockpy-copy-share-link").html("Copied!");
+        });
+    });
 };

@@ -196,12 +196,27 @@
 .blockpy-feedback {
     padding: 10px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     /*max-height: 230px;*/
 }
 
 .blockpy-feedback-traces table {
     background: white;
     width: 100%;
+}
+
+.blockpy-feedback-thank-you {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    transition: all 0.5s ease-out;
+}
+
+.blockpy-feedback-thank-you.show {
+    opacity: 1;
+    transform: translateY(-16px);
 }
 
 table.pedal-table {
@@ -535,7 +550,7 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 
 .blockpy-content .blockpy-feedback-positive {
     right: 10px;
-    position: absolute;
+    /*position: absolute;*/
     bottom: 0;
 }
 
@@ -630,4 +645,9 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
 .feedback-expand-on-click:not(.feedback-shrunk)::before {
     content: "-";
     float: right;
+}
+
+.blockpy-copy-share-link-area {
+    overflow-x: auto;
+    user-select: all;
 }

@@ -74,11 +74,11 @@ export let FILES_HTML = `
                 data-bind="css: {active: $root.display.filename() === filename()},
                             click: $root.display.filename.bind($data, filename()),
                             text: $root.ui.files.displayFilename(filename())">
-            </a>        
+            </a>
         </li>
     <!-- /ko -->
   
-    <li class="nav-item dropdown">
+    <li class="nav-item dropdown" data-bind="visible: ui.files.addIsVisible">
         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
          role="button" aria-haspopup="true" aria-expanded="false">Add New</a>
         <!-- ko if: $root.display.instructor() -->
@@ -87,8 +87,8 @@ export let FILES_HTML = `
                 data-bind="hidden: ui.files.hasContents('?mock_urls.blockpy'),
                            click: ui.files.add.bind($data, '?mock_urls.blockpy')">URL Data</a>
             <a class="dropdown-item blockpy-file-instructor" href="#"
-                data-bind="hidden: ui.files.hasContents('?images.blockpy'),
-                           click: ui.files.add.bind($data, '?images.blockpy')">Images</a>
+                data-bind="hidden: ui.files.hasContents('images.blockpy'),
+                           click: ui.files.add.bind($data, 'images.blockpy')">Images</a>
             <a class="dropdown-item blockpy-file-instructor" href="#"
                 data-bind="hidden: ui.files.hasContents('?toolbox.blockpy'),
                            click: ui.files.add.bind($data, '?toolbox.blockpy')">Toolbox</a>
@@ -136,6 +136,13 @@ export let FILES_HTML = `
 const NEW_INSTRUCTOR_FILE_DIALOG_HTML = `
 <form>
 <div class="form-group row">
+    <div>
+        <p>This dialog box is for creating text files (e.g., Python code, Markdown, etc.) that will be
+        accessible from Python. If you want to upload a binary file (e.g., an image, a sqlite database),
+        then you should use the "Images" or "URL Data" options.</p>
+        
+        <p>Students will not be able to see file tabs unless you change the "Hide Files" setting to be unchecked.</p>
+    </div>
     <!-- Filename -->
     <div class="col-sm-2 text-right">
         <label for="blockpy-instructor-file-dialog-filename">Filename:</label>
@@ -304,6 +311,7 @@ export class BlockPyFileSystem {
         this.watches_ = {};
 
         this.remoteFiles_ = {};
+        this.filesToUrls = {};
 
         /*main.model.configuration.container.find(".blockpy-file-instructor").toggle(this.main.model.display.instructor());
         this.main.model.display.instructor.subscribe((visiblity)=> {
@@ -658,24 +666,57 @@ export class BlockPyFileSystem {
         this.main.components.dialog.confirm("Make New File", body, yes, ()=>{}, "Add");
     }
 
-    loadRemoteFiles() {
+    loadRemoteFiles(files=null) {
         // Clear existing remote files (?)
         /*
         Object.getOwnPropertyNames(this.remoteFiles_).forEach(function (prop) {
             delete this.remoteFiles_[prop];
         });*/
         let model = this.main.model;
-        const preloadFiles = model.assignment.settings.preloadFiles();
-        if (!preloadFiles) {
+
+        const preloadFiles = model.assignment.settings.preloadFiles() || model.assignment.settings.preloadAllFiles();
+        if (!preloadFiles && !files) {
             return null;
         }
-        let files;
-        try {
-            files = JSON.parse(preloadFiles);
-        } catch (e) {
-            console.error("Failed to preload files, invalid structure: ", e);
-            return null;
+        if (model.assignment.settings.preloadFiles()) {
+            try {
+                files = JSON.parse(preloadFiles);
+            } catch (e) {
+                console.error("Failed to preload files, invalid structure: ", e);
+                return null;
+            }
+            this.downloadRemoteFiles(files);
+        } else if (files) {
+            this.downloadRemoteFiles(this.reorganizeFiles(files));
+        } else {
+            this.main.components.server.listUploadedFiles((data) => {
+                this.downloadRemoteFiles(this.reorganizeFiles(data.files));
+            });
         }
+    }
+
+    reorganizeFiles(files) {
+        const organized = {};
+        Object.entries(files).forEach(([placement, placedFiles]) => {
+            placedFiles.forEach(([filename, url]) => {
+                const searchParams = new URL(url, window.location.origin).searchParams;
+                const directory = searchParams.get("directory");
+                const placement = searchParams.get("placement");
+                if (!(placement in organized)) {
+                    organized[placement] = {};
+                }
+                if (!(directory in organized[placement])) {
+                    organized[placement][directory] = {};
+                }
+                organized[placement][directory][filename] = true;
+                this.filesToUrls[filename] = url;
+            });
+        });
+        return organized;
+    }
+
+    downloadRemoteFiles(files) {
+        const oldRemainingFiles = Object.keys(this.remoteFiles_);
         Object.entries(files).forEach(([placement, placementData]) => {
             Object.entries(placementData).forEach(([directory, directoryData]) => {
                 Object.entries(directoryData).forEach(([filename, renamedFile]) => {
@@ -684,11 +725,14 @@ export class BlockPyFileSystem {
                     }
                     if (!(renamedFile in this.remoteFiles_)) {
                         this.main.components.server.downloadFile(placement, directory, filename, (data) => {
+                            this.newFile("images.blockpy", "{}");
                             this.remoteFiles_[renamedFile] = makeMockModelFile(renamedFile, data);
+                            delete oldRemainingFiles[renamedFile];
                         });
                     }
                 });
             });
         });
+        // TODO: Clean up the old files after all the new ones are loaded
     }
 }

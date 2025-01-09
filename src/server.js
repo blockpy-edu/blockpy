@@ -157,6 +157,20 @@ BlockPyServer.prototype.finalizeSubscriptions = function () {
     //this.main.model.assignment.settings.datasets.subscribe(this.saveAssignment.bind(this));
 };
 
+BlockPyServer.prototype.authorizeHeader = function(currentSettings) {
+    if (!currentSettings) {
+        currentSettings = {};
+    }
+    const accessToken = this.main.model.configuration.accessToken();
+    if (accessToken) {
+        if (!currentSettings.headers) {
+            currentSettings.headers = {};
+        }
+        currentSettings.headers["Authorization"] = "Bearer " + accessToken;
+    }
+    return currentSettings;
+};
+
 /**
  * Creates the default payload for any communication with the server API
  * @returns {{assignment_id: *, course_id: *, group_id: *, user_id: *, timezone: *, version: *, timestamp: *}}
@@ -169,7 +183,7 @@ BlockPyServer.prototype.createServerData = function () {
     const configuration = this.main.model.configuration;
     let now = new Date();
     let microseconds = now.getTime();
-    return {
+    let result = {
         "assignment_id": assignment.id(),
         "assignment_group_id": user.groupId(),
         "course_id": user.courseId(),
@@ -181,6 +195,7 @@ BlockPyServer.prototype.createServerData = function () {
         "passcode": display.passcode(),
         "part_id": configuration.partId()
     };
+    return result;
 };
 
 /**
@@ -190,8 +205,10 @@ BlockPyServer.prototype.createServerData = function () {
  * @param message {string?}
  */
 BlockPyServer.prototype.setStatus = function (endpoint, status, message) {
-    this.main.model.status[endpoint](status);
-    this.main.model.status[endpoint + "Message"](message || "");
+    if (endpoint in this.main.model.status) {
+        this.main.model.status[endpoint](status);
+        this.main.model.status[endpoint + "Message"](message || "");
+    }
 };
 
 /**
@@ -261,7 +278,7 @@ BlockPyServer.prototype._postRetry = function (data, endpoint, delay, callback) 
     let postRequest = () => {
         // Make a backup of the current post
         this._enqueueData(endpoint, data);
-        $.post(this.urls[endpoint], data)
+        $.ajax({url: this.urls[endpoint], type: "post", data: data, ...this.authorizeHeader()})
             .done((response) => {
                 this._dequeueData(endpoint, data);
                 if (response.success) {
@@ -308,7 +325,7 @@ BlockPyServer.prototype._postLatestRetry = function (data, filename, endpoint, d
         this.storage.set(cache, JSON.stringify(data));
         let time = this.storage.getTime(cache);
         // Send the request
-        $.post(this.urls[endpoint], data)
+        $.ajax({url: this.urls[endpoint], data: data, type: "post", ...this.authorizeHeader()})
             .done((response) => {
                 if (response.success) {
                     this.checkIP(response);
@@ -357,7 +374,7 @@ BlockPyServer.prototype._postBlocking = function (endpoint, data, attempts, succ
         type: "POST",
         url: this.urls[endpoint],
         data: data,
-        ...extraSettings
+        ...this.authorizeHeader(extraSettings)
     })
         .done((response) => {
             this.hideOverlay();
@@ -376,7 +393,7 @@ BlockPyServer.prototype._postBlocking = function (endpoint, data, attempts, succ
                 setTimeout(() => {
                     this.hideOverlay();
                     this.setStatus(endpoint, StatusState.RETRYING, textStatus.toString());
-                    this._postBlocking(endpoint, data, attempts - 1, success, failure);
+                    this._postBlocking(endpoint, data, attempts - 1, success, failure, extraSettings);
                 }, this.FAIL_DELAY);
             }
         });
@@ -454,7 +471,7 @@ BlockPyServer.prototype.listUploadedFiles = function (callback) {
     }
 };
 
-BlockPyServer.prototype.uploadFile = function (placement, directory, filename, contents, callback) {
+BlockPyServer.prototype.uploadFile = function (placement, directory, filename, contents, callback, deleteInstead=false) {
     let model = this.main.model;
     if (model.ui.server.isEndpointConnected("uploadFile")) {
         let data = this.createServerData();
@@ -462,11 +479,18 @@ BlockPyServer.prototype.uploadFile = function (placement, directory, filename, c
         data["directory"] = directory;
         data["filename"] = filename;
         data["contents"] = contents;
+        if (deleteInstead) {
+            data["delete"] = true;
+        }
         let fd = Object.entries(data).reduce((d,e) => (d.append(...e), d), new FormData());
         return this._postBlocking("uploadFile", fd, 3,
                                   callback,
                                   (e, textStatus, errorThrown) => {
-                                      this.main.components.dialog.ERROR_UPLOADING_FILE(textStatus);
+                                      if (deleteInstead) {
+                                          this.main.components.dialog.ERROR_DELETING_FILE(textStatus);
+                                      } else {
+                                          this.main.components.dialog.ERROR_UPLOADING_FILE(textStatus);
+                                      }
                                       console.error(e, textStatus, errorThrown);
                                   }, {processData: false, contentType: false});
     } else {
@@ -490,6 +514,26 @@ BlockPyServer.prototype.downloadFile = function (placement, directory, filename,
                                   }, {processData: false, contentType: false, dataType: "text"});
     } else {
         this.setStatus("uploadFile", StatusState.OFFLINE, "Server is not connected! (Upload File)");
+    }
+};
+
+BlockPyServer.prototype.renameFile = function (placement, directory, old_filename, new_filename, callback) {
+    let model = this.main.model;
+    if (model.ui.server.isEndpointConnected("renameFile")) {
+        let data = this.createServerData();
+        data["placement"] = placement;
+        data["directory"] = directory;
+        data["old_filename"] = old_filename;
+        data["new_filename"] = new_filename;
+        let fd = Object.entries(data).reduce((d,e) => (d.append(...e), d), new FormData());
+        return this._postBlocking("renameFile", fd, 3,
+                                  callback,
+                                  (e, textStatus, errorThrown) => {
+                                      this.main.components.dialog.ERROR_UPLOADING_FILE(textStatus);
+                                      console.error(e, textStatus, errorThrown);
+                                  }, {processData: false, contentType: false});
+    } else {
+        this.setStatus("renameFile", StatusState.OFFLINE, "Server is not connected! (Rename File)");
     }
 };
 
@@ -639,4 +683,12 @@ BlockPyServer.prototype.updateSubmission = function (score, correct, hiddenOverr
                             });
         });
     }
+};
+
+BlockPyServer.prototype.openaiProxy = function (openai_data) {
+    var model = this.main.model;
+    var server = this;
+    var data = this.createServerData();
+    data["openai_data"] = openai_data;
+    return this._postBlocking(this.urls.openai_proxy, data);
 };

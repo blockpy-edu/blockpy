@@ -28,14 +28,31 @@ export let $sk_mod_instructor = function() {
      * Logs feedback to javascript console
      */
     mod.console_log = new Sk.builtin.func(function() {
-        console.log(([...arguments]).map(Sk.ffi.remapToJs));
+        const strArgs = ([...arguments]).map(Sk.ffi.remapToJs);
+        strArgs.forEach(function(arg) {
+            Sk.executionReports["model"].ui.feedback.addPositiveFeedback(
+                arg, "comment", "rgb(128, 128, 128)", undefined, true, true
+            );
+        });
     });
     
     /**
      * Logs debug to javascript console
      */
     mod.console_debug = new Sk.builtin.func(function() {
-        console.log(arguments);
+        console.log("debug", arguments);
+        try {
+            const strArgs = ([...arguments]).map(JSON.stringify);
+            strArgs.forEach(function(arg) {
+                Sk.executionReports["model"].ui.feedback.addPositiveFeedback(
+                    arg, "info-circle", "rgb(128, 128, 128)", undefined, true, true
+                );
+            });
+        } catch (e) {
+            Sk.executionReports["model"].ui.feedback.addPositiveFeedback(
+                `Failed to render debug message: ${e}`, "exclamation-triangle", "rgb(128, 128, 128)", undefined, true, true
+            );
+        }
     });
 
     /**
@@ -356,6 +373,7 @@ export let $sk_mod_instructor = function() {
         const url = `${downloadFileUrl}${combiner}placement=${placement}&directory=${directory}&filename=${filename}`;
         const prom = new Promise(function (resolve, reject) {
             const xmlhttp = new XMLHttpRequest();
+            // TODO: Figure out if this needs headers
 
             xmlhttp.addEventListener("loadend", function (e) {
                 resolve(Sk.ffi.remapToPy(xmlhttp.responseText));

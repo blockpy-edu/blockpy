@@ -75,12 +75,14 @@ let config = {
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
-            ko: "knockout"
+            ko: "knockout",
+            FilePond: "filepond"
         })
     ],
     externals: {
         jquery: "jQuery",
-        knockout: "ko"
+        knockout: "ko",
+        filepond: "FilePond"
     }
 };
 

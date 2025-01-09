@@ -22,6 +22,8 @@ export class Configuration {
         Sk.configure(this.getSkulptOptions());
         // Set openFile as mechanism to read files
         Sk.inBrowser = this.openFile.bind(this);
+        // Function to convert filenames to URLs
+        Sk.fileToURL = this.getUrlFromFilename.bind(this);
         // Proxy requests
         Sk.requestsGet = (url, data, timeout) => this.openURL(url, data, timeout);
         // Configure a "do you want to wait? prompt"
@@ -73,6 +75,14 @@ export class Configuration {
             // Whether or not to keep the globals
             retainGlobals: true
         };
+    }
+
+    getUrlFromFilename(filename) {
+        const found = this.main.components.fileSystem.filesToUrls[filename];
+        if (found === undefined) {
+            throw new Sk.builtin.OSError("File not found: " + filename);
+        }
+        return found;
     }
 
     /**
