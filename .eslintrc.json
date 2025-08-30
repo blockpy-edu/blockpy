@@ -3,6 +3,15 @@
         "es6": true,
         "browser": true
     },
+    "extends": [],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2019
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "rules": {
         "no-mixed-spaces-and-tabs": "error",
         "indent": ["error", 4, {
@@ -14,10 +23,18 @@
         "curly": ["error", "all"],
         "semi": ["error", "always"],
         "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
-        "quotes": ["error", "double", {"avoidEscape": true}]
+        "quotes": ["error", "double", {"avoidEscape": true}],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/no-inferrable-types": "off"
     },
-    "parserOptions": {
-        "sourceType": "module",
-        "ecmaVersion": 2019
-    }
+    "overrides": [
+        {
+            "files": ["*.js"],
+            "rules": {
+                "@typescript-eslint/no-var-requires": "off"
+            }
+        }
+    ]
 }

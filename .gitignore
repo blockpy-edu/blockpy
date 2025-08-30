@@ -23,6 +23,9 @@ node_modules/
 jspm_packages/
 .npm
 
+# TypeScript
+*.tsbuildinfo
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
