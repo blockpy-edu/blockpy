@@ -20,7 +20,8 @@ import {
     makeModelFile,
     observeConcatenatedFile,
     UNDELETABLE_FILES,
-    UNRENAMABLE_FILES
+    UNRENAMABLE_FILES,
+    chompSpecialFile
 } from "./files";
 import {uploadFile, downloadFile} from "./editor/abstract_editor";
 import {BlockPyEngine} from "engine.js";
@@ -1011,7 +1012,7 @@ export class BlockPy {
                     model.submission.code(model.assignment.startingCode());
                     model.submission.extraFiles(model.assignment.extraStartingFiles().map(
                         file => {
-                            let filename = file.filename().substr(1);
+                            let filename = chompSpecialFile(file.filename());
                             return makeModelFile(filename, file.contents());
                         }
                     ));
