@@ -873,6 +873,10 @@ export class BlockPy {
                     }
                 }),
             },
+            // Method to view exact value of complex data structures
+            viewExactValue: function(variableName, type, exactValue) {
+                self.components.dialog.DATA_EXPLORER(variableName, type, exactValue);
+            },
             files: {
                 visible: ko.pureComputed(() =>
                     model.display.instructor() || !model.assignment.settings.hideFiles() || model.assignment.settings.preloadAllFiles()
