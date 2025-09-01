@@ -9,6 +9,7 @@
  *  .peml: PEML Editor
  *  .png, .gif, .jpeg, .jpg, .bmp: Image Editor
  *  .json: JSON Editor
+ *  .csv: CSV Editor
  *  .yaml: YAML Editor
  */
 
@@ -19,6 +20,7 @@ import {TagsEditor} from "./editor/tags";
 import {MarkdownEditor} from "./editor/markdown";
 import {SampleSubmissions} from "./editor/sample_submissions";
 import {JsonEditor} from "./editor/json";
+import {CsvEditor} from "./editor/csv";
 import {ToolboxEditor} from "./editor/toolbox";
 import {QuizEditor} from "./editor/quiz";
 import {ImageEditor} from "./editor/images";
@@ -43,7 +45,7 @@ const SPECIAL_NAMESPACES = ["!", "^", "?", "$"];
 
 const AVAILABLE_EDITORS = [
     TextEditor, PythonEditor, AssignmentSettings, TagsEditor, MarkdownEditor,
-    SampleSubmissions, JsonEditor, ToolboxEditor, QuizEditor, ImageEditor
+    SampleSubmissions, JsonEditor, CsvEditor, ToolboxEditor, QuizEditor, ImageEditor
 ];
 
 export const EDITORS_HTML = AVAILABLE_EDITORS.map(editor => `
