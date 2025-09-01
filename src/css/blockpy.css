@@ -651,3 +651,64 @@ div.blockpy-blocks.blockpy-editor-menu.col-md-6 {
     overflow-x: auto;
     user-select: all;
 }
+
+/** CSV Editor Styles **/
+.blockpy-csv-editor-table-container {
+    max-height: 400px;
+    overflow: auto;
+    border: 1px solid #dee2e6;
+}
+
+.blockpy-csv-editor-table {
+    margin-bottom: 0;
+}
+
+.blockpy-csv-editor-table th,
+.blockpy-csv-editor-table td {
+    padding: 2px 4px;
+    vertical-align: middle;
+}
+
+.blockpy-csv-editor-table th {
+    cursor: pointer;
+    user-select: none;
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.blockpy-csv-editor-table th:hover {
+    background-color: #e9ecef;
+}
+
+.blockpy-csv-editor-table tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.blockpy-csv-editor-table tr.table-active,
+.blockpy-csv-editor-table th.table-active,
+.blockpy-csv-editor-table td.table-active {
+    background-color: rgba(0, 123, 255, 0.2);
+}
+
+.blockpy-csv-editor-table input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 2px;
+}
+
+.blockpy-csv-editor-table input:focus {
+    background: white;
+    border: 1px solid #007bff;
+    outline: none;
+}
+
+.blockpy-csv-editor-controls button {
+    margin-right: 5px;
+}
+
+.blockpy-csv-raw-text {
+    font-family: monospace;
+}
