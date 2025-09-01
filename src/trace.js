@@ -56,10 +56,10 @@ export const TRACE_HTML = `
                 <td data-bind="text: type"></td>
                 <td>
                     <code data-bind="text: value"></code>
-                    <!-- ko if: type == "List" -->
+                    <!-- ko if: type == "List" || type == "Dictionary" || type == "Tuple" -->
                     
-                    <a href="" data-bind="click: //$root.viewExactValue(type, exact_value)">
-                    <span class='glyphicon glyphicon-new-window'></span>
+                    <a href="" data-bind="click: function() { $root.viewExactValue(name, type, exact_value); }">
+                    <span class='fas fa-external-link-alt' title='Explore in new window'></span>
                     </a>
                     <!-- /ko -->
                 </td>
@@ -294,7 +294,8 @@ export class BlockPyTrace {
             case Sk.builtin.tuple:
                 return {"name": property,
                     "type": "Tuple",
-                    "value": value.$r().v
+                    "value": value.$r().v,
+                    "exact_value": value
                 };
             case Sk.builtin.list:
                 if (value.v.length <= 20) {
@@ -313,7 +314,8 @@ export class BlockPyTrace {
             case Sk.builtin.dict:
                 return {"name": property,
                     "type": "Dictionary",
-                    "value": value.$r().v
+                    "value": value.$r().v,
+                    "exact_value": value
                 };
             case Number:
                 return {"name": property,

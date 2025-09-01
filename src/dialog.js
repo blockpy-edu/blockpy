@@ -242,3 +242,272 @@ BlockPyDialog.prototype.START_SHARE = function (url, wasPrompted) {
         });
     });
 };
+
+/**
+ * Enhanced State Explorer dialog for viewing complex data structures
+ * Supports nested exploration similar to Spyder's variable explorer
+ */
+BlockPyDialog.prototype.DATA_EXPLORER = function (variableName, type, exactValue) {
+    const explorerContent = this.buildDataExplorerContent(variableName, type, exactValue);
+    
+    this.show(`Data Explorer: ${variableName} (${type})`, explorerContent, () => {
+        // Cleanup when dialog closes
+        this.tag.find(".data-explorer-item").off("click");
+    });
+    
+    // Make dialog larger for better data viewing
+    this.tag.find(".modal-dialog").addClass("modal-xl");
+    
+    // Set up click handlers for nested exploration
+    this.setupDataExplorerHandlers();
+};
+
+/**
+ * Build HTML content for data explorer based on data type and value
+ */
+BlockPyDialog.prototype.buildDataExplorerContent = function(variableName, type, exactValue) {
+    let content = "<div class=\"data-explorer\">";
+    
+    try {
+        switch (type) {
+            case "List":
+                content += this.buildListExplorer(variableName, exactValue);
+                break;
+            case "Dictionary":
+                content += this.buildDictExplorer(variableName, exactValue);
+                break;
+            case "Tuple":
+                content += this.buildTupleExplorer(variableName, exactValue);
+                break;
+            default:
+                content += this.buildSimpleValueExplorer(variableName, type, exactValue);
+        }
+    } catch (error) {
+        content += `<div class="alert alert-warning">Error exploring ${type}: ${error.message}</div>`;
+        content += `<pre>${exactValue.$r ? exactValue.$r().v : exactValue.toString()}</pre>`;
+    }
+    
+    content += "</div>";
+    return content;
+};
+
+/**
+ * Build explorer content for List data structures
+ */
+BlockPyDialog.prototype.buildListExplorer = function(variableName, listValue) {
+    let content = `<h5>List Contents (${listValue.v.length} items)</h5>`;
+    content += "<div class=\"table-responsive\"><table class=\"table table-sm table-striped\">";
+    content += "<thead><tr><th>Index</th><th>Type</th><th>Value</th><th>Explore</th></tr></thead><tbody>";
+    
+    for (let i = 0; i < Math.min(listValue.v.length, 100); i++) {
+        const item = listValue.v[i];
+        const itemInfo = this.parseDataValue(`${variableName}[${i}]`, item);
+        const canExplore = this.canExploreValue(item);
+        
+        content += "<tr>";
+        content += `<td>${i}</td>`;
+        content += `<td>${itemInfo.type}</td>`;
+        content += `<td><code>${this.escapeHtml(itemInfo.value)}</code></td>`;
+        content += "<td>";
+        if (canExplore) {
+            content += `<button class="btn btn-sm btn-outline-primary data-explorer-item" 
+                               data-name="${variableName}[${i}]" 
+                               data-type="${itemInfo.type}" 
+                               data-index="${i}">
+                        <span class="fas fa-search"></span>
+                    </button>`;
+        }
+        content += "</td></tr>";
+    }
+    
+    if (listValue.v.length > 100) {
+        content += `<tr><td colspan="4"><em>... and ${listValue.v.length - 100} more items</em></td></tr>`;
+    }
+    
+    content += "</tbody></table></div>";
+    return content;
+};
+
+/**
+ * Build explorer content for Dictionary data structures
+ */
+BlockPyDialog.prototype.buildDictExplorer = function(variableName, dictValue) {
+    let content = "<h5>Dictionary Contents</h5>";
+    content += "<div class=\"table-responsive\"><table class=\"table table-sm table-striped\">";
+    content += "<thead><tr><th>Key</th><th>Type</th><th>Value</th><th>Explore</th></tr></thead><tbody>";
+    
+    const entries = Object.entries(dictValue.v);
+    for (let i = 0; i < Math.min(entries.length, 100); i++) {
+        const [key, value] = entries[i];
+        const keyInfo = this.parseDataValue("key", key);
+        const valueInfo = this.parseDataValue(`${variableName}[${keyInfo.value}]`, value);
+        const canExplore = this.canExploreValue(value);
+        
+        content += "<tr>";
+        content += `<td><code>${this.escapeHtml(keyInfo.value)}</code></td>`;
+        content += `<td>${valueInfo.type}</td>`;
+        content += `<td><code>${this.escapeHtml(valueInfo.value)}</code></td>`;
+        content += "<td>";
+        if (canExplore) {
+            content += `<button class="btn btn-sm btn-outline-primary data-explorer-item" 
+                               data-name="${variableName}[${this.escapeHtml(keyInfo.value)}]" 
+                               data-type="${valueInfo.type}" 
+                               data-key="${this.escapeHtml(keyInfo.value)}">
+                        <span class="fas fa-search"></span>
+                    </button>`;
+        }
+        content += "</td></tr>";
+    }
+    
+    if (entries.length > 100) {
+        content += `<tr><td colspan="4"><em>... and ${entries.length - 100} more entries</em></td></tr>`;
+    }
+    
+    content += "</tbody></table></div>";
+    return content;
+};
+
+/**
+ * Build explorer content for Tuple data structures
+ */
+BlockPyDialog.prototype.buildTupleExplorer = function(variableName, tupleValue) {
+    let content = `<h5>Tuple Contents (${tupleValue.v.length} items)</h5>`;
+    content += "<div class=\"table-responsive\"><table class=\"table table-sm table-striped\">";
+    content += "<thead><tr><th>Index</th><th>Type</th><th>Value</th><th>Explore</th></tr></thead><tbody>";
+    
+    for (let i = 0; i < Math.min(tupleValue.v.length, 100); i++) {
+        const item = tupleValue.v[i];
+        const itemInfo = this.parseDataValue(`${variableName}[${i}]`, item);
+        const canExplore = this.canExploreValue(item);
+        
+        content += "<tr>";
+        content += `<td>${i}</td>`;
+        content += `<td>${itemInfo.type}</td>`;
+        content += `<td><code>${this.escapeHtml(itemInfo.value)}</code></td>`;
+        content += "<td>";
+        if (canExplore) {
+            content += `<button class="btn btn-sm btn-outline-primary data-explorer-item" 
+                               data-name="${variableName}[${i}]" 
+                               data-type="${itemInfo.type}" 
+                               data-index="${i}">
+                        <span class="fas fa-search"></span>
+                    </button>`;
+        }
+        content += "</td></tr>";
+    }
+    
+    if (tupleValue.v.length > 100) {
+        content += `<tr><td colspan="4"><em>... and ${tupleValue.v.length - 100} more items</em></td></tr>`;
+    }
+    
+    content += "</tbody></table></div>";
+    return content;
+};
+
+/**
+ * Build explorer content for simple values
+ */
+BlockPyDialog.prototype.buildSimpleValueExplorer = function(variableName, type, exactValue) {
+    let content = `<h5>${type} Value</h5>`;
+    content += "<div class=\"mb-3\">";
+    content += "<label class=\"form-label\">Raw Value:</label>";
+    content += `<pre class="bg-light p-3 border rounded">${this.escapeHtml(exactValue.$r ? exactValue.$r().v : exactValue.toString())}</pre>`;
+    content += "</div>";
+    
+    if (exactValue.$r) {
+        content += "<div class=\"mb-3\">";
+        content += "<label class=\"form-label\">String Representation:</label>";
+        content += `<pre class="bg-light p-3 border rounded">${this.escapeHtml(exactValue.$r().v)}</pre>`;
+        content += "</div>";
+    }
+    
+    return content;
+};
+
+/**
+ * Parse a Skulpt value to get readable information
+ */
+BlockPyDialog.prototype.parseDataValue = function(name, value) {
+    if (value === undefined) {
+        return { name, type: "Unknown", value: "Undefined" };
+    }
+    
+    // Use existing parsing logic from BlockPyTrace
+    if (window.BlockPyTrace && window.BlockPyTrace.parseValue) {
+        const parsed = window.BlockPyTrace.parseValue(name, value, true);
+        return parsed || { name, type: "Unknown", value: "Unknown" };
+    }
+    
+    // Fallback parsing
+    if (value.constructor === Sk.builtin.str) {
+        return { name, type: "String", value: value.$r().v };
+    } else if (value.constructor === Sk.builtin.int_) {
+        return { name, type: "Integer", value: value.$r().v };
+    } else if (value.constructor === Sk.builtin.float_) {
+        return { name, type: "Float", value: value.$r().v };
+    } else if (value.constructor === Sk.builtin.bool) {
+        return { name, type: "Boolean", value: value.$r().v };
+    } else if (value.constructor === Sk.builtin.list) {
+        return { name, type: "List", value: `[${value.v.length} items]` };
+    } else if (value.constructor === Sk.builtin.dict) {
+        return { name, type: "Dictionary", value: `{${Object.keys(value.v).length} keys}` };
+    } else if (value.constructor === Sk.builtin.tuple) {
+        return { name, type: "Tuple", value: `(${value.v.length} items)` };
+    } else {
+        return { name, type: value.tp$name || "Object", value: value.$r ? value.$r().v : value.toString() };
+    }
+};
+
+/**
+ * Check if a value can be explored further
+ */
+BlockPyDialog.prototype.canExploreValue = function(value) {
+    if (!value) {return false;}
+    
+    return value.constructor === Sk.builtin.list ||
+           value.constructor === Sk.builtin.dict ||
+           value.constructor === Sk.builtin.tuple ||
+           (value.v && (Array.isArray(value.v) || typeof value.v === "object"));
+};
+
+/**
+ * Set up click handlers for nested data exploration
+ */
+BlockPyDialog.prototype.setupDataExplorerHandlers = function() {
+    const self = this;
+    
+    this.tag.find(".data-explorer-item").on("click", function() {
+        const button = $(this);
+        const itemName = button.data("name");
+        const itemType = button.data("type");
+        const index = button.data("index");
+        const key = button.data("key");
+        
+        // Get the current dialog's exact value and navigate to the item
+        // This is a simplified approach - in a full implementation, we'd store references
+        // to the original data structure to allow deep navigation
+        
+        // For now, create a new dialog with placeholder content
+        const newDialog = new BlockPyDialog(self.main, $("<div>").appendTo("body"));
+        newDialog.show(`Data Explorer: ${itemName} (${itemType})`, 
+                       `<div class="alert alert-info">
+                Nested exploration of ${itemName} would open here.
+                <br><br>
+                <strong>Item:</strong> ${itemName}<br>
+                <strong>Type:</strong> ${itemType}<br>
+                ${index !== undefined ? `<strong>Index:</strong> ${index}<br>` : ""}
+                ${key !== undefined ? `<strong>Key:</strong> ${key}<br>` : ""}
+            </div>`);
+            
+        newDialog.tag.find(".modal-dialog").addClass("modal-lg");
+    });
+};
+
+/**
+ * Utility function to escape HTML
+ */
+BlockPyDialog.prototype.escapeHtml = function(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+};
