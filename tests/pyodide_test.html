@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pyodide Test - BlockPy</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        #output {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        #code {
+            width: 100%;
+            height: 150px;
+            font-family: monospace;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px 10px 0;
+            cursor: pointer;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.loading {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+        .status.success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+        }
+        .status.error {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pyodide Test for BlockPy</h1>
+    
+    <div id="status" class="status loading">Loading Pyodide...</div>
+    
+    <h3>Python Code:</h3>
+    <textarea id="code">print("Hello from Pyodide!")
+x = 5
+y = 10
+print(f"The sum of {x} and {y} is {x + y}")
+
+# Test list comprehension
+squares = [i**2 for i in range(5)]
+print("Squares:", squares)</textarea>
+    
+    <button onclick="runCode()">Run Code</button>
+    <button onclick="clearOutput()">Clear Output</button>
+    
+    <h3>Output:</h3>
+    <div id="output"></div>
+    
+    <script>
+        let pyodide = null;
+        
+        async function initPyodide() {
+            const statusDiv = document.getElementById('status');
+            try {
+                statusDiv.textContent = 'Loading Pyodide...';
+                statusDiv.className = 'status loading';
+                
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
+                });
+                
+                // Set up output capturing
+                await pyodide.runPythonAsync(`
+import sys
+import io
+
+# Create a custom output buffer
+_output_buffer = io.StringIO()
+
+# Override stdout
+class OutputCapture:
+    def write(self, text):
+        _output_buffer.write(text)
+    def flush(self):
+        pass
+
+sys.stdout = OutputCapture()
+sys.stderr = OutputCapture()
+`);
+                
+                statusDiv.textContent = 'Pyodide loaded successfully!';
+                statusDiv.className = 'status success';
+                
+                console.log('Pyodide initialized:', pyodide);
+            } catch (error) {
+                statusDiv.textContent = 'Error loading Pyodide: ' + error.message;
+                statusDiv.className = 'status error';
+                console.error('Error initializing Pyodide:', error);
+            }
+        }
+        
+        async function runCode() {
+            if (!pyodide) {
+                alert('Pyodide is not loaded yet. Please wait...');
+                return;
+            }
+            
+            const code = document.getElementById('code').value;
+            const outputDiv = document.getElementById('output');
+            
+            try {
+                // Clear the output buffer
+                await pyodide.runPythonAsync('_output_buffer.truncate(0); _output_buffer.seek(0)');
+                
+                // Run the user's code
+                await pyodide.runPythonAsync(code);
+                
+                // Get the captured output
+                const output = await pyodide.runPythonAsync('_output_buffer.getvalue()');
+                
+                outputDiv.textContent = output || '(No output)';
+                outputDiv.style.color = 'black';
+            } catch (error) {
+                outputDiv.textContent = 'Error: ' + error.message;
+                outputDiv.style.color = 'red';
+                console.error('Error running code:', error);
+            }
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+        }
+        
+        // Initialize Pyodide when the page loads
+        initPyodide();
+    </script>
+</body>
+</html>
