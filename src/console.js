@@ -1,4 +1,5 @@
 import {encodeHTML} from "./utilities";
+import {Sk} from "./pyodide_adapter";
 
 /**
  * Evaluate button HTML template

@@ -1,4 +1,6 @@
 import {slug} from "./utilities";
+import {Sk} from "./pyodide_adapter";
+import $ from "jquery";
 
 // TODO: editor.bm.blockEditor.extraTools[]
 

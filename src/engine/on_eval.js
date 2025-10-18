@@ -1,5 +1,6 @@
 import {InstructorConfiguration} from "./instructor";
 import {StatusState} from "../server";
+import {Sk} from "../pyodide_adapter";
 import {findActualInstructorOffset, INSTRUCTOR_MARKER, NEW_LINE_REGEX} from "./on_run";
 import {indent} from "../utilities";
 

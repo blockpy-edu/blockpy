@@ -1,3 +1,5 @@
+import {Sk} from "../pyodide_adapter";
+
 export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }";
 
 /**

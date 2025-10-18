@@ -1,3 +1,6 @@
+import {encodeHTML, parseValue} from "./utilities";
+import {Sk} from "./pyodide_adapter";
+
 export const TRACE_HTML = `
 
 <div class="blockpy-trace col-md-6 blockpy-panel"
