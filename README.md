@@ -45,6 +45,8 @@ $> mkdir pedal-edu
 
 2. Skulpt is probably the hardest dependency, since you will probably want to modify it.
 
+Note from 4/4/2026: You need to use the `esbuild-source` branch nowadays.
+
 ```shell
 $> cd blockpy-edu
 $> git clone https://github.com/blockpy-edu/skulpt skulpt
