@@ -1,5 +1,6 @@
 import {StudentConfiguration} from "./student";
 import {StatusState} from "../server";
+import {Sk} from "../pyodide_adapter";
 import {BlockPyTrace} from "../trace";
 
 export class EvalConfiguration extends StudentConfiguration {

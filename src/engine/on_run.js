@@ -1,6 +1,7 @@
 import {indent} from "../utilities";
 import {StatusState} from "../server";
 import {InstructorConfiguration} from "./instructor";
+import {Sk} from "../pyodide_adapter";
 
 export function findActualInstructorOffset(instructorCode) {
     const index = instructorCode.indexOf(INSTRUCTOR_MARKER);

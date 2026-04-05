@@ -1,5 +1,6 @@
 import {StudentConfiguration} from "./student";
 import {StatusState} from "../server";
+import {Sk} from "../pyodide_adapter";
 
 export class RunConfiguration extends StudentConfiguration {
     use(engine) {

@@ -1,11 +1,14 @@
 import {Configuration, EMPTY_MODULE} from "./configurations.js";
-import {$sk_mod_instructor} from "../skulpt_modules/sk_mod_instructor";
-import {$sk_mod_coverage} from "../skulpt_modules/coverage";
-import {$pedal_tracer} from "../skulpt_modules/pedal_tracer";
+import {Sk} from "../pyodide_adapter";
+// TODO: Port these Skulpt modules to Pyodide equivalents
+//import {$sk_mod_instructor} from "../skulpt_modules/sk_mod_instructor";
+//import {$sk_mod_coverage} from "../skulpt_modules/coverage";
+//import {$pedal_tracer} from "../skulpt_modules/pedal_tracer";
 import {chompSpecialFile} from "../files";
 
-const UTILITY_MODULE_CODE = "var $builtinmodule = " + $sk_mod_instructor.toString();
-const COVERAGE_MODULE_CODE = $sk_mod_coverage;
+// TODO: These need to be ported to Pyodide
+const UTILITY_MODULE_CODE = ""; // was: "var $builtinmodule = " + $sk_mod_instructor.toString();
+const COVERAGE_MODULE_CODE = ""; // was: $sk_mod_coverage;
 
 export class InstructorConfiguration extends Configuration {
     use(engine) {

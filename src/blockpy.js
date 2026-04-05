@@ -5,8 +5,11 @@
 import "./css/blockpy.css";
 import "./css/bootstrap_retheme.css";
 import $ from "jquery";
-import {$builtinmodule as imageModule} from "skulpt_modules/image";
-import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
+// Pyodide adapter replaces Skulpt
+import {Sk} from "./pyodide_adapter";
+// TODO: Port or replace these Skulpt modules for Pyodide
+//import {$builtinmodule as imageModule} from "skulpt_modules/image";
+//import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
 //import {$builtinmodule as matplotlibModule} from "skulpt_modules/matplotlib2";
 import {LocalStorageWrapper} from "storage.js";
 import {EditorsEnum} from "editors.js";
@@ -1184,7 +1187,9 @@ export class BlockPy {
 
     turnOnHacks() {
         //console.log("TODO");
-        Sk.builtinFiles.files["src/lib/image.js"] = imageModule.toString();
+        // TODO: Port image and weakref modules to Pyodide
+        // For now, we'll handle these modules differently in the Pyodide adapter
+        //Sk.builtinFiles.files["src/lib/image.js"] = imageModule.toString();
         //Sk.builtinFiles.files["src/lib/weakref.js"] = weakrefModule.toString();
         //Sk.builtinFiles.files["src/lib/matplotlib/pyplot/__init__.js"] = matplotlibModule.toString();
     }

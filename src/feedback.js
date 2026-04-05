@@ -1,4 +1,5 @@
 import {arrayMove, capitalize, pyStr} from "./utilities";
+import {Sk} from "./pyodide_adapter";
 
 export let FEEDBACK_HTML = `
 

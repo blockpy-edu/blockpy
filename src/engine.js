@@ -1,4 +1,5 @@
 import {StatusState} from "./server";
+import {Sk} from "./pyodide_adapter";
 import {OnRunConfiguration} from "./engine/on_run";
 import {RunConfiguration} from "./engine/run";
 import {EvalConfiguration} from "./engine/eval";
@@ -32,8 +33,8 @@ export class BlockPyEngine {
             onEval: new OnEvalConfiguration(main)
         };
 
-        // Preconfigure skulpt so we can parse
-        Sk.configure(this.configurations.run.getSkulptOptions());
+        // Initialize Pyodide adapter
+        this.initializePyodide();
 
         // Keeps track of the tracing while the program is executing
         this.executionBuffer = {};
@@ -44,6 +45,22 @@ export class BlockPyEngine {
          */
         this.onExecutionBegin = null;
         this.onExecutionEnd = null;
+    }
+
+    /**
+     * Initialize Pyodide runtime asynchronously
+     */
+    async initializePyodide() {
+        try {
+            await Sk.initialize();
+            // Preconfigure Pyodide with initial options
+            Sk.configure(this.configurations.run.getSkulptOptions());
+            console.log("Pyodide initialized successfully");
+        } catch (error) {
+            console.error("Failed to initialize Pyodide:", error);
+            // Store error to display to user
+            this.pyodideInitError = error;
+        }
     }
 
     /**

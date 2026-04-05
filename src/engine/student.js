@@ -1,4 +1,5 @@
 import {Configuration, EMPTY_MODULE} from "./configurations";
+import {Sk} from "../pyodide_adapter";
 
 export class StudentConfiguration extends Configuration {
     use(engine) {
