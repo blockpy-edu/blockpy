@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Editor Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>CSV Editor Test</h1>
+        <p>This page tests the CSV editor component independently.</p>
+        
+        <!-- CSV Editor HTML -->
+        <div class="blockpy-csv-editor-test">
+            <div>
+                <div class="blockpy-csv-editor-controls mb-2">
+                    <button class="btn btn-sm btn-primary blockpy-csv-add-row" title="Add Row">
+                        <i class="fas fa-plus"></i> Add Row
+                    </button>
+                    <button class="btn btn-sm btn-primary blockpy-csv-add-column" title="Add Column">
+                        <i class="fas fa-plus"></i> Add Column
+                    </button>
+                    <button class="btn btn-sm btn-danger blockpy-csv-delete-row" title="Delete Selected Row">
+                        <i class="fas fa-minus"></i> Delete Row
+                    </button>
+                    <button class="btn btn-sm btn-danger blockpy-csv-delete-column" title="Delete Selected Column">
+                        <i class="fas fa-minus"></i> Delete Column
+                    </button>
+                </div>
+                <div class="blockpy-csv-editor-table-container">
+                    <table class="table table-bordered blockpy-csv-editor-table">
+                        <thead>
+                            <tr class="blockpy-csv-header-row"></tr>
+                        </thead>
+                        <tbody class="blockpy-csv-body"></tbody>
+                    </table>
+                </div>
+                <div class="blockpy-csv-editor-raw mt-2">
+                    <label>
+                        <input type="checkbox" class="blockpy-csv-raw-mode"> 
+                        Edit as Raw CSV Text
+                    </label>
+                    <textarea class="form-control blockpy-csv-raw-text" rows="10" style="display: none;"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h3>CSV Output:</h3>
+            <pre id="csv-output"></pre>
+        </div>
+    </div>
+
+    <style>
+        .blockpy-csv-editor-table-container {
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid #dee2e6;
+        }
+
+        .blockpy-csv-editor-table {
+            margin-bottom: 0;
+        }
+
+        .blockpy-csv-editor-table th,
+        .blockpy-csv-editor-table td {
+            padding: 2px 4px;
+            vertical-align: middle;
+        }
+
+        .blockpy-csv-editor-table th {
+            cursor: pointer;
+            user-select: none;
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .blockpy-csv-editor-table th:hover {
+            background-color: #e9ecef;
+        }
+
+        .blockpy-csv-editor-table tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        .blockpy-csv-editor-table tr.table-active,
+        .blockpy-csv-editor-table th.table-active,
+        .blockpy-csv-editor-table td.table-active {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+
+        .blockpy-csv-editor-table input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 2px;
+        }
+
+        .blockpy-csv-editor-table input:focus {
+            background: white;
+            border: 1px solid #007bff;
+            outline: none;
+        }
+
+        .blockpy-csv-editor-controls button {
+            margin-right: 5px;
+        }
+
+        .blockpy-csv-raw-text {
+            font-family: monospace;
+        }
+    </style>
+
+    <script>
+        // Simple CSV parser - extracted from our CSV editor
+        class CSVParser {
+            static parseCSV(csvText) {
+                if (!csvText || csvText.trim() === "") {
+                    return [[]];
+                }
+                
+                const lines = [];
+                const rows = csvText.split("\n");
+                
+                for (let row of rows) {
+                    if (row.trim() === "") {
+                        continue;
+                    }
+                    
+                    const cells = [];
+                    let currentCell = "";
+                    let inQuotes = false;
+                    
+                    for (let i = 0; i < row.length; i++) {
+                        const char = row[i];
+                        const nextChar = row[i + 1];
+                        
+                        if (char === '"') {
+                            if (inQuotes && nextChar === '"') {
+                                currentCell += '"';
+                                i++; // Skip next quote
+                            } else {
+                                inQuotes = !inQuotes;
+                            }
+                        } else if (char === "," && !inQuotes) {
+                            cells.push(currentCell);
+                            currentCell = "";
+                        } else {
+                            currentCell += char;
+                        }
+                    }
+                    cells.push(currentCell);
+                    lines.push(cells);
+                }
+                
+                return lines;
+            }
+            
+            static stringifyCSV(data) {
+                if (!data || data.length === 0) {
+                    return "";
+                }
+                
+                return data.map(row => {
+                    return row.map(cell => {
+                        const cellStr = String(cell || "");
+                        if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
+                            return '"' + cellStr.replace(/"/g, '""') + '"';
+                        }
+                        return cellStr;
+                    }).join(",");
+                }).join("\n");
+            }
+        }
+
+        // Simple CSV Editor Test Implementation
+        class SimpleCSVEditor {
+            constructor() {
+                this.data = [["Name", "Age", "City"], ["John Doe", "30", "New York"], ["Jane Smith", "25", "Los Angeles"]];
+                this.selectedRow = -1;
+                this.selectedColumn = -1;
+                this.rawMode = false;
+                
+                this.setupEventHandlers();
+                this.renderTable();
+                this.updateOutput();
+            }
+            
+            setupEventHandlers() {
+                $('.blockpy-csv-add-row').on('click', () => this.addRow());
+                $('.blockpy-csv-add-column').on('click', () => this.addColumn());
+                $('.blockpy-csv-delete-row').on('click', () => this.deleteRow());
+                $('.blockpy-csv-delete-column').on('click', () => this.deleteColumn());
+                $('.blockpy-csv-raw-mode').on('change', (e) => this.toggleRawMode(e.target.checked));
+                $('.blockpy-csv-raw-text').on('input', () => this.handleRawTextChange());
+            }
+            
+            renderTable() {
+                const headerRow = $('.blockpy-csv-header-row');
+                const tbody = $('.blockpy-csv-body');
+                
+                headerRow.empty();
+                tbody.empty();
+                
+                if (this.data.length === 0) {
+                    this.data = [[]];
+                }
+                
+                const maxColumns = Math.max(...this.data.map(row => row.length), 1);
+                
+                // Render header
+                for (let col = 0; col < maxColumns; col++) {
+                    const th = $(`<th data-column="${col}">Column ${col + 1}</th>`);
+                    th.on('click', () => this.selectColumn(col));
+                    headerRow.append(th);
+                }
+                
+                // Render data rows
+                this.data.forEach((row, rowIndex) => {
+                    const tr = $(`<tr data-row="${rowIndex}"></tr>`);
+                    tr.on('click', (e) => {
+                        if (e.target.tagName !== 'INPUT') {
+                            this.selectRow(rowIndex);
+                        }
+                    });
+                    
+                    for (let col = 0; col < maxColumns; col++) {
+                        const cellValue = row[col] || '';
+                        const td = $(`<td data-row="${rowIndex}" data-column="${col}"></td>`);
+                        const input = $(`<input type="text" class="form-control form-control-sm" value="">`);
+                        input.val(cellValue);
+                        input.on('input', () => this.handleCellChange(rowIndex, col, input.val()));
+                        td.append(input);
+                        tr.append(td);
+                    }
+                    
+                    tbody.append(tr);
+                });
+                
+                this.updateSelection();
+            }
+            
+            handleCellChange(row, col, value) {
+                while (this.data.length <= row) {
+                    this.data.push([]);
+                }
+                while (this.data[row].length <= col) {
+                    this.data[row].push('');
+                }
+                
+                this.data[row][col] = value;
+                this.updateOutput();
+                this.updateRawText();
+            }
+            
+            updateOutput() {
+                const csvText = CSVParser.stringifyCSV(this.data);
+                $('#csv-output').text(csvText);
+            }
+            
+            addRow() {
+                const maxColumns = Math.max(...this.data.map(row => row.length), 1);
+                const newRow = new Array(maxColumns).fill('');
+                this.data.push(newRow);
+                this.renderTable();
+                this.updateOutput();
+                this.selectRow(this.data.length - 1);
+            }
+            
+            addColumn() {
+                this.data.forEach(row => row.push(''));
+                this.renderTable();
+                this.updateOutput();
+                this.selectColumn(this.data[0].length - 1);
+            }
+            
+            deleteRow() {
+                if (this.selectedRow >= 0 && this.selectedRow < this.data.length) {
+                    this.data.splice(this.selectedRow, 1);
+                    this.selectedRow = -1;
+                    this.renderTable();
+                    this.updateOutput();
+                }
+            }
+            
+            deleteColumn() {
+                if (this.selectedColumn >= 0) {
+                    this.data.forEach(row => {
+                        if (row.length > this.selectedColumn) {
+                            row.splice(this.selectedColumn, 1);
+                        }
+                    });
+                    this.selectedColumn = -1;
+                    this.renderTable();
+                    this.updateOutput();
+                }
+            }
+            
+            selectRow(rowIndex) {
+                this.selectedRow = rowIndex;
+                this.selectedColumn = -1;
+                this.updateSelection();
+            }
+            
+            selectColumn(columnIndex) {
+                this.selectedColumn = columnIndex;
+                this.selectedRow = -1;
+                this.updateSelection();
+            }
+            
+            updateSelection() {
+                $('tr, th').removeClass('table-active');
+                
+                if (this.selectedRow >= 0) {
+                    $(`tr[data-row="${this.selectedRow}"]`).addClass('table-active');
+                }
+                if (this.selectedColumn >= 0) {
+                    $(`th[data-column="${this.selectedColumn}"], td[data-column="${this.selectedColumn}"]`).addClass('table-active');
+                }
+            }
+            
+            toggleRawMode(enabled) {
+                this.rawMode = enabled;
+                const table = $('.blockpy-csv-editor-table-container');
+                const rawText = $('.blockpy-csv-raw-text');
+                const controls = $('.blockpy-csv-editor-controls');
+                
+                if (enabled) {
+                    table.hide();
+                    controls.hide();
+                    rawText.show();
+                    this.updateRawText();
+                } else {
+                    table.show();
+                    controls.show();
+                    rawText.hide();
+                    this.handleRawTextChange();
+                }
+            }
+            
+            updateRawText() {
+                if (!this.rawMode) return;
+                
+                const csvText = CSVParser.stringifyCSV(this.data);
+                $('.blockpy-csv-raw-text').val(csvText);
+            }
+            
+            handleRawTextChange() {
+                const rawText = $('.blockpy-csv-raw-text').val();
+                this.data = CSVParser.parseCSV(rawText);
+                this.renderTable();
+                this.updateOutput();
+            }
+        }
+
+        $(document).ready(function() {
+            new SimpleCSVEditor();
+        });
+    </script>
+</body>
+</html>
