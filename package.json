@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --progress --color --watch --env dev",
-    "build": "webpack --env dev && webpack --env build"
+    "dev": "vite build --watch --config vite.config.mjs",
+    "build": "vite build --config vite.config.mjs && cross-env BUILD_MIN=true vite build --config vite.config.mjs"
   },
   "repository": {
     "type": "git",
@@ -24,18 +24,10 @@
   },
   "homepage": "https://github.com/RealTimeWeb/blockpy#readme",
   "devDependencies": {
-    "@babel/core": "7.0.0",
-    "@babel/preset-env": "7.11.0",
-    "babel-loader": "8.1.0",
-    "css-loader": "4.2.0",
+    "cross-env": "^10.1.0",
     "eslint": "5.0.0",
-    "eslint-loader": "4.0.2",
     "jquery": "3.5.1",
     "knockout": "3.5.1",
-    "mini-css-extract-plugin": "0.9.0",
-    "path": "0.12.7",
-    "webpack": "4.44.1",
-    "webpack-cli": "^4.2.0",
-    "yargs": "15.4.1"
+    "vite": "^6.4.2"
   }
 }
