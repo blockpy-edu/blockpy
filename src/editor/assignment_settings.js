@@ -32,6 +32,7 @@ const ASSIGNMENT_SETTINGS = [
     ["hideMiddlePanel", "hide_middle_panel", false, "bool", "If checked, then the console and feedback areas is hidden."],
     ["hideAll", "hide_all", false, "bool", "INCOMPLETE: If checked, then the entire interface is hidden."],
     ["hideEvaluate", "hide_evaluate", false, "bool", "If checked, then the Evaluate button is not shown on the console."],
+    ["hideUploadButton", "hide_upload_button", false, "bool", "If checked, then the Upload button is not shown."],
     ["hideImportDatasetsButton", "hide_import_datasets_button", false, "bool", "If checked, then students cannot see the import datasets button."],
     // TODO: Fix this one to be settable
     ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
