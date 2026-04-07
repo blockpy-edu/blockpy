@@ -64,7 +64,8 @@ export const PYTHON_EDITOR_HTML = `
          </div>
          <!-- /ko -->
          
-         <div class="btn-group mr-2" data-bind="hidden: ui.smallLayout">
+         <!-- ko if: !assignment.settings.hideUploadButton() && !ui.smallLayout()-->
+         <div class="btn-group mr-2">
                 <label class="btn btn-outline-secondary">
                     <span class="fas fa-file-upload"></span> Upload
                     <input class="blockpy-toolbar-upload" type="file"
@@ -85,6 +86,7 @@ export const PYTHON_EDITOR_HTML = `
                     </a>
                 </div>
             </div>
+         <!-- /ko -->
          
          <div class="btn-group mr-2" role="group" aria-label="History Group" data-bind="hidden: ui.smallLayout">
             <button type="button" class="btn btn-outline-secondary"
