@@ -68,7 +68,7 @@ export class SkulptRuntimeAdapter extends PythonRuntime {
 
     popQueuedInput() {
         if (Sk.queuedInput && Sk.queuedInput.length) {
-            return Sk.queuedInput.pop();
+            return Sk.queuedInput.shift();
         }
         return "";
     }
@@ -171,14 +171,42 @@ export class SkulptRuntimeAdapter extends PythonRuntime {
 
     makeError(name, message) {
         const ctor = Sk.builtin[name] || Sk.builtin.Exception;
-        return new ctor(message);
+        if (ctor) {
+            return new ctor(message);
+        }
+        const fallback = new Error(message);
+        fallback.name = name;
+        return fallback;
     }
 
     isGracefulExit(error) {
         return error && error.tp$name === "GracefulExit";
     }
 
+    getModuleScope(module) {
+        return module && module.$d ? module.$d : module;
+    }
+
+    getNamedModuleScope(module, name) {
+        const scope = this.getModuleScope(module);
+        if (scope && scope[name] && scope[name].$d) {
+            return scope[name].$d;
+        }
+        return scope ? scope[name] : undefined;
+    }
+
+    getEvalValue(module) {
+        const scope = this.getModuleScope(module);
+        if (scope && scope._ && scope._.$r) {
+            return this.remapToJs(scope._.$r());
+        }
+        return undefined;
+    }
+
     setBuiltinFile(path, content) {
+        if (!Sk.builtinFiles || !Sk.builtinFiles.files) {
+            throw new Error("Skulpt builtinFiles not initialized.");
+        }
         Sk.builtinFiles.files[path] = content;
     }
 

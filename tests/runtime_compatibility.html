@@ -22,6 +22,7 @@
         }
     }
 
+    // Minimal mock structure needed by runtime factory/adapter constructors.
     const main = {initialConfiguration_: {}, model: {assignment: {settings: {}}}};
 
     const selected = normalizeRuntime("PYODIDE");
@@ -42,7 +43,10 @@
             name: "error-normalization",
             run: (runtime) => {
                 const error = runtime.makeError("RuntimeError", "sample");
-                return Boolean(error && (error.name === "RuntimeError" || error.tp$name === "RuntimeError"));
+                if (runtime.getName() === "pyodide") {
+                    return Boolean(error && error.name === "RuntimeError");
+                }
+                return Boolean(error && (error.tp$name === "RuntimeError" || error.name === "RuntimeError"));
             }
         },
         {

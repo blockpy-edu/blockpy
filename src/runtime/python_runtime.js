@@ -15,7 +15,11 @@ export class PythonRuntime {
         throw new Error("Abstract runtime configure");
     }
 
-    execute(filename, code, sysmodules) {
+    getPython3Future() {
+        return undefined;
+    }
+
+    async execute(filename, code, sysmodules) {
         throw new Error("Abstract runtime execute");
     }
 
@@ -115,6 +119,19 @@ export class PythonRuntime {
 
     isGracefulExit(error) {
         return error && error.name === "GracefulExit";
+    }
+
+    getModuleScope(module) {
+        return module;
+    }
+
+    getNamedModuleScope(module, name) {
+        const scope = this.getModuleScope(module) || {};
+        return scope[name];
+    }
+
+    getEvalValue(module) {
+        return undefined;
     }
 
     setBuiltinFile(path, content) {}

@@ -64,6 +64,9 @@ function getRuntimeFromConfig(main) {
         if (main.initialConfiguration_["runtime.backend"]) {
             return main.initialConfiguration_["runtime.backend"];
         }
+        if (main.initialConfiguration_.runtimeBackend) {
+            return main.initialConfiguration_.runtimeBackend;
+        }
         if (main.initialConfiguration_["assignment.settings.runtime_backend"]) {
             return main.initialConfiguration_["assignment.settings.runtime_backend"];
         }
@@ -71,7 +74,12 @@ function getRuntimeFromConfig(main) {
     if (main.model && main.model.assignment && main.model.assignment.settings) {
         const runtimeBackend = main.model.assignment.settings.runtimeBackend;
         if (typeof runtimeBackend === "function") {
-            return runtimeBackend();
+            try {
+                return normalizeRuntime(runtimeBackend());
+            } catch (e) {
+                console.warn("Failed to resolve runtimeBackend from assignment settings:", e);
+                return null;
+            }
         }
     }
     return null;

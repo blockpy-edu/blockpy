@@ -56,8 +56,11 @@ export class RunConfiguration extends StudentConfiguration {
             this.main.components.console.beginEval();
         }
         return new Promise((resolve, reject) => {
-            if (module && module.$d && this.runtime.getCapabilities().tracing) {
-                this.step(module.$d, module.$d,-1, 0, filename + ".py");
+            const moduleScope = this.runtime.getModuleScope(module);
+            if (moduleScope && this.runtime.getCapabilities().tracing) {
+                this.step(moduleScope, moduleScope,-1, 0, filename + ".py");
+            } else if (!this.runtime.getCapabilities().tracing) {
+                console.info("Tracing disabled for runtime:", this.runtime.getName());
             }
             this.lastStep();
             report["student"] = {

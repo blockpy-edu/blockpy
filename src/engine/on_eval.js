@@ -116,8 +116,11 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         this.main.model.execution.instructor.globals = this.runtime.getGlobals();
         this.main.model.execution.instructor.sysmodules = this.runtime.getSysmodules();
         console.log(module);
-        let results = module.$d.on_eval.$d;
-        console.log(module.$d);
+        let results = this.runtime.getNamedModuleScope(module, "on_eval");
+        if (!results) {
+            throw this.runtime.makeError("RuntimeError", "Missing on_eval results; expected instructor namespace in runtime " + this.runtime.getName() + ".");
+        }
+        console.log(this.runtime.getModuleScope(module));
         this.main.components.feedback.presentFeedback(results);
         this.main.model.execution.reports["instructor"]["success"] = true;
         let success = runtimeToJs(this.runtime, results.SUCCESS);

@@ -146,7 +146,10 @@ export class OnRunConfiguration extends InstructorConfiguration {
         this.main.model.execution.instructor.globals = this.runtime.getGlobals();
         this.main.model.execution.instructor.sysmodules = this.runtime.getSysmodules();
         this.runtime.clearGlobals();
-        let results = module.$d.on_run.$d;
+        let results = this.runtime.getNamedModuleScope(module, "on_run");
+        if (!results) {
+            throw this.runtime.makeError("RuntimeError", "Missing on_run results; expected instructor namespace in runtime " + this.runtime.getName() + ".");
+        }
         this.main.components.feedback.presentFeedback(results);
         this.main.model.execution.reports["instructor"]["success"] = true;
         let success = runtimeToJs(this.runtime, results.SUCCESS);

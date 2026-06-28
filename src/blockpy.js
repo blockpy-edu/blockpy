@@ -6,7 +6,6 @@ import "./css/blockpy.css";
 import "./css/bootstrap_retheme.css";
 import $ from "jquery";
 import {$builtinmodule as imageModule} from "skulpt_modules/image";
-import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
 //import {$builtinmodule as matplotlibModule} from "skulpt_modules/matplotlib2";
 import {LocalStorageWrapper} from "storage.js";
 import {EditorsEnum} from "editors.js";
@@ -1185,8 +1184,6 @@ export class BlockPy {
     turnOnHacks() {
         this.runtimeModules_ = {
             "src/lib/image.js": imageModule.toString()
-            //"src/lib/weakref.js": weakrefModule.toString(),
-            //"src/lib/matplotlib/pyplot/__init__.js": matplotlibModule.toString()
         };
     }
 

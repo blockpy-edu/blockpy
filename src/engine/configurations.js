@@ -38,7 +38,7 @@ export class Configuration {
                 delay = this.runtime.getExecLimit() + parseInt(delay, 10) * 1000;
                 this.runtime.setExecLimit(delay);
                 this.runtime.setExecLimitFunction(() =>
-                    this.main.model.assignment.settings.disableTimeout() ? Infinity : delay;
+                    this.main.model.assignment.settings.disableTimeout() ? Infinity : delay
                 );
             }
             return delay;
@@ -58,7 +58,7 @@ export class Configuration {
 
     getRuntimeOptions() {
         return {
-            __future__: this.runtime.getPython3Future ? this.runtime.getPython3Future() : undefined,
+            __future__: this.runtime.getPython3Future(),
             // import
             read: this.importFile.bind(this),
             // open
@@ -148,12 +148,15 @@ export class Configuration {
         this.main.model.execution.inputIndex(0);
     }
 
-    static inputMockFunction(runtime) {
-        if (!runtime) {
+    /**
+     * @param {Object} runtimeAdapter - Active Python runtime adapter instance.
+     */
+    static inputMockFunction(runtimeAdapter) {
+        if (!runtimeAdapter) {
             return "";
         }
-        if (runtime.getQueuedInput().length) {
-            return runtime.popQueuedInput();
+        if (runtimeAdapter.getQueuedInput().length) {
+            return runtimeAdapter.popQueuedInput();
         } else {
             return "";
         }

@@ -43,7 +43,14 @@ export class PyodideRuntimeAdapter extends PythonRuntime {
 
     async execute(filename, code, sysmodules) {
         const pyodide = this.resolvePyodide_();
-        await pyodide.runPythonAsync(code);
+        try {
+            await pyodide.runPythonAsync(code);
+        } catch (error) {
+            const wrapped = new Error(error && error.message ? error.message : String(error));
+            wrapped.name = "PythonError";
+            wrapped.original = error;
+            throw wrapped;
+        }
         return {
             $pyodide: true,
             filename,
@@ -53,6 +60,9 @@ export class PyodideRuntimeAdapter extends PythonRuntime {
     }
 
     parse(filename, code) {
+        // Pyodide parsing is not yet wired into BlockPy's AST/trace pipeline.
+        // Return an empty AST shape so parser-dependent features degrade safely.
+        // TODO: Replace with real AST parsing support for trace and parser reports.
         return {
             parse: null,
             ast: {body: []}
@@ -73,7 +83,7 @@ export class PyodideRuntimeAdapter extends PythonRuntime {
 
     popQueuedInput() {
         if (this.queuedInput_.length) {
-            return this.queuedInput_.pop();
+            return this.queuedInput_.shift();
         }
         return "";
     }
@@ -145,6 +155,13 @@ export class PyodideRuntimeAdapter extends PythonRuntime {
     }
 
     isGracefulExit(error) {
-        return error && (error.name === "GracefulExit" || error.tp$name === "GracefulExit");
+        return error && error.name === "GracefulExit";
+    }
+
+    getModuleScope(module) {
+        if (module && module.globals) {
+            return module.globals;
+        }
+        return module;
     }
 }

@@ -32,8 +32,11 @@ export class EvalConfiguration extends StudentConfiguration {
         let report = this.main.model.execution.reports;
         let filename = this.filename;
         this.main.model.execution.student.results = module;
-        if (module && module.$d && module.$d._ && module.$d._.$r) {
-            this.main.components.console.printValue(runtimeToJs(this.runtime, module.$d._.$r()));
+        const evalValue = this.runtime.getEvalValue(module);
+        if (evalValue !== undefined) {
+            this.main.components.console.printValue(runtimeToJs(this.runtime, evalValue));
+        } else {
+            this.main.components.console.print("No evaluation value available for runtime: " + this.runtime.getName());
         }
         return new Promise((resolve, reject) => {
             //this.step(module.$d, module.$d,-1, 0, filename + ".py");
