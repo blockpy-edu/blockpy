@@ -11,33 +11,33 @@ export class InstructorConfiguration extends Configuration {
     use(engine) {
         super.use(engine);
         // Instructors get 4 seconds
-        Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 7000;
-        Sk.execLimit = Sk.execLimitFunction();
+        this.runtime.setExecLimitFunction(() =>
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 7000);
         // Stepper! Executed after every statement.
-        Sk.afterSingleExecution = null; // 10 *1000
+        this.runtime.setAfterSingleExecution(null); // 10 *1000
         // Mute everything
         this.main.model.display.mutePrinter(true);
         // Disable input box
-        Sk.queuedInput = [];
+        this.runtime.setQueuedInput([]);
         // TODO Sk.inputfun = BlockPyEngine.inputMockFunction;
         // TODO: Allow input function to disable the timer, somehow
         // Disable the beforeCall checker unless specifically requested
-        Sk.beforeCallBackup = Sk.beforeCall;
-        Sk.beforeCall = null;
+        this.beforeCallBackup = this.runtime.getBeforeCall();
+        this.runtime.setBeforeCallBackup(this.beforeCallBackup);
+        this.runtime.setBeforeCall(null);
         // Enable utility mode
-        Sk.builtinFiles.files["src/lib/utility/__init__.js"] = UTILITY_MODULE_CODE;
-        Sk.builtinFiles.files["src/lib/coverage.py"] = COVERAGE_MODULE_CODE;
+        this.runtime.setBuiltinFile("src/lib/utility/__init__.js", UTILITY_MODULE_CODE);
+        this.runtime.setBuiltinFile("src/lib/coverage.py", COVERAGE_MODULE_CODE);
         // TODO: Check if this needs to be optimized
         //const PEDAL_TRACER_MODULE_CODE = Sk.compile($pedal_tracer, "tracer.py", "exec", true, false);
-        Sk.builtinFiles.files["src/lib/pedal/sandbox/tracer.py"] = $pedal_tracer;
-        delete Sk.builtinFiles.files["src/lib/pedal/sandbox/tracer.js"];
+        this.runtime.setBuiltinFile("src/lib/pedal/sandbox/tracer.py", $pedal_tracer);
+        this.runtime.deleteBuiltinFile("src/lib/pedal/sandbox/tracer.js");
         // TODO: Mock Pedal's tracer module with the appropriate version
-        Sk.builtinFiles.files["./_instructor/__init__.js"] = EMPTY_MODULE;
+        this.runtime.setBuiltinFile("./_instructor/__init__.js", EMPTY_MODULE);
         // Reuse any existing sysmodules that we previously found, but not __main__ modules
         this.sysmodules = this.clearExistingStudentImports();
         // Horrific hack, to prevent Tifa from caching a bad version of the students' import
-        Sk.clearExistingStudentImports = this.clearExistingStudentImports;
+        this.runtime.setClearExistingStudentImports(this.clearExistingStudentImports.bind(this));
         return this;
     }
 
@@ -51,11 +51,7 @@ export class InstructorConfiguration extends Configuration {
         // Remove any existing __main__ modules
         if (sysmodules !== undefined) {
             for (let filename of this.getAllFilenames()) {
-                let skFilename = new Sk.builtin.str(filename);
-                /*if (sysmodules.quick$lookup(skFilename)) {
-                    sysmodules.pop$item(skFilename);
-                }*/
-                sysmodules.pop$item(skFilename);
+                this.runtime.popSysmodule(sysmodules, filename);
             }
         }
         return sysmodules;
@@ -105,7 +101,7 @@ export class InstructorConfiguration extends Configuration {
     openFile(filename) {
         let found = this.main.components.fileSystem.searchForFile(filename, false);
         if (found === undefined) {
-            throw new Sk.builtin.OSError("File not found: "+filename);
+            throw this.runtime.makeError("OSError", "File not found: "+filename);
         } else {
             return found.contents();
         }
@@ -129,14 +125,12 @@ export class InstructorConfiguration extends Configuration {
             return this.main.model.assignment.onEval() || "";
         } else if (filename === "./_instructor/__init__.js") {
             return EMPTY_MODULE;
-        } else if (Sk.builtinFiles === undefined) {
-            throw new Sk.builtin.OSError("Built-in modules not accessible.");
-        } else if (Sk.builtinFiles["files"][filename] !== undefined) {
-            return Sk.builtinFiles["files"][filename];
+        } else if (this.runtime.hasBuiltinFile(filename)) {
+            return this.runtime.getBuiltinFile(filename);
         } else {
             let found = this.main.components.fileSystem.searchForFile(filename, false);
             if (found === undefined) {
-                throw new Sk.builtin.OSError("File not found: '"+filename + "'");
+                throw this.runtime.makeError("OSError", "File not found: '"+filename + "'");
             } else {
                 return found.contents();
             }

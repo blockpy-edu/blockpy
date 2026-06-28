@@ -1183,10 +1183,11 @@ export class BlockPy {
     }
 
     turnOnHacks() {
-        //console.log("TODO");
-        Sk.builtinFiles.files["src/lib/image.js"] = imageModule.toString();
-        //Sk.builtinFiles.files["src/lib/weakref.js"] = weakrefModule.toString();
-        //Sk.builtinFiles.files["src/lib/matplotlib/pyplot/__init__.js"] = matplotlibModule.toString();
+        this.runtimeModules_ = {
+            "src/lib/image.js": imageModule.toString()
+            //"src/lib/weakref.js": weakrefModule.toString(),
+            //"src/lib/matplotlib/pyplot/__init__.js": matplotlibModule.toString()
+        };
     }
 
     /**
@@ -1215,6 +1216,9 @@ export class BlockPy {
         components.trace = new BlockPyTrace(main);
         components.console = new BlockPyConsole(main, container.find(".blockpy-console"));
         components.engine = new BlockPyEngine(main);
+        Object.keys(this.runtimeModules_ || {}).forEach((path) => {
+            components.engine.runtime.setBuiltinFile(path, this.runtimeModules_[path]);
+        });
         components.fileSystem = new BlockPyFileSystem(main);
         components.editors = new Editors(main, container.find(".blockpy-editor"));
         // Convenient shortcut directly to PythonEditor
@@ -1279,4 +1283,3 @@ export class BlockPy {
     }
 
 }
-

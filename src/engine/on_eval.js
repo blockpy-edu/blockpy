@@ -2,6 +2,7 @@ import {InstructorConfiguration} from "./instructor";
 import {StatusState} from "../server";
 import {findActualInstructorOffset, INSTRUCTOR_MARKER, NEW_LINE_REGEX} from "./on_run";
 import {indent} from "../utilities";
+import {runtimeToJs} from "../runtime/conversions";
 
 /**
  * @return {string}
@@ -104,8 +105,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
 
         super.use(engine);
 
-        //Sk.retainGlobals = false;
-        Sk.globals = this.main.model.execution.instructor.globals;
+        this.runtime.setGlobals(this.main.model.execution.instructor.globals);
 
         return this;
     }
@@ -113,22 +113,22 @@ export class OnEvalConfiguration extends InstructorConfiguration {
     success(module) {
         console.log("OnEval success");
         // TODO: Actually parse results
-        this.main.model.execution.instructor.globals = Sk.globals;
-        this.main.model.execution.instructor.sysmodules = Sk.sysmodules;
+        this.main.model.execution.instructor.globals = this.runtime.getGlobals();
+        this.main.model.execution.instructor.sysmodules = this.runtime.getSysmodules();
         console.log(module);
         let results = module.$d.on_eval.$d;
         console.log(module.$d);
         this.main.components.feedback.presentFeedback(results);
         this.main.model.execution.reports["instructor"]["success"] = true;
-        let success = Sk.ffi.remapToJs(results.SUCCESS);
+        let success = runtimeToJs(this.runtime, results.SUCCESS);
         this.main.model.submission.correct(success || this.main.model.submission.correct());
         // Cannot exceed 1 point, cannot go below 0 points
-        let score = Sk.ffi.remapToJs(results.SCORE);
+        let score = runtimeToJs(this.runtime, results.SCORE);
         score = Math.max(0.0, Math.min(1.0, score));
         let oldScore = this.main.model.submission.score();
         this.main.model.submission.score(Math.max(oldScore, score));
         // Hide status
-        let hide = Sk.ffi.remapToJs(results.HIDE);
+        let hide = runtimeToJs(this.runtime, results.HIDE);
         // And fire the result!
         this.main.components.server.updateSubmission(score, success, hide, false);
         this.main.model.status.onExecution(StatusState.READY);
@@ -138,7 +138,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
             this.main.model.configuration.callbacks.success(this.main.model.assignment.id());
         }*/
 
-        if (!Sk.executionReports.instructor.scrolling) {
+        if (!this.main.model.execution.reports.instructor.scrolling) {
             try {
                 this.main.components.console.scrollToBottom();
             } catch (e) {
@@ -149,7 +149,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
     failure(error) {
         console.log("OnEval failure", error);
         let report = this.main.model.execution.reports;
-        if (error.tp$name === "GracefulExit") {
+        if (this.runtime.isGracefulExit(error)) {
             report["instructor"]["success"] = true;
             this.main.model.status.onExecution(StatusState.READY);
         } else {

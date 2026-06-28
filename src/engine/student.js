@@ -5,11 +5,10 @@ export class StudentConfiguration extends Configuration {
         super.use(engine);
         // Limit execution to 4 seconds
         let settings = this.main.model.settings;
-        Sk.execLimitFunction = () =>
-            this.main.model.assignment.settings.disableTimeout() ? Infinity : 5000;
-        Sk.execLimit = Sk.execLimitFunction();
+        this.runtime.setExecLimitFunction(() =>
+            this.main.model.assignment.settings.disableTimeout() ? Infinity : 5000);
         // Stepper! Executed after every statement.
-        Sk.afterSingleExecution = this.step.bind(this);
+        this.runtime.setAfterSingleExecution(this.step.bind(this));
 
         // Unmute everything
         this.main.model.display.mutePrinter(false);
@@ -17,7 +16,7 @@ export class StudentConfiguration extends Configuration {
         // Function to call after each step
         // afterSingleExecution
 
-        Sk.builtinFiles.files["src/lib/utility/__init__.js"] = EMPTY_MODULE;
+        this.runtime.setBuiltinFile("src/lib/utility/__init__.js", EMPTY_MODULE);
 
         return this;
     }
@@ -26,10 +25,10 @@ export class StudentConfiguration extends Configuration {
         let found = this.main.components.fileSystem.searchForFile(filename, true);
         //console.log(filename, found);
         if (found === undefined) {
-            if (Sk.builtinFiles && Sk.builtinFiles["files"][filename] !== undefined) {
-                return Sk.builtinFiles["files"][filename];
+            if (this.runtime.hasBuiltinFile(filename)) {
+                return this.runtime.getBuiltinFile(filename);
             } else {
-                throw new Sk.builtin.OSError("File not found: " + filename);
+                throw this.runtime.makeError("OSError", "File not found: " + filename);
             }
         } else {
             return found.contents();
@@ -41,14 +40,12 @@ export class StudentConfiguration extends Configuration {
             throw "File not accessible: '" + filename + "'";
         } else if (filename === "./answer.py") {
             return this.main.model.submission.code();
-        } else if (Sk.builtinFiles === undefined) {
-            throw new Sk.builtin.OSError("Built-in modules not accessible.");
-        } else if (Sk.builtinFiles["files"][filename] !== undefined) {
-            return Sk.builtinFiles["files"][filename];
+        } else if (this.runtime.hasBuiltinFile(filename)) {
+            return this.runtime.getBuiltinFile(filename);
         } else {
             let found = this.main.components.fileSystem.searchForFile(filename, true);
             if (found === undefined) {
-                throw new Sk.builtin.OSError("File not found: '"+filename + "'");
+                throw this.runtime.makeError("OSError", "File not found: '"+filename + "'");
             } else {
                 return found.contents();
             }
@@ -149,8 +146,7 @@ export class StudentConfiguration extends Configuration {
         // Attempt a parse
         let ast;
         try {
-            let parse = Sk.parse(this.filename, this.code);
-            ast = Sk.astFromParse(parse.cst, this.filename, parse.flags);
+            ast = this.runtime.parse(this.filename, this.code).ast;
             lines = this.getLines(ast);
         } catch (error) {
             // Report the error

@@ -23,16 +23,14 @@ export class RunConfiguration extends StudentConfiguration {
             "code": this.code
         };
 
-        if (typeof Sk.environ == "undefined") {
-            Sk.environ = new Sk.builtin.dict();
-        }
+        this.runtime.ensureEnviron();
         const printerTag = this.main.components.console.printerTag,
             width = printerTag.width()-50,
             height = Math.max(300, printerTag.height()-50);
-        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_WIDTH"), new Sk.builtin.int_(Math.round(width)));
-        Sk.environ.set$item(new Sk.builtin.str("DESIGNER_WINDOW_HEIGHT"), new Sk.builtin.int_(Math.round(height)));
+        this.runtime.setEnvironItem("DESIGNER_WINDOW_WIDTH", Math.round(width));
+        this.runtime.setEnvironItem("DESIGNER_WINDOW_HEIGHT", Math.round(height));
 
-        Sk.retainGlobals = false;
+        this.runtime.setRetainGlobals(false);
 
         this.clearInput();
 
@@ -49,8 +47,8 @@ export class RunConfiguration extends StudentConfiguration {
         this.main.model.display.dirtySubmission(false);
         this.main.components.console.finishTurtles();
         this.main.model.status.onExecution(StatusState.READY);
-        this.main.model.execution.student.globals(Sk.globals);
-        Sk.globals = {};
+        this.main.model.execution.student.globals(this.runtime.getGlobals());
+        this.runtime.clearGlobals();
         let report = this.main.model.execution.reports;
         let filename = this.filename;
         this.main.model.execution.student.results = module;
@@ -58,7 +56,9 @@ export class RunConfiguration extends StudentConfiguration {
             this.main.components.console.beginEval();
         }
         return new Promise((resolve, reject) => {
-            this.step(module.$d, module.$d,-1, 0, filename + ".py");
+            if (module && module.$d && this.runtime.getCapabilities().tracing) {
+                this.step(module.$d, module.$d,-1, 0, filename + ".py");
+            }
             this.lastStep();
             report["student"] = {
                 "success": true,

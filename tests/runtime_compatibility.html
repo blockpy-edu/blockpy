@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Runtime Compatibility Smoke Tests</title>
+</head>
+<body>
+<pre id="output"></pre>
+<script type="module">
+    import {createRuntimeAdapter, normalizeRuntime} from "../src/runtime/factory.js";
+
+    const output = document.getElementById("output");
+    const logs = [];
+    function log(message) {
+        logs.push(message);
+        output.textContent = logs.join("\n");
+    }
+
+    function assert(condition, message) {
+        if (!condition) {
+            throw new Error(message);
+        }
+    }
+
+    const main = {initialConfiguration_: {}, model: {assignment: {settings: {}}}};
+
+    const selected = normalizeRuntime("PYODIDE");
+    assert(selected === "pyodide", "normalizeRuntime should normalize casing.");
+
+    const skulptRuntime = createRuntimeAdapter(main, "skulpt");
+    const pyodideRuntime = createRuntimeAdapter(main, "pyodide");
+
+    const scenarios = [
+        {
+            name: "capabilities-present",
+            run: (runtime) => {
+                const caps = runtime.getCapabilities();
+                return Boolean(caps && typeof caps === "object" && "instructorFlow" in caps);
+            }
+        },
+        {
+            name: "error-normalization",
+            run: (runtime) => {
+                const error = runtime.makeError("RuntimeError", "sample");
+                return Boolean(error && (error.name === "RuntimeError" || error.tp$name === "RuntimeError"));
+            }
+        },
+        {
+            name: "queued-input-api",
+            run: (runtime) => {
+                runtime.setQueuedInput([]);
+                runtime.pushQueuedInput("A");
+                return runtime.popQueuedInput() === "A";
+            }
+        }
+    ];
+
+    function runScenarioSuite(runtime, label) {
+        scenarios.forEach((scenario) => {
+            const passed = scenario.run(runtime);
+            assert(passed, `${label}:${scenario.name} failed`);
+            log(`PASS ${label}:${scenario.name}`);
+        });
+    }
+
+    runScenarioSuite(skulptRuntime, "skulpt");
+    runScenarioSuite(pyodideRuntime, "pyodide");
+
+    log("All runtime compatibility smoke tests passed.");
+</script>
+</body>
+</html>

@@ -16,6 +16,7 @@ const ASSIGNMENT_SETTINGS = [
     ["disableInstructorRun", "disable_instructor_run", false, "bool", "If checked, then the instructor on_run will not automatically run the students' code. This still runs the students' code once beforehand, but the output/data will not be available to the instructor's on_run.py script."],
     ["disableStudentRun", "disable_student_run", false, "bool", "If checked, then the run button no longer run the students' code. This still runs the instructor's feedback on_run script."],
     ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
+    ["runtimeBackend", "runtime_backend", "skulpt", "string", "Which Python runtime backend to use (skulpt or pyodide)."],
     ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
     ["disableEdit", "disable_edit", false, "bool", "If checked, then the students' file will not be editable."],
     ["preloadAllFiles", "preload_all_files", false, "bool", "If checked, then the students can upload and use images and other files. This preloads all available files and images. You can filter them using the Preloaded Files setting."],

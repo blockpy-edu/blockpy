@@ -16,33 +16,35 @@ export class Configuration {
     use(engine) {
         // Access point for instructor data
         this.engine = engine;
-        Sk.executionReports = this.main.model.execution.reports;
-        Sk.console = this.main.components.console;
-        Sk.queuedInput = [];
-        Sk.configure(this.getSkulptOptions());
+        this.runtime = engine.runtime;
+        this.runtime.setExecutionReports(this.main.model.execution.reports);
+        this.runtime.setConsole(this.main.components.console);
+        this.runtime.setQueuedInput([]);
+        this.runtime.configure(this.getRuntimeOptions());
         // Set openFile as mechanism to read files
-        Sk.inBrowser = this.openFile.bind(this);
+        this.runtime.setInBrowser(this.openFile.bind(this));
         // Function to convert filenames to URLs
-        Sk.fileToURL = this.getUrlFromFilename.bind(this);
+        this.runtime.setFileToURL(this.getUrlFromFilename.bind(this));
         // Proxy requests
-        Sk.requestsGet = (url, data, timeout) => this.openURL(url, data, timeout);
+        this.runtime.setRequestsGet((url, data, timeout) => this.openURL(url, data, timeout));
         // Configure a "do you want to wait? prompt"
-        Sk.timeoutHandler = (timePassed, execLimit) => {
+        this.runtime.setTimeoutHandler((timePassed, execLimit) => {
             if (this.main.model.assignment.settings.disableTimeout()) {
                 return null;
             }
             let promptMessage = this.getTimeoutPrompt(timePassed/1000 > 30);
-            let delay = prompt(promptMessage, Sk.execLimit/1000);
+            let delay = prompt(promptMessage, this.runtime.getExecLimit()/1000);
             if (delay !== null || delay==0) {
-                delay = Sk.execLimit + parseInt(delay, 10) * 1000;
-                Sk.execLimit = delay;
-                Sk.execLimitFunction = () =>
+                delay = this.runtime.getExecLimit() + parseInt(delay, 10) * 1000;
+                this.runtime.setExecLimit(delay);
+                this.runtime.setExecLimitFunction(() =>
                     this.main.model.assignment.settings.disableTimeout() ? Infinity : delay;
+                );
             }
             return delay;
-        };
+        });
         // Attach beforeCall
-        Sk.beforeCall = this.beforeCall.bind(this);
+        this.runtime.setBeforeCall(this.beforeCall.bind(this));
         return this;
     }
 
@@ -54,9 +56,9 @@ export class Configuration {
         }
     }
 
-    getSkulptOptions() {
+    getRuntimeOptions() {
         return {
-            __future__: Sk.python3,
+            __future__: this.runtime.getPython3Future ? this.runtime.getPython3Future() : undefined,
             // import
             read: this.importFile.bind(this),
             // open
@@ -80,7 +82,7 @@ export class Configuration {
     getUrlFromFilename(filename) {
         const found = this.main.components.fileSystem.filesToUrls[filename];
         if (found === undefined) {
-            throw new Sk.builtin.OSError("File not found: " + filename);
+            throw this.runtime.makeError("OSError", "File not found: " + filename);
         }
         return found;
     }
@@ -102,7 +104,7 @@ export class Configuration {
         //return new Promise((resolve, reject) => {
         let mockUrlData = this.main.components.fileSystem.getFile("?mock_urls.blockpy");
         if (mockUrlData == null) {
-            throw (new Sk.builtin.IOError("Cannot access url: URL Data was not made available for this assignment"));
+            throw this.runtime.makeError("IOError", "Cannot access url: URL Data was not made available for this assignment");
         }
         mockUrlData = JSON.parse(mockUrlData.handle());
         for (let filename in mockUrlData) {
@@ -116,7 +118,7 @@ export class Configuration {
             }
         }
         //reject(new Sk.builtin.IOError("Cannot access url: "+url+" was not made available for this assignment"));
-        throw (new Sk.builtin.IOError("Cannot access url: "+url+" was not made available for this assignment"));
+        throw this.runtime.makeError("IOError", "Cannot access url: "+url+" was not made available for this assignment");
         //});
     }
 
@@ -146,9 +148,12 @@ export class Configuration {
         this.main.model.execution.inputIndex(0);
     }
 
-    static inputMockFunction() {
-        if (Sk.queuedInput.length) {
-            return Sk.queuedInput.pop();
+    static inputMockFunction(runtime) {
+        if (!runtime) {
+            return "";
+        }
+        if (runtime.getQueuedInput().length) {
+            return runtime.popQueuedInput();
         } else {
             return "";
         }
@@ -216,4 +221,3 @@ export class Configuration {
         studentModel.calls[functionName].push(args);
     }
 }
-

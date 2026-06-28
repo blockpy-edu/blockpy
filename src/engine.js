@@ -6,6 +6,7 @@ import {SampleConfiguration} from "./engine/sample";
 import {OnChangeConfiguration} from "./engine/on_change";
 import {OnEvalConfiguration} from "./engine/on_eval";
 import {OnSampleConfiguration} from "./engine/on_sample";
+import {resolvePythonRuntime} from "./runtime/factory";
 
 /**
  * An object for executing Python code and passing the results along to interested components.
@@ -23,6 +24,8 @@ export class BlockPyEngine {
     constructor(main) {
         this.main = main;
         this.executionModel = this.main.model.execution;
+        this.runtime = resolvePythonRuntime(main);
+        this.capabilities = this.runtime.getCapabilities();
 
         this.configurations = {
             run: new RunConfiguration(main),
@@ -32,8 +35,8 @@ export class BlockPyEngine {
             onEval: new OnEvalConfiguration(main)
         };
 
-        // Preconfigure skulpt so we can parse
-        Sk.configure(this.configurations.run.getSkulptOptions());
+        // Preconfigure active runtime so we can parse
+        this.runtime.configure(this.configurations.run.getRuntimeOptions());
 
         // Keeps track of the tracing while the program is executing
         this.executionBuffer = {};
@@ -112,7 +115,9 @@ export class BlockPyEngine {
             this.configuration.success.bind(this.configuration),
             this.configuration.failure.bind(this.configuration)
         );
-        if (!this.main.model.assignment.settings.disableFeedback() && !disableFeedback) {
+        if (!this.main.model.assignment.settings.disableFeedback() &&
+            !disableFeedback &&
+            this.capabilities.instructorFlow) {
             execution.then(() => {
                 this.configuration.provideSecretError();
                 return this.onRun();
@@ -144,7 +149,8 @@ export class BlockPyEngine {
                 this.configuration.failure.bind(this.configuration)
             );
             if (!this.main.model.assignment.settings.disableFeedback() &&
-                this.main.model.assignment.onEval()) {
+                this.main.model.assignment.onEval() &&
+                this.capabilities.instructorFlow) {
                 this.configuration.provideSecretError();
                 execution.then(this.onEval.bind(this));
             } else {
@@ -171,10 +177,10 @@ export class BlockPyEngine {
 
     execute() {
         this.main.model.status.onExecution(StatusState.ACTIVE);
-        return Sk.misceval.asyncToPromise(() =>
-            Sk.importMainWithBody(this.configuration.filename, false,
-                                  this.configuration.code, true,
-                                  this.configuration.sysmodules)
+        return this.runtime.execute(
+            this.configuration.filename,
+            this.configuration.code,
+            this.configuration.sysmodules
         );
     }
 
@@ -196,7 +202,7 @@ export class BlockPyEngine {
         engine.verifyCode();
         engine.updateParse();
         engine.runInstructorCode(FILENAME, true, function (module) {
-            if (Sk.executionReports["instructor"]["success"]) {
+            if (engine.main.model.execution.reports["instructor"]["success"]) {
                 // SUCCESS, SCORE, CATEGORY, LABEL, MESSAGE, DATA, HIDE
                 // TODO: only show under certain circumstances
                 if (!success &&
@@ -231,4 +237,3 @@ export class BlockPyEngine {
     }
 
 }
-
