@@ -14,6 +14,8 @@ function registerComprehensionBlock(blockly) {
     };
 }
 function blockToPython(block, errors, ctx) {
+    // KIND is not exposed in the block UI (always defaults to 'list'); the field
+    // read is retained for potential legacy blocks that store a kind value.
     const kind = block.getFieldValue("KIND") || "list";
     const legacyCode = (block.getFieldValue("CODE") || "").trim();
     const elt = ctx.blockToCode(block.getInputTargetBlock("ELT"), errors).trim();

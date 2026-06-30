@@ -45,7 +45,7 @@ BlockPyCorgis.prototype.loadDatasets = function (silently) {
         server = this.main.components.server;
     let imports = [];
     model.assignment.settings.datasets().split(",").forEach((name) => {
-        if (name) {
+        if (name && this.loadedDatasets.indexOf(slug(name)) === -1) {
             imports.push.apply(imports, this.importDataset(slug(name), name, silently));
         }
     });

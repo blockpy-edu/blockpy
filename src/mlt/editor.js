@@ -6,6 +6,11 @@ const DEFAULT_HEIGHT = 500;
 const XMLNS = "https://developers.google.com/blockly/xml";
 
 const GLOBAL_SCOPE = typeof window !== "undefined" ? window : globalThis;
+
+// Backward-compatibility shims: CORGIS dataset _blockly.js scripts may register
+// toolbox entries via BlockMirrorBlockEditor.EXTRA_TOOLS, and hidden-import lists
+// via BlockMirrorTextToBlocks.hiddenImports. We preserve those global names so
+// externally-loaded dataset scripts continue to work without modification.
 const DATASET_EXTRA_TOOLS = GLOBAL_SCOPE.BlockMirrorBlockEditor && GLOBAL_SCOPE.BlockMirrorBlockEditor.EXTRA_TOOLS
     ? GLOBAL_SCOPE.BlockMirrorBlockEditor.EXTRA_TOOLS
     : {};
