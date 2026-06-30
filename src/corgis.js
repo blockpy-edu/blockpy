@@ -1,4 +1,5 @@
 import {slug} from "./utilities";
+import {MLTEditor} from "./mlt/editor";
 
 // TODO: editor.bm.blockEditor.extraTools[]
 
@@ -44,7 +45,7 @@ BlockPyCorgis.prototype.loadDatasets = function (silently) {
         server = this.main.components.server;
     let imports = [];
     model.assignment.settings.datasets().split(",").forEach((name) => {
-        if (name && !(name in BlockMirrorBlockEditor.EXTRA_TOOLS)) {
+        if (name) {
             imports.push.apply(imports, this.importDataset(slug(name), name, silently));
         }
     });
@@ -90,7 +91,10 @@ BlockPyCorgis.prototype.importDataset = function (slug, name) {
         // On completion, update menus.
         $.when(getDataset, getSkulpt, getBlockly).done(() => {
             this.loadedDatasets.push(slug);
-            this.main.components.pythonEditor.bm.textToBlocks.hiddenImports.push(slug);
+            let hiddenImports = this.main.components.pythonEditor.bm.textToBlocks.hiddenImports;
+            if (hiddenImports.indexOf(slug) === -1) {
+                hiddenImports.push(slug);
+            }
             this.main.components.pythonEditor.bm.forceBlockRefresh();
             this.main.components.pythonEditor.bm.blockEditor.remakeToolbox();
             this.main.model.display.loadingDatasets.remove(name);

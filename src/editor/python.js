@@ -11,6 +11,7 @@
 import {AbstractEditor, sluggify} from "./abstract_editor";
 import {HISTORY_TOOLBAR_HTML} from "../history";
 import {SecondRowSecondPanelOptions} from "../interface";
+import {MLTEditor} from "../mlt/editor";
 
 export let DisplayModes = {
     BLOCK: "block",
@@ -183,8 +184,10 @@ function convertIpynbToPython(code) {
 class PythonEditorView extends AbstractEditor {
     constructor(main, tag) {
         super(main, tag.find(".blockpy-python-blockmirror"));
-        Blockly.setParentContainer(main.model.configuration.container[0]);
-        this.bm = new BlockMirror({
+        if (Blockly.setParentContainer) {
+            Blockly.setParentContainer(main.model.configuration.container[0]);
+        }
+        this.bm = new MLTEditor({
             "container": this.tag[0],
             "run": main.components.engine.run.bind(main.components.engine),
             "skipSkulpt": true,
