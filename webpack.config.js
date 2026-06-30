@@ -17,7 +17,7 @@ if (env === "build") {
 let config = {
     mode: mode,
     entry: {
-        blockpy: __dirname + "/src/blockpy.js"
+        blockpy: __dirname + "/src/blockpy.ts"
     },
     devtool: "inline-source-map",
     output: {
@@ -31,17 +31,19 @@ let config = {
     module: {
         rules: [
             {
-                test: /(\.jsx|\.js)$/,
-                /*loader: "babel-loader",*/
-                use: {
-                    loader: "babel-loader"
-                },
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: "babel-loader"
+                    },
+                    {
+                        loader: "ts-loader",
+                        options: {
+                            transpileOnly: true
+                        }
+                    }
+                ],
                 exclude: /(node_modules|bower_components)/
-            },
-            {
-                test: /(\.jsx|\.js)$/,
-                loader: "eslint-loader",
-                exclude: /node_modules/
             },
             {
                 test: /\.css$/,
@@ -62,7 +64,7 @@ let config = {
     },
     resolve: {
         modules: [path.resolve("./node_modules"), path.resolve("./src")],
-        extensions: [".json", ".js"]
+        extensions: [".ts", ".tsx", ".json", ".js"]
     },
     plugins: [
         new MiniCssExtractPlugin({
