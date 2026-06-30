@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src/",
     "dev": "webpack --progress --color --watch --env dev",
     "build": "webpack --env dev && webpack --env build"
   },
@@ -28,7 +29,7 @@
     "@babel/preset-env": "7.11.0",
     "babel-loader": "8.1.0",
     "css-loader": "4.2.0",
-    "eslint": "5.0.0",
+    "eslint": "^8.57.1",
     "eslint-loader": "4.0.2",
     "jquery": "3.5.1",
     "knockout": "3.5.1",
@@ -37,5 +38,13 @@
     "webpack": "4.44.1",
     "webpack-cli": "^4.2.0",
     "yargs": "15.4.1"
+  },
+  "dependencies": {
+    "@types/jquery": "^4.0.1",
+    "@types/knockout": "^3.4.79",
+    "@typescript-eslint/eslint-plugin": "^8.62.1",
+    "@typescript-eslint/parser": "^8.62.1",
+    "ts-loader": "^8.4.0",
+    "typescript": "^6.0.3"
   }
 }

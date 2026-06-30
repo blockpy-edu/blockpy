@@ -1,4 +1,4 @@
-import {firstDefinedValue} from "utilities.js";
+import {firstDefinedValue} from "utilities";
 
 // ${makeTab("?mock_urls.blockpy", "URL Data", true)}
 

@@ -1,4 +1,4 @@
-import {Configuration, EMPTY_MODULE} from "./configurations.js";
+import {Configuration, EMPTY_MODULE} from "./configurations";
 import {$sk_mod_instructor} from "../skulpt_modules/sk_mod_instructor";
 import {$sk_mod_coverage} from "../skulpt_modules/coverage";
 import {$pedal_tracer} from "../skulpt_modules/pedal_tracer";
