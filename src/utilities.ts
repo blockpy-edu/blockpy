@@ -79,7 +79,7 @@ function expandArray<T>(array: T[], addArray: T[], removeArray: T[]): T[] {
  */
 function cloneNode(node: Node): Node {
     // If the node is a text node, then re-create it rather than clone it
-    var clone: Node = node.nodeType == 3
+    var clone: Node = node.nodeType === 3
         ? document.createTextNode((node as Text).nodeValue ?? "")
         : node.cloneNode(false);
  
@@ -165,7 +165,7 @@ if (typeof Blockly !== "undefined") {
             // Get a block
             var block = blocks[i];
             var properties = block.getRelativeToSurfaceXY();
-            if (i == 0) {
+            if (i === 0) {
                 x = 5;
             } else {
                 x = -properties.x+randomInteger(10, width);

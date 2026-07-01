@@ -20,10 +20,10 @@ try {
 } catch(e) {
     LOCAL_STORAGE_REF = {
         _data       : {},
-        setItem     : function(id: string, val: string) { return this._data![id] = String(val); },
+        setItem     : function(id: string, val: string): void { this._data![id] = String(val); },
         getItem     : function(id: string) { return this._data!.hasOwnProperty(id) ? this._data![id] : null; },
-        removeItem  : function(id: string) { return delete this._data![id]; },
-        clear       : function() { return this._data = {}; }
+        removeItem  : function(id: string): void { delete this._data![id]; },
+        clear       : function(): void { this._data = {}; }
     };
 }
 
