@@ -49,12 +49,19 @@ const EDITOR_VERSION = "5.1.2";
  * it on an assignment switch.
  */
 export class BlockPy {
+    localSettings_: LocalStorageWrapper;
+    initialConfiguration_: Record<string, any>;
+    model: any;
+    components: any;
+    utilities: any;
+    clock: ReturnType<typeof setInterval> | null;
+
     /**
      * @param {Object} configuration - User level settings (e.g., what editor mode, whether to mute semantic errors, etc.)
      * @param {Object} assignment - Assignment level settings (data about the loaded assignment, user, submission, etc.)
      * @param {Object} submission - Includes the source code of any programs to be loaded
      */
-    constructor(configuration, assignment, submission) {
+    constructor(configuration: Record<string, any>, assignment?: any, submission?: any) {
         this.initModel(configuration);
         if (assignment !== undefined) {
             this.setAssignment(configuration, assignment, submission);
@@ -83,7 +90,7 @@ export class BlockPy {
      * @param {string} key - the key to look up a value for
      * @param {Object} defaultValue - if the key is not found anywhere, use this value
      */
-    getSetting(key, defaultValue) {
+    getSetting(key: string, defaultValue: any): any {
         if (key in this.initialConfiguration_) {
             return this.initialConfiguration_[key];
         } else if (this.localSettings_.has(key)) {
@@ -105,7 +112,7 @@ export class BlockPy {
      *   * execution: values related to last run (not stored)
      *   * configuration: constant values related to setup (not stored)
      */
-    initModel(configuration) {
+    initModel(configuration: Record<string, any>): void {
         // Connect to local storage
         this.localSettings_ = new LocalStorageWrapper("localSettings");
         this.initialConfiguration_ = configuration;
@@ -425,24 +432,24 @@ export class BlockPy {
         constants.container = $(constants.attachmentPoint).html($(gui));
     };
 
-    loadAssignment(assignment_id) {
+    loadAssignment(assignment_id: any): void {
         this.components.server.loadAssignment(assignment_id);
     }
 
-    loadTags(tags) {
+    loadTags(tags: any[]): void {
         // Already a JSON list representing tags
     }
 
-    loadSampleSubmissions(samples) {
+    loadSampleSubmissions(samples: any[]): void {
         // Already a JSON list representing samples
     }
 
-    loadNoSubmission(assignment) {
+    loadNoSubmission(assignment: any): void {
         this.model.submission.code(assignment.starting_code);
         loadConcatenatedFile(assignment.extra_starting_files, this.model.submission.extraFiles);
     }
 
-    loadSubmission(submission, assignment) {
+    loadSubmission(submission: any, assignment: any): boolean {
         if (!submission) {
             // TODO: Scarier "You are not logged in message"
             this.loadNoSubmission(assignment);
@@ -464,7 +471,7 @@ export class BlockPy {
         loadConcatenatedFile(submission.extra_files, this.model.submission.extraFiles);
     }
 
-    loadAssignmentData_(data) {
+    loadAssignmentData_(data: any): void {
         console.debug(data);
         this.resetInterface();
         this.components.fileSystem.dismountExtraFiles();

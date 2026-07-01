@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         },
         build: {
             lib: {
-                entry: path.resolve(__dirname, "src/blockpy.js"),
+                entry: path.resolve(__dirname, "src/blockpy.ts"),
                 name: "blockpy",
                 formats: ["umd"],
                 fileName: () => isProd ? "blockpy.min.js" : "blockpy.js",
