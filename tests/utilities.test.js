@@ -6,7 +6,7 @@ import {
     encodeHTML,
     extractPart,
     firstDefinedValue,
-} from "../src/utilities.js";
+} from "../src/utilities";
 
 // ─── arrayMove ───────────────────────────────────────────────────────────────
 

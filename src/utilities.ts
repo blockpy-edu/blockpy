@@ -8,7 +8,7 @@
  * @param newIndex
  * @returns {*}
  */
-export function arrayMove(arr, oldIndex, newIndex) {
+export function arrayMove<T>(arr: T[], oldIndex: number, newIndex: number): T[] {
     const length = arr.length;
     const itemToMove = arr[oldIndex];
 
@@ -16,7 +16,7 @@ export function arrayMove(arr, oldIndex, newIndex) {
         return arr;
     }
 
-    return arr.reduce((acc, item, index) => {
+    return arr.reduce((acc: T[], item: T, index: number) => {
         if (index === oldIndex) {return acc;}
         if (index === newIndex) {return oldIndex < newIndex ? [...acc, item, itemToMove] : [...acc, itemToMove, item];}
         return [...acc, item];
@@ -25,11 +25,11 @@ export function arrayMove(arr, oldIndex, newIndex) {
 
 /**
  * Determines if the element is in the list.
- * @param {anything} needle - The element to look for.
- * @param {Array} haystack - The list to search.
- * @return {Boolean} Whether the element exists
+ * @param needle - The element to look for.
+ * @param haystack - The list to search.
+ * @return Whether the element exists
  */
-function arrayContains(needle, haystack) {
+function arrayContains<T>(needle: T, haystack: T[]): boolean {
     return haystack.indexOf(needle) > -1;
 }
 
@@ -39,9 +39,9 @@ function arrayContains(needle, haystack) {
  * Courtesy:
  * https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
  *
- * @param {Array} array - The array to uniquify. Elements compared with ===.
+ * @param array - The array to uniquify. Elements compared with ===.
  */
-function arrayUnique(array) {
+function arrayUnique<T>(array: T[]): T[] {
     var a = array.concat();
     for(var i=0; i<a.length; ++i) {
         for(var j=i+1; j<a.length; ++j) {
@@ -60,12 +60,12 @@ function arrayUnique(array) {
  * Any duplicate items are removed.
  * Creates a new array, so is non-destructive.
  *
- * @param {Array} array - the array to manipulate
- * @param {Array} addArray - the elements to add to the array
- * @param {Array} removeArray - the elements to remove from the array
- * @return {Array} The modified array
+ * @param array - the array to manipulate
+ * @param addArray - the elements to add to the array
+ * @param removeArray - the elements to remove from the array
+ * @return The modified array
  */
-function expandArray(array, addArray, removeArray) {
+function expandArray<T>(array: T[], addArray: T[], removeArray: T[]): T[] {
     var copyArray = array.filter(function(item) {
         return removeArray.indexOf(item) === -1;
     });
@@ -74,12 +74,14 @@ function expandArray(array, addArray, removeArray) {
 
 /**
  * Deeply clones a node
- * @param {Node} node A node to clone
- * @return {Node} A clone of the given node and all its children
+ * @param node A node to clone
+ * @return A clone of the given node and all its children
  */
-function cloneNode(node) {
+function cloneNode(node: Node): Node {
     // If the node is a text node, then re-create it rather than clone it
-    var clone = node.nodeType == 3 ? document.createTextNode(node.nodeValue) : node.cloneNode(false);
+    var clone: Node = node.nodeType == 3
+        ? document.createTextNode((node as Text).nodeValue ?? "")
+        : node.cloneNode(false);
  
     // Recurse     
     var child = node.firstChild;
@@ -94,28 +96,28 @@ function cloneNode(node) {
 /**
  * Indents the given string by 4 spaces. This correctly handles multi-line strings.
  *
- * @param {String} str - The string to be manipulated.
- * @returns {String} The string with four spaces added at the start of every new line.
+ * @param str - The string to be manipulated.
+ * @returns The string with four spaces added at the start of every new line.
  */
-export function indent(str) {
+export function indent(str: string): string {
     return str.replace(/^(?=.)/gm, "    ");
 }
 
 /**
  * Turns spaces into underscores in the string, makes it lowercase.
- * @param {String} str - the string to be manipulated
- * @returns {string}
+ * @param str - the string to be manipulated
+ * @returns The slugified string.
  */
-export function slug(str) {
+export function slug(str: string): string {
     return str.replace(/\s/g, "_").toLowerCase();
 }
 
 /**
  * Capitalize the first letter of a string.
- * @param {String} s - The string to be capitalized.
- * @returns {string}
+ * @param s - The string to be capitalized.
+ * @returns The capitalized string, or an empty string if s is not a string.
  */
-export function capitalize(s) {
+export function capitalize(s: unknown): string {
     if (typeof s !== "string") {
         return "";
     }
@@ -125,11 +127,11 @@ export function capitalize(s) {
 /**
  * Return a random integer between [`min`, `max`].
  * 
- * @param {number} min - The lowest possible integer.
- * @param {number} max - The highest possible integer (inclusive).
- * @returns {number} A random integer.
+ * @param min - The lowest possible integer.
+ * @param max - The highest possible integer (inclusive).
+ * @returns A random integer.
  */
-function randomInteger(min,max) {
+function randomInteger(min: number, max: number): number {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
 
@@ -137,10 +139,10 @@ function randomInteger(min,max) {
  * Encodes some text so that it can be safely written into an HTML box.
  * This includes replacing special HTML characters (&, <, >, etc.).
  *
- * @param {string} str - The text to be converted.
- * @return {string} The HTML-safe text.
+ * @param str - The text to be converted.
+ * @return The HTML-safe text.
  */
-export function encodeHTML(str) {
+export function encodeHTML(str: string): string {
     return str.replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -179,7 +181,7 @@ if (typeof Blockly !== "undefined") {
  * Move elements from one array to another based on a conditional check.
  * https://stackoverflow.com/questions/31887967/javascript-move-objects-from-one-array-to-another-best-approach
  */
-function moveElements(source, target, moveCheck) {
+function moveElements<T>(source: T[], target: T[], moveCheck: (element: T) => boolean): void {
     for (var i = 0; i < source.length; i++) {
         var element = source[i];
         if (moveCheck(element)) {
@@ -191,10 +193,10 @@ function moveElements(source, target, moveCheck) {
 }
 
 
-export function firstDefinedValue() {
-    for (var i = 0; i < arguments.length; i++) {
-        if (arguments[i] != null) {
-            return arguments[i];
+export function firstDefinedValue(...args: unknown[]): unknown {
+    for (var i = 0; i < args.length; i++) {
+        if (args[i] != null) {
+            return args[i];
         }
     }
     return undefined;
@@ -207,10 +209,10 @@ export function firstDefinedValue() {
  *          of the constructor and look for the substring "return new Sk.builtin"
  *          But I don't know how reliable that is.  Rather, it's kind of hackish.
  *          Should tehoretically belong in Sk.ffi
- * @param {object} obj - the object to be examined
- * @return {boolean} true if the object is one of the Sk.builtin types
+ * @param obj - the object to be examined
+ * @return true if the object is one of the Sk.builtin types
 **/
-function isSkBuiltin(obj){
+function isSkBuiltin(obj: any): boolean {
     return (obj instanceof Sk.builtin.dict) ||
         (obj instanceof Sk.builtin.list) ||
         (obj instanceof Sk.builtin.tuple) ||
@@ -223,7 +225,7 @@ function isSkBuiltin(obj){
     //return cons_str.indexOf("return new Sk.builtin") !== -1;
 }
 
-function isAstNode(obj){
+function isAstNode(obj: any): boolean {
     return obj instanceof Object && "_astname" in obj;
 }
 
@@ -235,9 +237,9 @@ const DEFAULT_SECTION_PATTERN = /^(##### Part (.+))$/gm;
  * is returned without modifications.
  * @param text
  * @param partId
- * @returns {null|*}
+ * @returns The extracted part body, the original text if no partId, or null if not found.
  */
-export function extractPart(text, partId) {
+export function extractPart(text: string, partId: string | null | undefined): string | null {
     if (partId === "" || partId == null) {
         return text;
     }
@@ -265,10 +267,10 @@ export function extractPart(text, partId) {
  * Should theoretically belong in Sk.ffi, but I put it here instead to not mess up the skulpt files
  * like the normal Sk.ffi.remapToPy, it doesn't work for functions or more complex objects, but it handles
  * cases where the types in obj are a mix of python SIMPLE objects and SIMPLE normal javascript objects
- * @param {object} obj - the object to be converted
- * @return {Sk.builtin.???} - returns the corresponding python object, dropping all functions and things it can't convert
+ * @param obj - the object to be converted
+ * @return returns the corresponding python object, dropping all functions and things it can't convert
 **/
-function mixedRemapToPy(obj){
+function mixedRemapToPy(obj: any): any {
     var k;
     var kvs;
     var i;
@@ -319,10 +321,10 @@ function mixedRemapToPy(obj){
 }
 
 
-export function getCurrentTime() {
+export function getCurrentTime(): string {
     const today = new Date();
     let h = Math.floor(today.getHours()%12);
-    let m = today.getMinutes();
+    let m: number | string = today.getMinutes();
     //let s = today.getSeconds();
     if (m < 10) {m = "0" + m;}
     //if (s < 10) {s = "0" + s;}

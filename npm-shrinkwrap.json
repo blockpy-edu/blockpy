@@ -14,6 +14,7 @@
       "devDependencies": {
         "@babel/core": "^7.29.7",
         "@babel/preset-env": "^7.29.7",
+        "@babel/preset-typescript": "^7.29.7",
         "babel-jest": "^29.7.0",
         "babel-loader": "^8.4.1",
         "css-loader": "4.2.0",
@@ -24,6 +25,7 @@
         "knockout": "3.5.1",
         "mini-css-extract-plugin": "0.9.0",
         "path": "0.12.7",
+        "typescript": "^5.9.3",
         "webpack": "4.44.1",
         "webpack-cli": "^4.2.0",
         "yargs": "15.4.1"
@@ -1663,6 +1665,26 @@
         "@babel/core": "^7.0.0-0"
       }
     },
+    "node_modules/@babel/plugin-transform-typescript": {
+      "version": "7.29.7",
+      "resolved": "https://registry.npmjs.org/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.29.7.tgz",
+      "integrity": "sha512-jK52h8LaLc7JarhQV2ofeFMts4H7vnOXnqZNA6fYglBTZewRBE51KWt3BUltW1P+KoPsYkHoJeXePuz4zo2LMw==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@babel/helper-annotate-as-pure": "^7.29.7",
+        "@babel/helper-create-class-features-plugin": "^7.29.7",
+        "@babel/helper-plugin-utils": "^7.29.7",
+        "@babel/helper-skip-transparent-expression-wrappers": "^7.29.7",
+        "@babel/plugin-syntax-typescript": "^7.29.7"
+      },
+      "engines": {
+        "node": ">=6.9.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "^7.0.0-0"
+      }
+    },
     "node_modules/@babel/plugin-transform-unicode-escapes": {
       "version": "7.29.7",
       "resolved": "https://registry.npmjs.org/@babel/plugin-transform-unicode-escapes/-/plugin-transform-unicode-escapes-7.29.7.tgz",
@@ -1839,6 +1861,26 @@
       },
       "peerDependencies": {
         "@babel/core": "^7.0.0-0 || ^8.0.0-0 <8.0.0"
+      }
+    },
+    "node_modules/@babel/preset-typescript": {
+      "version": "7.29.7",
+      "resolved": "https://registry.npmjs.org/@babel/preset-typescript/-/preset-typescript-7.29.7.tgz",
+      "integrity": "sha512-/Foi8vKY2EVbed/1eZx0gJEEwHAIxogrySI7rULcRIvhZzbvoE/b5qG5Ghc0WKAFKOHA9SD1x7RsFlOYdutIiQ==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@babel/helper-plugin-utils": "^7.29.7",
+        "@babel/helper-validator-option": "^7.29.7",
+        "@babel/plugin-syntax-jsx": "^7.29.7",
+        "@babel/plugin-transform-modules-commonjs": "^7.29.7",
+        "@babel/plugin-transform-typescript": "^7.29.7"
+      },
+      "engines": {
+        "node": ">=6.9.0"
+      },
+      "peerDependencies": {
+        "@babel/core": "^7.0.0-0"
       }
     },
     "node_modules/@babel/template": {
@@ -12888,6 +12930,20 @@
       "resolved": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz",
       "integrity": "sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=",
       "dev": true
+    },
+    "node_modules/typescript": {
+      "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+      "dev": true,
+      "license": "Apache-2.0",
+      "bin": {
+        "tsc": "bin/tsc",
+        "tsserver": "bin/tsserver"
+      },
+      "engines": {
+        "node": ">=14.17"
+      }
     },
     "node_modules/unbox-primitive": {
       "version": "1.1.0",

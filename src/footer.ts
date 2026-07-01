@@ -1,5 +1,5 @@
 //TODO: Move get link down to footer, remove vertical bar from quick-menu
-export let FOOTER_HTML = `
+export const FOOTER_HTML: string = `
 <div class="col-md-12 blockpy-panel blockpy-status">
     <div>
         <label class="badge" data-bind="class: ui.server.status('loadAssignment')">Load Assignment

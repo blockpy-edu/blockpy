@@ -8,7 +8,7 @@ import $ from "jquery";
 import {$builtinmodule as imageModule} from "skulpt_modules/image";
 import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
 //import {$builtinmodule as matplotlibModule} from "skulpt_modules/matplotlib2";
-import {LocalStorageWrapper} from "storage.js";
+import {LocalStorageWrapper} from "storage";
 import {EditorsEnum} from "editors.js";
 import {DisplayModes} from "editor/python.js";
 import {StatusState} from "server.js";

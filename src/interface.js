@@ -14,7 +14,7 @@ import {TRACE_HTML} from "trace.js";
 import {DIALOG_HTML} from "dialog.js";
 import {FEEDBACK_HTML} from "feedback.js";
 import {FILES_HTML} from "files.js";
-import {FOOTER_HTML} from "footer.js";
+import {FOOTER_HTML} from "footer";
 import {EDITORS_HTML} from "editors.js";
 import {CONSOLE_HTML} from "console.js";
 

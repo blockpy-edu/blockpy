@@ -31,8 +31,7 @@ let config = {
     module: {
         rules: [
             {
-                test: /(\.jsx|\.js)$/,
-                /*loader: "babel-loader",*/
+                test: /(\.tsx?|\.jsx?)$/,
                 use: {
                     loader: "babel-loader"
                 },
@@ -62,7 +61,7 @@ let config = {
     },
     resolve: {
         modules: [path.resolve("./node_modules"), path.resolve("./src")],
-        extensions: [".json", ".js"]
+        extensions: [".ts", ".tsx", ".json", ".js"]
     },
     plugins: [
         new MiniCssExtractPlugin({

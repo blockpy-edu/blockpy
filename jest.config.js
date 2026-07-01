@@ -1,7 +1,8 @@
 module.exports = {
     testEnvironment: "node",
     transform: {
-        "^.+\\.js$": "babel-jest"
+        "^.+\\.[jt]s$": "babel-jest"
     },
+    moduleFileExtensions: ["ts", "js", "json"],
     setupFiles: ["./tests/jest.setup.js"]
 };
