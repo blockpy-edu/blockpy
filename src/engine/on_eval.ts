@@ -6,7 +6,7 @@ import {indent} from "../utilities";
 /**
  * @return {string}
  */
-export const WRAP_INSTRUCTOR_CODE = function (studentCode, instructorCode, quick, isSafe) {
+export const WRAP_INSTRUCTOR_CODE = function (studentCode: Record<string, string>, instructorCode: string, quick: boolean, isSafe: boolean): string {
     let safeCode = JSON.stringify(studentCode);
 
     return `
@@ -76,7 +76,7 @@ for system in final.systems:
 };
 
 export class OnEvalConfiguration extends InstructorConfiguration {
-    use(engine) {
+    use(engine: any): this {
         super.use(engine);
         this.filename = "_instructor.on_eval";
         this.code = this.main.model.assignment.onEval() || "";
@@ -110,7 +110,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         return this;
     }
 
-    success(module) {
+    success(module: any): void {
         console.log("OnEval success");
         // TODO: Actually parse results
         this.main.model.execution.instructor.globals = Sk.globals;
@@ -146,7 +146,7 @@ export class OnEvalConfiguration extends InstructorConfiguration {
         }
     }
 
-    failure(error) {
+    failure(error: any): void {
         console.log("OnEval failure", error);
         let report = this.main.model.execution.reports;
         if (error.tp$name === "GracefulExit") {

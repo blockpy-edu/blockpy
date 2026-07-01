@@ -6,14 +6,20 @@ export const EMPTY_MODULE = "let $builtinmodule = function(mod){ return mod; }";
  */
 export class Configuration {
 
-    constructor(main) {
+    main: any;
+    filename: string | null;
+    code: string | null;
+    sysmodules: any;
+    engine: any;
+
+    constructor(main: any) {
         this.main = main;
         this.filename = null;
         this.code = null;
         this.sysmodules = undefined;
     }
 
-    use(engine) {
+    use(engine: any): this {
         // Access point for instructor data
         this.engine = engine;
         Sk.executionReports = this.main.model.execution.reports;
@@ -46,7 +52,7 @@ export class Configuration {
         return this;
     }
 
-    getTimeoutPrompt(longTimeout) {
+    getTimeoutPrompt(longTimeout: boolean): string {
         if (longTimeout) {
             return "The program has taken a REALLY long time to run (30 or more seconds). You might want to cancel and check your code. Or, you can add more seconds to wait below.";
         } else {
@@ -54,7 +60,7 @@ export class Configuration {
         }
     }
 
-    getSkulptOptions() {
+    getSkulptOptions(): Record<string, any> {
         return {
             __future__: Sk.python3,
             // import
@@ -77,7 +83,7 @@ export class Configuration {
         };
     }
 
-    getUrlFromFilename(filename) {
+    getUrlFromFilename(filename: string): string {
         const found = this.main.components.fileSystem.filesToUrls[filename];
         if (found === undefined) {
             throw new Sk.builtin.OSError("File not found: " + filename);
@@ -93,12 +99,12 @@ export class Configuration {
      * @returns {String} The JavaScript source code of the file (weird, right?)
      * @throws Will throw an error if the file isn't found.
      */
-    importFile(filename) {
+    importFile(filename: string): string {
         console.warn("Unimplemented method!");
         // TODO
     };
 
-    openURL(url, data, timeout) {
+    openURL(url: any, data: any, timeout: any): any {
         //return new Promise((resolve, reject) => {
         let mockUrlData = this.main.components.fileSystem.getFile("?mock_urls.blockpy");
         if (mockUrlData == null) {
@@ -120,33 +126,33 @@ export class Configuration {
         //});
     }
 
-    openFile() {
+    openFile(): void {
         console.warn("Unimplemented method!");
         // TODO
     }
 
-    writeFile() {
+    writeFile(): void {
         console.warn("Unimplemented method!");
         // TODO
     }
 
-    print(value) {
+    print(value: any): void {
         this.main.components.console.print(value);
     }
 
-    input() {
+    input(): any {
         console.warn("Unimplemented method!");
         // TODO
     }
 
-    clearInput() {
+    clearInput(): void {
         if (this.main.model.display.clearInputs()) {
             this.main.model.execution.input([]);
         }
         this.main.model.execution.inputIndex(0);
     }
 
-    static inputMockFunction() {
+    static inputMockFunction(): string {
         if (Sk.queuedInput.length) {
             return Sk.queuedInput.pop();
         } else {
@@ -154,32 +160,32 @@ export class Configuration {
         }
     };
 
-    getImageProxy(url) {
+    getImageProxy(url: string): string {
         // TODO
         return url;
     }
 
-    step() {
+    step(): void {
 
     }
 
-    lastStep() {
+    lastStep(): void {
 
     }
 
-    isForbidden(filename) {
+    isForbidden(filename: string): boolean {
         return false;
     }
 
-    success(module) {
+    success(module: any): any {
         throw new Error("Abstract success execution");
     }
 
-    failure(error) {
+    failure(error: any): any {
         throw new Error("Abstract failure execution");
     }
 
-    finally(result) {
+    finally(result: any): void {
         // Force Pygame to stop trapping keyboard events
         if (this.main.components.console.pygameLine) {
             this.main.components.console.pygameLine.cleanup();
@@ -187,11 +193,11 @@ export class Configuration {
         }
     }
 
-    dummyOutSandbox() {
+    dummyOutSandbox(): void {
         //Sk.builtinFiles.files["src/lib/pedal/sandbox/sandbox.py"] = "class Sandbox: pass\ndef run(): pass\ndef reset(): pass\n";
     }
 
-    beforeCall(functionName, posargs, kwargs) {
+    beforeCall(functionName: string, posargs: any[], kwargs: any): void {
         //console.log("TRACKING CALL", functionName, posargs, kwargs);
         // TODO: Handle fastcall too? Check how that works in Skulpt side
         let studentModel = this.main.model.execution.reports.student;

@@ -1,7 +1,7 @@
 import {StudentConfiguration} from "./student";
 
 export class SampleConfiguration extends StudentConfiguration {
-    use(engine) {
+    use(engine: any): this {
         super.use(engine);
         // TODO: Fix to be the current sample submission
         this.filename = "answer.py";

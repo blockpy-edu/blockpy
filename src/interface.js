@@ -15,7 +15,7 @@ import {DIALOG_HTML} from "dialog.js";
 import {FEEDBACK_HTML} from "feedback.js";
 import {FILES_HTML} from "files.js";
 import {FOOTER_HTML} from "footer";
-import {EDITORS_HTML} from "editors.js";
+import {EDITORS_HTML} from "editors";
 import {CONSOLE_HTML} from "console.js";
 
 /**

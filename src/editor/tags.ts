@@ -19,7 +19,7 @@ Tags:
 `;
 
 class TagsEditorView extends AbstractEditor {
-    constructor(main, tag) {
+    constructor(main: any, tag: any) {
         super(main, tag.find(".blockpy-editor-tags"));
     }
 }

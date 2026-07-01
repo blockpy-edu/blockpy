@@ -62,7 +62,14 @@ ${editor.template}
 ).join("\n");
 
 export class Editors {
-    constructor(main, tag) {
+    main: any;
+    tag: any;
+    current: any;
+    registered_: any[];
+    extensions_: Record<string, any>;
+    byName_: Record<string, any>;
+
+    constructor(main: any, tag: any) {
         this.main = main;
         this.tag = tag;
         this.current = null;
@@ -73,7 +80,7 @@ export class Editors {
         this.main.model.display.filename.subscribe(this.changeEditor, this);
     }
 
-    registerEditor(data) {
+    registerEditor(data: any): void {
         let extensions = data.extensions;
         let instance = new data.constructor(this.main, this.tag);
         instance.name = data.name;
@@ -84,11 +91,11 @@ export class Editors {
         }
     }
 
-    byName(name) {
+    byName(name: string): any {
         return this.byName_[name.toLowerCase()];
     }
 
-    changeEditor(newFilename) {
+    changeEditor(newFilename: string): void {
         let oldEditor = this.current;
         let newEditor = this.getEditor(newFilename, oldEditor);
         if (oldEditor !== null) {
@@ -98,7 +105,7 @@ export class Editors {
         this.current.enter(newFilename, oldEditor);
     }
 
-    static parseFilename(path) {
+    static parseFilename(path: string): { space: string; name: string; type: string } {
         let space = path.charAt(0);
         if (SPECIAL_NAMESPACES.indexOf(space) !== -1) {
             path = path.substr(1);
@@ -110,7 +117,7 @@ export class Editors {
         return {"space": space, "name": name, "type": type};
     }
 
-    getEditor(path) {
+    getEditor(path: string): any {
         let {space, name, type} = Editors.parseFilename(path);
         if (type === ".blockpy" && path in this.extensions_) {
             return this.extensions_[path];

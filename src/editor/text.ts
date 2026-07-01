@@ -1,24 +1,28 @@
 import {AbstractEditor} from "./abstract_editor";
 import {default_header} from "./default_header";
 
-export const JSON_EDITOR_HTML = `
+export const TEXT_EDITOR_HTML = `
     ${default_header}
-     <div>
-        <textarea class="blockpy-editor-json"></textarea>
+    <div>
+    <textarea class="blockpy-editor-text"></textarea>
     </div>
 `;
 
-class JsonEditorView extends AbstractEditor {
-    constructor(main, tag) {
+class TextEditorView extends AbstractEditor {
+    codeMirror: any;
+    dirty: boolean;
+    currentSubscription: any;
+    currentListener: any;
+
+    constructor(main: any, tag: any) {
         super(main, tag);
-        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-json")[0], {
+        this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-text")[0], {
             showCursorWhenSelecting: true,
             lineNumbers: true,
             firstLineNumber: 1,
             indentUnit: 4,
             tabSize: 4,
             indentWithTabs: false,
-            mode: "json",
             extraKeys: {
                 "Tab": "indentMore",
                 "Shift-Tab": "indentLess",
@@ -37,7 +41,7 @@ class JsonEditorView extends AbstractEditor {
         this.dirty = false;
     }
 
-    enter(newFilename, oldEditor) {
+    enter(newFilename: string, oldEditor: any): void {
         super.enter(newFilename, oldEditor);
         this.dirty = false;
         this.updateEditor(this.file.handle());
@@ -52,10 +56,9 @@ class JsonEditorView extends AbstractEditor {
         }
         // TODO: update dynamically when changing instructor status
         this.codeMirror.setOption("readOnly", newFilename.startsWith("&") && !this.main.model.display.instructor());
-
     }
 
-    updateEditor(newContents) {
+    updateEditor(newContents: string): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -65,7 +68,7 @@ class JsonEditorView extends AbstractEditor {
         }
     }
 
-    updateHandle(event) {
+    updateHandle(event: any): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -74,18 +77,18 @@ class JsonEditorView extends AbstractEditor {
         }
     }
 
-    exit(newFilename, oldEditor, newEditor) {
+    exit(newFilename: string, oldEditor: any, newEditor: any): void {
         // Remove subscriber
         this.currentSubscription.dispose();
         this.codeMirror.off("change", this.currentListener);
         this.codeMirror.setOption("readOnly", false);
-        super.exit(newFilename, oldEditor);
+        super.exit(newFilename, oldEditor, newEditor);
     }
 }
 
-export const JsonEditor = {
-    name: "JSON",
-    extensions: [".json"],
-    constructor: JsonEditorView,
-    template: JSON_EDITOR_HTML
+export const TextEditor = {
+    name: "Text",
+    extensions: [".txt"],
+    constructor: TextEditorView,
+    template: TEXT_EDITOR_HTML
 };

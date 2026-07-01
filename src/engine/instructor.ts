@@ -8,7 +8,7 @@ const UTILITY_MODULE_CODE = "var $builtinmodule = " + $sk_mod_instructor.toStrin
 const COVERAGE_MODULE_CODE = $sk_mod_coverage;
 
 export class InstructorConfiguration extends Configuration {
-    use(engine) {
+    use(engine: any): this {
         super.use(engine);
         // Instructors get 4 seconds
         Sk.execLimitFunction = () =>
@@ -41,12 +41,12 @@ export class InstructorConfiguration extends Configuration {
         return this;
     }
 
-    print(value) {
+    print(value: any): void {
         super.print(value);
         console.info("Printed:", value);
     }
 
-    clearExistingStudentImports() {
+    clearExistingStudentImports(): any {
         let sysmodules = this.main.model.execution.instructor.sysmodules;
         // Remove any existing __main__ modules
         if (sysmodules !== undefined) {
@@ -61,7 +61,7 @@ export class InstructorConfiguration extends Configuration {
         return sysmodules;
     }
 
-    getAllStudentFiles() {
+    getAllStudentFiles(): Record<string, string> {
         const files = {
             "answer.py": this.main.model.ui.files.getStudentCode()
         };
@@ -78,7 +78,7 @@ export class InstructorConfiguration extends Configuration {
         return files;
     }
 
-    getAllFilenames() {
+    getAllFilenames(): string[] {
         function clean(filename) {
             filename = chompSpecialFile(filename);
             if (filename.endsWith(".py")) {
@@ -94,7 +94,7 @@ export class InstructorConfiguration extends Configuration {
         ];
     }
 
-    getTimeoutPrompt(longTimeout) {
+    getTimeoutPrompt(longTimeout: boolean): string {
         if (longTimeout) {
             return "The instructor code has taken a REALLY long time to check your code (30 or more seconds). You might want to cancel and check your code (or get help from an instructor). Or, you can add more seconds to wait below.";
         } else {
@@ -102,7 +102,7 @@ export class InstructorConfiguration extends Configuration {
         }
     }
 
-    openFile(filename) {
+    openFile(filename: string): string {
         let found = this.main.components.fileSystem.searchForFile(filename, false);
         if (found === undefined) {
             throw new Sk.builtin.OSError("File not found: "+filename);
@@ -111,7 +111,7 @@ export class InstructorConfiguration extends Configuration {
         }
     }
 
-    openURL(url, data, timeout) {
+    openURL(url: any, data: any, timeout: any): any {
         // TODO: Figure out why parameters are misaligned..?
         if (data.v === "OPENAI") {
             return this.main.components.server.openaiProxy(timeout.v);
@@ -120,7 +120,7 @@ export class InstructorConfiguration extends Configuration {
         }
     }
 
-    importFile(filename) {
+    importFile(filename: string): string {
         if (filename === "./answer.py") {
             return this.main.model.submission.code();
         } else if (filename === "./_instructor/on_run.py") {
@@ -143,7 +143,7 @@ export class InstructorConfiguration extends Configuration {
         }
     };
 
-    input(promptMessage) {
+    input(promptMessage: string): any {
         //return "ApplePie";
         console.log(">>>", this.main.model.execution.input(), this.main.model.execution.inputIndex());
         if (this.main.model.execution.inputIndex() < this.main.model.execution.input().length) {
@@ -159,7 +159,7 @@ export class InstructorConfiguration extends Configuration {
         });*/
     }
 
-    beforeCall(functionName, posargs, kwargs) {
+    beforeCall(functionName: string, posargs: any[], kwargs: any): void {
         let studentModel = this.main.model.execution.reports.student;
         //console.log("HEY INSTRUCTOR CALL", functionName, studentModel.tracing);
         if (studentModel.tracing && studentModel.tracing.length) {

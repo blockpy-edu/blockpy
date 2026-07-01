@@ -2,7 +2,7 @@ import {indent} from "../utilities";
 import {StatusState} from "../server";
 import {InstructorConfiguration} from "./instructor";
 
-export function findActualInstructorOffset(instructorCode) {
+export function findActualInstructorOffset(instructorCode: string): number {
     const index = instructorCode.indexOf(INSTRUCTOR_MARKER);
     const before = instructorCode.slice(0, index);
     const match = before.match(NEW_LINE_REGEX);
@@ -14,7 +14,7 @@ export const NEW_LINE_REGEX = /\n/g;
 /**
  * @return {string}
  */
-export const WRAP_INSTRUCTOR_CODE = function (studentFiles, instructorCode, quick, isSafe) {
+export const WRAP_INSTRUCTOR_CODE = function (studentFiles: Record<string, string>, instructorCode: string, quick: boolean, isSafe: boolean): string {
     let safeCode = JSON.stringify(studentFiles);
     let skip_tifa = quick ? "True": "False";
 
@@ -98,7 +98,7 @@ for system in final.systems:
 };
 
 export class OnRunConfiguration extends InstructorConfiguration {
-    use(engine) {
+    use(engine: any): this {
         super.use(engine);
         this.filename = "_instructor.on_run";
         this.code = this.main.model.assignment.onRun();
@@ -138,7 +138,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         return this;
     }
 
-    success(module) {
+    success(module: any): void {
         // TODO Logging!!!!
         //console.log("OnRun success");
         // TODO: Actually parse results
@@ -175,7 +175,7 @@ export class OnRunConfiguration extends InstructorConfiguration {
         }
     }
 
-    failure(error) {
+    failure(error: any): void {
         console.error("OnRun failure", error);
         let report = this.main.model.execution.reports;
         if (error.tp$name === "GracefulExit") {

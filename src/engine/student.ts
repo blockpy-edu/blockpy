@@ -1,7 +1,7 @@
 import {Configuration, EMPTY_MODULE} from "./configurations";
 
 export class StudentConfiguration extends Configuration {
-    use(engine) {
+    use(engine: any): this {
         super.use(engine);
         // Limit execution to 4 seconds
         let settings = this.main.model.settings;
@@ -22,7 +22,7 @@ export class StudentConfiguration extends Configuration {
         return this;
     }
 
-    openFile(filename) {
+    openFile(filename: string): string {
         let found = this.main.components.fileSystem.searchForFile(filename, true);
         //console.log(filename, found);
         if (found === undefined) {
@@ -36,7 +36,7 @@ export class StudentConfiguration extends Configuration {
         }
     }
 
-    importFile(filename) {
+    importFile(filename: string): string {
         if (this.isForbidden(filename)) {
             throw "File not accessible: '" + filename + "'";
         } else if (filename === "./answer.py") {
@@ -55,11 +55,11 @@ export class StudentConfiguration extends Configuration {
         }
     }
 
-    input(promptMessage) {
+    input(promptMessage: string): any {
         return this.main.components.console.input(promptMessage);
     }
 
-    isForbidden(filename) {
+    isForbidden(filename: string): boolean {
         return filename.startsWith("src/lib/utility/") ||
             filename.startsWith("src/lib/pedal/") ||
             filename.startsWith("./_instructor/");
@@ -77,7 +77,7 @@ export class StudentConfiguration extends Configuration {
      * @param {String} filename - The name of the python file being executed (e.g., "__main__.py").
      * @param {Boolean} isDocstring - Whether or not this is an actual line or a docstring.
      */
-    step(globals, locals, lineNumber, columnNumber, filename, isDocstring, astName) {
+    step(globals: any, locals: any, lineNumber: number, columnNumber: number, filename: string, isDocstring: boolean, astName: string): void {
         if (filename === "answer.py") {
             /*if (execStack) {
                 console.log(execStack.map(([n, o]) => [n, {...o}]));
@@ -109,7 +109,7 @@ export class StudentConfiguration extends Configuration {
      * Called at the end of the Skulpt execution to terminate the executionBuffer
      * and hand it off to the execution trace in the model.
      */
-    lastStep() {
+    lastStep(): void {
         let execution = this.main.model.execution;
         execution.student.currentTraceData(this.engine.executionBuffer.trace);
         execution.student.currentStep(this.engine.executionBuffer.step);
@@ -119,7 +119,7 @@ export class StudentConfiguration extends Configuration {
         execution.student.currentTraceStep(this.engine.executionBuffer.step);
     };
 
-    getLines(ast) {
+    getLines(ast: any): number[] {
         let visitedLines = new Set();
         let visitBody = (node) => {
             if (node.lineno !== undefined) {
@@ -142,7 +142,7 @@ export class StudentConfiguration extends Configuration {
     /**
      * Ensure that the parse information is up-to-date
      */
-    updateParse() {
+    updateParse(): boolean {
         let report = this.main.model.execution.reports;
         // Hold all the actually discovered lines from the parse
         let lines = [];
@@ -174,7 +174,7 @@ export class StudentConfiguration extends Configuration {
         return true;
     }
 
-    showErrors() {
+    showErrors(): void {
         let report = this.main.model.execution.reports;
         if (report["student"].success) {
             this.main.components.feedback.clear("Execution finished. No errors to report.");
@@ -183,7 +183,7 @@ export class StudentConfiguration extends Configuration {
         }
     }
 
-    provideSecretError() {
+    provideSecretError(): void {
         let report = this.main.model.execution.reports;
         let feedback = this.main.components.feedback;
         if (!report["student"].success) {

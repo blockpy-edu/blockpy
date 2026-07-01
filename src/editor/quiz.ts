@@ -7,7 +7,12 @@ export const QUIZ_EDITOR_HTML = `
 `;
 
 class QuizEditorView extends AbstractEditor {
-    constructor(main, tag) {
+    codeMirror: any;
+    dirty: boolean;
+    currentSubscription: any;
+    currentListener: any;
+
+    constructor(main: any, tag: any) {
         super(main, tag);
         this.codeMirror = CodeMirror.fromTextArea(tag.find(".blockpy-editor-quiz")[0], {
             showCursorWhenSelecting: true,
@@ -34,7 +39,7 @@ class QuizEditorView extends AbstractEditor {
         this.dirty = false;
     }
 
-    enter(newFilename, oldEditor) {
+    enter(newFilename: string, oldEditor: any): void {
         super.enter(newFilename, oldEditor);
         this.dirty = false;
         this.updateEditor(this.file.handle());
@@ -51,7 +56,7 @@ class QuizEditorView extends AbstractEditor {
         this.codeMirror.setOption("readOnly", newFilename.startsWith("&") && !this.main.model.display.instructor());
     }
 
-    updateEditor(newContents) {
+    updateEditor(newContents: string): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -61,7 +66,7 @@ class QuizEditorView extends AbstractEditor {
         }
     }
 
-    updateHandle(event) {
+    updateHandle(event: any): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -70,12 +75,12 @@ class QuizEditorView extends AbstractEditor {
         }
     }
 
-    exit(newFilename, oldEditor, newEditor) {
+    exit(newFilename: string, oldEditor: any, newEditor: any): void {
         // Remove subscriber
         this.currentSubscription.dispose();
         this.codeMirror.off("change", this.currentListener);
         this.codeMirror.setOption("readOnly", false);
-        super.exit(newFilename, oldEditor);
+        super.exit(newFilename, oldEditor, newEditor);
     }
 }
 

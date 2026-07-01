@@ -8,9 +8,14 @@ export const MARKDOWN_EDITOR_HTML = `
 
 
 class MarkdownEditorView extends AbstractEditor {
-    constructor(main, tag) {
+    mde: any;
+    dirty: boolean;
+    currentSubscription: any;
+    currentListener: any;
+
+    constructor(main: any, tag: any) {
         super(main, tag);
-        this.mde = new EasyMDE({
+        this.mde = new (window as any).EasyMDE({
             element: tag.find(".blockpy-editor-markdown")[0],
             autoDownloadFontAwesome: false,
             forceSync: true,
@@ -26,7 +31,7 @@ class MarkdownEditorView extends AbstractEditor {
         this.dirty = false;
     }
 
-    enter(newFilename, oldEditor) {
+    enter(newFilename: string, oldEditor: any): void {
         super.enter(newFilename, oldEditor);
         this.dirty = false;
         this.updateEditor(this.file.handle());
@@ -41,7 +46,7 @@ class MarkdownEditorView extends AbstractEditor {
         }
     }
 
-    updateEditor(newContents) {
+    updateEditor(newContents: string): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -51,7 +56,7 @@ class MarkdownEditorView extends AbstractEditor {
         }
     }
 
-    updateHandle(event) {
+    updateHandle(event: any): void {
         this.dirty = !this.dirty;
         if (this.dirty) {
             this.dirty = true;
@@ -60,11 +65,11 @@ class MarkdownEditorView extends AbstractEditor {
         }
     }
 
-    exit(newFilename, oldEditor, newEditor) {
+    exit(newFilename: string, oldEditor: any, newEditor: any): void {
         // Remove subscriber
         this.currentSubscription.dispose();
         this.mde.codemirror.off("change", this.currentListener);
-        super.exit(newFilename, oldEditor);
+        super.exit(newFilename, oldEditor, newEditor);
     }
 }
 

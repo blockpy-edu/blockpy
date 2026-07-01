@@ -2,7 +2,7 @@ import {StudentConfiguration} from "./student";
 import {StatusState} from "../server";
 
 export class RunConfiguration extends StudentConfiguration {
-    use(engine) {
+    use(engine: any): this {
         this.main.model.execution.feedback.message("Running...");
         this.filename = "answer";
         this.code = this.main.model.ui.files.getStudentCode();
@@ -39,7 +39,7 @@ export class RunConfiguration extends StudentConfiguration {
         return this;
     }
 
-    success(module) {
+    success(module: any): Promise<void> {
         console.log("Run success");
         let message = {
             "inputs": this.main.model.execution.input().join("\n"),
@@ -75,7 +75,7 @@ export class RunConfiguration extends StudentConfiguration {
         });
     }
 
-    failure(error) {
+    failure(error: any): Promise<void> {
         console.error("Run failure", error);
         this.main.model.status.onExecution(StatusState.FAILED);
         let report = this.main.model.execution.reports;

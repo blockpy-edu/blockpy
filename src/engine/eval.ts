@@ -3,7 +3,7 @@ import {StatusState} from "../server";
 import {BlockPyTrace} from "../trace";
 
 export class EvalConfiguration extends StudentConfiguration {
-    use(engine, code) {
+    use(engine: any, code: string): this {
         // TODO: fix to be currently added line
         this.main.model.execution.feedback.message("Running...");
         this.filename = "answer";
@@ -22,7 +22,7 @@ export class EvalConfiguration extends StudentConfiguration {
         return this;
     }
 
-    success(module) {
+    success(module: any): Promise<void> {
         console.log("Eval success");
         this.main.components.server.logEvent("X-Evaluate.Program", "", "", "", "evaluations");
         this.main.model.status.onExecution(StatusState.READY);
@@ -50,7 +50,7 @@ export class EvalConfiguration extends StudentConfiguration {
         });
     }
 
-    failure(error) {
+    failure(error: any): Promise<void> {
         console.log("Eval failure", error);
         this.main.model.status.onExecution(StatusState.FAILED);
         let report = this.main.model.execution.reports;
