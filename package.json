@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "webpack --progress --color --watch --env dev",
     "build": "webpack --env dev && webpack --env build"
   },
@@ -24,12 +24,14 @@
   },
   "homepage": "https://github.com/RealTimeWeb/blockpy#readme",
   "devDependencies": {
-    "@babel/core": "7.0.0",
-    "@babel/preset-env": "7.11.0",
-    "babel-loader": "8.1.0",
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "babel-jest": "^29.7.0",
+    "babel-loader": "^8.4.1",
     "css-loader": "4.2.0",
     "eslint": "5.0.0",
     "eslint-loader": "4.0.2",
+    "jest": "^29.7.0",
     "jquery": "3.5.1",
     "knockout": "3.5.1",
     "mini-css-extract-plugin": "0.9.0",
