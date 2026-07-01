@@ -10,9 +10,9 @@ import {$builtinmodule as weakrefModule} from "skulpt_modules/weakref";
 //import {$builtinmodule as matplotlibModule} from "skulpt_modules/matplotlib2";
 import {LocalStorageWrapper} from "storage";
 import {EditorsEnum} from "editors";
-import {DisplayModes} from "editor/python.js";
-import {StatusState} from "server.js";
-import {makeInterface, makeExtraInterfaceSubscriptions, SecondRowSecondPanelOptions} from "interface.js";
+import {DisplayModes} from "editor/python";
+import {StatusState} from "server";
+import {makeInterface, makeExtraInterfaceSubscriptions, SecondRowSecondPanelOptions} from "interface";
 import {Editors} from "editors";
 import {
     BlockPyFileSystem,
@@ -23,10 +23,10 @@ import {
     UNRENAMABLE_FILES
 } from "./files";
 import {uploadFile, downloadFile} from "./editor/abstract_editor";
-import {BlockPyEngine} from "engine.js";
+import {BlockPyEngine} from "engine";
 import {AST_DESCRIPTIONS, BlockPyTrace} from "./trace";
 import {BlockPyConsole} from "./console";
-import {BlockPyFeedback} from "feedback.js";
+import {BlockPyFeedback} from "feedback";
 import {BlockPyServer} from "./server";
 import {BlockPyDialog} from "./dialog";
 import {AssigmentType, loadAssignmentSettings, makeAssignmentSettingsModel} from "./editor/assignment_settings";

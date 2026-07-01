@@ -10,13 +10,13 @@
  *  Row 5: Footer Row
  */
 
-import {TRACE_HTML} from "trace.js";
-import {DIALOG_HTML} from "dialog.js";
-import {FEEDBACK_HTML} from "feedback.js";
-import {FILES_HTML} from "files.js";
+import {TRACE_HTML} from "trace";
+import {DIALOG_HTML} from "dialog";
+import {FEEDBACK_HTML} from "feedback";
+import {FILES_HTML} from "files";
 import {FOOTER_HTML} from "footer";
 import {EDITORS_HTML} from "editors";
-import {CONSOLE_HTML} from "console.js";
+import {CONSOLE_HTML} from "console";
 
 /**
  * The different layout options of the panes in the second row of the layout.

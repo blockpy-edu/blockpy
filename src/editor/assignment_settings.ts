@@ -49,7 +49,7 @@ export let AssigmentType = {
     READING: "reading"
 };
 
-function getDocumentation(name) {
+function getDocumentation(name: string): string {
     for (let i=0; i < ASSIGNMENT_SETTINGS.length; i++) {
         if (ASSIGNMENT_SETTINGS[i][0] === name) {
             return ASSIGNMENT_SETTINGS[i][4];
@@ -58,7 +58,7 @@ function getDocumentation(name) {
     return "Documentation not found for field";
 }
 
-function makeStartViewTab(name, icon, mode) {
+function makeStartViewTab(name: string, icon: string, mode: string): string {
     return `<label class="btn btn-outline-secondary blockpy-mode-set-blocks"
                 data-bind="css: {active: assignment.settings.startView() === '${mode}'},
                            click: assignment.settings.startView.bind($data, '${mode}')">
@@ -305,7 +305,7 @@ export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
     </div>
 `;
 
-export function saveAssignmentSettings(model) {
+export function saveAssignmentSettings(model: any): string {
     let settings = {};
     ASSIGNMENT_SETTINGS.forEach(setting => {
         let clientName = setting[0], serverName = setting[1], defaultValue = setting[2];
@@ -318,7 +318,7 @@ export function saveAssignmentSettings(model) {
     return JSON.stringify(settings);
 }
 
-export function loadAssignmentSettings(model, settings) {
+export function loadAssignmentSettings(model: any, settings: any): void {
     if (settings) {
         settings = JSON.parse(settings);
         ASSIGNMENT_SETTINGS.forEach(setting => {
@@ -336,7 +336,7 @@ export function loadAssignmentSettings(model, settings) {
     }
 }
 
-export function makeAssignmentSettingsModel(configuration) {
+export function makeAssignmentSettingsModel(configuration: any): Record<string, any> {
     let settings = {};
     ASSIGNMENT_SETTINGS.forEach(setting => {
         let clientName = setting[0], serverName = setting[1], defaultValue = setting[2],

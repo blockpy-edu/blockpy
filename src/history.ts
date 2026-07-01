@@ -33,13 +33,16 @@ export const HISTORY_TOOLBAR_HTML = `
 /**
  * An object for displaying the user's coding logs (their history).
  * A lightweight component, its only job is to open a dialog.
- *
- * @constructor
- * @this {BlockPyHistory}
- * @param {Object} main - The main BlockPy instance
  */
 export class BlockPyHistory {
-    constructor(main, tag) {
+    main: any;
+    tag: any;
+    currentId: number | null;
+    history: any[];
+    editEvents: any[];
+    selector: any;
+
+    constructor(main: any, tag: any) {
         this.main = main;
         this.tag = tag;
         this.currentId = null;
@@ -47,7 +50,7 @@ export class BlockPyHistory {
         this.editEvents = [];
     }
 
-    load(history) {
+    load(history: any[]): void {
         this.history = history;
         this.editEvents = [];
         this.selector = $(".blockpy-history-selector").empty();
@@ -59,7 +62,7 @@ export class BlockPyHistory {
                     entry.event_type !== "Intervention" &&
                     (!this.main.model.assignment.hidden() || entry.event_type !== "X-Submission.LMS")
             ))
-            .forEach((entry, index) => {
+            .forEach((entry: any) => {
                 let event_type = REMAP_EVENT_TYPES[entry.event_type] || entry.event_type;
                 let displayed = prettyPrintDateTime(entry.client_timestamp) +" - "+event_type;
                 let disable = (entry.event_type !== "File.Edit");
@@ -72,41 +75,41 @@ export class BlockPyHistory {
                 this.selector.append(option);
             });
         this.selector.val(Math.max(0, editId-1));
-        this.selector.change((evt) => {
+        this.selector.change(() => {
             this.updateEditor();
         });
     }
 
-    moveToStart() {
+    moveToStart(): void {
         this.selector.val(0);
         this.updateEditor();
     }
 
-    movePrevious() {
+    movePrevious(): void {
         let currentId = parseInt(this.selector.val(), 10);
         this.selector.val(Math.max(0, currentId-1));
         this.updateEditor();
     }
 
-    moveNext() {
+    moveNext(): void {
         let currentId = parseInt(this.selector.val(), 10);
         this.selector.val(Math.min(this.editEvents.length-1, currentId+1));
         this.updateEditor();
     }
 
-    moveToMostRecent() {
+    moveToMostRecent(): void {
         this.selector.val(this.editEvents.length-1);
         this.updateEditor();
     }
 
-    updateEditor() {
+    updateEditor(): void {
         if (this.editEvents.length) {
             let currentId = parseInt(this.selector.val(), 10);
             this.main.components.pythonEditor.bm.setCode(this.editEvents[currentId].message);
         }
     }
 
-    use() {
+    use(): void {
         if (this.editEvents.length) {
             let currentId = parseInt(this.selector.val(), 10);
             let code = this.editEvents[currentId].message;
@@ -115,15 +118,32 @@ export class BlockPyHistory {
         }
     }
 
-    isEditEvent(entry) {
+    isEditEvent(entry: any): boolean {
         return ((entry.event_type === "File.Edit" ||
                  entry.event_type === "File.Create") &&
                 this.main.model.display.filename() === entry.file_path);
     }
 
+    /**
+     * Opens the history dialog box. This requires a trip to the server and
+     * occurs asynchronously. The users' code is shown in preformatted text
+     * tags (no code highlighting currently) along with the timestamp.
+     */
+    openDialog(): void {
+        let dialog = this.main.components.dialog;
+        let body = "<pre>a = 0</pre>";
+        this.main.components.server.getHistory(function (data: any) {
+            body = data.reverse().reduce(function (complete: string, elem: any) {
+                let complete_str = prettyPrintDateTime(elem.time);
+                let new_line = "<b>"+complete_str+"</b><br><pre>"+elem.code+"</pre>";
+                return complete+"\n"+new_line;
+            }, "");
+            dialog.show("Work History", body, function() {});
+        });
+    }
 }
 
-const REMAP_EVENT_TYPES = {
+const REMAP_EVENT_TYPES: Record<string, string> = {
     "Session.Start": "Began session",
     "X-IP.Change": "Changed IP address",
     "File.Edit": "Edited code",
@@ -145,7 +165,7 @@ const weekDays = [
     "Sat"
 ];
 
-function isSameDay(first, second) {
+function isSameDay(first: Date, second: Date): boolean {
     return first.getDate() === second.getDate() &&
         first.getMonth() === second.getMonth() &&
         first.getFullYear() === second.getFullYear();
@@ -157,14 +177,7 @@ function isSameDay(first, second) {
  * @param {String} timeString - the string representation of time ("YYYYMMDD HHMMSS")
  * @returns {String} - A human-readable time string.
  */
-function prettyPrintDateTime(timeString) {
-    /*let year = timeString.slice(0, 4),
-        month = parseInt(timeString.slice(4, 6), 10)-1,
-        day = timeString.slice(6, 8),
-        hour = timeString.slice(9, 11),
-        minutes = timeString.slice(11, 13),
-        seconds = timeString.slice(13, 15);*/
-    // TODO: Handle timezones correctly
+function prettyPrintDateTime(timeString: string | undefined): string {
     if (timeString === undefined) {
         return "Undefined Time";
     }
@@ -183,22 +196,3 @@ function prettyPrintDateTime(timeString) {
         }
     }
 }
-
-
-/**
- * Opens the history dialog box. This requires a trip to the server and
- * occurs asynchronously. The users' code is shown in preformatted text
- * tags (no code highlighting currently) along with the timestamp.
- */
-BlockPyHistory.prototype.openDialog = function() {
-    var dialog = this.main.components.dialog;
-    var body = "<pre>a = 0</pre>";
-    this.main.components.server.getHistory(function (data) {
-        body = data.reverse().reduce(function (complete, elem) { 
-            var complete_str = prettyPrintDateTime(elem.time);
-            var new_line = "<b>"+complete_str+"</b><br><pre>"+elem.code+"</pre>";
-            return complete+"\n"+new_line;
-        }, "");
-        dialog.show("Work History", body, function() {});
-    });
-};

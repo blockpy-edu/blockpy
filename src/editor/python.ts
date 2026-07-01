@@ -19,7 +19,7 @@ export let DisplayModes = {
     TEXT: "text"
 };
 
-function makeTab(name, icon, mode) {
+function makeTab(name: string, icon: string, mode: string): string {
     return `<label class="btn btn-outline-secondary blockpy-mode-set-blocks"
                 data-bind="css: {active: display.pythonMode() === '${mode}'},
                            click: ui.editors.python.updateMode.bind($data, '${mode}')">
@@ -159,7 +159,7 @@ export const PYTHON_EDITOR_HTML = `
 
 
 
-function convertIpynbToPython(code) {
+function convertIpynbToPython(code: string): string {
     let ipynb = JSON.parse(code);
     let isUsable = function(cell) {
         if (cell.cell_type === "code") {
