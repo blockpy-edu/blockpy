@@ -1,0 +1,410 @@
+import {AbstractEditor} from "./abstract_editor";
+import {DisplayModes} from "./python";
+
+const ASSIGNMENT_SETTINGS = [
+    ["toolbox", "toolbox", "normal", "toolbox", "Which version of the toolbox to present to the user."],
+    ["type", "type", "blockpy", "type", "The type of question; BlockPy programming problems are the default, but we also support static readings, quiz questions, and a Maze game."],
+    ["passcode", "passcode", "", "string", "A string that the user must enter to access the problem. If blank, then no passcode is prompted."],
+    //["toolboxLevel", "toolbox_level", "normal", "toolbox", "INCOMPLETE: What level of toolbox to present to the user (hiding and showing categories)."],
+    ["startView", "start_view", DisplayModes.TEXT, DisplayModes, "The Python editor mode to start in when the student starts the problem."],
+    ["datasets", "datasets", "", "string", "The current list of datasets available on load as a comma-separated string."],
+    ["disableTimeout", "disable_timeout", false, "bool", "If checked, then students code is allowed to run without timeouts (potentially allowing infinite loops)."],
+    ["partId", "part_id", "", "string", "The Part ID of an Assignment that this editor is responsible for. Assignments can have regions (\"Parts\") that behave independently to the user but all correspond to the same assignment on the backend. Blank corresponds to the full document. Note that most assignment settings will apply UNIVERSALLY across all parts, including the on_run.py and the other settings on this page."],
+    ["isParsons", "is_parsons", false, "bool", "If checked, then this is a parson's style question (jumbled)."],
+    ["saveTurtleOutput", "save_turtle_output", false, "bool", "If checked, then turtle (and pygame) output is saved whenever the program uses it."],
+    ["disableFeedback", "disable_feedback", false, "bool", "If checked, then no instructor scripts are run (e.g., on_run and on_eval)."],
+    ["disableInstructorRun", "disable_instructor_run", false, "bool", "If checked, then the instructor on_run will not automatically run the students' code. This still runs the students' code once beforehand, but the output/data will not be available to the instructor's on_run.py script."],
+    ["disableStudentRun", "disable_student_run", false, "bool", "If checked, then the run button no longer run the students' code. This still runs the instructor's feedback on_run script."],
+    ["disableTifa", "disable_tifa", false, "bool", "If checked, then do not automatically run Tifa (which can be slow)."],
+    ["disableTrace", "disable_trace", false, "bool", "If checked, then the students code will not have its execution traced (no variables recorded, no coverage tracked)."],
+    ["disableEdit", "disable_edit", false, "bool", "If checked, then the students' file will not be editable."],
+    ["preloadAllFiles", "preload_all_files", false, "bool", "If checked, then the students can upload and use images and other files. This preloads all available files and images. You can filter them using the Preloaded Files setting."],
+    ["enableImages", "can_image", false, "bool", "If checked, then users can copy/paste images directly into the text editor."],
+    ["enableBlocks", "can_blocks", true, "bool", "If checked, then the student can edit the block interface (if not, then it is visible but not editable)."],
+    ["canClose", "can_close", false, "bool", "If checked, then the student should mark their submission closed when they are done. There is no way to force a student to do so. Unlike Reviewed, this still submits the correctness."],
+    ["onlyInteractive", "only_interactive", false, "bool", "If checked, the editors are hidden, the program is automatically run, and then the console enters Eval mode (interactive)."],
+    ["onlyUploads", "only_uploads", false, "bool", "If checked, then the students' file will not be directly editable (they will have to upload submissions)."],
+    // What menus/feedback to show and hide
+    ["hideSubmission", "hide_submission", false, "bool", "If checked, then students will not be able to see their submission's code or history on Canvas."],
+    ["hideFiles", "hide_files", true, "bool", "If checked, then students will not see the View Files toolbar."],
+    ["hideQueuedInputs", "hide_queued_inputs", false, "bool", "If checked, then the students cannot access the queued inputs box (makes repeated debugging easier for the input function)."],
+    ["hideEditors", "hide_editors", false, "bool", "If checked, then all of the editors are hidden."],
+    ["hideMiddlePanel", "hide_middle_panel", false, "bool", "If checked, then the console and feedback areas is hidden."],
+    ["hideAll", "hide_all", false, "bool", "INCOMPLETE: If checked, then the entire interface is hidden."],
+    ["hideEvaluate", "hide_evaluate", false, "bool", "If checked, then the Evaluate button is not shown on the console."],
+    ["hideImportDatasetsButton", "hide_import_datasets_button", false, "bool", "If checked, then students cannot see the import datasets button."],
+    // TODO: Fix this one to be settable
+    ["hideImportStatements", "hide_import_statements", false, "bool", "INCOMPLETE: If checked, certain kinds of import statements (matplotlib, turtle, datasets) are not shown in the block interface."],
+    ["hideCoverageButton", "hide_coverage_button", false, "bool", "INCOMPLETE: If checked, the coverage button is not shown."],
+    ["hideTraceButton", "hide_trace_button", false, "bool", "If checked, then the Trace button is not shown."],
+    ["smallLayout", "small_layout", false, "bool", "If checked, then the interface fits into a smaller region."],
+    ["hasClock", "has_clock", false, "bool", "If checked, then a clock is shown in the top right corner."],
+    ["preloadFiles", "preload_files", "", "string", "A JSON structure representing the files that should be loaded on start from the remote, as if they were local."]
+];
+
+export let AssigmentType = {
+    BLOCKPY: "blockpy",
+    MAZE: "maze",
+    QUIZ: "quiz",
+    READING: "reading"
+};
+
+function getDocumentation(name: string): string {
+    for (let i=0; i < ASSIGNMENT_SETTINGS.length; i++) {
+        if (ASSIGNMENT_SETTINGS[i][0] === name) {
+            return ASSIGNMENT_SETTINGS[i][4];
+        }
+    }
+    return "Documentation not found for field";
+}
+
+function makeStartViewTab(name: string, icon: string, mode: string): string {
+    return `<label class="btn btn-outline-secondary blockpy-mode-set-blocks"
+                data-bind="css: {active: assignment.settings.startView() === '${mode}'},
+                           click: assignment.settings.startView.bind($data, '${mode}')">
+                <span class='fas fa-${icon}'></span>
+                <input type="radio" name="blockpy-start-view-set" autocomplete="off" checked> ${name}
+            </label>`;
+}
+
+const ASSIGNMENT_SETTINGS_BOOLEAN_COMPONENTS_HTML = ASSIGNMENT_SETTINGS
+    // Only handle the simple booleans this way
+    .filter((setting) => setting[3] === "bool")
+    .map((setting) => {
+        let prettyName = setting[1].split("_").map(word=>(word.charAt(0).toUpperCase()+word.slice(1))).join(" ");
+        return `
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-${setting[0]}">${prettyName}</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-${setting[0]}"
+                    data-bind="checked: assignment.settings.${setting[0]}">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    ${setting[4]}
+                </small>
+            </div>
+        </div>
+        `;
+    }).join("\n\n");
+
+export const ASSIGNMENT_SETTINGS_EDITOR_HTML = `
+    <div class="blockpy-view-settings">
+    
+    <form>
+
+        <div class="form-group row">
+            <div class="col-sm-12 mx-auto">
+                <button type="button" class="btn btn-success"
+                    data-bind="click: ui.editors.settings.save">Save changes</button>
+            </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="blockpy-settings-name" class="col-sm-2 col-form-label text-right">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-name"
+                data-bind="value: assignment.name">
+                <small class="form-text text-muted">
+                    The student-facing name of the assignment. Assignments within a group are ordered alphabetically
+                    by their name, so you may want to use a naming scheme like "#43.5) Whatever".
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-url" class="col-sm-2 col-form-label text-right">URL:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-url"
+                data-bind="value: assignment.url">
+                <small class="form-text text-muted">
+                    The course-unique URL that can be used to consistently refer to this assignment. 
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-public">Public:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-public"
+                    data-bind="checked: assignment.public">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If not public, users outside of the course will not be able to see the assignment in course listings.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-hidden">Hidden:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-hidden"
+                    data-bind="checked: assignment.hidden">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If hidden, students will not be able to see their grade while working on the assignment.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-reviewed">Reviewed:</label>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="blockpy-settings-reviewed"
+                    data-bind="checked: assignment.reviewed">
+                </div>  
+            </div>            
+            <div class="col-sm-9">
+                <small class="form-text text-muted">
+                    If reviewed, the assignment need to be commented upon and regraded by the staff after submission.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-points" class="col-sm-2 col-form-label text-right">Points:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control" id="blockpy-settings-points"
+                data-bind="value: assignment.points">
+                <small class="form-text text-muted">
+                    The number of points this assignment is worth; defaults to 1 point. 
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <div class="col-sm-2 text-right">
+                <label class="form-check-label" for="blockpy-settings-reviewed">Starting View:</label>
+            </div>
+            <div class="col-sm-3">
+                <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                    ${makeStartViewTab("Blocks", "th-large", DisplayModes.BLOCK)}
+                    ${makeStartViewTab("Split", "columns", DisplayModes.SPLIT)}
+                    ${makeStartViewTab("Text", "align-left", DisplayModes.TEXT)}
+                 </div>
+            </div>            
+            <div class="col-sm-7">
+                <small class="form-text text-muted">
+                    ${getDocumentation("startView")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-ip-ranges" class="col-sm-2 col-form-label text-right">IP Ranges:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-ip-ranges"
+                data-bind="value: assignment.ipRanges">
+                <small class="form-text text-muted">
+                    Provide a comma-separated list of IP Addresses that will be explicitly allowed. If blank,
+                    then all addresses are allowed. If an address starts with <code>^</code> then it it is explicitly
+                    blacklisted, but that can be overridden in turn with a <code>!</code>. Addresses can also
+                    include a bit mask to allow a range of addresses.
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-passcode" class="col-sm-2 col-form-label text-right">Passcode:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-passcode"
+                data-bind="value: assignment.settings.passcode">
+                <small class="form-text text-muted">
+                    ${getDocumentation("passcode")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-datasets" class="col-sm-2 col-form-label text-right">Preloaded Datasets:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-datasets"
+                data-bind="value: assignment.settings.datasets">
+                <small class="form-text text-muted">
+                    ${getDocumentation("datasets")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-preload-files" class="col-sm-2 col-form-label text-right">Preloaded Files:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-preload-files"
+                data-bind="value: assignment.settings.preloadFiles">
+                <small class="form-text text-muted">
+                    ${getDocumentation("preloadFiles")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-toolbox" class="col-sm-2 col-form-label text-right">Block Toolbox:</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="blockpy-settings-toolbox"
+                       data-bind="value: assignment.settings.toolbox">
+                   <option value="normal">Normal Toolbox</option>
+                   <option value="ct">CT@VT Toolbox</option>
+                   <option value="ct2">CT@VT Toolbox V2</option>
+                   <option value="minimal">Minimal Set</option>
+                   <option value="full">All Blocks</option>
+                   <option value="custom">Custom</option>
+                </select>
+                <small class="form-text text-muted">
+                    ${getDocumentation("toolbox")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-type" class="col-sm-2 col-form-label text-right">Problem Type:</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="blockpy-settings-type"
+                       data-bind="value: assignment.type">
+                   <option value="blockpy">BlockPy</option>
+                   <option value="maze">Maze</option>
+                   <option value="quiz">Quiz Question</option>
+                   <option value="reading">Reading</option>
+                </select>
+                <small class="form-text text-muted">
+                    ${getDocumentation("type")}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="blockpy-settings-part-id" class="col-sm-2 col-form-label text-right">Part ID:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="blockpy-settings-part-id"
+                data-bind="value: configuration.partId">
+                <small class="form-text text-muted">
+                    ${getDocumentation("partId")}
+                </small>
+            </div>
+        </div>
+        
+        ${ASSIGNMENT_SETTINGS_BOOLEAN_COMPONENTS_HTML}
+    </form>
+    
+    </div>
+`;
+
+export function saveAssignmentSettings(model: any): string {
+    let settings = {};
+    ASSIGNMENT_SETTINGS.forEach(setting => {
+        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2];
+        let value = model.assignment.settings[clientName]();
+        // Only store this setting if its different from the default
+        if (value !== defaultValue) {
+            settings[serverName] = value;
+        }
+    });
+    return JSON.stringify(settings);
+}
+
+export function loadAssignmentSettings(model: any, settings: any): void {
+    if (settings) {
+        settings = JSON.parse(settings);
+        ASSIGNMENT_SETTINGS.forEach(setting => {
+            let clientName = setting[0], serverName = setting[1];
+            if (serverName in settings) {
+                model.assignment.settings[clientName](settings[serverName]);
+            } else {
+                model.assignment.settings[clientName](setting[2]);
+            }
+        });
+
+        if (settings.start_view) {
+            model.display.pythonMode(settings.start_view);
+        }
+    }
+}
+
+export function makeAssignmentSettingsModel(configuration: any): Record<string, any> {
+    let settings = {};
+    ASSIGNMENT_SETTINGS.forEach(setting => {
+        let clientName = setting[0], serverName = setting[1], defaultValue = setting[2],
+            fieldType = setting[3];
+        if (configuration["assignment.settings."+serverName] === undefined) {
+            settings[clientName] = ko.observable(defaultValue);
+        } else {
+            let configValue = configuration["assignment.settings."+serverName];
+            if (fieldType === "bool") {
+                configValue = configValue.toLowerCase() === "true";
+            }
+            settings[clientName] = ko.observable(configValue);
+        }
+    });
+
+    return settings;
+}
+
+class AssignmentSettingsView extends AbstractEditor {
+    constructor(main, tag) {
+        super(main, tag);
+        this.dirty = false;
+    }
+
+    enter(newFilename, oldEditor) {
+        super.enter(newFilename, oldEditor);
+        this.dirty = false;
+        //TODO: this.updateEditor(this.file.handle());
+        // Subscribe to the relevant File
+        // this.currentSubscription = this.file.handle.subscribe(this.updateEditor.bind(this));
+        // Notify relevant file of changes to BM
+        this.currentListener = this.updateHandle.bind(this);
+
+        //TODO: this.codeMirror.on("change", this.currentListener);
+    }
+
+    updateEditor(newContents) {
+        this.dirty = !this.dirty;
+        if (this.dirty) {
+            this.dirty = true;
+            // TODO: Do update
+
+            this.dirty = false;
+        }
+    }
+
+    updateHandle(event) {
+        this.dirty = !this.dirty;
+        if (this.dirty) {
+            this.dirty = true;
+            //this.file.handle(this.codeMirror.value());
+            // TODO: Update
+            this.dirty = false;
+        }
+    }
+
+    exit(newFilename, oldEditor, newEditor) {
+        // Remove subscriber
+        //this.currentSubscription.dispose();
+        // TODO: update
+        //this.codeMirror.off("change", this.currentListener);
+        super.exit(newFilename, oldEditor);
+    }
+}
+
+export const AssignmentSettings = {
+    name: "Assignment Settings",
+    extensions: ["!assignment_settings.blockpy"],
+    constructor: AssignmentSettingsView,
+    template: ASSIGNMENT_SETTINGS_EDITOR_HTML
+};
